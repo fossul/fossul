@@ -16,7 +16,7 @@ RUN go get -u github.com/gorilla/mux
 
 RUN mkdir /backups
 
-#COPY . /app
+COPY . /app
 
 RUN cd /app/engine/storage && go build -o /app/storage main.go logger.go routes.go handlers.go structs.go
 
