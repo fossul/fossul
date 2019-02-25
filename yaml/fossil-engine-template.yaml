@@ -82,6 +82,7 @@ objects:
         type: Git
     strategy:
       dockerStrategy:
+        dockerfilePath: engine/workflow/Dockerfile
         from:
           kind: ImageStreamTag
           name: fedora:latest
@@ -121,6 +122,7 @@ objects:
         type: Git
     strategy:
       dockerStrategy:
+        dockerfilePath: engine/app/Dockerfile
         from:
           kind: ImageStreamTag
           name: fedora:latest
@@ -160,6 +162,7 @@ objects:
         type: Git
     strategy:
       dockerStrategy:
+        dockerfilePath: engine/storage/Dockerfile
         from:
           kind: ImageStreamTag
           name: fedora:latest
@@ -478,10 +481,18 @@ parameters:
     description: Context Dir for storage
     value: engine/storage
     required: true             
-  - name: SOURCE_REPOSITORY_REF
+  - name: SOURCE_REPOSITORY_REF_WORKFLOW
     displayName: Source Repository Reference Tag
     description: The Branch tag to use
     value: master
+  - name: SOURCE_REPOSITORY_REF_APP
+    displayName: Source Repository Reference Tag
+    description: The Branch tag to use
+    value: master    
+  - name: SOURCE_REPOSITORY_REF_STORAGE
+    displayName: Source Repository Reference Tag
+    description: The Branch tag to use
+    value: master    
   - name: STORAGE_CAPACITY
     description: Storage needed for ML Models
     value: 10Gi

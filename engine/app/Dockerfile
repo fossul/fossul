@@ -4,9 +4,7 @@ FROM fedora:latest
 LABEL ios.k8s.display-name="fossil-app" \
     maintainer="Keith Tenzer <ktenzer@redhat.com>"
 
-RUN dnf install golang
-
-RUN go build main.go logger.go routes.go handlers.go struct.go -o app
+RUN dnf install -y golang
 
 RUN mkdir /app
 
@@ -14,6 +12,7 @@ WORKDIR /app
 
 COPY . /app
 
+RUN go build main.go logger.go routes.go handlers.go struct.go -o app
 
 RUN chown -R 1001:0 /app && \
     chmod -R ug+rwX /app
