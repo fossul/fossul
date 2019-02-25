@@ -31,4 +31,4 @@ RUN echo "1.0" > /etc/imageversion
 
 USER 1001
 
-CMD /bin/bash /app/storage
+CMD /app/storage
