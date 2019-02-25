@@ -453,12 +453,12 @@ parameters:
     description: The URL of the repository with your application source code
     value: https://github.com/ktenzer/fossil.git
     required: true
-    - name: SOURCE_REPOSITORY_URL_app
+  - name: SOURCE_REPOSITORY_URL_APP
     displayName: Source Repository URL
     description: The URL of the repository with your application source code
     value: https://github.com/ktenzer/fossil.git
     required: true  
-  - name: SOURCE_REPOSITORY_URL_storage
+  - name: SOURCE_REPOSITORY_URL_STORAGE
     displayName: Source Repository URL
     description: The URL of the repository with your application source code
     value: https://github.com/ktenzer/fossil.git
