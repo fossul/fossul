@@ -4,9 +4,7 @@ FROM fedora:latest
 LABEL ios.k8s.display-name="fossil-storage" \
     maintainer="Keith Tenzer <ktenzer@redhat.com>"
 
-RUN dnf install golang
-
-RUN go build main.go logger.go routes.go handlers.go struct.go -o storage
+RUN dnf install -y golang
 
 RUN mkdir /backups
 
@@ -16,6 +14,7 @@ WORKDIR /app
 
 COPY . /app
 
+RUN go build main.go logger.go routes.go handlers.go struct.go -o storage
 
 RUN chown -R 1001:0 /app && \
     chown -R 1001:0 /backups && \
