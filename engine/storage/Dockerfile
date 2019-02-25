@@ -6,17 +6,19 @@ LABEL ios.k8s.display-name="fossil-storage" \
 
 RUN dnf install -y golang
 
-RUN go get -u github.com/gorilla/mux
-
-RUN mkdir /backups
-
 RUN mkdir /app
 
 WORKDIR /app
 
+ENV GOPATH=/app
+
+RUN go get -u github.com/gorilla/mux
+
+RUN mkdir /backups
+
 COPY . /app
 
-RUN cd /app/engine/storage && go build -o /app/storage main.go logger.go routes.go handlers.go structs.go
+RUN go build -o /app/storage main.go logger.go routes.go handlers.go structs.go
 
 RUN chown -R 1001:0 /app && \
     chown -R 1001:0 /backups && \

@@ -6,15 +6,17 @@ LABEL ios.k8s.display-name="fossil-app" \
 
 RUN dnf install -y golang
 
-RUN go get -u github.com/gorilla/mux
-
 RUN mkdir /app
 
 WORKDIR /app
 
+ENV GOPATH=/app
+
+RUN go get -u github.com/gorilla/mux
+
 COPY . /app
 
-RUN cd /app/engine/app && go build -o /app/app main.go logger.go routes.go handlers.go structs.go
+RUN go build -o /app/app main.go logger.go routes.go handlers.go structs.go
 
 RUN chown -R 1001:0 /app && \
     chmod -R ug+rwX /app &&
