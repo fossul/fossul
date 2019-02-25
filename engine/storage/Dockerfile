@@ -20,7 +20,8 @@ RUN cd /app/engine/storage && go build -o /app/storage main.go logger.go routes.
 
 RUN chown -R 1001:0 /app && \
     chown -R 1001:0 /backups && \
-    chmod -R ug+rwX /app
+    chmod -R ug+rwX /app && \
+    chmod 755 /app/storage
 
 RUN chmod -R 777 /tmp
 
