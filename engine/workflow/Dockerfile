@@ -12,7 +12,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN go build main.go logger.go routes.go handlers.go struct.go -o workflow
+RUN cd /app/engine/workflow && go build main.go logger.go routes.go handlers.go struct.go -o workflow
 
 RUN chown -R 1001:0 /app && \
     chmod -R ug+rwX /app

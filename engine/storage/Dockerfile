@@ -14,7 +14,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN go build main.go logger.go routes.go handlers.go struct.go -o storage
+RUN cd /app/engine/storage && go build main.go logger.go routes.go handlers.go struct.go -o storage
 
 RUN chown -R 1001:0 /app && \
     chown -R 1001:0 /backups && \

@@ -12,7 +12,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN go build main.go logger.go routes.go handlers.go struct.go -o app
+RUN cd /app/engine/app && go build main.go logger.go routes.go handlers.go struct.go -o app
 
 RUN chown -R 1001:0 /app && \
     chmod -R ug+rwX /app
