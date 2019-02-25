@@ -16,7 +16,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN cd /app/engine/storage && go build -o build/storage main.go logger.go routes.go handlers.go structs.go
+RUN cd /app/engine/storage && go build -o /app/storage main.go logger.go routes.go handlers.go structs.go
 
 RUN chown -R 1001:0 /app && \
     chown -R 1001:0 /backups && \
@@ -28,4 +28,4 @@ RUN echo "1.0" > /etc/imageversion
 
 USER 1001
 
-CMD /bin/bash /app/storage
+CMD /bin/bash /app/build/storage
