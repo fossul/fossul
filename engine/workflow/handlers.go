@@ -67,7 +67,7 @@ func CreateBackupWorkflowEndpoint(w http.ResponseWriter, r *http.Request) {
 
 func quiesce () Result {
 
-	req, err := http.NewRequest("GET", "http://localhost:8001/quiesce", nil)
+	req, err := http.NewRequest("GET", "http://fossil-app:8001/quiesce", nil)
 	if err != nil {
 		log.Fatal("NewRequest: ", err)
 	}
@@ -93,7 +93,7 @@ func quiesce () Result {
 
 func createBackup () Result {
 
-	req, err := http.NewRequest("GET", "http://localhost:8002/createBackup", nil)
+	req, err := http.NewRequest("GET", "http://fossil-storage:8002/createBackup", nil)
 	if err != nil {
 		log.Fatal("NewRequest: ", err)
 	}
@@ -119,7 +119,7 @@ func createBackup () Result {
 
 func deleteBackup () Result {
 
-	req, err := http.NewRequest("GET", "http://localhost:8002/deleteBackup", nil)
+	req, err := http.NewRequest("GET", "http://fossil-storage:8002/deleteBackup", nil)
 	if err != nil {
 		log.Fatal("NewRequest: ", err)
 	}
@@ -145,7 +145,7 @@ func deleteBackup () Result {
 
 func unquiesce () Result {
 
-	req, err := http.NewRequest("GET", "http://localhost:8001/unquiesce", nil)
+	req, err := http.NewRequest("GET", "http://fossil-app:8001/unquiesce", nil)
 	if err != nil {
 		log.Fatal("NewRequest: ", err)
 	}
