@@ -6,6 +6,8 @@ LABEL ios.k8s.display-name="fossil-storage" \
 
 RUN dnf install -y golang
 
+RUN go get -u github.com/gorilla/mux
+
 RUN mkdir /backups
 
 RUN mkdir /app

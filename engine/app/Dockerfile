@@ -6,6 +6,8 @@ LABEL ios.k8s.display-name="fossil-app" \
 
 RUN dnf install -y golang
 
+RUN go get -u github.com/gorilla/mux
+
 RUN mkdir /app
 
 WORKDIR /app
