@@ -16,9 +16,9 @@ RUN go get -u github.com/gorilla/mux
 
 RUN mkdir /backups
 
-COPY . /app
+#COPY . /app
 
-RUN go build -o /app/storage main.go logger.go routes.go handlers.go structs.go
+RUN cd /app/engine/storage && go build -o /app/storage main.go logger.go routes.go handlers.go structs.go
 
 RUN chown -R 1001:0 /app && \
     chown -R 1001:0 /backups && \

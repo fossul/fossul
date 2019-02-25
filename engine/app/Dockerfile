@@ -14,9 +14,9 @@ ENV GOPATH=/app
 
 RUN go get -u github.com/gorilla/mux
 
-COPY . /app
+#COPY . /app
 
-RUN go build -o /app/app main.go logger.go routes.go handlers.go structs.go
+RUN cd /app/engine/app && go build -o /app/app main.go logger.go routes.go handlers.go structs.go
 
 RUN chown -R 1001:0 /app && \
     chmod -R ug+rwX /app &&
