@@ -82,7 +82,7 @@ objects:
         type: Git
     strategy:
       dockerStrategy:
-        dockerfilePath: engine/workflow/Dockerfile
+        dockerfilePath: src/engine/workflow/Dockerfile
         from:
           kind: ImageStreamTag
           name: fedora:latest
@@ -122,7 +122,7 @@ objects:
         type: Git
     strategy:
       dockerStrategy:
-        dockerfilePath: engine/app/Dockerfile
+        dockerfilePath: src/engine/app/Dockerfile
         from:
           kind: ImageStreamTag
           name: fedora:latest
@@ -162,7 +162,7 @@ objects:
         type: Git
     strategy:
       dockerStrategy:
-        dockerfilePath: engine/storage/Dockerfile
+        dockerfilePath: src/engine/storage/Dockerfile
         from:
           kind: ImageStreamTag
           name: fedora:latest

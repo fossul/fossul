@@ -11,6 +11,7 @@ RUN mkdir /app
 WORKDIR /app
 
 ENV GOPATH=/app
+ENV GOBIN=/app
 
 RUN go get -u github.com/gorilla/mux
 
@@ -18,7 +19,7 @@ RUN mkdir /backups
 
 COPY . /app
 
-RUN cd /app/engine/storage && go build -o /app/storage main.go logger.go routes.go handlers.go structs.go
+RUN cd /app && go build engine/util && go install engine/storage
 
 RUN chown -R 1001:0 /app && \
     chown -R 1001:0 /backups && \

@@ -11,12 +11,13 @@ RUN mkdir /app
 WORKDIR /app
 
 ENV GOPATH=/app
+ENV GOBIN=/app
 
 RUN go get -u github.com/gorilla/mux
 
 COPY . /app
 
-RUN cd /app/engine/workflow && go build -o /app/workflow main.go logger.go routes.go handlers.go structs.go
+RUN cd /app && go build engine/util && go install engine/workflow
 
 RUN chown -R 1001:0 /app && \
     chmod -R ug+rwX /app && \

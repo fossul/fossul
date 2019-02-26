@@ -1,60 +1,60 @@
 package main
 
 import (
-    "encoding/json"
-//    "io/ioutil"
-	"net/http"
+	"encoding/json"
+	//    "io/ioutil"
+	"engine/util"
 	"log"
-//	"fmt"
+	"net/http"
+	//	"fmt"
 )
 
 func GetStatusEndpoint(w http.ResponseWriter, r *http.Request) {
-	var status = Status{Msg: "OK"}
+	var status = util.Status{Msg: "OK"}
 	json.NewEncoder(w).Encode(status)
 }
 
 func CreateBackupWorkflowEndpoint(w http.ResponseWriter, r *http.Request) {
 
+	/*  OLD CODE
+	    req, err := http.NewRequest("GET", "http://localhost:8001/quiesce", nil)
+		if err != nil {
+			log.Fatal("NewRequest: ", err)
+			return
+		}
 
-/*  OLD CODE
-    req, err := http.NewRequest("GET", "http://localhost:8001/quiesce", nil)
-	if err != nil {
-		log.Fatal("NewRequest: ", err)
-		return
-	}
+		client := &http.Client{}
 
-	client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Fatal("Do: ", err)
+			return
+		}
 
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal("Do: ", err)
-		return
-	}
+		defer resp.Body.Close()
 
-	defer resp.Body.Close()
+		var quiesce Result
 
-	var quiesce Result
+		if err := json.NewDecoder(resp.Body).Decode(&quiesce); err != nil {
+			log.Println(err)
+		}
 
-	if err := json.NewDecoder(resp.Body).Decode(&quiesce); err != nil {
-		log.Println(err)
-	}
-
-//	response, err := http.Get("http://localhost:8001/quiesce")
-//	data, _ := ioutil.ReadAll(response.Body)
-*/
-	var quiesceResult Result
+	//	response, err := http.Get("http://localhost:8001/quiesce")
+	//	data, _ := ioutil.ReadAll(response.Body)
+	*/
+	var quiesceResult util.Result
 	quiesceResult = quiesce()
 
-	var createBackupResult Result
+	var createBackupResult util.Result
 	createBackupResult = createBackup()
 
-	var unquiesceResult Result
+	var unquiesceResult util.Result
 	unquiesceResult = unquiesce()
 
-	var deleteBackupResult Result
+	var deleteBackupResult util.Result
 	deleteBackupResult = deleteBackup()
 
-	var results []Result
+	var results []util.Result
 
 	results = append(results, quiesceResult)
 	results = append(results, createBackupResult)
@@ -65,7 +65,7 @@ func CreateBackupWorkflowEndpoint(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(results)
 }
 
-func quiesce () Result {
+func quiesce() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-app:8001/quiesce", nil)
 	if err != nil {
@@ -81,7 +81,7 @@ func quiesce () Result {
 
 	defer resp.Body.Close()
 
-	var result Result
+	var result util.Result
 
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		log.Println(err)
@@ -91,7 +91,7 @@ func quiesce () Result {
 
 }
 
-func createBackup () Result {
+func createBackup() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-storage:8002/createBackup", nil)
 	if err != nil {
@@ -107,7 +107,7 @@ func createBackup () Result {
 
 	defer resp.Body.Close()
 
-	var result Result
+	var result util.Result
 
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		log.Println(err)
@@ -117,7 +117,7 @@ func createBackup () Result {
 
 }
 
-func deleteBackup () Result {
+func deleteBackup() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-storage:8002/deleteBackup", nil)
 	if err != nil {
@@ -133,7 +133,7 @@ func deleteBackup () Result {
 
 	defer resp.Body.Close()
 
-	var result Result
+	var result util.Result
 
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		log.Println(err)
@@ -143,7 +143,7 @@ func deleteBackup () Result {
 
 }
 
-func unquiesce () Result {
+func unquiesce() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-app:8001/unquiesce", nil)
 	if err != nil {
@@ -159,7 +159,7 @@ func unquiesce () Result {
 
 	defer resp.Body.Close()
 
-	var result Result
+	var result util.Result
 
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		log.Println(err)
@@ -168,4 +168,3 @@ func unquiesce () Result {
 	return result
 
 }
-
