@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"log"
 	"os/exec"
+        "github.com/fossil/engine/util"
+
 )
 
-func executeCommand(args ...string) (result Result) {
+func executeCommand(args ...string) (result util.Result) {
 
 	baseCmd := args[0]
 	cmdArgs := args[1:]

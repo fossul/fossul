@@ -1,4 +1,4 @@
-package main
+package util
 
 type Result struct {
 	Code    int      `json:"code"`
