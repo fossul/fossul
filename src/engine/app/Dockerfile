@@ -6,7 +6,7 @@ LABEL ios.k8s.display-name="fossil-app" \
 
 RUN dnf install -y golang
 
-RUN mkdir -p /app/src
+RUN mkdir /app
 
 WORKDIR /app
 
