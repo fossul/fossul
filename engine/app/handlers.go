@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"engine/util"
 	"net/http"
-	"github.com/fossil/engine/util"
 )
 
 func GetStatusEndpoint(w http.ResponseWriter, r *http.Request) {

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"log"
 	"os/exec"
-        "github.com/fossil/engine/util"
+    "engine/util"
 
 )
 
