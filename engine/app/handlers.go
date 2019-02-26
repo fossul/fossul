@@ -4,13 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 )
+
 func GetStatusEndpoint(w http.ResponseWriter, r *http.Request) {
 	var status = Status{Msg: "OK"}
 	json.NewEncoder(w).Encode(status)
 }
 
 func CreateQuiesceEndpoint(w http.ResponseWriter, r *http.Request) {
-	var result = Result{Code: 0, Stdout: "quiesce completed successfully", Stderr: "executed command xyz successfully"}
+	//var result = Result{Code: 0, Stdout: "quiesce completed successfully", Stderr: "executed command xyz successfully"}
+	var result Result
+	result = executeCommand("echo", "hello", "world")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
