@@ -14,7 +14,7 @@ func GetStatusEndpoint(w http.ResponseWriter, r *http.Request) {
 func CreateQuiesceEndpoint(w http.ResponseWriter, r *http.Request) {
 	//var result = Result{Code: 0, Stdout: "quiesce completed successfully", Stderr: "executed command xyz successfully"}
 	var result util.Result
-	result = executeCommand("echo", "hello", "world")
+	result = util.ExecuteCommand("echo", "hello", "world")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }

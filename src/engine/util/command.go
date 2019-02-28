@@ -1,14 +1,12 @@
-package main
+package util
 
 import (
 	"bytes"
 	"log"
 	"os/exec"
-    "engine/util"
-
 )
 
-func executeCommand(args ...string) (result util.Result) {
+func ExecuteCommand(args ...string) (result Result) {
 
 	baseCmd := args[0]
 	cmdArgs := args[1:]
