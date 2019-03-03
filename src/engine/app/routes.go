@@ -42,7 +42,7 @@ var routes = Routes{
     },
     Route{
         "CreateQuiesceEndpoint",
-        "GET",
+        "POST",
         "/quiesce",
         CreateQuiesceEndpoint,
     },
