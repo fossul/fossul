@@ -1,2 +1,2 @@
 #/bin/sh
-curl -f -k -H 'Content-Type: application/json' -XPOST -d '{"profile": "myprofile","appPlugin": "myapp", "storagePlugin": "mystorage", "backupRetentionDays": 10}' http://localhost:8001/quiesce
+curl -f -k -H 'Content-Type: application/json' -XPOST -d '{"profile": "myprofile","appPlugin": "myapp", "storagePlugin": "mystorage", "backupRetentions": [{"policy": "daily", "retentionDays": 5},{"policy": "weekly", "retentionDays": 10}]}' http://localhost:8001/quiesce
