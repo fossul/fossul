@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"engine/util"
 	"net/http"
-	"log"
 )
 
 func GetStatusEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -13,20 +12,6 @@ func GetStatusEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateQuiesceEndpoint(w http.ResponseWriter, r *http.Request) {
-
-	var config util.Config
-	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
-		log.Println(err)
-	}
-	defer r.Body.Close()
- 
-	res,err := json.Marshal(&config)
-	if err != nil {
-        log.Println(err)
-    }
-	
-	
-	log.Println("test", string(res), config.BackupRetentions)
 
 	var result util.Result
 	result = util.ExecuteCommand("echo", "hello", "world")

@@ -6,6 +6,7 @@ import (
 	"engine/util"
 	"net/http"
 	//	"fmt"
+	"log"
 )
 
 func GetStatusEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -13,34 +14,22 @@ func GetStatusEndpoint(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(status)
 }
 
-func CreateBackupWorkflowEndpoint(w http.ResponseWriter, r *http.Request) {
+func StartBackupWorkflowEndpoint(w http.ResponseWriter, r *http.Request) {
 
-	/*  OLD CODE
-	    req, err := http.NewRequest("GET", "http://localhost:8001/quiesce", nil)
-		if err != nil {
-			log.Fatal("NewRequest: ", err)
-			return
-		}
+	var config util.Config
+	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
+		log.Println(err)
+	}
+	defer r.Body.Close()
+ 
+	res,err := json.Marshal(&config)
+	if err != nil {
+        log.Println(err)
+    }
+	
+	
+	log.Println("test", string(res), config.BackupRetentions)
 
-		client := &http.Client{}
-
-		resp, err := client.Do(req)
-		if err != nil {
-			log.Fatal("Do: ", err)
-			return
-		}
-
-		defer resp.Body.Close()
-
-		var quiesce Result
-
-		if err := json.NewDecoder(resp.Body).Decode(&quiesce); err != nil {
-			log.Println(err)
-		}
-
-	//	response, err := http.Get("http://localhost:8001/quiesce")
-	//	data, _ := ioutil.ReadAll(response.Body)
-	*/
 	var quiesceResult util.Result
 	quiesceResult = quiesce()
 

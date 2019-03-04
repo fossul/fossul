@@ -41,9 +41,9 @@ var routes = Routes{
         GetStatusEndpoint,
     },
     Route{
-        "CreateBackupWorkflowEndpoint",
-        "GET",
-        "/createBackupWorkflow",
-        CreateBackupWorkflowEndpoint,
+        "StartBackupWorkflowEndpoint",
+        "POST",
+        "/startBackupWorkflow",
+        StartBackupWorkflowEndpoint,
     },
 }
