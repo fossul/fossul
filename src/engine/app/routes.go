@@ -35,22 +35,57 @@ func NewRouter() *mux.Router {
  
 var routes = Routes{
     Route{
-        "GetStatusEndpoint",
+        "GetStatus",
         "GET",
         "/status",
-        GetStatusEndpoint,
+        GetStatus,
     },
     Route{
-        "CreateQuiesceEndpoint",
-        "POST",
+        "PreQuiesceCmd",
+        "GET",
+        "/preQuiesceCmd",
+        PreQuiesceCmd,
+    },
+    Route{
+        "QuiesceCmd",
+        "GET",
+        "/quiesceCmd",
+        QuiesceCmd,
+    },
+    Route{
+        "Quiesce",
+        "GET",
         "/quiesce",
-        CreateQuiesceEndpoint,
+        Quiesce,
     },
-
     Route{
-        "CreateUnquiesceEndpoint",
+        "PostQuiesceCmd",
+        "GET",
+        "/postQuiesceCmd",
+        PostQuiesceCmd,
+    },
+    Route{
+        "PreUnquiesceCmd",
+        "GET",
+        "/preUnquiesceCmd",
+        PreUnquiesceCmd,
+    },
+    Route{
+        "UnquiesceCmd",
+        "GET",
+        "/unquiesceCmd",
+        UnquiesceCmd,
+    },
+    Route{
+        "Unquiesce",
         "GET",
         "/unquiesce",
-        CreateUnquiesceEndpoint,
+        Unquiesce,
     },
+    Route{
+        "PostUnquiesceCmd",
+        "GET",
+        "/postUnquiesceCmd",
+        PostUnquiesceCmd,
+    },    
 }

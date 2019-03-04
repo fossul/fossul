@@ -35,15 +35,27 @@ func NewRouter() *mux.Router {
 
 var routes = Routes{
     Route{
-        "GetStatusEndpoint",
+        "GetStatus",
         "GET",
         "/status",
-        GetStatusEndpoint,
+        GetStatus,
     },
     Route{
-        "StartBackupWorkflowEndpoint",
+        "StartBackupWorkflow",
         "POST",
         "/startBackupWorkflow",
-        StartBackupWorkflowEndpoint,
-    },
+        StartBackupWorkflow,
+    },   
+    Route{
+        "SendTrapSuccessCmd",
+        "GET",
+        "/sendTrapSuccessCmd",
+        SendTrapSuccessCmd,
+    },   
+    Route{
+        "SendTrapErrorCmd",
+        "GET",
+        "/sendTrapErrorCmd",
+        SendTrapErrorCmd,
+    },    
 }

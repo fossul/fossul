@@ -1,7 +1,7 @@
 package util
 
 type Result struct {
-	Code   int    `json:"code"`
-	Stdout string `json:"stdout"`
-	Stderr string `json:"stderr"`
+	Code   int    `json:"code,omitempty"`
+	Stdout string `json:"stdout,omitempty"`
+	Stderr string `json:"stderr,omitempty"`
 }

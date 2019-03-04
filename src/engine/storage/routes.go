@@ -35,24 +35,24 @@ func NewRouter() *mux.Router {
  
 var routes = Routes{
     Route{
-        "GetStatusEndpoint",
+        "GetStatus",
         "GET",
         "/status",
-        GetStatusEndpoint,
+        GetStatus,
     },
 
     Route{
-        "CreateBackupEndpoint",
+        "CreateBackup",
         "GET",
         "/createBackup",
-        CreateBackupEndpoint,
+        CreateBackup,
     },
 
     Route{
-        "DeleteBackupEndpoint",
+        "DeleteBackup",
         "GET",
         "/deleteBackup",
-        DeleteBackupEndpoint,
+        DeleteBackup,
     },
 
 }
