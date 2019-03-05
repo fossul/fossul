@@ -12,13 +12,13 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateBackup(w http.ResponseWriter, r *http.Request) {
-	var result = util.Result{Code: 0, Stdout: "backup create completed successfully", Stderr: "executed command xyz successfully"}
+	var result = util.SetResult(0, "backup create completed successfully", "executed command xyz successfully")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func DeleteBackup(w http.ResponseWriter, r *http.Request) {
-	var result = util.Result{Code: 0, Stdout: "backup delete completed successfully", Stderr: "executed command xyz successfully"}
+	var result = util.SetResult(0, "backup delete completed successfully", "executed command xyz successfully")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }

@@ -14,14 +14,14 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 
 func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.Result{Code: 0, Stdout: "pre quiesce cmd completed successfully", Stderr: "executed command xyz successfully"}
+	var result = util.SetResult(0, "pre quiesce cmd completed successfully", "executed command xyz successfully")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.Result{Code: 0, Stdout: "quiesce cmd completed successfully", Stderr: "executed command xyz successfully"}
+	var result = util.SetResult(0, "quiesce cmd completed successfully", "executed command xyz successfully")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
@@ -36,34 +36,35 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 
 func PostQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.Result{Code: 0, Stdout: "post quiesce cmd completed successfully", Stderr: "executed command xyz successfully"}
+	var result = util.SetResult(0, "post quiesce cmd completed successfully", "executed command xyz successfully")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.Result{Code: 0, Stdout: "unquiesce cmd completed successfully", Stderr: "executed command xyz successfully"}
+	var result = util.SetResult(0, "unquiesce cmd completed successfully", "executed command xyz successfully")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.Result{Code: 0, Stdout: "pre unquiesce cmd completed successfully", Stderr: "executed command xyz successfully"}
+	var result = util.SetResult(0, "pre unquiesce cmd completed successfully", "executed command xyz successfully")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func Unquiesce(w http.ResponseWriter, r *http.Request) {
-	var result = util.Result{Code: 0, Stdout: "unquiesce completed successfully", Stderr: "executed command xyz successfully"}
+
+	var result = util.SetResult(0, "unquiesce completed successfully", "executed command xyz successfully")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.Result{Code: 0, Stdout: "post unquiesce cmd completed successfully", Stderr: "executed command xyz successfully"}
+	var result = util.SetResult(0, "post znquiesce cmd completed successfully", "executed command xyz successfully")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }

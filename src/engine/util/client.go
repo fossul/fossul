@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"bytes"
 )
 
 func GetWorkflowServiceStatus() Status {
@@ -81,5 +82,35 @@ func GetStorageServiceStatus() Status {
 	}
 
 	return status
+
+}
+
+func StartBackupWorkflow(config Config) (result []Result) {
+
+
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/startBackupWorkflow", b)
+	req.Header.Add("Content-Type", "application/json")
+
+	if err != nil {
+		log.Println("NewRequest: ", err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Do: ", err)
+	}
+
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		log.Println(err)
+	}
+
+	return result
 
 }

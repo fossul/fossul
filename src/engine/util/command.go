@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"log"
 	"os/exec"
+	"strings"
 )
 
 func ExecuteCommand(args ...string) (result Result) {
@@ -27,8 +28,11 @@ func ExecuteCommand(args ...string) (result Result) {
 	}
 
 	outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
-	result.Stderr = errStr
-	result.Stdout = outStr
+
+	outStr = strings.TrimSuffix(outStr, "\n")
+	errStr = strings.TrimSuffix(errStr, "\n")
+
+	result = SetResult(0, outStr, errStr)
 
 	return result
 }

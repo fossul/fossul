@@ -20,6 +20,15 @@ func main() {
 	
 	if *optAction == "backup" {
 
+		var config util.Config
+		var result []util.Result
+		result = util.StartBackupWorkflow(config)
+
+		for index, item := range result {
+			fmt.Println(index, item.Time, item.Code, item.Stdout, item.Stderr)
+		}	
+
+
 	} else if *optAction == "list" {
 
 	} else if *optAction == "status" {

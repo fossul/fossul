@@ -141,14 +141,14 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.Result{Code: 0, Stdout: "send trap success cmd completed successfully", Stderr: "executed command xyz successfully"}
+	var result = util.SetResult(0, "send trap success cmd completed successfully", "executed command xyz successfully")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.Result{Code: 0, Stdout: "send trap error cmd completed successfully", Stderr: "executed command xyz successfully"}
+	var result = util.SetResult(0, "send trap error cmd completed successfully", "executed command xyz successfully")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
