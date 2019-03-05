@@ -7,8 +7,8 @@ import (
 )
 
 type Config struct {
-	Profile string `json:"profile"`
 	BackupName string `json:"backupName"`
+	PluginDir string `json:"pluginDir"`
 	AppPlugin string `json:"appPlugin"`
 	StoragePlugin string `json:"storagePlugin"`
 	BackupRetentions []BackupRetention `json:"backupRetentions"`
