@@ -26,7 +26,7 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
     }
 	
 	
-	log.Println("DEBUG", string(res), config.BackupRetentions)
+	log.Println("DEBUG", string(res))
 
 	var sendTrapErrorCmdResult util.Result
 

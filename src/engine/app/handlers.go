@@ -64,7 +64,7 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 
 func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.SetResult(0, "post znquiesce cmd completed successfully", "executed command xyz successfully")
+	var result = util.SetResult(0, "post unquiesce cmd completed successfully", "executed command xyz successfully")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
