@@ -27,15 +27,15 @@ func main() {
 
 		var workflowStatus util.Status
 		workflowStatus = util.GetWorkflowServiceStatus()
-		fmt.Println("Workflow Service:", util.Status(workflowStatus))
+		fmt.Println("Workflow Service:", workflowStatus)
 
 		var appStatus util.Status
 		appStatus = util.GetAppServiceStatus()
-		fmt.Println("App Service:", util.Status(appStatus))
+		fmt.Println("App Service:", appStatus)
 
 		var storageStatus util.Status
 		storageStatus = util.GetStorageServiceStatus()
-		fmt.Println("Storage Service:", util.Status(storageStatus))
+		fmt.Println("Storage Service:", storageStatus)
 
 	}
 }

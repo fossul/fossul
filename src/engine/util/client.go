@@ -8,7 +8,7 @@ import (
 
 func GetWorkflowServiceStatus() Status {
 
-	req, err := http.NewRequest("GET", "http://fossil-app:8000/status", nil)
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/status", nil)
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -60,7 +60,7 @@ func GetAppServiceStatus() Status {
 
 func GetStorageServiceStatus() Status {
 
-	req, err := http.NewRequest("GET", "http://fossil-app:8002/status", nil)
+	req, err := http.NewRequest("GET", "http://fossil-storage:8002/status", nil)
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
