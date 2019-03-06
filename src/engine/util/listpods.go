@@ -1,57 +1,76 @@
 package util
 
 import (
+	"flag"
 	"fmt"
-	"net/http"
 	"os"
+	"path/filepath"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
-	"k8s.io/client-go/rest"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 func ListPods() {
-	        // Build a rest.Config from configuration injected into the Pod by
-        // Kubernetes. Clients will use the Pod's ServiceAccount principal.
-        restconfig, err := rest.InClusterConfig()
+        var kubeconfig *string
+	if home := homeDir(); home != "" {
+		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+	} else {
+		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	}
+	flag.Parse()
+
+	// use the current context in kubeconfig
+	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// create the clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	/*pods, err := clientset.CoreV1().Pods("").List(metav1.ListOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+	fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
+        */
+
+        namespace := "fossil"
+        pods, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{})
         if err != nil {
                 panic(err)
         }
 
-        // If you need to know the Pod's Namespace, adjust the Pod's spec to pass
-        // the information into an environment variable in advance via the downward
-        // API.
-        namespace := os.Getenv("NAMESPACE")
-        if namespace == "" {
-                panic("NAMESPACE was not set")
+        fmt.Println("Pods in namespace", namespace)
+        for _, pod := range pods.Items {
+                fmt.Println("Pods", pod.Name)
         }
+                
+        // Examples for error handling:
+	// - Use helper functions like e.g. errors.IsNotFound()
+	// - And/or cast to StatusError and use its properties like e.g. ErrStatus.Message
+	pod := "fossil-app-2-zpdgr"
+	_, err = clientset.CoreV1().Pods(namespace).Get(pod, metav1.GetOptions{})
+	if errors.IsNotFound(err) {
+		fmt.Printf("Pod %s in namespace %s not found\n", pod, namespace)
+	} else if statusError, isStatus := err.(*errors.StatusError); isStatus {
+		fmt.Printf("Error getting pod %s in namespace %s: %v\n",
+			pod, namespace, statusError.ErrStatus.Message)
+	} else if err != nil {
+		panic(err.Error())
+	} else {
+		fmt.Printf("Found pod %s in namespace %s\n", pod, namespace)
+	}
+}
 
-        // Create a Kubernetes core/v1 client.
-        coreclient, err := corev1client.NewForConfig(restconfig)
-        if err != nil {
-                panic(err)
-        }
-
-        mux := http.NewServeMux()
-        mux.HandleFunc("/", func(rw http.ResponseWriter, req *http.Request) {
-                rw.Header().Set("Cache-Control", "no-store, must-revalidate")
-                rw.Header().Set("Content-Type", "text/plain")
-
-                // List all Pods in our current Namespace.
-                pods, err := coreclient.Pods(namespace).List(metav1.ListOptions{})
-                if err != nil {
-                        panic(err)
-                }
-
-                fmt.Fprintf(rw, "Pods in namespace %s:\n", namespace)
-                for _, pod := range pods.Items {
-                        fmt.Fprintf(rw, "  %s\n", pod.Name)
-                }
-        })
-
-        // Run an HTTP server on port 8080 which will serve the pod and build list.
-        err = http.ListenAndServe(":8080", mux)
-        if err != nil {
-                panic(err)
-        }
+func homeDir() string {
+	if h := os.Getenv("HOME"); h != "" {
+		return h
+	}
+	return os.Getenv("USERPROFILE") // windows
 }
