@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"engine/util"
 	"net/http"
+	"github.com/gorilla/mux"
 	"log"
 	"os"
 	"io/ioutil"
@@ -18,7 +19,7 @@ func ListPlugins(w http.ResponseWriter, r *http.Request) {
 	var config util.Config = util.GetConfig(w,r)
 
 	var plugins []string
-	fileInfo, err := ioutil.ReadDir(config.PluginDir + "/app")
+	fileInfo, err := ioutil.ReadDir(config.PluginDir)
 	if err != nil {
 		log.Println(err)
 	}
@@ -29,6 +30,20 @@ func ListPlugins(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewDecoder(r.Body).Decode(&plugins)
 	json.NewEncoder(w).Encode(plugins)
+}
+
+func ListPluginCapabilities(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)	
+	var pluginName string = params["plugin"]
+
+	var config util.Config = util.GetConfig(w,r)
+	var plugin string = config.PluginDir + "/" + pluginName
+
+	var result util.Result
+	result = util.ExecuteCommand(plugin, "--action", "list")
+
+	_ = json.NewDecoder(r.Body).Decode(&result)
+	json.NewEncoder(w).Encode(result)
 }
 
 func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {

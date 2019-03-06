@@ -45,7 +45,13 @@ var routes = Routes{
         "POST",
         "/listPlugins",
         ListPlugins,
-    },    
+    }, 
+    Route{
+        "ListPluginCapabilities",
+        "POST",
+        "/listPluginCapabilities/{plugin}",
+        ListPluginCapabilities,
+    },        
     Route{
         "PreQuiesceCmd",
         "GET",

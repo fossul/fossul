@@ -6,14 +6,15 @@ import (
 	"engine/util"
 	"engine/client"
 	"fmt"
-	
+	"strings"
 )
 
 func main() {
 	optProfile := getopt.StringLong("profile",'p',"","Profile name")
 	optConfig := getopt.StringLong("config",'c',"","Config name")
 	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
-    optAction := getopt.StringLong("action",'a',"","backup|backupList|appPluginList|status")
+	optAction := getopt.StringLong("action",'a',"","backup|backupList|pluginList|pluginCapabilities|status")
+	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
     optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -62,12 +63,23 @@ func main() {
 
 	} else if *optAction == "backupList" {
 		
-	} else if *optAction == "appPluginList" {
+	} else if *optAction == "pluginList" {
 		fmt.Println("### List of Application Plugins ###")
-		var plugins []string = client.ListAppPlugins(config)
+		var plugins []string = client.ListPlugins(config)
 		for _, plugin := range plugins {
-			fmt.Println("Plugin:",plugin)
+			fmt.Println(plugin)
 		}
+	} else if *optAction == "pluginCapabilities" {
+
+		var result util.Result
+		var pluginName string = *optPluginName
+		result = client.ListPluginCapabilities(config,pluginName)
+
+		pluginCapabilities := strings.Fields(result.Stdout)
+		fmt.Println("### " + pluginName + " Plugin Capabilities ###")
+		for _, pluginCapability := range pluginCapabilities {
+			fmt.Println(pluginCapability)
+		}	
 	} else if *optAction == "status" {
 		fmt.Println("### Checking status of services ###")
 

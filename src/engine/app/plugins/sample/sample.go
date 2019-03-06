@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	optAction := getopt.StringLong("action",'a',"","quiesce|unquiesce")
+	optAction := getopt.StringLong("action",'a',"","quiesce|unquiesce|list")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -26,6 +26,8 @@ func main() {
 		quiesce()
 	} else if *optAction == "unquiesce" {
 		unquiesce()
+	} else if *optAction == "list" {
+		list()		
 	}
 }	
 
@@ -35,4 +37,8 @@ func quiesce () {
 
 func unquiesce () {
 	fmt.Println("Performing application unquiesce")
+}
+
+func list () {
+	fmt.Println("quiesce unquiesce")
 }

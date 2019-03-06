@@ -72,7 +72,7 @@ func Unquiesce(config util.Config) util.Result {
 
 }
 
-func ListAppPlugins(config util.Config) []string {
+func ListPlugins(config util.Config) []string {
 
 
 	b := new(bytes.Buffer)
@@ -101,5 +101,37 @@ func ListAppPlugins(config util.Config) []string {
 	}
 
 	return plugins
+
+}
+
+func ListPluginCapabilities(config util.Config, plugin string) util.Result {
+
+
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/listPluginCapabilities/" + plugin, b)
+	req.Header.Add("Content-Type", "application/json")
+
+	if err != nil {
+		log.Println("NewRequest: ", err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Do: ", err)
+	}
+
+	defer resp.Body.Close()
+
+	var result util.Result
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		log.Println(err)
+	}
+
+	return result
 
 }
