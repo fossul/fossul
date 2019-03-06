@@ -1,15 +1,22 @@
-package main
+package client
 
 import (
 	"encoding/json"
 	"engine/util"
 	"log"
 	"net/http"
+	"bytes"
 )
 
-func quiesce() util.Result {
+func Quiesce(config util.Config) util.Result {
 
-	req, err := http.NewRequest("GET", "http://fossil-app:8001/quiesce", nil)
+
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/quiesce", b)
+	req.Header.Add("Content-Type", "application/json")
+
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -33,9 +40,15 @@ func quiesce() util.Result {
 
 }
 
-func unquiesce() util.Result {
+func Unquiesce(config util.Config) util.Result {
 
-	req, err := http.NewRequest("GET", "http://fossil-app:8001/unquiesce", nil)
+
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/unquiesce", b)
+	req.Header.Add("Content-Type", "application/json")
+
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}

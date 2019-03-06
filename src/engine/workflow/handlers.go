@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"engine/util"
+	"engine/client"
 	"net/http"
-	"log"
 )
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -14,86 +14,74 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 
 func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
-	var config util.Config
-	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
-		log.Println(err)
-	}
-	defer r.Body.Close()
- 
-	res,err := json.Marshal(&config)
-	if err != nil {
-        log.Println(err)
-    }
-	
-	
-	log.Println("DEBUG", string(res))
+	var config util.Config = util.GetConfig(w,r)
 
 	var sendTrapErrorCmdResult util.Result
 
 	var preQuiesceCmdResult util.Result
-	preQuiesceCmdResult = preQuiesceCmd()
+	preQuiesceCmdResult = client.PreQuiesceCmd()
 	if preQuiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = sendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 	}
 
 	var quiesceCmdResult util.Result
-	quiesceCmdResult = quiesceCmd()
+	quiesceCmdResult = client.QuiesceCmd()
 	if quiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = sendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 	}
 	
 	var quiesceResult util.Result
-	quiesceResult = quiesce()
+	quiesceResult = client.Quiesce(config)
 	if quiesceResult.Code != 0 {
-		sendTrapErrorCmdResult = sendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 	}
 
 	var postQuiesceCmdResult util.Result
-	postQuiesceCmdResult = postQuiesceCmd()
+	postQuiesceCmdResult = client.PostQuiesceCmd()
 	if postQuiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = sendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 	}
 
 	var createBackupResult util.Result
-	createBackupResult = createBackup()
+	createBackupResult = client.CreateBackup()
 	if createBackupResult.Code != 0 {
-		sendTrapErrorCmdResult = sendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 	}
 
 	var preUnquiesceCmdResult util.Result
-	preUnquiesceCmdResult = preUnquiesceCmd()
+	preUnquiesceCmdResult = client.PreUnquiesceCmd()
 	if preUnquiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = sendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 	}
 
 	var unquiesceCmdResult util.Result
-	unquiesceCmdResult = unquiesceCmd()
+	unquiesceCmdResult = client.UnquiesceCmd()
 	if unquiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = sendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 	}
 
 	var unquiesceResult util.Result
-	unquiesceResult = unquiesce()
+	unquiesceResult = client.Unquiesce(config)
 	if unquiesceResult.Code != 0 {
-		sendTrapErrorCmdResult = sendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 	}
 
 	var postUnquiesceCmdResult util.Result
-	postUnquiesceCmdResult = postUnquiesceCmd()
+	postUnquiesceCmdResult = client.PostUnquiesceCmd()
 	if postUnquiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = sendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 	}
 
 	var deleteBackupResult util.Result
-	deleteBackupResult = deleteBackup()
+	deleteBackupResult = client.DeleteBackup()
 	if deleteBackupResult.Code != 0 {
-		sendTrapErrorCmdResult = sendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 	}
 
 	var sendTrapSuccessCmdResult util.Result
-	sendTrapSuccessCmdResult = sendTrapSuccessCmd()
+	sendTrapSuccessCmdResult = client.SendTrapSuccessCmd()
 	if sendTrapSuccessCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = sendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 	}
 
 	var results []util.Result

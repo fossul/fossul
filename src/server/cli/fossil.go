@@ -4,6 +4,7 @@ import (
 	"github.com/pborman/getopt/v2"
 	"os"
 	"engine/util"
+	"engine/client"
 	"fmt"
 	
 )
@@ -52,7 +53,7 @@ func main() {
 	if *optAction == "backup" {
 
 		var result []util.Result
-		result = util.StartBackupWorkflow(config)
+		result = client.StartBackupWorkflow(config)
 
 		for index, item := range result {
 			fmt.Println(index, item.Time, item.Code, item.Stdout, item.Stderr)
@@ -65,15 +66,15 @@ func main() {
 		fmt.Println("Checking status of services")
 
 		var workflowStatus util.Status
-		workflowStatus = util.GetWorkflowServiceStatus()
+		workflowStatus = client.GetWorkflowServiceStatus()
 		fmt.Println("Workflow Service:", workflowStatus)
 
 		var appStatus util.Status
-		appStatus = util.GetAppServiceStatus()
+		appStatus = client.GetAppServiceStatus()
 		fmt.Println("App Service:", appStatus)
 
 		var storageStatus util.Status
-		storageStatus = util.GetStorageServiceStatus()
+		storageStatus = client.GetStorageServiceStatus()
 		fmt.Println("Storage Service:", storageStatus)
 
 	}

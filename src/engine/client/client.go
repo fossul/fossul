@@ -1,13 +1,14 @@
-package util
+package client
 
 import (
 	"encoding/json"
 	"log"
+	"engine/util"
 	"net/http"
 	"bytes"
 )
 
-func GetWorkflowServiceStatus() Status {
+func GetWorkflowServiceStatus() util.Status {
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/status", nil)
 	if err != nil {
@@ -23,7 +24,7 @@ func GetWorkflowServiceStatus() Status {
 
 	defer resp.Body.Close()
 
-	var status Status
+	var status util.Status
 
 	if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
 		log.Println(err)
@@ -33,7 +34,7 @@ func GetWorkflowServiceStatus() Status {
 
 }
 
-func GetAppServiceStatus() Status {
+func GetAppServiceStatus() util.Status {
 
 	req, err := http.NewRequest("GET", "http://fossil-app:8001/status", nil)
 	if err != nil {
@@ -49,7 +50,7 @@ func GetAppServiceStatus() Status {
 
 	defer resp.Body.Close()
 
-	var status Status
+	var status util.Status
 
 	if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
 		log.Println(err)
@@ -59,7 +60,7 @@ func GetAppServiceStatus() Status {
 
 }
 
-func GetStorageServiceStatus() Status {
+func GetStorageServiceStatus() util.Status {
 
 	req, err := http.NewRequest("GET", "http://fossil-storage:8002/status", nil)
 	if err != nil {
@@ -75,7 +76,7 @@ func GetStorageServiceStatus() Status {
 
 	defer resp.Body.Close()
 
-	var status Status
+	var status util.Status
 
 	if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
 		log.Println(err)
@@ -85,7 +86,7 @@ func GetStorageServiceStatus() Status {
 
 }
 
-func StartBackupWorkflow(config Config) (result []Result) {
+func StartBackupWorkflow(config util.Config) (result []util.Result) {
 
 
 	b := new(bytes.Buffer)

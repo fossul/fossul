@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func createBackup() util.Result {
+func CreateBackup() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-storage:8002/createBackup", nil)
 	if err != nil {
@@ -33,7 +33,7 @@ func createBackup() util.Result {
 
 }
 
-func deleteBackup() util.Result {
+func DeleteBackup() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-storage:8002/deleteBackup", nil)
 	if err != nil {

@@ -1,4 +1,4 @@
-package main
+package client
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func preQuiesceCmd() util.Result {
+func PreQuiesceCmd() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-app:8001/preQuiesceCmd", nil)
 	if err != nil {
@@ -33,7 +33,7 @@ func preQuiesceCmd() util.Result {
 
 }
 
-func quiesceCmd() util.Result {
+func QuiesceCmd() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-app:8001/quiesceCmd", nil)
 	if err != nil {
@@ -59,7 +59,7 @@ func quiesceCmd() util.Result {
 
 }
 
-func postQuiesceCmd() util.Result {
+func PostQuiesceCmd() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-app:8001/postQuiesceCmd", nil)
 	if err != nil {
@@ -85,7 +85,7 @@ func postQuiesceCmd() util.Result {
 
 }
 
-func preUnquiesceCmd() util.Result {
+func PreUnquiesceCmd() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-app:8001/preUnquiesceCmd", nil)
 	if err != nil {
@@ -111,7 +111,7 @@ func preUnquiesceCmd() util.Result {
 
 }
 
-func unquiesceCmd() util.Result {
+func UnquiesceCmd() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-app:8001/unquiesceCmd", nil)
 	if err != nil {
@@ -137,7 +137,7 @@ func unquiesceCmd() util.Result {
 
 }
 
-func postUnquiesceCmd() util.Result {
+func PostUnquiesceCmd() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-app:8001/postUnquiesceCmd", nil)
 	if err != nil {
@@ -163,7 +163,7 @@ func postUnquiesceCmd() util.Result {
 
 }
 
-func sendTrapSuccessCmd() util.Result {
+func SendTrapSuccessCmd() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/sendTrapSuccessCmd", nil)
 	if err != nil {
@@ -189,7 +189,7 @@ func sendTrapSuccessCmd() util.Result {
 
 }
 
-func sendTrapErrorCmd() util.Result {
+func SendTrapErrorCmd() util.Result {
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/sendTrapErrorCmd", nil)
 	if err != nil {
