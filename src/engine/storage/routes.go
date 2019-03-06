@@ -40,19 +40,34 @@ var routes = Routes{
         "/status",
         GetStatus,
     },
-
     Route{
-        "CreateBackup",
-        "GET",
-        "/createBackup",
-        CreateBackup,
-    },
-
+        "PluginList",
+        "POST",
+        "/pluginList",
+        PluginList,
+    }, 
     Route{
-        "DeleteBackup",
-        "GET",
-        "/deleteBackup",
-        DeleteBackup,
+        "PluginInfo",
+        "POST",
+        "/pluginInfo/{plugin}",
+        PluginInfo,
     },
-
+    Route{
+        "Backup",
+        "POST",
+        "/backup",
+        Backup,
+    },
+    Route{
+        "BackupList",
+        "POST",
+        "/backupList",
+        Backup,
+    },
+    Route{
+        "BackupDelete",
+        "POST",
+        "/backupDelete",
+        BackupDelete,
+    },
 }

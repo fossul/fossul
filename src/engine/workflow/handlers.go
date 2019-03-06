@@ -58,12 +58,12 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 		sendError(w,r,results)
 	}
 
-	var createBackupResult util.Result
-	createBackupResult = client.CreateBackup()
-	if (util.Result{}) != createBackupResult {	
-		results = append(results, createBackupResult)
+	var backupResult util.Result
+	backupResult = client.Backup(config)
+	if (util.Result{}) != backupResult {	
+		results = append(results, backupResult)
 	}
-	if createBackupResult.Code != 0 {
+	if backupResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
 	}
@@ -108,12 +108,12 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 		sendError(w,r,results)	
 	}
 
-	var deleteBackupResult util.Result
-	deleteBackupResult = client.DeleteBackup()
-	if (util.Result{}) != deleteBackupResult {	
-		results = append(results, deleteBackupResult)
+	var backupDeleteResult util.Result
+	backupDeleteResult = client.BackupDelete(config)
+	if (util.Result{}) != backupDeleteResult {	
+		results = append(results, backupDeleteResult)
 	}
-	if deleteBackupResult.Code != 0 {
+	if backupDeleteResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
 	}

@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 	"engine/util"
 	"net/http"
+	"github.com/gorilla/mux"
+	"log"
+	"os"
+	"io/ioutil"
 )
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -11,14 +15,90 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(status)
 }
 
-func CreateBackup(w http.ResponseWriter, r *http.Request) {
-	var result = util.SetResult(0, "backup create completed successfully", "executed command xyz successfully")
+func PluginList(w http.ResponseWriter, r *http.Request) {
+	var config util.Config = util.GetConfig(w,r)
+
+	var plugins []string
+	fileInfo, err := ioutil.ReadDir(config.PluginDir)
+	if err != nil {
+		log.Println(err)
+	}
+
+	for _, file := range fileInfo {
+		plugins = append(plugins, file.Name())
+	}
+
+	_ = json.NewDecoder(r.Body).Decode(&plugins)
+	json.NewEncoder(w).Encode(plugins)
+}
+
+func PluginInfo(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)	
+	var pluginName string = params["plugin"]
+
+	var config util.Config = util.GetConfig(w,r)
+	var plugin string = config.PluginDir + "/" + pluginName
+
+	var result util.Result
+	result = util.ExecuteCommand(plugin, "--action", "info")
+
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
-func DeleteBackup(w http.ResponseWriter, r *http.Request) {
-	var result = util.SetResult(0, "backup delete completed successfully", "executed command xyz successfully")
+func Backup(w http.ResponseWriter, r *http.Request) {
+
+	var config util.Config = util.GetConfig(w,r)
+	var plugin string = config.PluginDir + "/" + config.StoragePlugin
+	if _, err := os.Stat(plugin); os.IsNotExist(err) {
+		var errMsg string = "ERROR: Storage plugin does not exist"
+		log.Println(err, errMsg)
+		var result = util.SetResult(1, errMsg, err.Error())
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
+
+	var result util.Result
+	result = util.ExecuteCommand(plugin, "--action", "backup")
+	_ = json.NewDecoder(r.Body).Decode(&result)
+	json.NewEncoder(w).Encode(result)
+}
+
+func BackupList(w http.ResponseWriter, r *http.Request) {
+
+	var config util.Config = util.GetConfig(w,r)
+	var plugin string = config.PluginDir + "/" + config.StoragePlugin
+	if _, err := os.Stat(plugin); os.IsNotExist(err) {
+		var errMsg string = "ERROR: Storage plugin does not exist"
+		log.Println(err, errMsg)
+		var result = util.SetResult(1, errMsg, err.Error())
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
+
+	var result util.Result
+	result = util.ExecuteCommand(plugin, "--action", "backupList")
+	_ = json.NewDecoder(r.Body).Decode(&result)
+	json.NewEncoder(w).Encode(result)
+}
+
+func BackupDelete(w http.ResponseWriter, r *http.Request) {
+
+	var config util.Config = util.GetConfig(w,r)
+	var plugin string = config.PluginDir + "/" + config.StoragePlugin
+	if _, err := os.Stat(plugin); os.IsNotExist(err) {
+		var errMsg string = "ERROR: Storage plugin does not exist"
+		log.Println(err, errMsg)
+		var result = util.SetResult(1, errMsg, err.Error())
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
+
+	var result util.Result
+	result = util.ExecuteCommand(plugin, "--action", "backupDelete")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }

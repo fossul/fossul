@@ -5,11 +5,16 @@ import (
 	"engine/util"
 	"log"
 	"net/http"
+	"bytes"
 )
 
-func CreateBackup() util.Result {
+func Backup(config util.Config) util.Result {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("GET", "http://fossil-storage:8002/createBackup", nil)
+	req, err := http.NewRequest("POST", "http://fossil-storage:8002/backup", b)
+	req.Header.Add("Content-Type", "application/json")
+
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -30,12 +35,15 @@ func CreateBackup() util.Result {
 	}
 
 	return result
-
 }
 
-func DeleteBackup() util.Result {
+func BackupList(config util.Config) util.Result {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("GET", "http://fossil-storage:8002/deleteBackup", nil)
+	req, err := http.NewRequest("POST", "http://fossil-storage:8002/backupList", b)
+	req.Header.Add("Content-Type", "application/json")
+
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -56,5 +64,33 @@ func DeleteBackup() util.Result {
 	}
 
 	return result
+}
 
+func BackupDelete(config util.Config) util.Result {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	req, err := http.NewRequest("POST", "http://fossil-storage:8002/backupDelete", b)
+	req.Header.Add("Content-Type", "application/json")
+
+	if err != nil {
+		log.Println("NewRequest: ", err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Do: ", err)
+	}
+
+	defer resp.Body.Close()
+
+	var result util.Result
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		log.Println(err)
+	}
+
+	return result
 }

@@ -69,6 +69,11 @@ func main() {
 			fmt.Println(plugin)
 		}
 	} else if *optAction == "pluginInfo" {
+		if getopt.IsSet("plugin") != true {
+			fmt.Println("ERROR: Missing parameter --plugin")
+			getopt.Usage()
+			os.Exit(1)
+		}
 
 		var result util.Result
 		var plugin util.Plugin
@@ -97,7 +102,10 @@ func main() {
 		var storageStatus util.Status
 		storageStatus = client.GetStorageServiceStatus()
 		fmt.Println("Storage Service:", storageStatus)
-
+	} else {
+		fmt.Println("ERROR: incorrect parameter", *optAction)
+		getopt.Usage()
+		os.Exit(1)
 	}
 }
 

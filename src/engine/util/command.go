@@ -19,12 +19,13 @@ func ExecuteCommand(args ...string) (result Result) {
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 
+	var resultCode int
 	err := cmd.Run()
 	if err != nil {
 		log.Println("cmd.Run() failed with\n", err)
-		result.Code = 1
+		resultCode = 1
 	} else {
-		result.Code = 0
+		resultCode = 0
 	}
 
 	outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
@@ -32,7 +33,7 @@ func ExecuteCommand(args ...string) (result Result) {
 	outStr = strings.TrimSuffix(outStr, "\n")
 	errStr = strings.TrimSuffix(errStr, "\n")
 
-	result = SetResult(0, outStr, errStr)
+	result = SetResult(resultCode, outStr, errStr)
 
 	return result
 }

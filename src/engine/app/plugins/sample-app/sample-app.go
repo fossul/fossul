@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	optAction := getopt.StringLong("action",'a',"","quiesce|unquiesce|list")
+	optAction := getopt.StringLong("action",'a',"","quiesce|unquiesce|info")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -30,6 +30,10 @@ func main() {
 		unquiesce()
 	} else if *optAction == "info" {
 		info()		
+	} else {
+		fmt.Println("ERROR: incorrect parameter", *optAction)
+		getopt.Usage()
+		os.Exit(1)
 	}
 }	
 
