@@ -41,16 +41,16 @@ var routes = Routes{
         GetStatus,
     },
     Route{
-        "ListPlugins",
+        "PluginList",
         "POST",
-        "/listPlugins",
-        ListPlugins,
+        "/pluginList",
+        PluginList,
     }, 
     Route{
-        "ListPluginCapabilities",
+        "PluginInfo",
         "POST",
-        "/listPluginCapabilities/{plugin}",
-        ListPluginCapabilities,
+        "/pluginInfo/{plugin}",
+        PluginInfo,
     },        
     Route{
         "PreQuiesceCmd",

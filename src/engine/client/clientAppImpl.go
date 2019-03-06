@@ -72,13 +72,13 @@ func Unquiesce(config util.Config) util.Result {
 
 }
 
-func ListPlugins(config util.Config) []string {
+func PluginList(config util.Config) []string {
 
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/listPlugins", b)
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginList", b)
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {
@@ -104,13 +104,11 @@ func ListPlugins(config util.Config) []string {
 
 }
 
-func ListPluginCapabilities(config util.Config, plugin string) util.Result {
-
-
+func PluginInfo(config util.Config, pluginName string) (util.Result, util.Plugin) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/listPluginCapabilities/" + plugin, b)
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginInfo/" + pluginName, b)
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {
@@ -127,11 +125,14 @@ func ListPluginCapabilities(config util.Config, plugin string) util.Result {
 	defer resp.Body.Close()
 
 	var result util.Result
-
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		log.Println(err)
 	}
 
-	return result
+	//unmarshall json response to plugin struct
+	var plugin util.Plugin
+	pluginBytes := []byte(result.Stdout)
+    json.Unmarshal(pluginBytes, &plugin)
 
+	return result, plugin
 }

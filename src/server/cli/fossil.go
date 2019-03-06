@@ -6,14 +6,13 @@ import (
 	"engine/util"
 	"engine/client"
 	"fmt"
-	"strings"
 )
 
 func main() {
 	optProfile := getopt.StringLong("profile",'p',"","Profile name")
 	optConfig := getopt.StringLong("config",'c',"","Config name")
 	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
-	optAction := getopt.StringLong("action",'a',"","backup|backupList|pluginList|pluginCapabilities|status")
+	optAction := getopt.StringLong("action",'a',"","backup|backupList|pluginList|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
     optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
@@ -65,21 +64,25 @@ func main() {
 		
 	} else if *optAction == "pluginList" {
 		fmt.Println("### List of Application Plugins ###")
-		var plugins []string = client.ListPlugins(config)
+		var plugins []string = client.PluginList(config)
 		for _, plugin := range plugins {
 			fmt.Println(plugin)
 		}
-	} else if *optAction == "pluginCapabilities" {
+	} else if *optAction == "pluginInfo" {
 
 		var result util.Result
-		var pluginName string = *optPluginName
-		result = client.ListPluginCapabilities(config,pluginName)
+		var plugin util.Plugin
 
-		pluginCapabilities := strings.Fields(result.Stdout)
-		fmt.Println("### " + pluginName + " Plugin Capabilities ###")
-		for _, pluginCapability := range pluginCapabilities {
-			fmt.Println(pluginCapability)
-		}	
+		var pluginName string = *optPluginName
+		result, plugin = client.PluginInfo(config,pluginName)
+
+		checkResult(result)
+
+		fmt.Println("### Plugin Information ###")
+		fmt.Println("Name:", plugin.Name)
+		fmt.Println("Description:", plugin.Description)
+		fmt.Println("Type:", plugin.Type)
+		fmt.Println("Capabilities:", plugin.Capabilities)
 	} else if *optAction == "status" {
 		fmt.Println("### Checking status of services ###")
 
@@ -95,5 +98,11 @@ func main() {
 		storageStatus = client.GetStorageServiceStatus()
 		fmt.Println("Storage Service:", storageStatus)
 
+	}
+}
+
+func checkResult(result util.Result) {
+	if result.Code != 0 {
+		fmt.Println("ERROR:", result.Code, result.Stdout, result.Stderr)
 	}
 }

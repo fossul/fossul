@@ -15,7 +15,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(status)
 }
 
-func ListPlugins(w http.ResponseWriter, r *http.Request) {
+func PluginList(w http.ResponseWriter, r *http.Request) {
 	var config util.Config = util.GetConfig(w,r)
 
 	var plugins []string
@@ -32,7 +32,7 @@ func ListPlugins(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(plugins)
 }
 
-func ListPluginCapabilities(w http.ResponseWriter, r *http.Request) {
+func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var pluginName string = params["plugin"]
 
@@ -40,7 +40,7 @@ func ListPluginCapabilities(w http.ResponseWriter, r *http.Request) {
 	var plugin string = config.PluginDir + "/" + pluginName
 
 	var result util.Result
-	result = util.ExecuteCommand(plugin, "--action", "list")
+	result = util.ExecuteCommand(plugin, "--action", "info")
 
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
