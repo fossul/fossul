@@ -41,6 +41,12 @@ var routes = Routes{
         GetStatus,
     },
     Route{
+        "ListPlugins",
+        "POST",
+        "/listPlugins",
+        ListPlugins,
+    },    
+    Route{
         "PreQuiesceCmd",
         "GET",
         "/preQuiesceCmd",

@@ -13,7 +13,7 @@ func main() {
 	optProfile := getopt.StringLong("profile",'p',"","Profile name")
 	optConfig := getopt.StringLong("config",'c',"","Config name")
 	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
-    optAction := getopt.StringLong("action",'a',"","backup|list|status")
+    optAction := getopt.StringLong("action",'a',"","backup|backupList|appPluginList|status")
     optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -48,7 +48,7 @@ func main() {
 	}
 
 	var config util.Config = util.ReadConfig(configPath)
-	fmt.Println(config.BackupRetentions[1].Policy)
+	//fmt.Println(config.BackupRetentions[1].Policy)
 
 	if *optAction == "backup" {
 
@@ -60,10 +60,16 @@ func main() {
 		}	
 
 
-	} else if *optAction == "list" {
-
+	} else if *optAction == "backupList" {
+		
+	} else if *optAction == "appPluginList" {
+		fmt.Println("### List of Application Plugins ###")
+		var plugins []string = client.ListAppPlugins(config)
+		for _, plugin := range plugins {
+			fmt.Println("Plugin:",plugin)
+		}
 	} else if *optAction == "status" {
-		fmt.Println("Checking status of services")
+		fmt.Println("### Checking status of services ###")
 
 		var workflowStatus util.Status
 		workflowStatus = client.GetWorkflowServiceStatus()

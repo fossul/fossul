@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"log"
 	"os"
+	"io/ioutil"
 )
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -13,6 +14,22 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(status)
 }
 
+func ListPlugins(w http.ResponseWriter, r *http.Request) {
+	var config util.Config = util.GetConfig(w,r)
+
+	var plugins []string
+	fileInfo, err := ioutil.ReadDir(config.PluginDir + "/app")
+	if err != nil {
+		log.Println(err)
+	}
+
+	for _, file := range fileInfo {
+		plugins = append(plugins, file.Name())
+	}
+
+	_ = json.NewDecoder(r.Body).Decode(&plugins)
+	json.NewEncoder(w).Encode(plugins)
+}
 
 func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
