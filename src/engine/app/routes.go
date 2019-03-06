@@ -54,7 +54,7 @@ var routes = Routes{
     },
     Route{
         "Quiesce",
-        "GET",
+        "POST",
         "/quiesce",
         Quiesce,
     },
@@ -78,7 +78,7 @@ var routes = Routes{
     },
     Route{
         "Unquiesce",
-        "GET",
+        "POST",
         "/unquiesce",
         Unquiesce,
     },
