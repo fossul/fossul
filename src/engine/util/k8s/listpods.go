@@ -1,4 +1,4 @@
-package util
+package k8s
 
 import (
 	"flag"
@@ -48,7 +48,7 @@ func ListPods() {
 
         fmt.Println("Pods in namespace", namespace)
         for _, pod := range pods.Items {
-                fmt.Println("Pods", pod.Name)
+                fmt.Println("Pods", pod.Name, pod.Status.Phase)
         }
                 
         // Examples for error handling:
