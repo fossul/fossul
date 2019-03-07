@@ -27,6 +27,12 @@ func ListPods() {
 		panic(err.Error())
 	}
 
+	//for withing cluster
+	//config, err := rest.InClusterConfig()
+	//if err != nil {
+	//	panic(err.Error())
+	//}
+
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {

@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	k8s.ListPods()
 	optProfile := getopt.StringLong("profile",'p',"","Profile name")
 	optConfig := getopt.StringLong("config",'c',"","Config name")
 	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
