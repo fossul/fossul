@@ -5,7 +5,6 @@ import (
 	"os"
 	"engine/util"
 	"engine/client"
-	"engine/util/k8s"
 	"fmt"
 )
 
@@ -48,8 +47,29 @@ func main() {
 		os.Exit(1)
 	}
 
+	//read base config
 	var config util.Config = util.ReadConfig(configPath)
 	//fmt.Println(config.BackupRetentions[1].Policy)
+
+	//read app plugin config 
+	var configMapApp map[string]string
+	if len(config.AppPlugin) != 0 {
+		appConfigPath := *optConfigPath + "/" + *optProfile + "/" + config.AppPlugin + ".conf"
+		configMapApp = util.ReadConfigToMap(appConfigPath)
+		for k, v := range configMapApp { 
+			fmt.Println(k,v)
+		}
+	}
+
+	// read storage plugin config
+	var configMapStorage map[string]string
+	if len(config.AppPlugin) != 0 {
+		storageConfigPath := *optConfigPath + "/" + *optProfile + "/" + config.StoragePlugin + ".conf"
+		configMapStorage = util.ReadConfigToMap(storageConfigPath)
+		for k, v := range configMapStorage { 
+			fmt.Println(k,v)
+		}
+	}
 
 	if *optAction == "backup" {
 

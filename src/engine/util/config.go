@@ -4,6 +4,9 @@ import (
 	"io/ioutil"
 	"log"
 	"github.com/BurntSushi/toml"
+	"os"
+	"bufio"
+	"regexp"
 )
 
 type Config struct {
@@ -21,11 +24,18 @@ type Config struct {
 	PostAppUnquiesceCmd string `json:"postAppUnquiesceCmd,omitempty"`
 	SendTrapErrorCmd string `json:"sendTrapErrorCmd,omitempty"`
 	SendTrapSuccessCmd string `json:"sendTrapSuccessCmd,omitempty"`
+	BaseContainerPlugin BaseContainerPlugin `json:"baseContainerPlugin,omitempty"`
 }
 
 type BackupRetention struct {
 	Policy string `json:"policy"`
 	RetentionDays int `json:"retentionDays"`	
+}
+
+type BaseContainerPlugin struct {
+	AccessWithinCluster bool `json:"accessWithinCluster,omitempty"`
+	Namespace string `json:"namespace,omitempty"`
+	ServiceName string `json:"serviceName,omitempty"`
 }
 
 func ReadConfig (filename string) Config {
@@ -48,3 +58,30 @@ func decodeConfig (blob string) Config {
 
 	return config
 }
+
+func ReadConfigToMap (filename string) map[string]string {
+	file, err := os.Open(filename)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	if err := scanner.Err(); err != nil {
+        log.Fatal(err)
+	}
+
+	var configMap = map[string]string{}
+    for scanner.Scan() {
+		//re := regexp.MustCompile(`(\S+)\s*=\s*\"(\S+)\"`)
+		re := regexp.MustCompile(`(\S+)\s*=\s*\"(\S+)\"`)
+		match := re.FindStringSubmatch(scanner.Text())
+
+		if len(match) != 0 {
+			configMap[match[1]] = match[2]
+		}
+    }
+	
+	return configMap
+}
+
