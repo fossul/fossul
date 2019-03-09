@@ -40,7 +40,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var plugin string = config.PluginDir + "/" + pluginName
 
 	var result util.Result
-	result = util.ExecuteCommand(plugin, "--action", "info")
+	result = util.ExecuteCommand(config, "storage,", plugin, "--action", "info")
 
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
@@ -60,7 +60,7 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var result util.Result
-	result = util.ExecuteCommand(plugin, "--action", "backup")
+	result = util.ExecuteCommand(config, "storage", plugin, "--action", "backup")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
@@ -79,7 +79,7 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var result util.Result
-	result = util.ExecuteCommand(plugin, "--action", "backupList")
+	result = util.ExecuteCommand(config, "storage", plugin, "--action", "backupList")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
@@ -98,7 +98,7 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var result util.Result
-	result = util.ExecuteCommand(plugin, "--action", "backupDelete")
+	result = util.ExecuteCommand(config, "storage", plugin, "--action", "backupDelete")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }

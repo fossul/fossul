@@ -25,6 +25,8 @@ type Config struct {
 	SendTrapErrorCmd string `json:"sendTrapErrorCmd,omitempty"`
 	SendTrapSuccessCmd string `json:"sendTrapSuccessCmd,omitempty"`
 	BaseContainerPlugin BaseContainerPlugin `json:"baseContainerPlugin,omitempty"`
+	AppPluginParameters map[string]string `json:"appPluginParameters,omitempty"`
+	StoragePluginParameters map[string]string `json:"storagePluginParameters,omitempty"`
 }
 
 type BackupRetention struct {
@@ -73,7 +75,6 @@ func ReadConfigToMap (filename string) map[string]string {
 
 	var configMap = map[string]string{}
     for scanner.Scan() {
-		//re := regexp.MustCompile(`(\S+)\s*=\s*\"(\S+)\"`)
 		re := regexp.MustCompile(`(\S+)\s*=\s*\"(\S+)\"`)
 		match := re.FindStringSubmatch(scanner.Text())
 
@@ -85,3 +86,19 @@ func ReadConfigToMap (filename string) map[string]string {
 	return configMap
 }
 
+func SetPluginParameters(appConfigPath,storageConfigPath string, config Config) Config {
+	configAppMap := make(map[string]string)
+	configStorageMap := make(map[string]string)
+
+	if len(config.AppPlugin) != 0 {
+		configAppMap = ReadConfigToMap(appConfigPath)
+		configStorageMap = ReadConfigToMap(storageConfigPath)
+		for k, v := range configAppMap { 
+			log.Println(k,v)
+		}
+	}
+	config.AppPluginParameters = configAppMap
+	config.StoragePluginParameters = configStorageMap
+
+	return config
+}

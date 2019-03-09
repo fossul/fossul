@@ -38,10 +38,12 @@ func main() {
 }	
 
 func quiesce () {
+	printEnv()
 	fmt.Println("Performing application quiesce")
 }
 
 func unquiesce () {
+	printEnv()
 	fmt.Println("Performing application unquiesce")
 }
 
@@ -78,4 +80,13 @@ func setPlugin() (plugin util.Plugin) {
 	plugin.Capabilities = capabilities
 
 	return plugin
+}
+
+func printEnv() {
+	fmt.Println("Config Parameters")
+	sampleAppVar1 := os.Getenv("SampleAppVar1")
+	fmt.Println("SampleAppVar1=" + sampleAppVar1)
+
+	sampleAppVar2 := os.Getenv("SampleAppVar2")
+	fmt.Println("SampleAppVar2=" + sampleAppVar2)
 }

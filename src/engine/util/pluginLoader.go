@@ -1,5 +1,7 @@
 package util
 
+// NOT CURRENTLY USED, for testing
+
 import (
 	"bytes"
 	"log"
@@ -40,7 +42,7 @@ func ExecutePlugin(args ...string) (result Result) {
 	return result
 }
 
-func setBaseContainerPluginEnv(config Config) {
+func setBaseContainerPluginEnvtest(config Config) {
 	v := reflect.ValueOf(config.BaseContainerPlugin)
 	values := make([]interface{}, v.NumField())
 

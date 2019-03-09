@@ -40,7 +40,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var plugin string = config.PluginDir + "/" + pluginName
 
 	var result util.Result
-	result = util.ExecuteCommand(plugin, "--action", "info")
+	result = util.ExecuteCommand(config, "app", plugin, "--action", "info")
 
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
@@ -74,7 +74,7 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var result util.Result
-	result = util.ExecuteCommand(plugin, "--action", "quiesce")
+	result = util.ExecuteCommand(config, "app", plugin, "--action", "quiesce")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
@@ -114,7 +114,7 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var result util.Result
-	result = util.ExecuteCommand(plugin, "--action", "unquiesce")
+	result = util.ExecuteCommand(config, "app", plugin, "--action", "unquiesce")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }

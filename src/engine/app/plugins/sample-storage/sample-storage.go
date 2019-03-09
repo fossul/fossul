@@ -40,14 +40,17 @@ func main() {
 }	
 
 func backup () {
+	printEnv()
 	fmt.Println("Performing backup")
 }
 
 func backupList () {
+	printEnv()
 	fmt.Println("Performing backup list")
 }
 
 func backupDelete () {
+	printEnv()
 	fmt.Println("Performing backup delete")
 }
 
@@ -87,4 +90,13 @@ func setPlugin() (plugin util.Plugin) {
 	plugin.Capabilities = capabilities
 
 	return plugin
+}
+
+func printEnv() {
+	fmt.Println("Config Parameters")
+	sampleStorageVar1 := os.Getenv("SampleStorageVar1")
+	fmt.Println("SampleStorageVar1=" + sampleStorageVar1)
+
+	sampleStorageVar2 := os.Getenv("SampleStorageVar2")
+	fmt.Println("SampleStorageVar2=" + sampleStorageVar2)
 }
