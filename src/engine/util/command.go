@@ -17,23 +17,25 @@ func ExecuteCommand(args ...string) (result Result) {
 
 	cmd := exec.Command(baseCmd, cmdArgs...)
 
-	stdoutStderrBytes, err := cmd.CombinedOutput()
 	var resultCode int
+	stdoutStderrBytes, err := cmd.CombinedOutput()
+	output := string(stdoutStderrBytes)
+	messages := strings.Split(output, "\n")
+
 	if err != nil {
-		log.Println("cmd.Run() failed with\n", err)
+		log.Println("Error: failed with\n", err)
 		resultCode = 1
 	} else {
 		resultCode = 0
+		log.Println("Command: completed successfully")
 	}
 
-	output := string(stdoutStderrBytes)
-	messages := strings.Split(output, "\n")
-	for index,line := range messages{
-		if line == "" {
-			continue
-		}
-		log.Println("test12345", index, line)
-	}	
+	//for index,line := range messages{
+	//	if line == "" {
+	//		continue
+	//	}
+	//	log.Println("test12345", index, line)
+	//}	
 
 	//var stdout, stderr bytes.Buffer
 	//cmd.Stdout = &stdout

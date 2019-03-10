@@ -25,19 +25,19 @@ func ExecutePlugin(config Config, pluginType string, args ...string) (result Res
 		cmd = setStoragePluginEnv(config, cmd)
 	}
 
-	stdoutStderrBytes, err := cmd.CombinedOutput()
 	var resultCode int
+	stdoutStderrBytes, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Println("cmd.Run() failed with\n", err)
+		log.Println("ERROR: failed with\n", err)
 		resultCode = 1
 	} else {
 		resultCode = 0
 	}
 	output := string(stdoutStderrBytes)
 	messages := strings.Split(output, "\n")
-	for index,line := range messages{
-		log.Println("test12345", index, line)
-	}	
+	//for index,line := range messages{
+		//log.Println("test12345", index, line)
+	//}	
 
 	//var stdout, stderr bytes.Buffer
 	//cmd.Stdout = &stdout

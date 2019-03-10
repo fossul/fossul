@@ -50,7 +50,10 @@ func backup (configMap map[string]string) {
 	podName := k8s.GetPod(configMap["Namespace"],configMap["ServiceName"],configMap["AccessWithinCluster"])
 	fmt.Printf("INFO: Performing backup for pod" + podName + "\n")
 
-	util.ExecuteCommand(configMap["RsyncCmdPath"],"rsync",podName + ":" + configMap["BackupSrcPath"],configMap["BackupDestPath"])
+	result := util.ExecuteCommand(configMap["RsyncCmdPath"],"rsync",podName + ":" + configMap["BackupSrcPath"],configMap["BackupDestPath"])
+	if result.Code != 0 {
+		os.Exit(1)
+	}
 }
 
 func backupList (configMap map[string]string) {
