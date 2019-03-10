@@ -93,9 +93,6 @@ func SetPluginParameters(appConfigPath,storageConfigPath string, config Config) 
 	if len(config.AppPlugin) != 0 {
 		configAppMap = ReadConfigToMap(appConfigPath)
 		configStorageMap = ReadConfigToMap(storageConfigPath)
-		for k, v := range configAppMap { 
-			log.Println(k,v)
-		}
 	}
 	config.AppPluginParameters = configAppMap
 	config.StoragePluginParameters = configStorageMap

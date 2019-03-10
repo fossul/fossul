@@ -19,32 +19,34 @@ func main() {
 	}
 
 	if getopt.IsSet("action") != true {
-		fmt.Println("ERROR: incorrect parameter")
+		fmt.Printf("ERROR: incorrect parameter\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
 
+		//load env parameters
+		configMap := getEnvParams()
+		printEnv(configMap)
+
 	if *optAction == "quiesce" {
-		quiesce()
+		quiesce(configMap)
 	} else if *optAction == "unquiesce" {
-		unquiesce()
+		unquiesce(configMap)
 	} else if *optAction == "info" {
 		info()		
 	} else {
-		fmt.Println("ERROR: incorrect parameter", *optAction)
+		fmt.Printf("ERROR: incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
 }	
 
-func quiesce () {
-	printEnv()
-	fmt.Println("Performing application quiesce")
+func quiesce (configMap map[string]string) {
+	fmt.Printf("Performing application quiesce")
 }
 
-func unquiesce () {
-	printEnv()
-	fmt.Println("Performing application unquiesce")
+func unquiesce (configMap map[string]string) {
+	fmt.Printf("Performing application unquiesce")
 }
 
 func info () {
@@ -57,7 +59,7 @@ func info () {
         return
 	}
 	
-	fmt.Println(string(b))
+	fmt.Printf(string(b)+ "\n")
 }
 
 func setPlugin() (plugin util.Plugin) {
@@ -82,11 +84,17 @@ func setPlugin() (plugin util.Plugin) {
 	return plugin
 }
 
-func printEnv() {
-	fmt.Println("Config Parameters")
-	sampleAppVar1 := os.Getenv("SampleAppVar1")
-	fmt.Println("SampleAppVar1=" + sampleAppVar1)
+func printEnv(configMap map[string]string) {
+	fmt.Printf("DEBUG: Config Parameters" + "\n")
+	fmt.Printf("DEBUG: SampleAppVar1=" + configMap["SampleAppVar1"] + "\n")
+	fmt.Printf("DEBUG: SampleAppVar2=" + configMap["SampleAppVar1"] + "\n")
+}
 
-	sampleAppVar2 := os.Getenv("SampleAppVar2")
-	fmt.Println("SampleAppVar2=" + sampleAppVar2)
+func getEnvParams() map[string]string {
+	configMap := map[string]string{}
+
+	configMap["SampleAppVar1"] = os.Getenv("SampleAppVar1")
+	configMap["SampleAppVar2"] = os.Getenv("SampleAppVar2")
+
+	return configMap
 }

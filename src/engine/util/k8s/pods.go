@@ -1,12 +1,11 @@
 package k8s
 
 import (
-	"os"
 //	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"log"
+	"fmt"
 	"strings"
 )
 
@@ -16,7 +15,7 @@ func GetPod(namespace, serviceName, accessWithinCluster string) string {
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(kubeConfig)
 	if err != nil {
-		log.Println(err.Error())
+		fmt.Println(err.Error())
 	}
 
     pods, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{})
@@ -24,12 +23,12 @@ func GetPod(namespace, serviceName, accessWithinCluster string) string {
     	panic(err)
     }
 
-	log.Println("Pods in namespace", namespace)
+	fmt.Println("DEBUG: Pods in namespace", namespace)
 	var ourPod string
     for _, pod := range pods.Items {
-		log.Println("Pods", pod.Name, pod.Status.Phase) 
+		fmt.Println("DEBUG: Pod", pod.Name, pod.Status.Phase) 
 		if strings.Contains(pod.Name,serviceName) && pod.Status.Phase == "Running" {
-			log.Println("Running Pod Found:", pod.Name)
+			fmt.Println("INFO: Running Pod Found:", pod.Name)
 			ourPod = pod.Name
 		}
 	}
@@ -50,11 +49,4 @@ func GetPod(namespace, serviceName, accessWithinCluster string) string {
 	*/
 
 	return ourPod
-}
-
-func homeDir() string {
-	if h := os.Getenv("HOME"); h != "" {
-		return h
-	}
-	return os.Getenv("USERPROFILE") // windows
 }

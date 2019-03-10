@@ -19,39 +19,40 @@ func main() {
 	}
 
 	if getopt.IsSet("action") != true {
-		fmt.Println("ERROR: incorrect parameter")
+		fmt.Printf("ERROR: incorrect parameter\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
 
+		//load env parameters
+		configMap := getEnvParams()
+		printEnv(configMap)
+
 	if *optAction == "backup" {
-		backup()
+		backup(configMap)
 	} else if *optAction == "backupList" {
-		backupList()
+		backupList(configMap)
 	} else if *optAction == "backupDelete" {
-		backupDelete()		
+		backupDelete(configMap)		
 	} else if *optAction == "info" {
 		info()			
 	} else {
-		fmt.Println("ERROR: incorrect parameter", *optAction)
+		fmt.Printf("ERROR: incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
 }	
 
-func backup () {
-	printEnv()
-	fmt.Println("Performing backup")
+func backup (configMap map[string]string) {
+	fmt.Printf("Performing backup")
 }
 
-func backupList () {
-	printEnv()
-	fmt.Println("Performing backup list")
+func backupList (configMap map[string]string) {
+	fmt.Printf("Performing backup list")
 }
 
-func backupDelete () {
-	printEnv()
-	fmt.Println("Performing backup delete")
+func backupDelete (configMap map[string]string) {
+	fmt.Printf("Performing backup delete")
 }
 
 func info () {
@@ -92,11 +93,17 @@ func setPlugin() (plugin util.Plugin) {
 	return plugin
 }
 
-func printEnv() {
-	fmt.Println("Config Parameters")
-	sampleStorageVar1 := os.Getenv("SampleStorageVar1")
-	fmt.Println("SampleStorageVar1=" + sampleStorageVar1)
+func printEnv(configMap map[string]string) {
+	fmt.Printf("DEBUG: Config Parameters\n")
+	fmt.Printf("DEBUG: SampleStorageVar1=" + configMap["SampleStorageVar1"] + "\n")
+	fmt.Printf("DEBUG: SampleStorageVar2=" + configMap["SampleStorageVar2"] + "\n")
+}
 
-	sampleStorageVar2 := os.Getenv("SampleStorageVar2")
-	fmt.Println("SampleStorageVar2=" + sampleStorageVar2)
+func getEnvParams() map[string]string {
+	configMap := map[string]string{}
+
+	configMap["SampleStorageVar1"] = os.Getenv("SampleStorageVar1")
+	configMap["SampleStorageVar2"] = os.Getenv("SampleStorageVar2")
+
+	return configMap
 }

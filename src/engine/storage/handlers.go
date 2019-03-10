@@ -40,7 +40,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var plugin string = config.PluginDir + "/" + pluginName
 
 	var result util.Result
-	result = util.ExecuteCommand(config, "storage,", plugin, "--action", "info")
+	result = util.ExecutePlugin(config, "storage,", plugin, "--action", "info")
 
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
@@ -53,14 +53,15 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: Storage plugin does not exist"
 		log.Println(err, errMsg)
-		var result = util.SetResult(1, errMsg, err.Error())
+		messages := []string{errMsg,err.Error()}
+		var result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}
 
 	var result util.Result
-	result = util.ExecuteCommand(config, "storage", plugin, "--action", "backup")
+	result = util.ExecutePlugin(config, "storage", plugin, "--action", "backup")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
@@ -72,14 +73,15 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: Storage plugin does not exist"
 		log.Println(err, errMsg)
-		var result = util.SetResult(1, errMsg, err.Error())
+		messages := []string{errMsg,err.Error()}
+		var result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}
 
 	var result util.Result
-	result = util.ExecuteCommand(config, "storage", plugin, "--action", "backupList")
+	result = util.ExecutePlugin(config, "storage", plugin, "--action", "backupList")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
@@ -91,14 +93,15 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: Storage plugin does not exist"
 		log.Println(err, errMsg)
-		var result = util.SetResult(1, errMsg, err.Error())
+		messages := []string{errMsg,err.Error()}
+		var result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}
 
 	var result util.Result
-	result = util.ExecuteCommand(config, "storage", plugin, "--action", "backupDelete")
+	result = util.ExecutePlugin(config, "storage", plugin, "--action", "backupDelete")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }

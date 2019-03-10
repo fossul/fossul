@@ -61,8 +61,11 @@ func main() {
 		var result []util.Result
 		result = client.StartBackupWorkflow(config)
 
-		for index, item := range result {
-			fmt.Println(index, item.Time, item.Code, item.Stdout, item.Stderr)
+		for _, item := range result {
+			for _, line := range item.Messages {
+				fmt.Println(item.Time, item.Code, line)
+			}
+			//fmt.Println(index, item.Time, item.Code, item.Messages)
 		}	
 
 
@@ -117,6 +120,8 @@ func main() {
 
 func checkResult(result util.Result) {
 	if result.Code != 0 {
-		fmt.Println("ERROR:", result.Code, result.Stdout, result.Stderr)
+		for _, line := range result.Messages {
+			fmt.Println(result.Time, result.Code, line)
+		}
 	}
 }

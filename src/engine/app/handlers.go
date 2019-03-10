@@ -40,7 +40,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var plugin string = config.PluginDir + "/" + pluginName
 
 	var result util.Result
-	result = util.ExecuteCommand(config, "app", plugin, "--action", "info")
+	result = util.ExecutePlugin(config, "app", plugin, "--action", "info")
 
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
@@ -48,14 +48,16 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 
 func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.SetResult(0, "pre quiesce cmd completed successfully", "executed command xyz successfully")
+	messages := []string{"pre quiesce cmd completed successfully","executed command xyz successfully"}
+	var result = util.SetResult(0, messages)
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.SetResult(0, "quiesce cmd completed successfully", "executed command xyz successfully")
+	messages := []string{"quiesce cmd completed successfully","executed command xyz successfully"}
+	var result = util.SetResult(0, messages)
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
@@ -67,35 +69,39 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: App plugin does not exist"
 		log.Println(err, errMsg)
-		var result = util.SetResult(1, errMsg, err.Error())
+		messages := []string{errMsg,err.Error()}
+		var result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}
 
 	var result util.Result
-	result = util.ExecuteCommand(config, "app", plugin, "--action", "quiesce")
+	result = util.ExecutePlugin(config, "app", plugin, "--action", "quiesce")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func PostQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.SetResult(0, "post quiesce cmd completed successfully", "executed command xyz successfully")
+	messages := []string{"post quiesce cmd completed successfully","executed command xyz successfully"}
+	var result = util.SetResult(0, messages)
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.SetResult(0, "unquiesce cmd completed successfully", "executed command xyz successfully")
+	messages := []string{"unquiesce cmd completed successfully","executed command xyz successfully"}
+	var result = util.SetResult(0, messages)
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.SetResult(0, "pre unquiesce cmd completed successfully", "executed command xyz successfully")
+	messages := []string{"pre unquiesce cmd completed successfully","executed command xyz successfully"}
+	var result = util.SetResult(0, messages)
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
@@ -104,24 +110,27 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 
 	var config util.Config = util.GetConfig(w,r)
 	var plugin string = config.PluginDir + "/" + config.AppPlugin
+	
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: App plugin does not exist"
 		log.Println(err, errMsg)
-		var result = util.SetResult(1, errMsg, err.Error())
+		messages := []string{errMsg,err.Error()}
+		var result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}
 
 	var result util.Result
-	result = util.ExecuteCommand(config, "app", plugin, "--action", "unquiesce")
+	result = util.ExecutePlugin(config, "app", plugin, "--action", "unquiesce")
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 
-	var result = util.SetResult(0, "post unquiesce cmd completed successfully", "executed command xyz successfully")
+	messages := []string{"post unquiesce cmd completed successfully","executed command xyz successfully"}
+	var result = util.SetResult(0, messages)
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }

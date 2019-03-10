@@ -1,15 +1,14 @@
 package util
 
 import (
-	"bytes"
+//	"bytes"
 	"log"
 	"os/exec"
-	"os"
 	"strings"
 //	"reflect"
 )
 
-func ExecuteCommand(config Config, pluginType string, args ...string) (result Result) {
+func ExecuteCommand(args ...string) (result Result) {
 
 	baseCmd := args[0]
 	cmdArgs := args[1:]
@@ -18,18 +17,8 @@ func ExecuteCommand(config Config, pluginType string, args ...string) (result Re
 
 	cmd := exec.Command(baseCmd, cmdArgs...)
 
-	if pluginType == "app" {
-		cmd = setAppPluginEnv(config, cmd)
-	} else if pluginType == "storage" {
-		cmd = setStoragePluginEnv(config, cmd)
-	}
-
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
+	stdoutStderrBytes, err := cmd.CombinedOutput()
 	var resultCode int
-	err := cmd.Run()
 	if err != nil {
 		log.Println("cmd.Run() failed with\n", err)
 		resultCode = 1
@@ -37,32 +26,34 @@ func ExecuteCommand(config Config, pluginType string, args ...string) (result Re
 		resultCode = 0
 	}
 
-	outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
+	output := string(stdoutStderrBytes)
+	messages := strings.Split(output, "\n")
+	for index,line := range messages{
+		if line == "" {
+			continue
+		}
+		log.Println("test12345", index, line)
+	}	
 
-	outStr = strings.TrimSuffix(outStr, "\n")
-	errStr = strings.TrimSuffix(errStr, "\n")
+	//var stdout, stderr bytes.Buffer
+	//cmd.Stdout = &stdout
+	//cmd.Stderr = &stderr
 
-	result = SetResult(resultCode, outStr, errStr)
+	//var resultCode int
+	//err := cmd.Run()
+	//if err != nil {
+	//	log.Println("cmd.Run() failed with\n", err)
+	//	resultCode = 1
+	//} else {
+	//	resultCode = 0
+	//}
+
+	//outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
+
+	//outStr = strings.TrimSuffix(outStr, "\n")
+	//errStr = strings.TrimSuffix(errStr, "\n")
+
+	result = SetResult(resultCode, messages)
 
 	return result
-}
-
-func setAppPluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
-	cmd.Env = os.Environ()
-	for k, v := range config.AppPluginParameters { 
-		cmd.Env = append(cmd.Env, k + "=" + v)
-		log.Println("test", k, v)
-	}
-	
-	return cmd
-}
-
-func setStoragePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
-	cmd.Env = os.Environ()
-	for k, v := range config.StoragePluginParameters { 
-		cmd.Env = append(cmd.Env, k + "=" + v)
-		log.Println("test", k, v)
-	}
-	
-	return cmd
 }

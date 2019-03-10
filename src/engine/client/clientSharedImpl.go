@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"bytes"
+	"strings"
 )
 
 func PluginList(config util.Config) []string {
@@ -65,8 +66,11 @@ func PluginInfo(config util.Config, pluginName string) (util.Result, util.Plugin
 
 	//unmarshall json response to plugin struct
 	var plugin util.Plugin
-	pluginBytes := []byte(result.Stdout)
-    json.Unmarshal(pluginBytes, &plugin)
+	messages := strings.Join(result.Messages, "\n")
+	pluginByteArray := []byte(messages)
+	//pluginBytes := []byte(result.Stdout)
+
+    json.Unmarshal(pluginByteArray, &plugin)
 
 	return result, plugin
 }

@@ -1,10 +1,10 @@
 package k8s
 
 import (
-	"flag"
-	"path/filepath"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/rest"
+	"log"
+	"os"
 )
 
 func getKubeConfig(accessWithinCluster string) *rest.Config {
@@ -13,23 +13,34 @@ func getKubeConfig(accessWithinCluster string) *rest.Config {
 	if accessWithinCluster == "true" {
 		kubeConfig, err = rest.InClusterConfig()
 		if err != nil {
-			panic(err.Error())
+			log.Fatal(err.Error())
+		}		
+	} else if accessWithinCluster == "false" {
+		var kubeconfigFile string
+		if home := homeDir(); home != "" {
+			kubeconfigFile = home + "/.kube" + "/config"
+			if _, err := os.Stat(kubeconfigFile); os.IsNotExist(err) {
+				log.Fatal(err,"\n" + "ERROR: Kube config not found under " + kubeconfigFile)
+			}
+		} else {
+			log.Fatal("ERROR: Could not find homedir, check environment!")
+		}
+
+		// use the current context in kubeconfig
+		kubeConfig, err = clientcmd.BuildConfigFromFlags("", kubeconfigFile)
+		if err != nil {
+			log.Fatal(err.Error())
 		}		
 	} else {
-		var kubeconfigFile *string
-		if home := homeDir(); home != "" {
-			kubeconfigFile = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-		} else {
-			kubeconfigFile = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-		}
-		flag.Parse()
-	
-		// use the current context in kubeconfig
-		kubeConfig, err = clientcmd.BuildConfigFromFlags("", *kubeconfigFile)
-		if err != nil {
-			panic(err.Error())
-		}		
+		log.Fatal("ERROR: Parameter AccessWithinCluster not set to true or false")
 	}
 
 	return kubeConfig
+}
+
+func homeDir() string {
+	if h := os.Getenv("HOME"); h != "" {
+		return h
+	}
+	return os.Getenv("USERPROFILE") // windows
 }

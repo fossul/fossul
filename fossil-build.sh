@@ -17,6 +17,7 @@ go build engine/client
 echo "Building Plugins"
 go install engine/app/plugins/sample-app
 go install engine/app/plugins/sample-storage
+go install engine/app/plugins/basic-container-storage
 
 echo "Building Services"
 go install engine/workflow
@@ -26,6 +27,7 @@ go install engine/storage
 echo "Moving plugins to $PLUGIN_DIR"
 mv $GOBIN/sample-app $PLUGIN_DIR
 mv $GOBIN/sample-storage $PLUGIN_DIR
+mv $GOBIN/basic-container-storage $PLUGIN_DIR
 
 echo "Build completed successfully"
 
