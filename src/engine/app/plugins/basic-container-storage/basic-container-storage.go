@@ -48,7 +48,9 @@ func backup (configMap map[string]string) {
 	fmt.Printf("Performing container backup")
 
 	podName := k8s.GetPod(configMap["Namespace"],configMap["ServiceName"],configMap["AccessWithinCluster"])
-	fmt.Printf("INFO: Performing backup for pod" + podName)
+	fmt.Printf("INFO: Performing backup for pod" + podName + "\n")
+
+	util.ExecuteCommand(configMap["RsyncCmdPath"],"rsync",podName + ":" + configMap["BackupSrcPath"],configMap["BackupDestPath"])
 }
 
 func backupList (configMap map[string]string) {
@@ -102,6 +104,9 @@ func printEnv(configMap map[string]string) {
 	fmt.Printf("AccessWithinCluster=" + configMap["AccessWithinCluster"] + "\n")
 	fmt.Printf("Namespace=" + configMap["Namespace"] + "\n")
 	fmt.Printf("SeriveName=" + configMap["ServiceName"] + "\n")
+	fmt.Printf("RsyncCmdPath=" + configMap["RsyncCmdPath"] + "\n")
+	fmt.Printf("BackupSrcPath=" + configMap["BackupSrcPath"] + "\n")
+	fmt.Printf("BackupDestPath=" + configMap["BackupDestPath"] + "\n")
 }
 
 func getEnvParams() map[string]string {
@@ -110,6 +115,9 @@ func getEnvParams() map[string]string {
 	configMap["AccessWithinCluster"] = os.Getenv("AccessWithinCluster")
 	configMap["Namespace"] = os.Getenv("Namespace")
 	configMap["ServiceName"] = os.Getenv("ServiceName")
+	configMap["RsyncCmdPath"] = os.Getenv("RsyncCmdPath")
+	configMap["BackupSrcPath"] = os.Getenv("BackupSrcPath")
+	configMap["BackupDestPath"] = os.Getenv("BackupDestPath")
 
 	return configMap
 }

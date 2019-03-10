@@ -1,3 +1,5 @@
 pkg/
 src/github.com/
 src/k8s.io/
+src/golang.org/
+src/gopkg.in/
