@@ -15,24 +15,23 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	var config util.Config = util.GetConfig(w,r)
+
 	var sendTrapErrorCmdResult util.Result
 	var results []util.Result
 
 	var preQuiesceCmdResult util.Result
 	preQuiesceCmdResult = client.PreQuiesceCmd()
-	//if (util.Result{}) != preQuiesceCmdResult {
-		results = append(results, preQuiesceCmdResult)
-	//}
+	results = append(results, preQuiesceCmdResult)
+
 	if preQuiesceCmdResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
 	}
 
 	var quiesceCmdResult util.Result
-	quiesceCmdResult = client.QuiesceCmd()
-	//if (util.Result{}) != quiesceCmdResult {	
-		results = append(results, quiesceCmdResult)
-	//}
+	quiesceCmdResult = client.QuiesceCmd()	
+	results = append(results, quiesceCmdResult)
+
 	if quiesceCmdResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
@@ -40,9 +39,8 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	
 	var quiesceResult util.Result
 	quiesceResult = client.Quiesce(config)
-	//if (util.Result{}) != quiesceResult {	
-		results = append(results, quiesceResult)
-	//}
+	results = append(results, quiesceResult)
+
 	if quiesceResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
@@ -50,9 +48,8 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	var postQuiesceCmdResult util.Result
 	postQuiesceCmdResult = client.PostQuiesceCmd()
-	//if (util.Result{}) != postQuiesceCmdResult {
-		results = append(results, postQuiesceCmdResult)
-	//}
+	results = append(results, postQuiesceCmdResult)
+
 	if postQuiesceCmdResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
@@ -60,9 +57,8 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	var backupResult util.Result
 	backupResult = client.Backup(config)
-	//if (util.Result{}) != backupResult {	
-		results = append(results, backupResult)
-	//}
+	results = append(results, backupResult)
+
 	if backupResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
@@ -70,19 +66,17 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	var preUnquiesceCmdResult util.Result
 	preUnquiesceCmdResult = client.PreUnquiesceCmd()
-	//if (util.Result{}) != preUnquiesceCmdResult {
-		results = append(results, preUnquiesceCmdResult)
-	//}
+	results = append(results, preUnquiesceCmdResult)
+
 	if preUnquiesceCmdResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
 	}
 
 	var unquiesceCmdResult util.Result
-	unquiesceCmdResult = client.UnquiesceCmd()
-	//if (util.Result{}) != unquiesceCmdResult {	
-		results = append(results, unquiesceCmdResult)
-	//}
+	unquiesceCmdResult = client.UnquiesceCmd()	
+	results = append(results, unquiesceCmdResult)
+
 	if unquiesceCmdResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
@@ -90,9 +84,8 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	var unquiesceResult util.Result
 	unquiesceResult = client.Unquiesce(config)
-	//if (util.Result{}) != unquiesceResult {
-		results = append(results, unquiesceResult)
-	//}
+	results = append(results, unquiesceResult)
+
 	if unquiesceResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
@@ -100,9 +93,8 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	var postUnquiesceCmdResult util.Result
 	postUnquiesceCmdResult = client.PostUnquiesceCmd()
-	//if (util.Result{}) != postUnquiesceCmdResult {
-		results = append(results, postUnquiesceCmdResult)
-	//}
+	results = append(results, postUnquiesceCmdResult)
+
 	if postUnquiesceCmdResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)	
@@ -110,27 +102,23 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	var backupDeleteResult util.Result
 	backupDeleteResult = client.BackupDelete(config)
-	//if (util.Result{}) != backupDeleteResult {	
-		results = append(results, backupDeleteResult)
-	//}
+	results = append(results, backupDeleteResult)
+
 	if backupDeleteResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
 	}
 
 	var sendTrapSuccessCmdResult util.Result
-	sendTrapSuccessCmdResult = client.SendTrapSuccessCmd()
-	//if (util.Result{}) != sendTrapSuccessCmdResult {	
-		results = append(results, sendTrapSuccessCmdResult)
-	//}
+	sendTrapSuccessCmdResult = client.SendTrapSuccessCmd()	
+	results = append(results, sendTrapSuccessCmdResult)
+
 	if sendTrapSuccessCmdResult.Code != 0 {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
 	}
-
-	//if (util.Result{}) != sendTrapErrorCmdResult {	
-		results = append(results, sendTrapErrorCmdResult)
-	//}
+	
+	results = append(results, sendTrapErrorCmdResult)
 
 	_ = json.NewDecoder(r.Body).Decode(&results)
 	json.NewEncoder(w).Encode(results)

@@ -6,7 +6,7 @@ import (
 	"engine/util"
 	"engine/client"
 	"fmt"
-	"time"
+//	"time"
 )
 
 func main() {
@@ -58,10 +58,15 @@ func main() {
 	config = util.SetPluginParameters(appConfigPath, storageConfigPath, config)
 
 	if *optAction == "backup" {
+		logger := util.GetInstance()
+		util.LogCommentMessage(logger, "Welcome To Fossil Backup Framework, Performing Backup")
 
 		var result []util.Result
 		result = client.StartBackupWorkflow(config)
 
+		util.LogResults(logger, result)
+
+		/*
 		for _, item := range result {
 			for _, line := range item.Messages {
 				//t := time.Unix(line.Timestamp,0)
@@ -69,7 +74,8 @@ func main() {
 				fmt.Println(time.Unix(line.Timestamp,0), line.Level, line.Message)
 			}
 			//fmt.Println(index, item.Time, item.Code, item.Messages)
-		}	
+		}
+		*/	
 
 
 	} else if *optAction == "backupList" {
