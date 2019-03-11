@@ -143,7 +143,10 @@ func sendError(w http.ResponseWriter, r *http.Request, results []util.Result) {
 
 func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 
-	messages := []string{"send trap success cmd completed successfully","executed command xyz successfully"}
+	var messages []util.Message
+	message := util.SetMessage("INFO", "send trap success cmd completed successfully")
+	messages = append(messages, message)
+
 	var result = util.SetResult(0, messages)
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
@@ -151,7 +154,10 @@ func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 
 func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
 
-	messages := []string{"send trap error cmd completed successfully","executed command xyz successfully"}
+	var messages []util.Message
+	message := util.SetMessage("INFO", "send trap error cmd completed successfully")
+	messages = append(messages, message)
+
 	var result = util.SetResult(0, messages)	
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)

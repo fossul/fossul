@@ -53,7 +53,11 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: Storage plugin does not exist"
 		log.Println(err, errMsg)
-		messages := []string{errMsg,err.Error()}
+
+		var messages []util.Message
+		message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+		messages = append(messages, message)
+
 		var result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
@@ -73,7 +77,11 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: Storage plugin does not exist"
 		log.Println(err, errMsg)
-		messages := []string{errMsg,err.Error()}
+
+		var messages []util.Message
+		message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+		messages = append(messages, message)
+
 		var result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
@@ -93,7 +101,11 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: Storage plugin does not exist"
 		log.Println(err, errMsg)
-		messages := []string{errMsg,err.Error()}
+
+		var messages []util.Message
+		message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+		messages = append(messages, message)
+
 		var result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)

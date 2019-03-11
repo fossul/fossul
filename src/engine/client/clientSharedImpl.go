@@ -39,7 +39,7 @@ func PluginList(config util.Config) []string {
 
 }
 
-func PluginInfo(config util.Config, pluginName string) (util.Result, util.Plugin) {
+func PluginInfo(config util.Config, pluginName string) (util.ResultSimple, util.Plugin) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
@@ -59,7 +59,7 @@ func PluginInfo(config util.Config, pluginName string) (util.Result, util.Plugin
 
 	defer resp.Body.Close()
 
-	var result util.Result
+	var result util.ResultSimple
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		log.Println(err)
 	}
@@ -68,9 +68,8 @@ func PluginInfo(config util.Config, pluginName string) (util.Result, util.Plugin
 	var plugin util.Plugin
 	messages := strings.Join(result.Messages, "\n")
 	pluginByteArray := []byte(messages)
-	//pluginBytes := []byte(result.Stdout)
 
-    json.Unmarshal(pluginByteArray, &plugin)
+	json.Unmarshal(pluginByteArray, &plugin)
 
 	return result, plugin
 }

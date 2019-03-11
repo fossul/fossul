@@ -2,7 +2,7 @@ package util
 
 import (
 //	"bytes"
-	"log"
+	"fmt"
 	"os/exec"
 	"strings"
 //	"reflect"
@@ -13,47 +13,31 @@ func ExecuteCommand(args ...string) (result Result) {
 	baseCmd := args[0]
 	cmdArgs := args[1:]
 
-	log.Println("Executing command: ", baseCmd, cmdArgs)
+	s := fmt.Sprintf("CMD executing command [%s %s]",baseCmd, strings.Join(cmdArgs, " "))
+	fmt.Println(s)
 
 	cmd := exec.Command(baseCmd, cmdArgs...)
 
 	var resultCode int
 	stdoutStderrBytes, err := cmd.CombinedOutput()
-	output := string(stdoutStderrBytes)
-	messages := strings.Split(output, "\n")
-
 	if err != nil {
-		log.Println("Error: failed with\n", err)
+		s1 := fmt.Sprintf("ERROR command [%s %s] failed",baseCmd, strings.Join(cmdArgs, " "))
+		fmt.Println(s1)
+		s2 := fmt.Sprintf("ERROR command failed with [%s]", err)
+		fmt.Println(s2)
+
 		resultCode = 1
 	} else {
 		resultCode = 0
-		log.Println("Command: completed successfully")
+		s := fmt.Sprintf("INFO command [%s %s] completed successfully",baseCmd, strings.Join(cmdArgs, " "))
+		fmt.Println(s)
+
 	}
 
-	//for index,line := range messages{
-	//	if line == "" {
-	//		continue
-	//	}
-	//	log.Println("test12345", index, line)
-	//}	
+	output := string(stdoutStderrBytes)
+	outputArray := strings.Split(output, "\n")
 
-	//var stdout, stderr bytes.Buffer
-	//cmd.Stdout = &stdout
-	//cmd.Stderr = &stderr
-
-	//var resultCode int
-	//err := cmd.Run()
-	//if err != nil {
-	//	log.Println("cmd.Run() failed with\n", err)
-	//	resultCode = 1
-	//} else {
-	//	resultCode = 0
-	//}
-
-	//outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
-
-	//outStr = strings.TrimSuffix(outStr, "\n")
-	//errStr = strings.TrimSuffix(errStr, "\n")
+	messages := SetMessages(outputArray)
 
 	result = SetResult(resultCode, messages)
 

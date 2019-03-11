@@ -20,14 +20,13 @@ func main() {
 	}
 
 	if getopt.IsSet("action") != true {
-		fmt.Printf("ERROR: incorrect parameter\n")
+		fmt.Printf("ERROR incorrect parameter\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
 
 	//load env parameters
 	configMap := getEnvParams()
-	printEnv(configMap)
 
 	if *optAction == "backup" {
 		backup(configMap)
@@ -38,17 +37,18 @@ func main() {
 	} else if *optAction == "info" {
 		info()			
 	} else {
-		fmt.Printf("ERROR: incorrect parameter" + *optAction + "\n")
+		fmt.Printf("ERROR incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
 }	
 
 func backup (configMap map[string]string) {
-	fmt.Printf("Performing container backup")
+	printEnv(configMap)
+	fmt.Printf("INFO Performing container backup")
 
 	podName := k8s.GetPod(configMap["Namespace"],configMap["ServiceName"],configMap["AccessWithinCluster"])
-	fmt.Printf("INFO: Performing backup for pod" + podName + "\n")
+	fmt.Printf("INFO Performing backup for pod" + podName + "\n")
 
 	result := util.ExecuteCommand(configMap["RsyncCmdPath"],"rsync",podName + ":" + configMap["BackupSrcPath"],configMap["BackupDestPath"])
 	if result.Code != 0 {
@@ -57,11 +57,13 @@ func backup (configMap map[string]string) {
 }
 
 func backupList (configMap map[string]string) {
-	fmt.Printf("Performing backup list")
+	printEnv(configMap)
+	fmt.Printf("INFO Performing backup list")
 }
 
 func backupDelete (configMap map[string]string) {
-	fmt.Printf("Performing backup delete")
+	printEnv(configMap)
+	fmt.Printf("INFO Performing backup delete")
 }
 
 func info () {
@@ -103,13 +105,13 @@ func setPlugin() (plugin util.Plugin) {
 }
 
 func printEnv(configMap map[string]string) {
-	fmt.Printf("Config Parameters\n")
-	fmt.Printf("AccessWithinCluster=" + configMap["AccessWithinCluster"] + "\n")
-	fmt.Printf("Namespace=" + configMap["Namespace"] + "\n")
-	fmt.Printf("SeriveName=" + configMap["ServiceName"] + "\n")
-	fmt.Printf("RsyncCmdPath=" + configMap["RsyncCmdPath"] + "\n")
-	fmt.Printf("BackupSrcPath=" + configMap["BackupSrcPath"] + "\n")
-	fmt.Printf("BackupDestPath=" + configMap["BackupDestPath"] + "\n")
+	fmt.Printf("INFO Config Parameters\n")
+	fmt.Printf("INFO AccessWithinCluster=" + configMap["AccessWithinCluster"] + "\n")
+	fmt.Printf("INFO Namespace=" + configMap["Namespace"] + "\n")
+	fmt.Printf("INFO SeriveName=" + configMap["ServiceName"] + "\n")
+	fmt.Printf("INFO RsyncCmdPath=" + configMap["RsyncCmdPath"] + "\n")
+	fmt.Printf("INFO BackupSrcPath=" + configMap["BackupSrcPath"] + "\n")
+	fmt.Printf("INFO BackupDestPath=" + configMap["BackupDestPath"] + "\n")
 }
 
 func getEnvParams() map[string]string {

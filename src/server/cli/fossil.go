@@ -6,6 +6,7 @@ import (
 	"engine/util"
 	"engine/client"
 	"fmt"
+	"time"
 )
 
 func main() {
@@ -63,7 +64,9 @@ func main() {
 
 		for _, item := range result {
 			for _, line := range item.Messages {
-				fmt.Println(item.Time, item.Code, line)
+				//t := time.Unix(line.Timestamp,0)
+				//fmt.Println(t.Format("2006-01-02 15:04:05"), line.Level, line.Message)
+				fmt.Println(time.Unix(line.Timestamp,0), line.Level, line.Message)
 			}
 			//fmt.Println(index, item.Time, item.Code, item.Messages)
 		}	
@@ -84,7 +87,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		var result util.Result
+		var result util.ResultSimple
 		var plugin util.Plugin
 
 		var pluginName string = *optPluginName
@@ -118,10 +121,10 @@ func main() {
 	}
 }
 
-func checkResult(result util.Result) {
+func checkResult(result util.ResultSimple) {
 	if result.Code != 0 {
 		for _, line := range result.Messages {
-			fmt.Println(result.Time, result.Code, line)
+			fmt.Println(line)
 		}
 	}
 }
