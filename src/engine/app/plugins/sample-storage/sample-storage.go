@@ -96,9 +96,8 @@ func setPlugin() (plugin util.Plugin) {
 }
 
 func printEnv(configMap map[string]string) {
-	fmt.Printf("DEBUG Config Parameters\n")
-	fmt.Printf("DEBUG SampleStorageVar1=" + configMap["SampleStorageVar1"] + "\n")
-	fmt.Printf("DEBUG SampleStorageVar2=" + configMap["SampleStorageVar2"] + "\n")
+	config := util.ConfigMapToJson(configMap)
+	fmt.Printf("DEBUG Config Parameters: " + config + "\n")
 }
 
 func getEnvParams() map[string]string {

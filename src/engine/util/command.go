@@ -1,43 +1,48 @@
 package util
 
 import (
-//	"bytes"
 	"fmt"
 	"os/exec"
 	"strings"
-//	"reflect"
+
 )
 
 func ExecuteCommand(args ...string) (result Result) {
-
 	baseCmd := args[0]
 	cmdArgs := args[1:]
 
-	s := fmt.Sprintf("CMD executing command [%s %s]",baseCmd, strings.Join(cmdArgs, " "))
-	fmt.Println(s)
+	var messages []Message
+	s0 := fmt.Sprintf("Executing command [%s %s]",baseCmd, strings.Join(cmdArgs, " "))
+	message := SetMessage("CMD", s0)
+	messages = append(messages, message)
 
 	cmd := exec.Command(baseCmd, cmdArgs...)
 
-	var resultCode int
 	stdoutStderrBytes, err := cmd.CombinedOutput()
+	var resultCode int
 	if err != nil {
-		s1 := fmt.Sprintf("ERROR command [%s %s] failed",baseCmd, strings.Join(cmdArgs, " "))
-		fmt.Println(s1)
-		s2 := fmt.Sprintf("ERROR command failed with [%s]", err)
-		fmt.Println(s2)
+		s1 := fmt.Sprintf("Command [%s %s] failed",baseCmd, strings.Join(cmdArgs, " "))
+		message := SetMessage("ERROR", s1)
+		messages = append(messages, message)
+
+		s2 := fmt.Sprintf("Command failed with [%s]", err.Error())
+		message = SetMessage("ERROR", s2)
+		messages = append(messages, message)
+
+		message = SetMessage("ERROR", string(stdoutStderrBytes))
+		messages = append(messages, message)
 
 		resultCode = 1
 	} else {
+		s1 := fmt.Sprintf("Command [%s %s] completed successfully",baseCmd, strings.Join(cmdArgs, " "))
+		message := SetMessage("INFO", s1)
+		messages = append(messages, message)
+
+		message = SetMessage("INFO", string(stdoutStderrBytes))
+		messages = append(messages, message)
+
 		resultCode = 0
-		s := fmt.Sprintf("INFO command [%s %s] completed successfully",baseCmd, strings.Join(cmdArgs, " "))
-		fmt.Println(s)
-
 	}
-
-	output := string(stdoutStderrBytes)
-	outputArray := strings.Split(output, "\n")
-
-	messages := SetMessages(outputArray)
 
 	result = SetResult(resultCode, messages)
 

@@ -65,7 +65,7 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var result util.Result
-	result = util.ExecutePlugin(config, "storage", plugin, "--action", "backup")
+	result = util.ExecutePlugin(config, "storage", plugin, "--action", "backup")	
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/pborman/getopt/v2"
 	"engine/util"
-	"encoding/json"
 	"engine/util/k8s"
+	"encoding/json"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	}
 
 	if getopt.IsSet("action") != true {
-		fmt.Printf("ERROR incorrect parameter\n")
+		fmt.Printf("ERROR missing parameter --action")
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -37,7 +37,7 @@ func main() {
 	} else if *optAction == "info" {
 		info()			
 	} else {
-		fmt.Printf("ERROR incorrect parameter" + *optAction + "\n")
+		fmt.Printf("ERROR incorrect parameter" + *optAction)
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -45,12 +45,18 @@ func main() {
 
 func backup (configMap map[string]string) {
 	printEnv(configMap)
-	fmt.Printf("INFO Performing container backup")
+	fmt.Println("INFO Performing container backup")
 
 	podName := k8s.GetPod(configMap["Namespace"],configMap["ServiceName"],configMap["AccessWithinCluster"])
-	fmt.Printf("INFO Performing backup for pod" + podName + "\n")
+	fmt.Println("INFO Performing backup for pod" + podName)
 
 	result := util.ExecuteCommand(configMap["RsyncCmdPath"],"rsync",podName + ":" + configMap["BackupSrcPath"],configMap["BackupDestPath"])
+
+	for _, line := range result.Messages {
+		//	//t := time.Unix(line.Timestamp,0)
+		fmt.Println(line.Level, line.Message)
+	}
+			
 	if result.Code != 0 {
 		os.Exit(1)
 	}
@@ -76,7 +82,7 @@ func info () {
         return
 	}
 	
-	fmt.Printf(string(b) + "\n")
+	fmt.Printf(string(b))
 }
 
 func setPlugin() (plugin util.Plugin) {
@@ -105,13 +111,8 @@ func setPlugin() (plugin util.Plugin) {
 }
 
 func printEnv(configMap map[string]string) {
-	fmt.Printf("INFO Config Parameters\n")
-	fmt.Printf("INFO AccessWithinCluster=" + configMap["AccessWithinCluster"] + "\n")
-	fmt.Printf("INFO Namespace=" + configMap["Namespace"] + "\n")
-	fmt.Printf("INFO SeriveName=" + configMap["ServiceName"] + "\n")
-	fmt.Printf("INFO RsyncCmdPath=" + configMap["RsyncCmdPath"] + "\n")
-	fmt.Printf("INFO BackupSrcPath=" + configMap["BackupSrcPath"] + "\n")
-	fmt.Printf("INFO BackupDestPath=" + configMap["BackupDestPath"] + "\n")
+	config := util.ConfigMapToJson(configMap)
+	fmt.Printf("DEBUG Config Parameters: " + config + "\n")
 }
 
 func getEnvParams() map[string]string {

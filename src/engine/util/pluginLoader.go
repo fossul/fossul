@@ -14,8 +14,10 @@ func ExecutePlugin(config Config, pluginType string, args ...string) (result Res
 	baseCmd := args[0]
 	cmdArgs := args[1:]
 
-	s := fmt.Sprintf("CMD executing plugin [%s %s]",baseCmd, strings.Join(cmdArgs, " "))
-	fmt.Println(s)
+	var messages []Message
+	s0 := fmt.Sprintf("Executing plugin [%s %s]",baseCmd, strings.Join(cmdArgs, " "))
+	message := SetMessage("CMD", s0)
+	messages = append(messages, message)
 
 	cmd := exec.Command(baseCmd, cmdArgs...)
 
@@ -28,21 +30,31 @@ func ExecutePlugin(config Config, pluginType string, args ...string) (result Res
 	var resultCode int
 	stdoutStderrBytes, err := cmd.CombinedOutput()
 	if err != nil {
-		s := fmt.Sprintf("ERROR plugin command [%s %s] failed",baseCmd, strings.Join(cmdArgs, " "))
-		fmt.Println(s)
-		fmt.Println("ERROR plugin command failed with\n", err)
+		s1 := fmt.Sprintf("Plugin command [%s %s] failed",baseCmd, strings.Join(cmdArgs, " "))
+		message := SetMessage("ERROR", s1)
+		messages = append(messages, message)
+
+		s2 := fmt.Sprintf("Plugin command failed with [%s]", err.Error())
+		message = SetMessage("ERROR", s2)
+		messages = append(messages, message)
+
 		resultCode = 1
 	} else {
-		resultCode = 0
-		s := fmt.Sprintf("INFO plugin command [%s %s] completed successfully",baseCmd, strings.Join(cmdArgs, " "))
-		fmt.Println(s)
+		s1 := fmt.Sprintf("Plugin command [%s %s] completed successfully",baseCmd, strings.Join(cmdArgs, " "))
+		message := SetMessage("INFO", s1)
+		messages = append(messages, message)
 
+		resultCode = 0
 	}
 
 	output := string(stdoutStderrBytes)
 	outputArray := strings.Split(output, "\n")
 
-	messages := SetMessages(outputArray)
+	//combine all messages
+	pluginMessages := SetMessages(outputArray)
+	for _, msg := range pluginMessages {
+		messages = append(messages, msg)
+	}
 
 	result = SetResult(resultCode, messages)
 

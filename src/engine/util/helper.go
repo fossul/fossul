@@ -23,3 +23,12 @@ func GetConfig (w http.ResponseWriter, r *http.Request) Config {
 
 	return config
 }
+
+func ConfigMapToJson (configMap map[string]string) string {
+	jsonString, err := json.Marshal(configMap)
+	if err != nil {
+		log.Println(err)	
+	}
+
+	return string(jsonString)
+}

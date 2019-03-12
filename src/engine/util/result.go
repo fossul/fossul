@@ -37,7 +37,6 @@ func SetMessages(inputMessages []string) []Message {
 	for _, msg := range inputMessages {
 		re := regexp.MustCompile(`(\S+)\s+(.*)`)
 		match := re.FindStringSubmatch(msg)
-
 		/*
 		if (isLevel == false) {
 			//var message Message
