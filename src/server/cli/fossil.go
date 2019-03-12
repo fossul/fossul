@@ -59,7 +59,7 @@ func main() {
 
 	if *optAction == "backup" {
 		logger := util.GetInstance()
-		util.LogCommentMessage(logger, "Welcome To Fossil Backup Framework, Performing Backup")
+		//util.LogCommentMessage(logger, "Welcome To Fossil Backup Framework, Performing Backup")
 
 		var result []util.Result
 		result = client.StartBackupWorkflow(config)

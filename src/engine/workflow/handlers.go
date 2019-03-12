@@ -19,6 +19,9 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	var sendTrapErrorCmdResult util.Result
 	var results []util.Result
 
+	commentResult := util.SetResultMessage(0,"COMMENT","Welcome to Fossil Backup Framework, Performing Backup Workflow")
+	results = append(results, commentResult)
+
 	var preQuiesceCmdResult util.Result
 	preQuiesceCmdResult = client.PreQuiesceCmd()
 	results = append(results, preQuiesceCmdResult)
@@ -27,6 +30,9 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
 	}
+
+	commentResult = util.SetResultMessage(0,"COMMENT","Performing Application Quiesce")
+	results = append(results, commentResult)
 
 	var quiesceCmdResult util.Result
 	quiesceCmdResult = client.QuiesceCmd()	
@@ -55,6 +61,9 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 		sendError(w,r,results)
 	}
 
+	commentResult = util.SetResultMessage(0,"COMMENT","Performing Backup")
+	results = append(results, commentResult)
+
 	var backupResult util.Result
 	backupResult = client.Backup(config)
 	results = append(results, backupResult)
@@ -72,6 +81,9 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
 	}
+
+	commentResult = util.SetResultMessage(0,"COMMENT","Performing Application Unquiesce")
+	results = append(results, commentResult)
 
 	var unquiesceCmdResult util.Result
 	unquiesceCmdResult = client.UnquiesceCmd()	
@@ -100,6 +112,9 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 		sendError(w,r,results)	
 	}
 
+	commentResult = util.SetResultMessage(0,"COMMENT","Performing Backup Retention")
+	results = append(results, commentResult)
+
 	var backupDeleteResult util.Result
 	backupDeleteResult = client.BackupDelete(config)
 	results = append(results, backupDeleteResult)
@@ -117,6 +132,9 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
 		sendError(w,r,results)
 	}
+
+	commentResult = util.SetResultMessage(0,"INFO","Backup Completed Successfully")
+	results = append(results, commentResult)
 	
 	results = append(results, sendTrapErrorCmdResult)
 

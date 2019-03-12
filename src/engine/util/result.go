@@ -60,6 +60,20 @@ func SetMessages(inputMessages []string) []Message {
 	return messages
 }
 
+func SetResultMessage(code int, level, msg string) Result {
+
+	var messages []Message
+	var message Message
+	message.Level = level
+	message.Message = msg
+	messages = append(messages,message)
+
+	result := SetResult(code, messages)
+
+	return result
+}
+
+
 func SetResult(code int, messages []Message) Result {
 	var result Result
 	result.Code = code

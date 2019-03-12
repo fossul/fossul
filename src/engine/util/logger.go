@@ -103,6 +103,9 @@ func LogResults (l *log.Logger, result []Result) {
 				t := time.Unix(line.Timestamp,0)
 				l.SetPrefix(t.String() + " [CMD] ")
 				l.Print(line.Message)	
+			} else if line.Level == "COMMENT" {
+				l.SetPrefix("########## ")
+				l.Print(line.Message + " ##########")
 			}			
 		}
 	}	
