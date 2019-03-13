@@ -37,20 +37,7 @@ func SetMessages(inputMessages []string) []Message {
 	for _, msg := range inputMessages {
 		re := regexp.MustCompile(`(\S+)\s+(.*)`)
 		match := re.FindStringSubmatch(msg)
-		/*
-		if (isLevel == false) {
-			//var message Message
-			msg := fmt.Sprintf("Message level %s invalid! Must be INFO|ERROR|WARN|DEBUG|CMD", match[1])
-			message := SetMessage("ERROR",msg)
-			messages = append(messages, message)
-		} else {
-			if len(match) != 0 {
-				message := SetMessage(match[1],match[2])
-				messages = append(messages,message)
-			}
-		}
-		//log.Println("tesHEREt",isLevel)
-		*/
+
 		if len(match) != 0 {
 			message := SetMessage(match[1],match[2])
 			messages = append(messages,message)

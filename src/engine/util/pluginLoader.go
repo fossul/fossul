@@ -22,8 +22,10 @@ func ExecutePlugin(config Config, pluginType string, args ...string) (result Res
 	cmd := exec.Command(baseCmd, cmdArgs...)
 
 	if pluginType == "app" {
+		cmd = setBasePluginEnv(config, cmd)
 		cmd = setAppPluginEnv(config, cmd)
 	} else if pluginType == "storage" {
+		cmd = setBasePluginEnv(config, cmd)
 		cmd = setStoragePluginEnv(config, cmd)
 	}
 
@@ -70,10 +72,11 @@ func ExecutePluginInfo(config Config, pluginType string, args ...string) (result
 	fmt.Println(s)
 
 	cmd := exec.Command(baseCmd, cmdArgs...)
-
 	if pluginType == "app" {
-		cmd = setAppPluginEnv(config, cmd)
+		cmd = setBasePluginEnv(config, cmd)
+		cmd = setAppPluginEnv(config, cmd)	
 	} else if pluginType == "storage" {
+		cmd = setBasePluginEnv(config, cmd)
 		cmd = setStoragePluginEnv(config, cmd)
 	}
 
@@ -101,7 +104,6 @@ func ExecutePluginInfo(config Config, pluginType string, args ...string) (result
 }
 
 func setAppPluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
-	cmd.Env = os.Environ()
 	for k, v := range config.AppPluginParameters { 
 		cmd.Env = append(cmd.Env, k + "=" + v)
 	}
@@ -110,13 +112,22 @@ func setAppPluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
 }
 
 func setStoragePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
-	cmd.Env = os.Environ()
 	for k, v := range config.StoragePluginParameters { 
 		cmd.Env = append(cmd.Env, k + "=" + v)
 	}
 	
 	return cmd
 }
+
+func setBasePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd  {
+	cmd.Env = os.Environ()
+	//profileName := fmt.Sprintf("ProfileName=%s",config.ProfileName)
+	//configName := fmt.Sprintf("ConfigName=%s",config.ConfigName)
+	cmd.Env = append(cmd.Env, "ProfileName=" +  config.ProfileName)
+	cmd.Env = append(cmd.Env, "ConfigName=" + config.ConfigName)
+
+	return cmd
+}	
 
 func setBaseContainerPluginEnvtest(config Config) {
 	v := reflect.ValueOf(config.BaseContainerPlugin)
@@ -125,6 +136,6 @@ func setBaseContainerPluginEnvtest(config Config) {
     for i := 0; i < v.NumField(); i++ {
 		values[i] = v.Field(i).Interface()
 		os.Setenv(v.Type().Field(i).Name,v.Field(i).Interface().(string))
-		log.Println("Parsing plugin struct",reflect.TypeOf(v.Field(i).Interface()),v.Type().Field(i).Name,v.Field(i).Interface())
+		log.Println("INFO Parsing plugin struct",reflect.TypeOf(v.Field(i).Interface()),v.Type().Field(i).Name,v.Field(i).Interface())
     }
 }

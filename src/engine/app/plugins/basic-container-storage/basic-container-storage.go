@@ -70,6 +70,8 @@ func backupList (configMap map[string]string) {
 func backupDelete (configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Printf("INFO Performing backup delete")
+
+
 }
 
 func info () {
@@ -118,6 +120,8 @@ func printEnv(configMap map[string]string) {
 func getEnvParams() map[string]string {
 	configMap := map[string]string{}
 
+	configMap["ProfileName"] = os.Getenv("ProfileName")
+	configMap["ConfigName"] = os.Getenv("ConfigName")
 	configMap["AccessWithinCluster"] = os.Getenv("AccessWithinCluster")
 	configMap["Namespace"] = os.Getenv("Namespace")
 	configMap["ServiceName"] = os.Getenv("ServiceName")

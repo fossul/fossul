@@ -58,11 +58,11 @@ func main() {
 	config = util.SetPluginParameters(appConfigPath, storageConfigPath, config)
 
 	if *optAction == "backup" {
-		logger := util.GetInstance()
+		logger := util.GetLoggerInstance()
 		//util.LogCommentMessage(logger, "Welcome To Fossil Backup Framework, Performing Backup")
 
 		var result []util.Result
-		result = client.StartBackupWorkflow(config)
+		result = client.StartBackupWorkflow(string(*optProfile),string(*optConfig),config)
 
 		util.LogResults(logger, result)
 

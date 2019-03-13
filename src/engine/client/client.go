@@ -86,8 +86,9 @@ func GetStorageServiceStatus() util.Status {
 
 }
 
-func StartBackupWorkflow(config util.Config) (result []util.Result) {
+func StartBackupWorkflow(profileName,configName string,config util.Config) (result []util.Result) {
 
+	config = setAdditionalConfigParams(profileName,configName,config)
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
@@ -114,4 +115,11 @@ func StartBackupWorkflow(config util.Config) (result []util.Result) {
 
 	return result
 
+}
+
+func setAdditionalConfigParams (profileName, configName string, config util.Config) util.Config {
+	config.ProfileName = profileName
+	config.ConfigName = configName
+
+	return config
 }

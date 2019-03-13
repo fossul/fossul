@@ -95,6 +95,8 @@ func printEnv(configMap map[string]string) {
 func getEnvParams() map[string]string {
 	configMap := map[string]string{}
 
+	configMap["ProfileName"] = os.Getenv("ProfileName")
+	configMap["ConfigName"] = os.Getenv("ConfigName")
 	configMap["SampleAppVar1"] = os.Getenv("SampleAppVar1")
 	configMap["SampleAppVar2"] = os.Getenv("SampleAppVar2")
 

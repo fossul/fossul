@@ -15,7 +15,7 @@ var logger *log.Logger
 var once sync.Once
 
 // start loggeando
-func GetInstance() *log.Logger {
+func GetLoggerInstance() *log.Logger {
     once.Do(func() {
         logger = createLogger()
     })

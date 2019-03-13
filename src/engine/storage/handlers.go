@@ -49,6 +49,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 func Backup(w http.ResponseWriter, r *http.Request) {
 
 	var config util.Config = util.GetConfig(w,r)
+
 	var plugin string = config.PluginDir + "/" + config.StoragePlugin
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: Storage plugin does not exist"
