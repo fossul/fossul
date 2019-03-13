@@ -2,10 +2,10 @@ package main
 
 import (
 	"os"
-	"fmt"
 	"github.com/pborman/getopt/v2"
 	"engine/util"
 	"engine/util/k8s"
+	"engine/util/pluginUtil"
 	"encoding/json"
 )
 
@@ -20,7 +20,7 @@ func main() {
 	}
 
 	if getopt.IsSet("action") != true {
-		fmt.Printf("ERROR missing parameter --action")
+		pluginUtil.LogErrorMessage("missing parameter --action")
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -37,7 +37,7 @@ func main() {
 	} else if *optAction == "info" {
 		info()			
 	} else {
-		fmt.Printf("ERROR incorrect parameter" + *optAction)
+		pluginUtil.LogErrorMessage("incorrect parameter" + *optAction)
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -45,17 +45,19 @@ func main() {
 
 func backup (configMap map[string]string) {
 	printEnv(configMap)
-	fmt.Println("INFO Performing container backup")
+	pluginUtil.LogInfoMessage("Performing container backup")
 
 	podName := k8s.GetPod(configMap["Namespace"],configMap["ServiceName"],configMap["AccessWithinCluster"])
-	fmt.Println("INFO Performing backup for pod" + podName)
+	pluginUtil.LogErrorMessage("Performing backup for pod" + podName)
 
-	result := util.ExecuteCommand(configMap["RsyncCmdPath"],"rsync",podName + ":" + configMap["BackupSrcPath"],configMap["BackupDestPath"])
+	backupName := util.GetBackupName(configMap["BackupName"])
+	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"] + "/" + backupName
+	pluginUtil.LogInfoMessage("Backup name is " + backupName + ", Backup path is " + backupPath)
 
-	for _, line := range result.Messages {
-		//	//t := time.Unix(line.Timestamp,0)
-		fmt.Println(line.Level, line.Message)
-	}
+	pluginUtil.CreateDir(backupPath,0755)
+
+	result := util.ExecuteCommand(configMap["RsyncCmdPath"],"rsync",podName + ":" + configMap["BackupSrcPath"],backupPath)
+	pluginUtil.LogResultMessages(result)
 			
 	if result.Code != 0 {
 		os.Exit(1)
@@ -64,12 +66,12 @@ func backup (configMap map[string]string) {
 
 func backupList (configMap map[string]string) {
 	printEnv(configMap)
-	fmt.Printf("INFO Performing backup list")
+	pluginUtil.LogInfoMessage("Performing backup list")
 }
 
 func backupDelete (configMap map[string]string) {
 	printEnv(configMap)
-	fmt.Printf("INFO Performing backup delete")
+	pluginUtil.LogInfoMessage("Performing backup delete")
 
 
 }
@@ -77,14 +79,12 @@ func backupDelete (configMap map[string]string) {
 func info () {
 	var plugin util.Plugin = setPlugin()
 
-	//output json
 	b, err := json.Marshal(plugin)
     if err != nil {
-        fmt.Println(err)
-        return
+        pluginUtil.LogErrorMessage(err.Error())
+	} else {
+		pluginUtil.PrintMessage(string(b))
 	}
-	
-	fmt.Printf(string(b))
 }
 
 func setPlugin() (plugin util.Plugin) {
@@ -114,7 +114,7 @@ func setPlugin() (plugin util.Plugin) {
 
 func printEnv(configMap map[string]string) {
 	config := util.ConfigMapToJson(configMap)
-	fmt.Printf("DEBUG Config Parameters: " + config + "\n")
+	pluginUtil.LogDebugMessage("Config Parameters: " + config + "\n")
 }
 
 func getEnvParams() map[string]string {
@@ -122,6 +122,7 @@ func getEnvParams() map[string]string {
 
 	configMap["ProfileName"] = os.Getenv("ProfileName")
 	configMap["ConfigName"] = os.Getenv("ConfigName")
+	configMap["BackupName"] = os.Getenv("BackupName")
 	configMap["AccessWithinCluster"] = os.Getenv("AccessWithinCluster")
 	configMap["Namespace"] = os.Getenv("Namespace")
 	configMap["ServiceName"] = os.Getenv("ServiceName")

@@ -1,7 +1,6 @@
 package util
 
 import (
-	"time"
 	"regexp"
 )
 
@@ -22,10 +21,10 @@ type Message struct {
 }
 
 func SetMessage(level string, msg string) Message {
-	t := time.Now().Unix()
+	time := GetTimestamp()
 
 	var message Message
-	message.Timestamp = t
+	message.Timestamp = time
 	message.Level = level
 	message.Message = msg
 
@@ -35,12 +34,17 @@ func SetMessage(level string, msg string) Message {
 func SetMessages(inputMessages []string) []Message {
 	var messages []Message
 	for _, msg := range inputMessages {
-		re := regexp.MustCompile(`(\S+)\s+(.*)`)
+		re := regexp.MustCompile(`(INFO|WARN|ERROR|DEBUG|CMD)\s+(.*)`)
 		match := re.FindStringSubmatch(msg)
 
 		if len(match) != 0 {
 			message := SetMessage(match[1],match[2])
 			messages = append(messages,message)
+		} else {
+			if msg != "" {
+				message := SetMessage("UNKOWN",msg)
+				messages = append(messages,message)			
+			}	
 		}	
 	}
 

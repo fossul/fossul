@@ -3,8 +3,8 @@ package k8s
 import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/rest"
-	"log"
 	"os"
+	"log"
 )
 
 func getKubeConfig(accessWithinCluster string) *rest.Config {

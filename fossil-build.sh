@@ -13,6 +13,8 @@ go get github.com/BurntSushi/toml
 echo "Building Shared Libraries"
 go build engine/util
 go build engine/client
+go build engine/util/k8s
+go build engine/util/pluginUtil
 
 echo "Building Plugins"
 go install engine/app/plugins/sample-app

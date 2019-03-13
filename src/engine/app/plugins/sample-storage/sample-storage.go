@@ -2,9 +2,9 @@ package main
 
 import (
 	"os"
-	"fmt"
 	"github.com/pborman/getopt/v2"
 	"engine/util"
+	"engine/util/pluginUtil"
 	"encoding/json"
 )
 
@@ -19,7 +19,7 @@ func main() {
 	}
 
 	if getopt.IsSet("action") != true {
-		fmt.Printf("ERROR incorrect parameter\n")
+		pluginUtil.LogErrorMessage("Incorrect parameter\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -36,7 +36,7 @@ func main() {
 	} else if *optAction == "info" {
 		info()			
 	} else {
-		fmt.Printf("ERROR incorrect parameter" + *optAction + "\n")
+		pluginUtil.LogErrorMessage("Incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -44,17 +44,17 @@ func main() {
 
 func backup (configMap map[string]string) {
 	printEnv(configMap)
-	fmt.Printf("INFO Performing backup")
+	pluginUtil.LogInfoMessage("Performing backup")
 }
 
 func backupList (configMap map[string]string) {
 	printEnv(configMap)
-	fmt.Printf("INFO Performing backup list")
+	pluginUtil.LogErrorMessage("Performing backup list")
 }
 
 func backupDelete (configMap map[string]string) {
 	printEnv(configMap)
-	fmt.Printf("INFO Performing backup delete")
+	pluginUtil.LogErrorMessage("Performing backup delete")
 }
 
 func info () {
@@ -63,11 +63,10 @@ func info () {
 	//output json
 	b, err := json.Marshal(plugin)
     if err != nil {
-        fmt.Println(err)
-        return
+        pluginUtil.LogErrorMessage(err.Error())
+	} else {
+		pluginUtil.PrintMessage(string(b))
 	}
-	
-	fmt.Println(string(b))
 }
 
 func setPlugin() (plugin util.Plugin) {
@@ -97,7 +96,7 @@ func setPlugin() (plugin util.Plugin) {
 
 func printEnv(configMap map[string]string) {
 	config := util.ConfigMapToJson(configMap)
-	fmt.Printf("DEBUG Config Parameters: " + config + "\n")
+	pluginUtil.LogDebugMessage("Config Parameters: " + config + "\n")
 }
 
 func getEnvParams() map[string]string {
@@ -105,6 +104,7 @@ func getEnvParams() map[string]string {
 
 	configMap["ProfileName"] = os.Getenv("ProfileName")
 	configMap["ConfigName"] = os.Getenv("ConfigName")
+	configMap["BackupName"] = os.Getenv("BackupName")
 	configMap["SampleStorageVar1"] = os.Getenv("SampleStorageVar1")
 	configMap["SampleStorageVar2"] = os.Getenv("SampleStorageVar2")
 

@@ -38,7 +38,7 @@ func main() {
 
 	var configPath string
 	if getopt.IsSet("configPath") == true {
-		configPath = *optConfigPath + "/" + *optProfile + "/" + *optConfig
+		configPath = *optConfigPath + "/" + *optProfile + "/" + *optConfig + ".conf"
 	} else {
 		configPath = "configs/" + *optProfile + "/" + *optConfig
 	}

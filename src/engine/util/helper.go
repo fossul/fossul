@@ -1,34 +1,22 @@
 package util
 
 import (
-	"encoding/json"
-	"net/http"
-	"log"
+	"time"
+	"fmt"
 )
 
-func GetConfig (w http.ResponseWriter, r *http.Request) Config {
 
-	var config Config
-	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
-		log.Println(err)
-	}
-	defer r.Body.Close()
- 
-	res,err := json.Marshal(&config)
-	if err != nil {
-        log.Println(err)
-	}
+func GetTimestamp() int64 {
+	time := time.Now().Unix()
 
-	log.Println("DEBUG", string(res))
-
-	return config
+	return time
 }
 
-func ConfigMapToJson (configMap map[string]string) string {
-	jsonString, err := json.Marshal(configMap)
-	if err != nil {
-		log.Println(err)	
-	}
+func GetBackupName(name string) string {
+	time := GetTimestamp()
+	timeToString := fmt.Sprintf("%d",time)
 
-	return string(jsonString)
+	backupName := fmt.Sprintf(name + "_" + timeToString)
+
+	return backupName
 }

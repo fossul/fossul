@@ -106,6 +106,10 @@ func LogResults (l *log.Logger, result []Result) {
 			} else if line.Level == "COMMENT" {
 				l.SetPrefix("########## ")
 				l.Print(line.Message + " ##########")
+			} else {
+				t := time.Unix(line.Timestamp,0)
+				l.SetPrefix(t.String() + " [UNKNOWN] ")
+				l.Print(line.Message)				
 			}			
 		}
 	}	

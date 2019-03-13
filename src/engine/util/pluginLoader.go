@@ -121,8 +121,6 @@ func setStoragePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
 
 func setBasePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd  {
 	cmd.Env = os.Environ()
-	//profileName := fmt.Sprintf("ProfileName=%s",config.ProfileName)
-	//configName := fmt.Sprintf("ConfigName=%s",config.ConfigName)
 	cmd.Env = append(cmd.Env, "ProfileName=" +  config.ProfileName)
 	cmd.Env = append(cmd.Env, "ConfigName=" + config.ConfigName)
 

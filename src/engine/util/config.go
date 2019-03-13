@@ -7,6 +7,8 @@ import (
 	"os"
 	"bufio"
 	"regexp"
+	"encoding/json"
+	"net/http"
 )
 
 type Config struct {
@@ -100,4 +102,31 @@ func SetPluginParameters(appConfigPath,storageConfigPath string, config Config) 
 	config.StoragePluginParameters = configStorageMap
 
 	return config
+}
+
+func GetConfig (w http.ResponseWriter, r *http.Request) Config {
+
+	var config Config
+	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
+		log.Println(err)
+	}
+	defer r.Body.Close()
+ 
+	res,err := json.Marshal(&config)
+	if err != nil {
+        log.Println(err)
+	}
+
+	log.Println("DEBUG", string(res))
+
+	return config
+}
+
+func ConfigMapToJson (configMap map[string]string) string {
+	jsonString, err := json.Marshal(configMap)
+	if err != nil {
+		log.Println(err)	
+	}
+
+	return string(jsonString)
 }
