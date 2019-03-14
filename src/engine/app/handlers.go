@@ -40,7 +40,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var plugin string = config.PluginDir + "/" + pluginName
 
 	var result util.ResultSimple
-	result = util.ExecutePluginInfo(config, "app", plugin, "--action", "info")
+	result = util.ExecutePluginSimple(config, "app", plugin, "--action", "info")
 
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)

@@ -51,7 +51,7 @@ func backup (configMap map[string]string) {
 	pluginUtil.LogErrorMessage("Performing backup for pod" + podName)
 
 	backupName := util.GetBackupName(configMap["BackupName"])
-	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"] + "/" + backupName
+	backupPath := util.GetBackupPath(configMap)
 	pluginUtil.LogInfoMessage("Backup name is " + backupName + ", Backup path is " + backupPath)
 
 	pluginUtil.CreateDir(backupPath,0755)
@@ -65,15 +65,34 @@ func backup (configMap map[string]string) {
 }
 
 func backupList (configMap map[string]string) {
-	printEnv(configMap)
-	pluginUtil.LogInfoMessage("Performing backup list")
+	backupDir := util.GetBackupDir(configMap)
+
+	//pluginUtil.LogCommentMessage("Performing backup list " + backupDir)
+	backups := pluginUtil.ListBackups(backupDir)
+
+	b, err := json.Marshal(backups)
+    if err != nil {
+        pluginUtil.LogErrorMessage(err.Error())
+	} else {
+		pluginUtil.PrintMessage(string(b))
+	}
+	/*
+	for index, backup := range backups {
+		backupListOutput := fmt.Sprintf("%d %s %s",index,backup.Name,backup.Timestamp)
+		pluginUtil.PrintMessage(backupListOutput)
+	}
+	/*b, err := json.Marshal(backups)
+    if err != nil {
+        pluginUtil.LogErrorMessage(err.Error())
+	} else {
+		pluginUtil.PrintMessage(string(b))
+	}
+	*/
 }
 
 func backupDelete (configMap map[string]string) {
 	printEnv(configMap)
 	pluginUtil.LogInfoMessage("Performing backup delete")
-
-
 }
 
 func info () {
@@ -129,6 +148,7 @@ func getEnvParams() map[string]string {
 	configMap["RsyncCmdPath"] = os.Getenv("RsyncCmdPath")
 	configMap["BackupSrcPath"] = os.Getenv("BackupSrcPath")
 	configMap["BackupDestPath"] = os.Getenv("BackupDestPath")
+	configMap["BackupCOunt"] = os.Getenv("BackupCount")
 
 	return configMap
 }

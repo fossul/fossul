@@ -63,7 +63,7 @@ func ExecutePlugin(config Config, pluginType string, args ...string) (result Res
 	return result
 }
 
-func ExecutePluginInfo(config Config, pluginType string, args ...string) (result ResultSimple) {
+func ExecutePluginSimple(config Config, pluginType string, args ...string) (result ResultSimple) {
 
 	baseCmd := args[0]
 	cmdArgs := args[1:]

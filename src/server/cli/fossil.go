@@ -79,7 +79,14 @@ func main() {
 
 
 	} else if *optAction == "backupList" {
-		
+		fmt.Println("### List of Backups ###")
+		result, backups := client.BackupList(string(*optProfile),string(*optConfig),config)
+
+		checkResult(result)
+
+		for _, backup := range backups {
+			fmt.Println(backup.Name, backup.Timestamp)
+		}
 	} else if *optAction == "pluginList" {
 		fmt.Println("### List of Application Plugins ###")
 		var plugins []string = client.PluginList(config)
@@ -93,11 +100,8 @@ func main() {
 			os.Exit(1)
 		}
 
-		var result util.ResultSimple
-		var plugin util.Plugin
-
 		var pluginName string = *optPluginName
-		result, plugin = client.PluginInfo(config,pluginName)
+		result, plugin := client.PluginInfo(config,pluginName)
 
 		checkResult(result)
 

@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"io/ioutil"
+	"fmt"
 )
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -39,18 +40,21 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var config util.Config = util.GetConfig(w,r)
 	var plugin string = config.PluginDir + "/" + pluginName
 
-	var result util.Result
-	result = util.ExecutePlugin(config, "storage,", plugin, "--action", "info")
+	var result util.ResultSimple
+	result = util.ExecutePluginSimple(config, "storage,", plugin, "--action", "info")
+
+	for _,msg := range result.Messages {
+		log.Println("HEREkkk ",msg)
+	}
 
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
 
 func Backup(w http.ResponseWriter, r *http.Request) {
-
 	var config util.Config = util.GetConfig(w,r)
-
 	var plugin string = config.PluginDir + "/" + config.StoragePlugin
+
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: Storage plugin does not exist"
 		log.Println(err, errMsg)
@@ -71,8 +75,34 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func BackupList(w http.ResponseWriter, r *http.Request) {
 
+func BackupList(w http.ResponseWriter, r *http.Request) {
+	var config util.Config = util.GetConfig(w,r)
+	var plugin string = config.PluginDir + "/" + config.StoragePlugin
+
+	if _, err := os.Stat(plugin); os.IsNotExist(err) {
+		var errMsg string = "ERROR: Storage plugin does not exist"
+		log.Println(err, errMsg)
+
+		var messages []string
+		message := fmt.Sprintf("ERROR %s %s",errMsg,err.Error())
+		messages = append(messages, message)
+
+		var result = util.SetResultSimple(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
+
+	var result util.ResultSimple
+	result = util.ExecutePluginSimple(config, "storage", plugin, "--action", "backupList")
+
+	_ = json.NewDecoder(r.Body).Decode(&result)
+	json.NewEncoder(w).Encode(result)
+}
+
+/*
+func BackupList(w http.ResponseWriter, r *http.Request) {
 	var config util.Config = util.GetConfig(w,r)
 	var plugin string = config.PluginDir + "/" + config.StoragePlugin
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
@@ -90,11 +120,12 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var result util.Result
-	result = util.ExecutePlugin(config, "storage", plugin, "--action", "backupList")
+	result = util.ExecutePlugin(config, "storage,", plugin, "--action", "backupList")
+
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
-
+*/
 func BackupDelete(w http.ResponseWriter, r *http.Request) {
 
 	var config util.Config = util.GetConfig(w,r)

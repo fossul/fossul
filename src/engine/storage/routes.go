@@ -63,7 +63,7 @@ var routes = Routes{
         "BackupList",
         "POST",
         "/backupList",
-        Backup,
+        BackupList,
     },
     Route{
         "BackupDelete",

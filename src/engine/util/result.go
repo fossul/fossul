@@ -72,3 +72,11 @@ func SetResult(code int, messages []Message) Result {
 
 	return result
 }
+
+func SetResultSimple(code int, messages []string) ResultSimple {
+	var result ResultSimple
+	result.Code = code
+	result.Messages = messages
+
+	return result
+}
