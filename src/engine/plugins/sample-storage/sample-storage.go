@@ -4,12 +4,12 @@ import (
 	"os"
 	"github.com/pborman/getopt/v2"
 	"engine/util"
-	"engine/util/pluginUtil"
+	"engine/plugins/pluginUtil"
 	"encoding/json"
 )
 
 func main() {
-	optAction := getopt.StringLong("action",'a',"","quiesce|unquiesce|info")
+	optAction := getopt.StringLong("action",'a',"","backup|backupList|backupDelete|info")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -19,7 +19,7 @@ func main() {
 	}
 
 	if getopt.IsSet("action") != true {
-		pluginUtil.LogErrorMessage("Incorrect parameter")
+		pluginUtil.LogErrorMessage("Incorrect parameter\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -27,14 +27,14 @@ func main() {
 		//load env parameters
 		configMap := getEnvParams()
 
-	if *optAction == "quiesce" {
-		printEnv(configMap)
-		quiesce(configMap)
-	} else if *optAction == "unquiesce" {
-		printEnv(configMap)
-		unquiesce(configMap)
+	if *optAction == "backup" {
+		backup(configMap)
+	} else if *optAction == "backupList" {
+		backupList(configMap)
+	} else if *optAction == "backupDelete" {
+		backupDelete(configMap)		
 	} else if *optAction == "info" {
-		info()		
+		info()			
 	} else {
 		pluginUtil.LogErrorMessage("Incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
@@ -42,14 +42,19 @@ func main() {
 	}
 }	
 
-func quiesce (configMap map[string]string) {
+func backup (configMap map[string]string) {
 	printEnv(configMap)
-	pluginUtil.LogInfoMessage("Performing application quiesce")
+	pluginUtil.LogInfoMessage("Performing backup")
 }
 
-func unquiesce (configMap map[string]string) {
+func backupList (configMap map[string]string) {
 	printEnv(configMap)
-	pluginUtil.LogInfoMessage("Performing application unquiesce")
+	pluginUtil.LogErrorMessage("Performing backup list")
+}
+
+func backupDelete (configMap map[string]string) {
+	printEnv(configMap)
+	pluginUtil.LogErrorMessage("Performing backup delete")
 }
 
 func info () {
@@ -70,16 +75,19 @@ func setPlugin() (plugin util.Plugin) {
 	plugin.Type = "app"
 
 	var capabilities []util.Capability
-	var quiesceCap util.Capability
-	quiesceCap.Name = "quiesce"
+	var backupCap util.Capability
+	backupCap.Name = "backup"
 
-	var unquiesceCap util.Capability
-	unquiesceCap.Name = "unquiesce"
+	var backupListCap util.Capability
+	backupListCap.Name = "backupList"
+
+	var backupDeleteCap util.Capability
+	backupDeleteCap.Name = "backupDelete"
 
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,quiesceCap,unquiesceCap,infoCap)
+	capabilities = append(capabilities,backupCap,backupListCap,backupDeleteCap,infoCap)
 
 	plugin.Capabilities = capabilities
 
@@ -88,7 +96,7 @@ func setPlugin() (plugin util.Plugin) {
 
 func printEnv(configMap map[string]string) {
 	config := util.ConfigMapToJson(configMap)
-	pluginUtil.LogDebugMessage("Config Parameters: " + config)
+	pluginUtil.LogDebugMessage("Config Parameters: " + config + "\n")
 }
 
 func getEnvParams() map[string]string {
@@ -96,8 +104,9 @@ func getEnvParams() map[string]string {
 
 	configMap["ProfileName"] = os.Getenv("ProfileName")
 	configMap["ConfigName"] = os.Getenv("ConfigName")
-	configMap["SampleAppVar1"] = os.Getenv("SampleAppVar1")
-	configMap["SampleAppVar2"] = os.Getenv("SampleAppVar2")
+	configMap["BackupName"] = os.Getenv("BackupName")
+	configMap["SampleStorageVar1"] = os.Getenv("SampleStorageVar1")
+	configMap["SampleStorageVar2"] = os.Getenv("SampleStorageVar2")
 
 	return configMap
 }
