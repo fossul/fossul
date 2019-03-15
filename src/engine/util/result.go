@@ -80,3 +80,14 @@ func SetResultSimple(code int, messages []string) ResultSimple {
 
 	return result
 }
+
+func PrependMessage(message Message,messages []Message) []Message {
+	var prependedMessages []Message
+	prependedMessages = append(prependedMessages,message)
+
+	for _, msg := range messages {
+		prependedMessages = append(prependedMessages,msg)
+	}
+
+	return prependedMessages
+}

@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"io/ioutil"
+	"strings"
 )
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -48,23 +49,37 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
-	var messages []util.Message
-	message := util.SetMessage("INFO", "pre quiesce cmd completed successfully")
-	messages = append(messages, message)
+	var result util.Result
 
-	var result = util.SetResult(0, messages)
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
+	var config util.Config = util.GetConfig(w,r)
+
+	if config.PreAppQuiesceCmd != "" {
+		args := strings.Split(config.PreAppQuiesceCmd, ",")
+		message := util.SetMessage("INFO", "Performing pre quiesce command")
+
+		result = util.ExecuteCommand(args...)
+		result.Messages = util.PrependMessage(message,result.Messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
 }
 
 func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
-	var messages []util.Message
-	message := util.SetMessage("INFO", "quiesce cmd completed successfully")
-	messages = append(messages, message)
+	var result util.Result
 
-	var result = util.SetResult(0, messages)
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
+	var config util.Config = util.GetConfig(w,r)
+
+	if config.PreAppQuiesceCmd != "" {
+		args := strings.Split(config.AppQuiesceCmd, ",")
+		message := util.SetMessage("INFO", "Performing quiesce command")
+
+		result = util.ExecuteCommand(args...)
+		result.Messages = util.PrependMessage(message,result.Messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
 }
 
 func Quiesce(w http.ResponseWriter, r *http.Request) {
@@ -92,33 +107,54 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostQuiesceCmd(w http.ResponseWriter, r *http.Request) {
-	var messages []util.Message
-	message := util.SetMessage("INFO", "post quiesce cmd completed successfully")
-	messages = append(messages, message)
+	var result util.Result
 
-	var result = util.SetResult(0, messages)
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
+	var config util.Config = util.GetConfig(w,r)
+
+	if config.PreAppQuiesceCmd != "" {
+		args := strings.Split(config.PostAppQuiesceCmd, ",")
+		message := util.SetMessage("INFO", "Performing post quiesce command")
+
+		result = util.ExecuteCommand(args...)
+		result.Messages = util.PrependMessage(message,result.Messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
 }
 
 func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
-	var messages []util.Message
-	message := util.SetMessage("INFO", "unquiesce cmd completed successfully")
-	messages = append(messages, message)
+	var result util.Result
 
-	var result = util.SetResult(0, messages)
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
+	var config util.Config = util.GetConfig(w,r)
+
+	if config.PreAppQuiesceCmd != "" {
+		args := strings.Split(config.AppUnquiesceCmd, ",")
+		message := util.SetMessage("INFO", "Performing unquiesce command")
+
+		result = util.ExecuteCommand(args...)
+		result.Messages = util.PrependMessage(message,result.Messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
 }
 
 func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
-	var messages []util.Message
-	message := util.SetMessage("INFO", "pre unquiesce cmd completed successfully")
-	messages = append(messages, message)
+	var result util.Result
 
-	var result = util.SetResult(0, messages)
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
+	var config util.Config = util.GetConfig(w,r)
+
+	if config.PreAppQuiesceCmd != "" {
+		args := strings.Split(config.PreAppUnquiesceCmd, ",")
+		message := util.SetMessage("INFO", "Performing pre unquiesce command")
+
+		result = util.ExecuteCommand(args...)
+		result.Messages = util.PrependMessage(message,result.Messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
 }
 
 func Unquiesce(w http.ResponseWriter, r *http.Request) {
@@ -147,11 +183,18 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
-	var messages []util.Message
-	message := util.SetMessage("INFO", "post unquiesce cmd completed successfully")
-	messages = append(messages, message)
+	var result util.Result
 
-	var result = util.SetResult(0, messages)
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
+	var config util.Config = util.GetConfig(w,r)
+
+	if config.PreAppQuiesceCmd != "" {
+		args := strings.Split(config.PostAppUnquiesceCmd, ",")
+		message := util.SetMessage("INFO", "Performing post unquiesce command")
+
+		result = util.ExecuteCommand(args...)
+		result.Messages = util.PrependMessage(message,result.Messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
 }

@@ -5,6 +5,7 @@ import (
 	"engine/util"
 	"engine/client"
 	"net/http"
+	"strings"
 )
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -23,11 +24,11 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	results = append(results, commentResult)
 
 	var preQuiesceCmdResult util.Result
-	preQuiesceCmdResult = client.PreQuiesceCmd()
+	preQuiesceCmdResult = client.PreQuiesceCmd(config)
 	results = append(results, preQuiesceCmdResult)
 
 	if preQuiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)
 	}
 
@@ -35,11 +36,11 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	results = append(results, commentResult)
 
 	var quiesceCmdResult util.Result
-	quiesceCmdResult = client.QuiesceCmd()	
+	quiesceCmdResult = client.QuiesceCmd(config)	
 	results = append(results, quiesceCmdResult)
 
 	if quiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)
 	}
 	
@@ -48,16 +49,16 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	results = append(results, quiesceResult)
 
 	if quiesceResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)
 	}
 
 	var postQuiesceCmdResult util.Result
-	postQuiesceCmdResult = client.PostQuiesceCmd()
+	postQuiesceCmdResult = client.PostQuiesceCmd(config)
 	results = append(results, postQuiesceCmdResult)
 
 	if postQuiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)
 	}
 
@@ -69,16 +70,16 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	results = append(results, backupResult)
 
 	if backupResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)
 	}
 
 	var preUnquiesceCmdResult util.Result
-	preUnquiesceCmdResult = client.PreUnquiesceCmd()
+	preUnquiesceCmdResult = client.PreUnquiesceCmd(config)
 	results = append(results, preUnquiesceCmdResult)
 
 	if preUnquiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)
 	}
 
@@ -86,11 +87,11 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	results = append(results, commentResult)
 
 	var unquiesceCmdResult util.Result
-	unquiesceCmdResult = client.UnquiesceCmd()	
+	unquiesceCmdResult = client.UnquiesceCmd(config)	
 	results = append(results, unquiesceCmdResult)
 
 	if unquiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)
 	}
 
@@ -99,16 +100,16 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	results = append(results, unquiesceResult)
 
 	if unquiesceResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)
 	}
 
 	var postUnquiesceCmdResult util.Result
-	postUnquiesceCmdResult = client.PostUnquiesceCmd()
+	postUnquiesceCmdResult = client.PostUnquiesceCmd(config)
 	results = append(results, postUnquiesceCmdResult)
 
 	if postUnquiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)	
 	}
 
@@ -120,16 +121,16 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	results = append(results, backupDeleteResult)
 
 	if backupDeleteResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)
 	}
 
 	var sendTrapSuccessCmdResult util.Result
-	sendTrapSuccessCmdResult = client.SendTrapSuccessCmd()	
+	sendTrapSuccessCmdResult = client.SendTrapSuccessCmd(config)	
 	results = append(results, sendTrapSuccessCmdResult)
 
 	if sendTrapSuccessCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd()
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)
 	}
 
@@ -148,23 +149,35 @@ func sendError(w http.ResponseWriter, r *http.Request, results []util.Result) {
 }
 
 func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
+	var result util.Result
 
-	var messages []util.Message
-	message := util.SetMessage("INFO", "send trap success cmd completed successfully")
-	messages = append(messages, message)
+	var config util.Config = util.GetConfig(w,r)
 
-	var result = util.SetResult(0, messages)
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
+	if config.SendTrapSuccessCmd != "" {
+		args := strings.Split(config.SendTrapSuccessCmd, ",")
+		message := util.SetMessage("INFO", "Performing send trap success command")
+
+		result = util.ExecuteCommand(args...)
+		result.Messages = util.PrependMessage(message,result.Messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
 }
 
 func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
+	var result util.Result
 
-	var messages []util.Message
-	message := util.SetMessage("INFO", "send trap error cmd completed successfully")
-	messages = append(messages, message)
+	var config util.Config = util.GetConfig(w,r)
 
-	var result = util.SetResult(0, messages)	
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
+	if config.SendTrapSuccessCmd != "" {
+		args := strings.Split(config.SendTrapErrorCmd, ",")
+		message := util.SetMessage("INFO", "Performing send trap error command")
+
+		result = util.ExecuteCommand(args...)
+		result.Messages = util.PrependMessage(message,result.Messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
 }

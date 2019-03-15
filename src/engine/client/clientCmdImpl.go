@@ -5,11 +5,16 @@ import (
 	"engine/util"
 	"log"
 	"net/http"
+	"bytes"
 )
 
-func PreQuiesceCmd() util.Result {
+func PreQuiesceCmd(config util.Config) util.Result {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("GET", "http://fossil-app:8001/preQuiesceCmd", nil)
+	req, err := http.NewRequest("GET", "http://fossil-app:8001/preQuiesceCmd", b)
+	req.Header.Add("Content-Type", "application/json")
+
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -30,12 +35,15 @@ func PreQuiesceCmd() util.Result {
 	}
 
 	return result
-
 }
 
-func QuiesceCmd() util.Result {
+func QuiesceCmd(config util.Config) util.Result {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("GET", "http://fossil-app:8001/quiesceCmd", nil)
+	req, err := http.NewRequest("GET", "http://fossil-app:8001/quiesceCmd", b)
+	req.Header.Add("Content-Type", "application/json")
+
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -56,12 +64,15 @@ func QuiesceCmd() util.Result {
 	}
 
 	return result
-
 }
 
-func PostQuiesceCmd() util.Result {
+func PostQuiesceCmd(config util.Config) util.Result {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("GET", "http://fossil-app:8001/postQuiesceCmd", nil)
+	req, err := http.NewRequest("GET", "http://fossil-app:8001/postQuiesceCmd", b)
+	req.Header.Add("Content-Type", "application/json")
+
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -82,12 +93,15 @@ func PostQuiesceCmd() util.Result {
 	}
 
 	return result
-
 }
 
-func PreUnquiesceCmd() util.Result {
+func PreUnquiesceCmd(config util.Config) util.Result {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("GET", "http://fossil-app:8001/preUnquiesceCmd", nil)
+	req, err := http.NewRequest("GET", "http://fossil-app:8001/preUnquiesceCmd", b)
+	req.Header.Add("Content-Type", "application/json")
+
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -108,12 +122,15 @@ func PreUnquiesceCmd() util.Result {
 	}
 
 	return result
-
 }
 
-func UnquiesceCmd() util.Result {
+func UnquiesceCmd(config util.Config) util.Result {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("GET", "http://fossil-app:8001/unquiesceCmd", nil)
+	req, err := http.NewRequest("GET", "http://fossil-app:8001/unquiesceCmd", b)
+	req.Header.Add("Content-Type", "application/json")
+
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -134,12 +151,15 @@ func UnquiesceCmd() util.Result {
 	}
 
 	return result
-
 }
 
-func PostUnquiesceCmd() util.Result {
+func PostUnquiesceCmd(config util.Config) util.Result {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("GET", "http://fossil-app:8001/postUnquiesceCmd", nil)
+	req, err := http.NewRequest("GET", "http://fossil-app:8001/postUnquiesceCmd", b)
+	req.Header.Add("Content-Type", "application/json")
+
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -160,12 +180,15 @@ func PostUnquiesceCmd() util.Result {
 	}
 
 	return result
-
 }
 
-func SendTrapSuccessCmd() util.Result {
+func SendTrapSuccessCmd(config util.Config) util.Result {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/sendTrapSuccessCmd", nil)
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/sendTrapSuccessCmd", b)
+	req.Header.Add("Content-Type", "application/json")
+
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -186,12 +209,15 @@ func SendTrapSuccessCmd() util.Result {
 	}
 
 	return result
-
 }
 
-func SendTrapErrorCmd() util.Result {
+func SendTrapErrorCmd(config util.Config) util.Result {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/sendTrapErrorCmd", nil)
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/sendTrapErrorCmd", b)
+	req.Header.Add("Content-Type", "application/json")
+
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -212,5 +238,4 @@ func SendTrapErrorCmd() util.Result {
 	}
 
 	return result
-
 }

@@ -34,11 +34,11 @@ func ExecuteCommand(args ...string) (result Result) {
 
 		resultCode = 1
 	} else {
-		s1 := fmt.Sprintf("Command [%s %s] completed successfully",baseCmd, strings.Join(cmdArgs, " "))
-		message := SetMessage("INFO", s1)
+		message = SetMessage("INFO", string(stdoutStderrBytes))
 		messages = append(messages, message)
 
-		message = SetMessage("INFO", string(stdoutStderrBytes))
+		s1 := fmt.Sprintf("Command [%s %s] completed successfully",baseCmd, strings.Join(cmdArgs, " "))
+		message := SetMessage("INFO", s1)
 		messages = append(messages, message)
 
 		resultCode = 0
