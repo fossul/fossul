@@ -7,6 +7,8 @@ import (
 	"engine/client/k8s"
 	"engine/plugins/pluginUtil"
 	"encoding/json"
+	"strconv"
+	"fmt"
 )
 
 func main() {
@@ -66,8 +68,6 @@ func backup (configMap map[string]string) {
 
 func backupList (configMap map[string]string) {
 	backupDir := util.GetBackupDir(configMap)
-
-	//pluginUtil.LogCommentMessage("Performing backup list " + backupDir)
 	backups := pluginUtil.ListBackups(backupDir)
 
 	b, err := json.Marshal(backups)
@@ -76,23 +76,37 @@ func backupList (configMap map[string]string) {
 	} else {
 		pluginUtil.PrintMessage(string(b))
 	}
-	/*
-	for index, backup := range backups {
-		backupListOutput := fmt.Sprintf("%d %s %s",index,backup.Name,backup.Timestamp)
-		pluginUtil.PrintMessage(backupListOutput)
-	}
-	/*b, err := json.Marshal(backups)
-    if err != nil {
-        pluginUtil.LogErrorMessage(err.Error())
-	} else {
-		pluginUtil.PrintMessage(string(b))
-	}
-	*/
 }
 
 func backupDelete (configMap map[string]string) {
 	printEnv(configMap)
-	pluginUtil.LogInfoMessage("Performing backup delete")
+
+	backupDir := util.GetBackupDir(configMap)
+	backups := pluginUtil.ListBackups(backupDir)
+	backupCount := len(backups)
+	backupRetentionCount, err := strconv.Atoi(configMap["BackupCount"])
+	if err != nil {
+		pluginUtil.LogErrorMessage(err.Error())
+	}
+
+
+	if backupCount > backupRetentionCount {
+		msg := fmt.Sprintf("Number of backups [%d] greater than backup retention [%d]",backupCount,backupRetentionCount)
+		pluginUtil.LogInfoMessage(msg)
+		count := 1
+		for backup := range pluginUtil.ReverseBackupList(backups) {	
+			if count > backupRetentionCount {
+				pluginUtil.LogInfoMessage("Deleting backup " + backup.Name + "_" + backup.Epoch)
+				backupPath := backupDir + "/" + backup.Name + "_" + backup.Epoch
+				pluginUtil.RecursiveDirDelete(backupPath)
+				pluginUtil.LogInfoMessage("Backup " + backup.Name + "_" + backup.Epoch + " deleted successfully")
+			}
+			count = count + 1
+		}
+	} else {
+		msg := fmt.Sprintf("Backup deletion skipped, there are [%d] backups but backup retention is [%d]",backupCount, backupRetentionCount)
+		pluginUtil.LogInfoMessage(msg)
+	}
 }
 
 func info () {
@@ -148,7 +162,7 @@ func getEnvParams() map[string]string {
 	configMap["RsyncCmdPath"] = os.Getenv("RsyncCmdPath")
 	configMap["BackupSrcPath"] = os.Getenv("BackupSrcPath")
 	configMap["BackupDestPath"] = os.Getenv("BackupDestPath")
-	configMap["BackupCOunt"] = os.Getenv("BackupCount")
+	configMap["BackupCount"] = os.Getenv("BackupCount")
 
 	return configMap
 }
