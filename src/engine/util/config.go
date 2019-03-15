@@ -23,6 +23,7 @@ type Config struct {
 	AppQuiesceCmd string `json:"appQuiesceCmd,omitempty"`
 	PostAppQuiesceCmd string `json:"postAppQuiesceCmd,omitempty"`
 	BackupCreateCmd string `json:"backupCreateCmd,omitempty"`
+	BackupDeleteCmd string `json:"backupDeleteCmd,omitempty"`
 	PreAppUnquiesceCmd string `json:"preAppUnquiesceCmd,omitempty"`
 	AppUnquiesceCmd string `json:"appUnquiesceCmd,omitempty"`
 	PostAppUnquiesceCmd string `json:"postAppUnquiesceCmd,omitempty"`

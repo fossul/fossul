@@ -49,13 +49,13 @@ var routes = Routes{
     },   
     Route{
         "SendTrapSuccessCmd",
-        "GET",
+        "POST",
         "/sendTrapSuccessCmd",
         SendTrapSuccessCmd,
     },   
     Route{
         "SendTrapErrorCmd",
-        "GET",
+        "POST",
         "/sendTrapErrorCmd",
         SendTrapErrorCmd,
     },    

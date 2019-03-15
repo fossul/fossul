@@ -71,4 +71,16 @@ var routes = Routes{
         "/backupDelete",
         BackupDelete,
     },
+    Route{
+        "BackupCreateCmd",
+        "POST",
+        "/backupCreateCmd",
+        BackupCreateCmd,
+    },
+    Route{
+        "BackupDeleteCmd",
+        "POST",
+        "/backupDeleteCmd",
+        BackupDeleteCmd,
+    },        
 }

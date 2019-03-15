@@ -50,7 +50,6 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 
 func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-
 	var config util.Config = util.GetConfig(w,r)
 
 	if config.PreAppQuiesceCmd != "" {
@@ -67,7 +66,6 @@ func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
 func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-
 	var config util.Config = util.GetConfig(w,r)
 
 	if config.PreAppQuiesceCmd != "" {
@@ -108,7 +106,6 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 
 func PostQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-
 	var config util.Config = util.GetConfig(w,r)
 
 	if config.PreAppQuiesceCmd != "" {
@@ -125,7 +122,6 @@ func PostQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
 func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-
 	var config util.Config = util.GetConfig(w,r)
 
 	if config.PreAppQuiesceCmd != "" {
@@ -142,7 +138,6 @@ func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 
 func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-
 	var config util.Config = util.GetConfig(w,r)
 
 	if config.PreAppQuiesceCmd != "" {
@@ -184,7 +179,6 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 
 func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-
 	var config util.Config = util.GetConfig(w,r)
 
 	if config.PreAppQuiesceCmd != "" {

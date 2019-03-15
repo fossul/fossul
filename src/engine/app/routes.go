@@ -55,13 +55,13 @@ var routes = Routes{
     },        
     Route{
         "PreQuiesceCmd",
-        "GET",
+        "POST",
         "/preQuiesceCmd",
         PreQuiesceCmd,
     },
     Route{
         "QuiesceCmd",
-        "GET",
+        "POST",
         "/quiesceCmd",
         QuiesceCmd,
     },
@@ -73,19 +73,19 @@ var routes = Routes{
     },
     Route{
         "PostQuiesceCmd",
-        "GET",
+        "POST",
         "/postQuiesceCmd",
         PostQuiesceCmd,
     },
     Route{
         "PreUnquiesceCmd",
-        "GET",
+        "POST",
         "/preUnquiesceCmd",
         PreUnquiesceCmd,
     },
     Route{
         "UnquiesceCmd",
-        "GET",
+        "POST",
         "/unquiesceCmd",
         UnquiesceCmd,
     },
@@ -97,7 +97,7 @@ var routes = Routes{
     },
     Route{
         "PostUnquiesceCmd",
-        "GET",
+        "POST",
         "/postUnquiesceCmd",
         PostUnquiesceCmd,
     },    

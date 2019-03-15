@@ -23,6 +23,10 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	commentResult := util.SetResultMessage(0,"COMMENT","Welcome to Fossil Backup Framework, Performing Backup Workflow")
 	results = append(results, commentResult)
 
+
+	commentResult = util.SetResultMessage(0,"COMMENT","Performing Application Quiesce")
+	results = append(results, commentResult)
+
 	var preQuiesceCmdResult util.Result
 	preQuiesceCmdResult = client.PreQuiesceCmd(config)
 	results = append(results, preQuiesceCmdResult)
@@ -31,9 +35,6 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)
 	}
-
-	commentResult = util.SetResultMessage(0,"COMMENT","Performing Application Quiesce")
-	results = append(results, commentResult)
 
 	var quiesceCmdResult util.Result
 	quiesceCmdResult = client.QuiesceCmd(config)	
@@ -65,6 +66,15 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	commentResult = util.SetResultMessage(0,"COMMENT","Performing Backup")
 	results = append(results, commentResult)
 
+	var backupCreateCmdResult util.Result
+	backupCreateCmdResult = client.BackupCreateCmd(config)	
+	results = append(results, backupCreateCmdResult)
+
+	if backupCreateCmdResult.Code != 0 {
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+		sendError(w,r,results)
+	}
+
 	var backupResult util.Result
 	backupResult = client.Backup(config)
 	results = append(results, backupResult)
@@ -74,6 +84,9 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 		sendError(w,r,results)
 	}
 
+	commentResult = util.SetResultMessage(0,"COMMENT","Performing Application Unquiesce")
+	results = append(results, commentResult)
+
 	var preUnquiesceCmdResult util.Result
 	preUnquiesceCmdResult = client.PreUnquiesceCmd(config)
 	results = append(results, preUnquiesceCmdResult)
@@ -82,9 +95,6 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
 		sendError(w,r,results)
 	}
-
-	commentResult = util.SetResultMessage(0,"COMMENT","Performing Application Unquiesce")
-	results = append(results, commentResult)
 
 	var unquiesceCmdResult util.Result
 	unquiesceCmdResult = client.UnquiesceCmd(config)	
@@ -115,6 +125,16 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	commentResult = util.SetResultMessage(0,"COMMENT","Performing Backup Retention")
 	results = append(results, commentResult)
+
+	var backupDeleteCmdResult util.Result
+	backupDeleteCmdResult = client.BackupDeleteCmd(config)	
+	results = append(results, backupDeleteCmdResult)
+
+	if backupCreateCmdResult.Code != 0 {
+		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+		sendError(w,r,results)
+	}
+
 
 	var backupDeleteResult util.Result
 	backupDeleteResult = client.BackupDelete(config)
