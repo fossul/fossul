@@ -45,3 +45,20 @@ func ConvertEpoch(epoch string) string {
 
 	return time.String()
 }
+
+func JoinArray(array, combinedArray []string) []string {
+	for _, item := range array {
+		combinedArray = append (combinedArray,item)
+	}
+
+	return combinedArray
+}
+
+func ExistsInArray(array []string, str string) bool {
+	for _, item := range array {
+	   if item == str {
+		  return true
+	   }
+	}
+	return false
+ }

@@ -18,9 +18,10 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 
 func PluginList(w http.ResponseWriter, r *http.Request) {
 	var config util.Config = util.GetConfig(w,r)
+	pluginDir := config.PluginDir + "/storage"
 
 	var plugins []string
-	fileInfo, err := ioutil.ReadDir(config.PluginDir)
+	fileInfo, err := ioutil.ReadDir(pluginDir)
 	if err != nil {
 		log.Println(err)
 	}
@@ -38,14 +39,10 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var pluginName string = params["plugin"]
 
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/" + pluginName
+	var plugin string = config.PluginDir + "/storage/" + pluginName
 
 	var result util.ResultSimple
 	result = util.ExecutePluginSimple(config, "storage,", plugin, "--action", "info")
-
-	for _,msg := range result.Messages {
-		log.Println("HEREkkk ",msg)
-	}
 
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
@@ -53,7 +50,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 
 func Backup(w http.ResponseWriter, r *http.Request) {
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/" + config.StoragePlugin
+	var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
 
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: Storage plugin does not exist"
@@ -78,7 +75,7 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 
 func BackupList(w http.ResponseWriter, r *http.Request) {
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/" + config.StoragePlugin
+	var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
 
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: Storage plugin does not exist"
@@ -129,7 +126,7 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 func BackupDelete(w http.ResponseWriter, r *http.Request) {
 
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/" + config.StoragePlugin
+	var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: Storage plugin does not exist"
 		log.Println(err, errMsg)

@@ -13,7 +13,7 @@ func main() {
 	optProfile := getopt.StringLong("profile",'p',"","Profile name")
 	optConfig := getopt.StringLong("config",'c',"","Config name")
 	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
-	optAction := getopt.StringLong("action",'a',"","backup|backupList|pluginList|pluginInfo|status")
+	optAction := getopt.StringLong("action",'a',"","backup|backupList|appPluginList|storagePluginList|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
     optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
@@ -87,21 +87,55 @@ func main() {
 		for _, backup := range backups {
 			fmt.Println(backup.Name, backup.Timestamp)
 		}
-	} else if *optAction == "pluginList" {
+	} else if *optAction == "appPluginList" {
 		fmt.Println("### List of Application Plugins ###")
-		var plugins []string = client.PluginList(config)
+
+		var plugins []string
+		var appPlugins []string = client.AppPluginList(config)
+		plugins = util.JoinArray(appPlugins,plugins)
+
 		for _, plugin := range plugins {
 			fmt.Println(plugin)
 		}
+	} else if *optAction == "storagePluginList" {
+		fmt.Println("### List of Storage Plugins ###")
+	
+		var plugins []string
+		var storagePlugins []string = client.StoragePluginList(config)
+		plugins = util.JoinArray(storagePlugins,plugins)
+	
+		for _, plugin := range plugins {
+			fmt.Println(plugin)
+		}		
 	} else if *optAction == "pluginInfo" {
 		if getopt.IsSet("plugin") != true {
 			fmt.Println("ERROR: Missing parameter --plugin")
 			getopt.Usage()
 			os.Exit(1)
 		}
-
 		var pluginName string = *optPluginName
-		result, plugin := client.PluginInfo(config,pluginName)
+
+		var result util.ResultSimple
+		var plugin util.Plugin
+
+		var appPlugins []string = client.AppPluginList(config)
+		isAppPlugin := util.ExistsInArray(appPlugins,pluginName)
+
+		if isAppPlugin == false {
+			var storagePlugins []string = client.StoragePluginList(config)	
+			isStoragePlugin := util.ExistsInArray(storagePlugins,pluginName)
+			if isStoragePlugin == true {
+				result, plugin = client.StoragePluginInfo(config,pluginName)
+			} else {
+				error := fmt.Sprintf("ERROR: Plugin %s not found!", plugin)
+				fmt.Println(error)
+			}
+		} else if isAppPlugin == true {
+			result, plugin = client.AppPluginInfo(config,pluginName)
+		} else {
+			error := fmt.Sprintf("ERROR: Plugin %s not found!", plugin)
+			fmt.Println(error)
+		}				
 
 		checkResult(result)
 

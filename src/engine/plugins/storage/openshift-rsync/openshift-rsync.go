@@ -107,9 +107,9 @@ func info () {
 }
 
 func setPlugin() (plugin util.Plugin) {
-	plugin.Name = "sample"
-	plugin.Description = "A sample plugin"
-	plugin.Type = "app"
+	plugin.Name = "openshift-rsync"
+	plugin.Description = "OpenShift Backup Plugin that uses rsync to backup a pod"
+	plugin.Type = "storage"
 
 	var capabilities []util.Capability
 	var backupCap util.Capability

@@ -17,9 +17,9 @@ go build engine/client/k8s
 go build engine/plugins/pluginUtil
 
 echo "Building Plugins"
-go install engine/plugins/sample-app
-go install engine/plugins/sample-storage
-go install engine/plugins/basic-container-storage
+go install engine/plugins/app/sample-app
+go install engine/plugins/storage/sample-storage
+go install engine/plugins/storage/openshift-rsync
 
 echo "Building Services"
 go install engine/workflow
@@ -27,9 +27,9 @@ go install engine/app
 go install engine/storage
 
 echo "Moving plugins to $PLUGIN_DIR"
-mv $GOBIN/sample-app $PLUGIN_DIR
-mv $GOBIN/sample-storage $PLUGIN_DIR
-mv $GOBIN/basic-container-storage $PLUGIN_DIR
+mv $GOBIN/sample-app $PLUGIN_DIR/app
+mv $GOBIN/sample-storage $PLUGIN_DIR/storage
+mv $GOBIN/openshift-rsync $PLUGIN_DIR/storage
 
 echo "Build completed successfully"
 

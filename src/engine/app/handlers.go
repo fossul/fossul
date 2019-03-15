@@ -17,9 +17,10 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 
 func PluginList(w http.ResponseWriter, r *http.Request) {
 	var config util.Config = util.GetConfig(w,r)
+	pluginDir := config.PluginDir + "/app"
 
 	var plugins []string
-	fileInfo, err := ioutil.ReadDir(config.PluginDir)
+	fileInfo, err := ioutil.ReadDir(pluginDir)
 	if err != nil {
 		log.Println(err)
 	}
@@ -37,7 +38,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var pluginName string = params["plugin"]
 
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/" + pluginName
+	var plugin string = config.PluginDir + "/app/" + pluginName
 
 	var result util.ResultSimple
 	result = util.ExecutePluginSimple(config, "app", plugin, "--action", "info")
@@ -69,7 +70,7 @@ func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
 func Quiesce(w http.ResponseWriter, r *http.Request) {
 
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/" + config.AppPlugin
+	var plugin string = config.PluginDir + "/app/" + config.AppPlugin
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: App plugin does not exist"
 		log.Println(err, errMsg)
@@ -123,7 +124,7 @@ func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 func Unquiesce(w http.ResponseWriter, r *http.Request) {
 
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/" + config.AppPlugin
+	var plugin string = config.PluginDir + "/app/" + config.AppPlugin
 	
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
 		var errMsg string = "ERROR: App plugin does not exist"
