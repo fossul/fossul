@@ -13,6 +13,7 @@ func main() {
 	optProfile := getopt.StringLong("profile",'p',"","Profile name")
 	optConfig := getopt.StringLong("config",'c',"","Config name")
 	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
+	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
 	optAction := getopt.StringLong("action",'a',"","backup|backupList|appPluginList|storagePluginList|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
     optHelp := getopt.BoolLong("help", 0, "Help")
@@ -50,7 +51,19 @@ func main() {
 
 	//read config file into struct
 	var config util.Config = util.ReadConfig(configPath)
-	//fmt.Println(config.BackupRetentions[1].Policy)
+
+	// Check retention policy
+	if *optAction == "backup" || *optAction == "backupList" {
+		if getopt.IsSet("policy") != true {
+			fmt.Println("ERROR: missing parameter --policy")
+			getopt.Usage()
+			os.Exit(1)	
+		}
+		if util.ExistsBackupRetention(*optPolicy,config.BackupRetentions) != true {
+			fmt.Println("ERROR: policy [" + *optPolicy + "] does npot match policy defined in config")
+			os.Exit(1)
+		}	
+	}
 
 	//load dynamic plugin parameters into config struct
 	appConfigPath := *optConfigPath + "/" + *optProfile + "/" + config.AppPlugin + ".conf"
@@ -62,7 +75,7 @@ func main() {
 		//util.LogCommentMessage(logger, "Welcome To Fossil Backup Framework, Performing Backup")
 
 		var result []util.Result
-		result = client.StartBackupWorkflow(string(*optProfile),string(*optConfig),config)
+		result = client.StartBackupWorkflow(string(*optProfile),string(*optConfig),string(*optPolicy),config)
 
 		util.LogResults(logger, result)
 
@@ -80,12 +93,13 @@ func main() {
 
 	} else if *optAction == "backupList" {
 		fmt.Println("### List of Backups ###")
-		result, backups := client.BackupList(string(*optProfile),string(*optConfig),config)
+		result, backups := client.BackupList(string(*optProfile),string(*optConfig),string(*optPolicy),config)
+		backupsByPolicy := util.GetBackupsByPolicy(string(*optPolicy),backups)
 
 		checkResult(result)
 
-		for _, backup := range backups {
-			fmt.Println(backup.Name, backup.Timestamp)
+		for _, backup := range backupsByPolicy {
+			fmt.Println(backup.Name, backup.Policy, backup.Timestamp)
 		}
 	} else if *optAction == "appPluginList" {
 		fmt.Println("### List of Application Plugins ###")

@@ -19,6 +19,8 @@ type Config struct {
 	AppPlugin string `json:"appPlugin"`
 	StoragePlugin string `json:"storagePlugin"`
 	BackupRetentions []BackupRetention `json:"backupRetentions"`
+	SelectedBackupPolicy string `json:"backupPolicy,omitmepty"`
+	SelectedBackupRetention int `json:"backupRetention,omitmepty"`
 	PreAppQuiesceCmd string `json:"preAppQuiesceCmd,omitempty"`
 	AppQuiesceCmd string `json:"appQuiesceCmd,omitempty"`
 	PostAppQuiesceCmd string `json:"postAppQuiesceCmd,omitempty"`
@@ -130,4 +132,22 @@ func ConfigMapToJson (configMap map[string]string) string {
 	}
 
 	return string(jsonString)
+}
+
+func ExistsBackupRetention(policy string, retentions []BackupRetention) bool {
+	for _, retention := range retentions {
+		if retention.Policy == policy {
+			return true
+		}
+	}
+	return false
+}
+
+func GetBackupRetention(policy string, retentions []BackupRetention) int {
+	for _, retention := range retentions {
+		if retention.Policy == policy {
+			return retention.RetentionDays
+		}
+	}
+	return -1
 }

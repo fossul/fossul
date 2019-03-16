@@ -20,17 +20,17 @@ func GetBackupDir(configMap map[string]string) string {
 }
 
 func GetBackupPath(configMap map[string]string) string {
-	backupName := GetBackupName(configMap["BackupName"])
+	backupName := GetBackupName(configMap["BackupName"],configMap["BackupPolicy"])
 	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"] + "/" + backupName
 
 	return backupPath
 }
 
-func GetBackupName(name string) string {
+func GetBackupName(name, policy string) string {
 	time := GetTimestamp()
 	timeToString := fmt.Sprintf("%d",time)
 
-	backupName := fmt.Sprintf(name + "_" + timeToString)
+	backupName := fmt.Sprintf(name + "_" + policy + "_" + timeToString)
 
 	return backupName
 }

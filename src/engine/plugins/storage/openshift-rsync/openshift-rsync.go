@@ -52,7 +52,7 @@ func backup (configMap map[string]string) {
 	podName := k8s.GetPod(configMap["Namespace"],configMap["ServiceName"],configMap["AccessWithinCluster"])
 	pluginUtil.LogErrorMessage("Performing backup for pod" + podName)
 
-	backupName := util.GetBackupName(configMap["BackupName"])
+	backupName := util.GetBackupName(configMap["BackupName"],configMap["BackupPolicy"])
 	backupPath := util.GetBackupPath(configMap)
 	pluginUtil.LogInfoMessage("Backup name is " + backupName + ", Backup path is " + backupPath)
 
@@ -83,8 +83,9 @@ func backupDelete (configMap map[string]string) {
 
 	backupDir := util.GetBackupDir(configMap)
 	backups := pluginUtil.ListBackups(backupDir)
-	backupCount := len(backups)
-	backupRetentionCount, err := strconv.Atoi(configMap["BackupCount"])
+	backupsByPolicy := util.GetBackupsByPolicy(configMap["BackupPolicy"],backups)
+	backupCount := len(backupsByPolicy)
+	backupRetentionCount, err := strconv.Atoi(configMap["BackupRetention"])
 	if err != nil {
 		pluginUtil.LogErrorMessage(err.Error())
 	}
@@ -94,12 +95,12 @@ func backupDelete (configMap map[string]string) {
 		msg := fmt.Sprintf("Number of backups [%d] greater than backup retention [%d]",backupCount,backupRetentionCount)
 		pluginUtil.LogInfoMessage(msg)
 		count := 1
-		for backup := range pluginUtil.ReverseBackupList(backups) {	
+		for backup := range pluginUtil.ReverseBackupList(backupsByPolicy) {
 			if count > backupRetentionCount {
 				pluginUtil.LogInfoMessage("Deleting backup " + backup.Name + "_" + backup.Epoch)
-				backupPath := backupDir + "/" + backup.Name + "_" + backup.Epoch
+				backupPath := backupDir + "/" + backup.Name + "_" + backup.Policy + "_" + backup.Epoch
 				pluginUtil.RecursiveDirDelete(backupPath)
-				pluginUtil.LogInfoMessage("Backup " + backup.Name + "_" + backup.Epoch + " deleted successfully")
+				pluginUtil.LogInfoMessage("Backup " + backup.Name + "_" + backup.Policy + "_" + backup.Epoch + " deleted successfully")
 			}
 			count = count + 1
 		}
@@ -155,6 +156,8 @@ func getEnvParams() map[string]string {
 
 	configMap["ProfileName"] = os.Getenv("ProfileName")
 	configMap["ConfigName"] = os.Getenv("ConfigName")
+	configMap["BackupPolicy"] = os.Getenv("BackupPolicy")
+	configMap["BackupRetention"] = os.Getenv("BackupRetention")
 	configMap["BackupName"] = os.Getenv("BackupName")
 	configMap["AccessWithinCluster"] = os.Getenv("AccessWithinCluster")
 	configMap["Namespace"] = os.Getenv("Namespace")
@@ -162,7 +165,6 @@ func getEnvParams() map[string]string {
 	configMap["RsyncCmdPath"] = os.Getenv("RsyncCmdPath")
 	configMap["BackupSrcPath"] = os.Getenv("BackupSrcPath")
 	configMap["BackupDestPath"] = os.Getenv("BackupDestPath")
-	configMap["BackupCount"] = os.Getenv("BackupCount")
 
 	return configMap
 }

@@ -85,7 +85,7 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 	var config util.Config = util.GetConfig(w,r)
 	var plugin string = config.PluginDir + "/app/" + config.AppPlugin
 	if _, err := os.Stat(plugin); os.IsNotExist(err) {
-		var errMsg string = "ERROR: App plugin does not exist"
+		var errMsg string = "\nERROR: App plugin does not exist: " + plugin
 		log.Println(err, errMsg)
 
 		var messages []util.Message

@@ -37,15 +37,16 @@ func ListBackups(path string) []util.Backup {
 	}
 
 	var backups []util.Backup
-	re := regexp.MustCompile(`(\S+)_(\S+)`)
+	re := regexp.MustCompile(`(\S+)_(\S+)_(\S+)`)
     for _, f := range files {
 		var backup util.Backup
 		match := re.FindStringSubmatch(f.Name())
 		if len(match) != 0 {
 			backup.Name = match[1]
-			backup.Epoch = match[2]
+			backup.Policy = match[2]
+			backup.Epoch = match[3]
 
-			timestamp := util.ConvertEpoch(match[2])
+			timestamp := util.ConvertEpoch(match[3])
 			backup.Timestamp = timestamp
 			backups = append(backups, backup)
 		}	

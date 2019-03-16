@@ -103,8 +103,8 @@ func Backup(config util.Config) util.Result {
 	return result
 }
 
-func BackupList(profileName,configName string,config util.Config) (util.ResultSimple, []util.Backup) {
-	config = SetAdditionalConfigParams(profileName,configName,config)
+func BackupList(profileName,configName,policyName string,config util.Config) (util.ResultSimple, []util.Backup) {
+	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
