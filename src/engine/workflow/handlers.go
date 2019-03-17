@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"engine/util"
 	"engine/client"
 	"net/http"
 	"strings"
+	"log"
 )
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -200,4 +202,17 @@ func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}
+}
+
+func GetConfig(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)	
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+
+	conf := configDir + profileName + "/" + configName + ".conf"
+	log.Println("DEBUG", "Config path is " + conf)
+	var config util.Config = util.ReadConfig(conf)
+
+	_ = json.NewDecoder(r.Body).Decode(&config)
+	json.NewEncoder(w).Encode(config)
 }

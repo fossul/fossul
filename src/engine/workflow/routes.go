@@ -58,5 +58,11 @@ var routes = Routes{
         "POST",
         "/sendTrapErrorCmd",
         SendTrapErrorCmd,
-    },    
+    },
+    Route{
+        "GetConfig",
+        "GET",
+        "/getConfig/{profileName}/{configName}",
+        GetConfig,
+    },        
 }

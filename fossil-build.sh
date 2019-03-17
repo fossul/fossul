@@ -31,5 +31,8 @@ mv $GOBIN/sample-app $PLUGIN_DIR/app
 mv $GOBIN/sample-storage $PLUGIN_DIR/storage
 mv $GOBIN/openshift-rsync $PLUGIN_DIR/storage
 
+echo "Copying default configs"
+cp -r $GOBIN/fossil/src/cli/configs/default $GOBIN/configs
+
 echo "Build completed successfully"
 

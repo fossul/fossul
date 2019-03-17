@@ -4,6 +4,8 @@ import (
     "log"
     "net/http"
 )
+
+const configDir = "configs/"
  
 func main() {
     router := NewRouter()

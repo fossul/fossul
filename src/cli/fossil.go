@@ -6,7 +6,6 @@ import (
 	"engine/util"
 	"engine/client"
 	"fmt"
-//	"time"
 )
 
 func main() {
@@ -37,11 +36,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	if *optConfigPath == "" {
+		*optConfigPath = "configs/"
+	}
+
 	var configPath string
 	if getopt.IsSet("configPath") == true {
 		configPath = *optConfigPath + "/" + *optProfile + "/" + *optConfig + ".conf"
 	} else {
-		configPath = "configs/" + *optProfile + "/" + *optConfig
+		configPath = *optConfigPath + *optProfile + "/" + *optConfig + ".conf"
 	}
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
@@ -72,27 +75,14 @@ func main() {
 
 	if *optAction == "backup" {
 		logger := util.GetLoggerInstance()
-		//util.LogCommentMessage(logger, "Welcome To Fossil Backup Framework, Performing Backup")
-
 		var result []util.Result
 		result = client.StartBackupWorkflow(string(*optProfile),string(*optConfig),string(*optPolicy),config)
 
 		util.LogResults(logger, result)
-
-		/*
-		for _, item := range result {
-			for _, line := range item.Messages {
-				//t := time.Unix(line.Timestamp,0)
-				//fmt.Println(t.Format("2006-01-02 15:04:05"), line.Level, line.Message)
-				fmt.Println(time.Unix(line.Timestamp,0), line.Level, line.Message)
-			}
-			//fmt.Println(index, item.Time, item.Code, item.Messages)
-		}
-		*/	
-
-
 	} else if *optAction == "backupList" {
-		fmt.Println("### List of Backups ###")
+		msg := fmt.Sprintf("### List of Backups for policy [%s] ###",*optPolicy)
+		fmt.Println(msg)
+
 		result, backups := client.BackupList(string(*optProfile),string(*optConfig),string(*optPolicy),config)
 		backupsByPolicy := util.GetBackupsByPolicy(string(*optPolicy),backups)
 
