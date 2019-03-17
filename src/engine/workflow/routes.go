@@ -64,5 +64,11 @@ var routes = Routes{
         "GET",
         "/getConfig/{profileName}/{configName}",
         GetConfig,
-    },        
+    },
+    Route{
+        "GetDefaultConfig",
+        "GET",
+        "/getDefaultConfig",
+        GetDefaultConfig,
+    },                 
 }

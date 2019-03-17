@@ -6,6 +6,7 @@ import (
 	"engine/util"
 	"engine/client"
 	"fmt"
+	"strconv"
 )
 
 func main() {
@@ -15,6 +16,7 @@ func main() {
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
 	optAction := getopt.StringLong("action",'a',"","backup|backupList|appPluginList|storagePluginList|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
+	optGetDefaultConfig := getopt.BoolLong("get-default-config", 0,"Get the default config file")
     optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -22,6 +24,32 @@ func main() {
         getopt.Usage()
         os.Exit(0)
 	}
+
+	if *optGetDefaultConfig {
+		var config util.Config = client.GetDefaultConfig()
+
+		fmt.Println("### Default Config ###")
+		fmt.Println("PluginDir = " + "\""+ config.PluginDir + "\"")
+		fmt.Println("AppPlugin = " + "\"" + config.AppPlugin + "\"")
+		fmt.Println("PreAppQuiesceCmd = " + "\"" + config.PreAppQuiesceCmd + "\"")
+		fmt.Println("PostAppQuiesceCmd = " + "\"" + config.PostAppQuiesceCmd + "\"")
+		fmt.Println("BackupCreateCmd = " + "\"" + config.BackupCreateCmd + "\"")
+		fmt.Println("BackupDeleteCmd = " + "\"" + config.BackupDeleteCmd + "\"")
+		fmt.Println("PreAppUnquiesceCmd = " + "\"" + config.PreAppUnquiesceCmd + "\"")
+		fmt.Println("AppUnquiesceCmd = " + "\"" + config.AppUnquiesceCmd + "\"")
+		fmt.Println("AppUnquiesceCmd = " + "\"" + config.AppUnquiesceCmd + "\"")
+		fmt.Println("PostAppUnquiesceCmd = " + "\"" + config.PostAppUnquiesceCmd + "\"")
+		fmt.Println("SendTrapErrorCmd = " + "\"" +config.SendTrapErrorCmd + "\"")
+		fmt.Println("SendTrapSuccessCmd = " + "\"" + config.SendTrapSuccessCmd + "\"" + "\n")
+
+		for _, retention := range config.BackupRetentions {
+			fmt.Println("[[BackupRetentions]]")
+			fmt.Println("Policy = " + "\"" + retention.Policy + "\"")
+			fmt.Println("RetentionDays = " + strconv.Itoa(retention.RetentionDays) + "\n")
+		}
+		os.Exit(0)
+	}	
+
 	if getopt.IsSet("profile") != true {
 		fmt.Println("ERROR: missing parameter --profile")
 		getopt.Usage()
@@ -36,6 +64,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	// set config path if empty
 	if *optConfigPath == "" {
 		*optConfigPath = "configs/"
 	}

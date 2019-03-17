@@ -216,3 +216,13 @@ func GetConfig(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&config)
 	json.NewEncoder(w).Encode(config)
 }
+
+func GetDefaultConfig(w http.ResponseWriter, r *http.Request) {
+
+	conf := configDir + "default" + "/" + "default.conf"
+	log.Println("DEBUG", "Default config path is " + conf)
+	var config util.Config = util.ReadConfig(conf)
+
+	_ = json.NewDecoder(r.Body).Decode(&config)
+	json.NewEncoder(w).Encode(config)
+}

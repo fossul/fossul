@@ -33,6 +33,31 @@ func GetConfig(profileName,configName string) util.Config {
 	return config
 }
 
+func GetDefaultConfig() util.Config {
+
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getDefaultConfig", nil)
+	req.Header.Add("Content-Type", "application/json")
+	if err != nil {
+		log.Println("NewRequest: ", err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Do: ", err)
+	}
+
+	defer resp.Body.Close()
+
+	var config util.Config
+	if err := json.NewDecoder(resp.Body).Decode(&config); err != nil {
+		log.Println(err)
+	}
+
+	return config
+}
+
 func GetWorkflowServiceStatus() util.Status {
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/status", nil)
