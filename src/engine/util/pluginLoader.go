@@ -1,11 +1,11 @@
 package util
 
 import (
-	"log"
+//	"log"
 	"os"
 	"os/exec"
 	"strings"
-	"reflect"
+//	"reflect"
 	"fmt"
 	"strconv"
 )
@@ -132,6 +132,7 @@ func setBasePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd  {
 	return cmd
 }	
 
+/*
 func setBaseContainerPluginEnvtest(config Config) {
 	v := reflect.ValueOf(config.BaseContainerPlugin)
 	values := make([]interface{}, v.NumField())
@@ -142,3 +143,4 @@ func setBaseContainerPluginEnvtest(config Config) {
 		log.Println("INFO Parsing plugin struct",reflect.TypeOf(v.Field(i).Interface()),v.Type().Field(i).Name,v.Field(i).Interface())
     }
 }
+*/

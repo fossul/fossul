@@ -70,5 +70,11 @@ var routes = Routes{
         "GET",
         "/getDefaultConfig",
         GetDefaultConfig,
-    },                 
+    },
+    Route{
+        "GetDefaultPluginConfig",
+        "GET",
+        "/getDefaultPluginConfig/{pluginName}",
+        GetDefaultPluginConfig,
+    },                        
 }

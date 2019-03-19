@@ -58,6 +58,31 @@ func GetDefaultConfig() util.Config {
 	return config
 }
 
+func GetDefaultPluginConfig(pluginName string) map[string]string {
+
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getDefaultPluginConfig/" + pluginName, nil)
+	req.Header.Add("Content-Type", "application/json")
+	if err != nil {
+		log.Println("NewRequest: ", err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Do: ", err)
+	}
+
+	defer resp.Body.Close()
+
+	var configMap map[string]string
+	if err := json.NewDecoder(resp.Body).Decode(&configMap); err != nil {
+		log.Println(err)
+	}
+
+	return configMap
+}
+
 func GetWorkflowServiceStatus() util.Status {
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/status", nil)

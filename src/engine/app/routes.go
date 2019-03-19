@@ -50,7 +50,7 @@ var routes = Routes{
     Route{
         "PluginInfo",
         "POST",
-        "/pluginInfo/{plugin}",
+        "/pluginInfo/{pluginName}",
         PluginInfo,
     },        
     Route{

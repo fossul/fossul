@@ -17,6 +17,7 @@ func main() {
 	optAction := getopt.StringLong("action",'a',"","backup|backupList|appPluginList|storagePluginList|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
 	optGetDefaultConfig := getopt.BoolLong("get-default-config", 0,"Get the default config file")
+	optGetDefaultPluginConfig := getopt.BoolLong("get-default-plugin-config", 0,"Get the default config file")
     optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -47,6 +48,22 @@ func main() {
 			fmt.Println("Policy = " + "\"" + retention.Policy + "\"")
 			fmt.Println("RetentionDays = " + strconv.Itoa(retention.RetentionDays) + "\n")
 		}
+		os.Exit(0)
+	}
+	
+	if *optGetDefaultPluginConfig {
+		if getopt.IsSet("plugin") != true {
+			fmt.Println("ERROR: Missing parameter --plugin")
+			getopt.Usage()
+			os.Exit(1)
+		}
+
+		var configMap map[string]string = client.GetDefaultPluginConfig(*optPluginName)
+
+		fmt.Println("### Default Plugin Config ###")
+		for k,v := range configMap {
+			fmt.Println(k + " = " + "\""+ v + "\"")
+		}		
 		os.Exit(0)
 	}	
 
@@ -98,9 +115,14 @@ func main() {
 	}
 
 	//load dynamic plugin parameters into config struct
-	appConfigPath := *optConfigPath + "/" + *optProfile + "/" + config.AppPlugin + ".conf"
-	storageConfigPath := *optConfigPath + "/" + *optProfile + "/" + config.StoragePlugin + ".conf"
-	config = util.SetPluginParameters(appConfigPath, storageConfigPath, config)
+	if config.AppPlugin != "" {
+		appConfigPath := *optConfigPath + "/" + *optProfile + "/" + config.AppPlugin + ".conf"
+		config = util.SetAppPluginParameters(appConfigPath, config)
+	}
+	if config.StoragePlugin != "" {
+		storageConfigPath := *optConfigPath + "/" + *optProfile + "/" + config.StoragePlugin + ".conf"
+		config = util.SetStoragePluginParameters(storageConfigPath, config)
+	}
 
 	if *optAction == "backup" {
 		logger := util.GetLoggerInstance()

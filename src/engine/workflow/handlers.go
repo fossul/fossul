@@ -29,132 +29,145 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	commentResult = util.SetResultMessage(0,"COMMENT","Performing Application Quiesce")
 	results = append(results, commentResult)
 
-	var preQuiesceCmdResult util.Result
-	preQuiesceCmdResult = client.PreQuiesceCmd(config)
-	results = append(results, preQuiesceCmdResult)
+	if config.PreAppQuiesceCmd != "" {
+		preQuiesceCmdResult := client.PreQuiesceCmd(config)
+		results = append(results, preQuiesceCmdResult)
 
-	if preQuiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)
+		if preQuiesceCmdResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)
+		}
 	}
 
-	var quiesceCmdResult util.Result
-	quiesceCmdResult = client.QuiesceCmd(config)	
-	results = append(results, quiesceCmdResult)
+	if config.AppQuiesceCmd != "" {
+		quiesceCmdResult := client.QuiesceCmd(config)	
+		results = append(results, quiesceCmdResult)
 
-	if quiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)
-	}
+		if quiesceCmdResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)
+		}
+	}	
 	
-	var quiesceResult util.Result
-	quiesceResult = client.Quiesce(config)
-	results = append(results, quiesceResult)
+	if config.AppPlugin != "" {
+		quiesceResult := client.Quiesce(config)
+		results = append(results, quiesceResult)	
 
-	if quiesceResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)
-	}
+		if quiesceResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)
+		}
+	}	
 
-	var postQuiesceCmdResult util.Result
-	postQuiesceCmdResult = client.PostQuiesceCmd(config)
-	results = append(results, postQuiesceCmdResult)
+	if config.PostAppQuiesceCmd != "" {
+		postQuiesceCmdResult := client.PostQuiesceCmd(config)
+		results = append(results, postQuiesceCmdResult)
 
-	if postQuiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)
-	}
+		if postQuiesceCmdResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)
+		}
+	}	
 
 	commentResult = util.SetResultMessage(0,"COMMENT","Performing Backup")
 	results = append(results, commentResult)
 
-	var backupCreateCmdResult util.Result
-	backupCreateCmdResult = client.BackupCreateCmd(config)	
-	results = append(results, backupCreateCmdResult)
+	if config.BackupCreateCmd != "" {
+		backupCreateCmdResult := client.BackupCreateCmd(config)	
+		results = append(results, backupCreateCmdResult)
 
-	if backupCreateCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)
-	}
+		if backupCreateCmdResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)
+		}
+	}	
 
-	var backupResult util.Result
-	backupResult = client.Backup(config)
-	results = append(results, backupResult)
+	if config.StoragePlugin != "" {	
+		backupResult := client.Backup(config)
+		results = append(results, backupResult)
 
-	if backupResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)
-	}
+		if backupResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)
+		}
+	}	
 
 	commentResult = util.SetResultMessage(0,"COMMENT","Performing Application Unquiesce")
 	results = append(results, commentResult)
 
-	var preUnquiesceCmdResult util.Result
-	preUnquiesceCmdResult = client.PreUnquiesceCmd(config)
-	results = append(results, preUnquiesceCmdResult)
+	if config.PreAppUnquiesceCmd != "" {
+		preUnquiesceCmdResult := client.PreUnquiesceCmd(config)
+		results = append(results, preUnquiesceCmdResult)
 
-	if preUnquiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)
-	}
+		if preUnquiesceCmdResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)
+		}
+	}	
 
-	var unquiesceCmdResult util.Result
-	unquiesceCmdResult = client.UnquiesceCmd(config)	
-	results = append(results, unquiesceCmdResult)
+	if config.AppUnquiesceCmd != "" {
+		unquiesceCmdResult := client.UnquiesceCmd(config)	
+		results = append(results, unquiesceCmdResult)
 
-	if unquiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)
-	}
+		if unquiesceCmdResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)
+		}
+	}	
 
-	var unquiesceResult util.Result
-	unquiesceResult = client.Unquiesce(config)
-	results = append(results, unquiesceResult)
+	if config.AppPlugin != "" {
+		unquiesceResult := client.Unquiesce(config)
+		results = append(results, unquiesceResult)
 
-	if unquiesceResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)
-	}
+		if unquiesceResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)
+		}
+	}	
 
-	var postUnquiesceCmdResult util.Result
-	postUnquiesceCmdResult = client.PostUnquiesceCmd(config)
-	results = append(results, postUnquiesceCmdResult)
+	if config.PostAppUnquiesceCmd != "" {
+		postUnquiesceCmdResult := client.PostUnquiesceCmd(config)
+		results = append(results, postUnquiesceCmdResult)
 
-	if postUnquiesceCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)	
-	}
+		if postUnquiesceCmdResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)	
+		}
+	}	
 
 	commentResult = util.SetResultMessage(0,"COMMENT","Performing Backup Retention")
 	results = append(results, commentResult)
 
-	var backupDeleteCmdResult util.Result
-	backupDeleteCmdResult = client.BackupDeleteCmd(config)	
-	results = append(results, backupDeleteCmdResult)
+	if config.BackupDeleteCmd != "" {
+		backupDeleteCmdResult := client.BackupDeleteCmd(config)	
+		results = append(results, backupDeleteCmdResult)
 
-	if backupCreateCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)
-	}
+		if backupDeleteCmdResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)
+		}
+	}	
 
 
-	var backupDeleteResult util.Result
-	backupDeleteResult = client.BackupDelete(config)
-	results = append(results, backupDeleteResult)
+	if config.StoragePlugin != "" {	
+		backupDeleteResult := client.BackupDelete(config)
+		results = append(results, backupDeleteResult)
 
-	if backupDeleteResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)
-	}
+		if backupDeleteResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)
+		}
+	}	
 
-	var sendTrapSuccessCmdResult util.Result
-	sendTrapSuccessCmdResult = client.SendTrapSuccessCmd(config)	
-	results = append(results, sendTrapSuccessCmdResult)
+	if config.SendTrapSuccessCmd != "" {
+		sendTrapSuccessCmdResult := client.SendTrapSuccessCmd(config)	
+		results = append(results, sendTrapSuccessCmdResult)
 
-	if sendTrapSuccessCmdResult.Code != 0 {
-		sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
-		sendError(w,r,results)
-	}
+		if sendTrapSuccessCmdResult.Code != 0 {
+			sendTrapErrorCmdResult = client.SendTrapErrorCmd(config)
+			sendError(w,r,results)
+		}
+	}	
 
 	commentResult = util.SetResultMessage(0,"INFO","Backup Completed Successfully")
 	results = append(results, commentResult)
@@ -225,4 +238,16 @@ func GetDefaultConfig(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewDecoder(r.Body).Decode(&config)
 	json.NewEncoder(w).Encode(config)
+}
+
+func GetDefaultPluginConfig(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)	
+	var pluginName string = params["pluginName"]
+
+	conf := configDir + "default" + "/" + pluginName + ".conf"
+	log.Println("DEBUG", "Config path is " + conf)
+	configMap := util.ReadConfigToMap(conf)
+
+	_ = json.NewDecoder(r.Body).Decode(&configMap)
+	json.NewEncoder(w).Encode(configMap)
 }

@@ -31,7 +31,6 @@ type Config struct {
 	PostAppUnquiesceCmd string `json:"postAppUnquiesceCmd,omitempty"`
 	SendTrapErrorCmd string `json:"sendTrapErrorCmd,omitempty"`
 	SendTrapSuccessCmd string `json:"sendTrapSuccessCmd,omitempty"`
-	BaseContainerPlugin BaseContainerPlugin `json:"baseContainerPlugin,omitempty"`
 	AppPluginParameters map[string]string `json:"appPluginParameters,omitempty"`
 	StoragePluginParameters map[string]string `json:"storagePluginParameters,omitempty"`
 }
@@ -39,12 +38,6 @@ type Config struct {
 type BackupRetention struct {
 	Policy string `json:"policy"`
 	RetentionDays int `json:"retentionDays"`	
-}
-
-type BaseContainerPlugin struct {
-	AccessWithinCluster bool `json:"accessWithinCluster,omitempty"`
-	Namespace string `json:"namespace,omitempty"`
-	ServiceName string `json:"serviceName,omitempty"`
 }
 
 func ReadConfig (filename string) Config {
@@ -55,7 +48,7 @@ func ReadConfig (filename string) Config {
 
 	str := string(b)
 	var config Config = decodeConfig(str)
-	
+
 	return config
 }
 
@@ -93,15 +86,23 @@ func ReadConfigToMap (filename string) map[string]string {
 	return configMap
 }
 
-func SetPluginParameters(appConfigPath,storageConfigPath string, config Config) Config {
+func SetAppPluginParameters(appConfigPath string, config Config) Config {
 	configAppMap := make(map[string]string)
-	configStorageMap := make(map[string]string)
 
 	if len(config.AppPlugin) != 0 {
 		configAppMap = ReadConfigToMap(appConfigPath)
-		configStorageMap = ReadConfigToMap(storageConfigPath)
 	}
 	config.AppPluginParameters = configAppMap
+
+	return config
+}
+
+func SetStoragePluginParameters(storageConfigPath string, config Config) Config {
+	configStorageMap := make(map[string]string)
+
+	if len(config.StoragePlugin) != 0 {
+		configStorageMap = ReadConfigToMap(storageConfigPath)
+	}
 	config.StoragePluginParameters = configStorageMap
 
 	return config
