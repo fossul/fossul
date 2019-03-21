@@ -5,9 +5,9 @@ import (
 	"github.com/pborman/getopt/v2"
 	"engine/util"
 	"engine/client/k8s"
+	"engine/client"
 	"engine/plugins/pluginUtil"
 	"encoding/json"
-	"strconv"
 	"fmt"
 )
 
@@ -46,13 +46,15 @@ func main() {
 }	
 
 func backup (configMap map[string]string) {
+	configMap = setWorkflowId(configMap)
 	printEnv(configMap)
+
 	pluginUtil.LogInfoMessage("Performing container backup")
 
 	podName := k8s.GetPod(configMap["Namespace"],configMap["ServiceName"],configMap["AccessWithinCluster"])
 	pluginUtil.LogErrorMessage("Performing backup for pod" + podName)
 
-	backupName := util.GetBackupName(configMap["BackupName"],configMap["BackupPolicy"])
+	backupName := util.GetBackupName(configMap["BackupName"],configMap["BackupPolicy"],configMap["WorkflowId"])
 	backupPath := util.GetBackupPath(configMap)
 	pluginUtil.LogInfoMessage("Backup name is " + backupName + ", Backup path is " + backupPath)
 
@@ -85,22 +87,29 @@ func backupDelete (configMap map[string]string) {
 	backups := pluginUtil.ListBackups(backupDir)
 	backupsByPolicy := util.GetBackupsByPolicy(configMap["BackupPolicy"],backups)
 	backupCount := len(backupsByPolicy)
-	backupRetentionCount, err := strconv.Atoi(configMap["BackupRetention"])
-	if err != nil {
-		pluginUtil.LogErrorMessage(err.Error())
-	}
-
+	backupRetentionCount := util.StringToInt(configMap["BackupRetention"])
 
 	if backupCount > backupRetentionCount {
-		msg := fmt.Sprintf("Number of backups [%d] greater than backup retention [%d]",backupCount,backupRetentionCount)
-		pluginUtil.LogInfoMessage(msg)
 		count := 1
 		for backup := range pluginUtil.ReverseBackupList(backupsByPolicy) {
 			if count > backupRetentionCount {
-				pluginUtil.LogInfoMessage("Deleting backup " + backup.Name + "_" + backup.Epoch)
-				backupPath := backupDir + "/" + backup.Name + "_" + backup.Policy + "_" + backup.Epoch
+				msg := fmt.Sprintf("Number of backups [%d] greater than backup retention [%d]",backupCount,backupRetentionCount)
+				pluginUtil.LogInfoMessage(msg)
+				backupCount = backupCount - 1
+
+				backupName := backup.Name + "_" + backup.Policy + "_" + backup.WorkflowId + "_" + util.IntToString(backup.Epoch)
+				pluginUtil.LogInfoMessage("Deleting backup " + backupName)
+				backupPath := backupDir + "/" + backupName
 				pluginUtil.RecursiveDirDelete(backupPath)
-				pluginUtil.LogInfoMessage("Backup " + backup.Name + "_" + backup.Policy + "_" + backup.Epoch + " deleted successfully")
+				pluginUtil.LogInfoMessage("Backup " + backupName + " deleted successfully")
+				
+				pluginUtil.LogInfoMessage("workflowId " + backup.WorkflowId)
+				result := client.DeleteWorkflowResults(configMap["ProfileName"],configMap["ConfigName"],backup.WorkflowId)
+				pluginUtil.LogResultMessages(result)
+
+				if result.Code != 0 {
+					os.Exit(1)
+				}
 			}
 			count = count + 1
 		}
@@ -165,6 +174,12 @@ func getEnvParams() map[string]string {
 	configMap["RsyncCmdPath"] = os.Getenv("RsyncCmdPath")
 	configMap["BackupSrcPath"] = os.Getenv("BackupSrcPath")
 	configMap["BackupDestPath"] = os.Getenv("BackupDestPath")
+
+	return configMap
+}
+
+func setWorkflowId(configMap map[string]string) map[string]string {
+	configMap["WorkflowId"] = os.Getenv("WorkflowId")
 
 	return configMap
 }

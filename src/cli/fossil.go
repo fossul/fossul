@@ -161,7 +161,7 @@ func main() {
 		checkResult(result)
 
 		for _, backup := range backupsByPolicy {
-			fmt.Println(backup.Name, backup.Policy, backup.Timestamp)
+			fmt.Println(backup.Name, backup.Policy, backup.WorkflowId, backup.Timestamp)
 		}
 	} else if *optAction == "appPluginList" {
 		fmt.Println("### List of Application Plugins ###")

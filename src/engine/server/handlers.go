@@ -21,6 +21,7 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	workflow.Status = "RUNNING"
 
 	var config util.Config = util.GetConfig(w,r)
+	config.WorkflowId = util.IntToString(workflow.Id)
 
 	//errCodeIn := make(chan int,1)
 	go func() {
@@ -161,4 +162,24 @@ func GetWorkflowStepResults(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewDecoder(r.Body).Decode(&results)
 	json.NewEncoder(w).Encode(results)	
+}
+
+func DeleteWorkflowResults(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)	
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+	var id string = params["id"]
+
+	resultsDir := dataDir + profileName + "/" + configName + "/" + id
+
+	var result util.Result
+	err := util.RecursiveDirDelete(resultsDir)
+	if err != nil {
+		log.Println(err.Error())
+		result = util.SetResultMessage(1,"ERROR",err.Error())
+	} else {
+		result = util.SetResultMessage(0,"INFO","Workflow results " + resultsDir + " deleted")
+	}
+	_ = json.NewDecoder(r.Body).Decode(&result)
+	json.NewEncoder(w).Encode(result)	
 }

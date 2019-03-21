@@ -14,6 +14,7 @@ import (
 type Config struct {
 	ProfileName string `json:"profileName,omitempty"`
 	ConfigName string `json:"configName,omitempty"`
+	WorkflowId string `json:"workflowId,omitempty"`
 	BackupName string `json:"backupName"`
 	PluginDir string `json:"pluginDir"`
 	AppPlugin string `json:"appPlugin"`

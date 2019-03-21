@@ -88,5 +88,11 @@ var routes = Routes{
         "GET",
         "/getWorkflowStatus/{profileName}/{configName}/{id}",
         GetWorkflowStatus,
-    },                                 
+    }, 
+    Route{
+        "DeleteWorkflowResults",
+        "POST",
+        "/deleteWorkflowResults/{profileName}/{configName}/{id}",
+        DeleteWorkflowResults,
+    },                                         
 }

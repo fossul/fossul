@@ -7,6 +7,7 @@ import (
 	"encoding/gob"
 	"os"
 	"log"
+	"path/filepath"
 )
 
 
@@ -23,17 +24,17 @@ func GetBackupDir(configMap map[string]string) string {
 }
 
 func GetBackupPath(configMap map[string]string) string {
-	backupName := GetBackupName(configMap["BackupName"],configMap["BackupPolicy"])
+	backupName := GetBackupName(configMap["BackupName"],configMap["BackupPolicy"],configMap["WorkflowId"])
 	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"] + "/" + backupName
 
 	return backupPath
 }
 
-func GetBackupName(name, policy string) string {
+func GetBackupName(name, policy,workflowId string) string {
 	time := GetTimestamp()
 	timeToString := fmt.Sprintf("%d",time)
 
-	backupName := fmt.Sprintf(name + "_" + policy + "_" + timeToString)
+	backupName := fmt.Sprintf(name + "_" + policy + "_" + workflowId + "_" + timeToString)
 
 	return backupName
 }
@@ -43,6 +44,13 @@ func ConvertEpoch(epoch string) string {
 	time:= time.Unix(i,0)
 
 	return time.String()
+}
+
+func ConvertEpochToTime(epoch string) time.Time {
+	i := StringToInt64(epoch)
+	time:= time.Unix(i,0)
+
+	return time
 }
 
 func JoinArray(array, combinedArray []string) []string {
@@ -97,11 +105,42 @@ func CreateDir(path string, mode os.FileMode) {
 		if err := os.MkdirAll(path, mode); err != nil {
 			log.Println("Creating directory " + path + " failed")
 			log.Println(err.Error())
-			os.Exit(1)
 		 } else {
 			log.Println("Creating directory " + path + " completed successfully")
 		 }		
 	}
+}
+
+func RecursiveDirDelete(dir string) error {
+	if ExistsPath(dir) == true {
+		log.Println("Removing directory " + dir)
+		d, err := os.Open(dir)
+
+		if err != nil {
+			return err
+		}
+		defer d.Close()
+
+		names, err := d.Readdirnames(-1)
+		if err != nil {
+			return err
+		}
+
+		for _, name := range names {
+			err = os.RemoveAll(filepath.Join(dir, name))
+			if err != nil {
+				return err
+			}
+		}
+
+		err = os.Remove(dir)
+		if err != nil {
+			return err
+		}
+
+		log.Println("Removing directory " + dir + " completed successfully")
+	}	
+	return nil
 }
 
 func IntToString(i int) string {
@@ -118,7 +157,7 @@ func Int64ToString(i int64) string {
 func StringToInt(s string) int {
 	i, err := strconv.Atoi(s)
 	if err != nil {
-    	log.Println(err.Error())
+    	log.Println("ERROR " + err.Error())
 	}
 	return i
 }

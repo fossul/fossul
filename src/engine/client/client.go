@@ -61,6 +61,32 @@ func GetWorkflowStepResults(profileName,configName string,workflowId int, step i
 	return results
 }
 
+func DeleteWorkflowResults(profileName,configName string,workflowId string) util.Result {
+
+	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/deleteWorkflowResults/" + profileName + "/" + configName + "/" + workflowId, nil)
+	req.Header.Add("Content-Type", "application/json")
+	if err != nil {
+		log.Println("NewRequest: ", err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Do: ", err)
+	}
+
+	defer resp.Body.Close()
+
+	var result util.Result
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		log.Println(err)
+	}
+
+	return result
+}
+
 func GetConfig(profileName,configName string) util.Config {
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getConfig/" + profileName + "/" + configName, nil)
