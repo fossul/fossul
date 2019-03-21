@@ -40,7 +40,7 @@ type BackupRetention struct {
 	RetentionDays int `json:"retentionDays"`	
 }
 
-func ReadConfig (filename string) Config {
+func ReadConfig(filename string) Config {
     b, err := ioutil.ReadFile(filename)
     if err != nil {
         log.Println(err)
@@ -52,7 +52,7 @@ func ReadConfig (filename string) Config {
 	return config
 }
 
-func decodeConfig (blob string) Config {
+func decodeConfig(blob string) Config {
 	var config Config
 	if _, err := toml.Decode(blob, &config); err != nil {
   		log.Println(err)
@@ -61,7 +61,7 @@ func decodeConfig (blob string) Config {
 	return config
 }
 
-func ReadConfigToMap (filename string) map[string]string {
+func ReadConfigToMap(filename string) map[string]string {
 	file, err := os.Open(filename)
     if err != nil {
         log.Fatal(err)
@@ -108,7 +108,7 @@ func SetStoragePluginParameters(storageConfigPath string, config Config) Config 
 	return config
 }
 
-func GetConfig (w http.ResponseWriter, r *http.Request) Config {
+func GetConfig(w http.ResponseWriter, r *http.Request) Config {
 
 	var config Config
 	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
@@ -126,7 +126,7 @@ func GetConfig (w http.ResponseWriter, r *http.Request) Config {
 	return config
 }
 
-func ConfigMapToJson (configMap map[string]string) string {
+func ConfigMapToJson(configMap map[string]string) string {
 	jsonString, err := json.Marshal(configMap)
 	if err != nil {
 		log.Println(err)	

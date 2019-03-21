@@ -44,12 +44,12 @@ func main() {
 
 func quiesce (configMap map[string]string) {
 	printEnv(configMap)
-	pluginUtil.LogInfoMessage("Performing application quiesce")
+	pluginUtil.LogInfoMessage("*** Application quiesce ***")
 }
 
 func unquiesce (configMap map[string]string) {
 	printEnv(configMap)
-	pluginUtil.LogInfoMessage("Performing application unquiesce")
+	pluginUtil.LogInfoMessage("*** Application unquiesce ***")
 }
 
 func info () {

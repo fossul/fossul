@@ -52,10 +52,12 @@ func SetMessages(inputMessages []string) []Message {
 }
 
 func SetResultMessage(code int, level, msg string) Result {
+	time := GetTimestamp()
 
 	var messages []Message
 	var message Message
 	message.Level = level
+	message.Timestamp = time
 	message.Message = msg
 	messages = append(messages,message)
 

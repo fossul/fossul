@@ -7,6 +7,7 @@ import (
 	"engine/client"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 func main() {
@@ -126,10 +127,30 @@ func main() {
 
 	if *optAction == "backup" {
 		logger := util.GetLoggerInstance()
-		var result []util.Result
-		result = client.StartBackupWorkflow(string(*optProfile),string(*optConfig),string(*optPolicy),config)
 
-		util.LogResults(logger, result)
+		workflowId := client.StartBackupWorkflow(string(*optProfile),string(*optConfig),string(*optPolicy),config)
+		var completedSteps []int
+		// loop and wait for all workflow steps to complete
+		for {
+			time.Sleep(1 * time.Second)
+			workflow := client.GetWorkflowStatus(*optProfile,*optConfig,workflowId)
+
+			// Print results for a step only once
+			for _, step := range workflow.Steps {
+				if step.Status == "COMPLETE" || step.Status == "ERROR" {
+					if !util.IntInSlice(step.Id,completedSteps) {
+						completedSteps = append(completedSteps,step.Id)
+						results := client.GetWorkflowStepResults(*optProfile,*optConfig,workflowId,step.Id)
+						util.LogResults(logger, results)
+					}
+				}
+			}
+
+			if workflow.Status == "COMPLETE" || workflow.Status == "ERROR"  {
+				break
+			}
+			time.Sleep(4 * time.Second)
+		}
 	} else if *optAction == "backupList" {
 		msg := fmt.Sprintf("### List of Backups for policy [%s] ###",*optPolicy)
 		fmt.Println(msg)

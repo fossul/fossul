@@ -76,5 +76,17 @@ var routes = Routes{
         "GET",
         "/getDefaultPluginConfig/{pluginName}",
         GetDefaultPluginConfig,
-    },                        
+    },
+    Route{
+        "GetWorkflowStepResults",
+        "GET",
+        "/getWorkflowStepResults/{profileName}/{configName}/{workflowId}/{stepId}",
+        GetWorkflowStepResults,
+    },
+    Route{
+        "GetWorkflowStatus",
+        "GET",
+        "/getWorkflowStatus/{profileName}/{configName}/{id}",
+        GetWorkflowStatus,
+    },                                 
 }

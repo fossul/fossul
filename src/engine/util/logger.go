@@ -81,8 +81,6 @@ func LogCommentMessage (l *log.Logger, message string) {
 func LogResults (l *log.Logger, result []Result) {
 	for _, item := range result {
 		for _, line := range item.Messages {
-			//t := time.Unix(line.Timestamp,0)
-			//fmt.Println(t.Format("2006-01-02 15:04:05"), line.Level, line.Message)
 			if line.Level == "INFO" {
 				t := time.Unix(line.Timestamp,0)
 				l.SetPrefix(t.String() + " [INFO] ")

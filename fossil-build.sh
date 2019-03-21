@@ -22,7 +22,7 @@ go install engine/plugins/storage/sample-storage
 go install engine/plugins/storage/openshift-rsync
 
 echo "Building Services"
-go install engine/workflow
+go install engine/server
 go install engine/app
 go install engine/storage
 

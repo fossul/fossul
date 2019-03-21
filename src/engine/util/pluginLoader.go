@@ -7,7 +7,6 @@ import (
 	"strings"
 //	"reflect"
 	"fmt"
-	"strconv"
 )
 
 func ExecutePlugin(config Config, pluginType string, args ...string) (result Result) {
@@ -126,7 +125,7 @@ func setBasePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd  {
 	cmd.Env = append(cmd.Env, "ConfigName=" + config.ConfigName)
 	cmd.Env = append(cmd.Env, "BackupPolicy=" + config.SelectedBackupPolicy)
 
-	backupRetentionToString := strconv.Itoa(config.SelectedBackupRetention)
+	backupRetentionToString := IntToString(config.SelectedBackupRetention)
 	cmd.Env = append(cmd.Env, "BackupRetention=" + backupRetentionToString)
 
 	return cmd

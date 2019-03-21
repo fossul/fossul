@@ -8,6 +8,59 @@ import (
 	"bytes"
 )
 
+func GetWorkflowStatus(profileName,configName string,id int) (workflow util.Workflow) {
+
+	idToString := util.IntToString(id)
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getWorkflowStatus/" + profileName + "/" + configName + "/" + idToString, nil)
+	req.Header.Add("Content-Type", "application/json")
+	if err != nil {
+		log.Println("NewRequest: ", err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Do: ", err)
+	}
+
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(&workflow); err != nil {
+		log.Println(err)
+	}
+
+	return workflow
+}
+
+func GetWorkflowStepResults(profileName,configName string,workflowId int, step int) (results []util.Result) {
+	//b := new(bytes.Buffer)
+	//json.NewEncoder(b).Encode(steps)
+
+	w := util.IntToString(workflowId)
+	s := util.IntToString(step)
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getWorkflowStepResults/" + profileName + "/" + configName + "/" + w + "/" + s, nil)
+	req.Header.Add("Content-Type", "application/json")
+	if err != nil {
+		log.Println("NewRequest: ", err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Do: ", err)
+	}
+
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
+		log.Println(err)
+	}
+
+	return results
+}
+
 func GetConfig(profileName,configName string) util.Config {
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getConfig/" + profileName + "/" + configName, nil)
@@ -161,7 +214,8 @@ func GetStorageServiceStatus() util.Status {
 
 }
 
-func StartBackupWorkflow(profileName,configName,policyName string,config util.Config) (result []util.Result) {
+//func StartBackupWorkflow(profileName,configName,policyName string,config util.Config) (result []util.Result) {
+func StartBackupWorkflow(profileName,configName,policyName string,config util.Config) (workflowId int) {
 
 	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
 
@@ -184,11 +238,11 @@ func StartBackupWorkflow(profileName,configName,policyName string,config util.Co
 
 	defer resp.Body.Close()
 
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&workflowId); err != nil {
 		log.Println(err)
 	}
 
-	return result
+	return workflowId
 
 }
 
