@@ -8,6 +8,7 @@ import (
 
 const configDir = "configs/"
 const dataDir = "data/"
+var runningWorkflowMap map[string]string = make(map[string]string)
  
 func main() {
     util.CreateDir(configDir,0755)

@@ -113,6 +113,39 @@ func LogResults (l *log.Logger, result []Result) {
 	}	
 }
 
+func LogResult (l *log.Logger, result Result) {
+	for _, line := range result.Messages {
+		if line.Level == "INFO" {
+			t := time.Unix(line.Timestamp,0)
+			l.SetPrefix(t.String() + " [INFO] ")
+			l.Print(line.Message)
+		} else if line.Level == "WARN" {
+			t := time.Unix(line.Timestamp,0)
+			l.SetPrefix(t.String() + " [WARN] ")
+			l.Print(line.Message)
+		} else if line.Level == "ERROR" {
+			t := time.Unix(line.Timestamp,0)
+			l.SetPrefix(t.String() + " [ERROR] ")
+			l.Print(line.Message)
+		} else if line.Level == "DEBUG" {
+			t := time.Unix(line.Timestamp,0)
+			l.SetPrefix(t.String() + " [DEBUG] ")
+			l.Print(line.Message)	
+		} else if line.Level == "CMD" {
+			t := time.Unix(line.Timestamp,0)
+			l.SetPrefix(t.String() + " [CMD] ")
+			l.Print(line.Message)	
+		} else if line.Level == "COMMENT" {
+			l.SetPrefix("########## ")
+			l.Print(line.Message + " ##########")
+		} else {
+			t := time.Unix(line.Timestamp,0)
+			l.SetPrefix(t.String() + " [UNKNOWN] ")
+			l.Print(line.Message)					
+		}
+	}	
+}
+
 func LogMessages (l *log.Logger, messages []Message) {
 	logDir := getLogDir()
 	file, err := os.OpenFile(logDir, os.O_CREATE|os.O_APPEND, 0644)

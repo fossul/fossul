@@ -241,7 +241,7 @@ func GetStorageServiceStatus() util.Status {
 }
 
 //func StartBackupWorkflow(profileName,configName,policyName string,config util.Config) (result []util.Result) {
-func StartBackupWorkflow(profileName,configName,policyName string,config util.Config) (workflowId int) {
+func StartBackupWorkflow(profileName,configName,policyName string,config util.Config) (result util.WorkflowResult) {
 
 	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
 
@@ -264,11 +264,11 @@ func StartBackupWorkflow(profileName,configName,policyName string,config util.Co
 
 	defer resp.Body.Close()
 
-	if err := json.NewDecoder(resp.Body).Decode(&workflowId); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		log.Println(err)
 	}
 
-	return workflowId
+	return result
 
 }
 

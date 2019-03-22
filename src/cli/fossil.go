@@ -125,10 +125,18 @@ func main() {
 		config = util.SetStoragePluginParameters(storageConfigPath, config)
 	}
 
+	fmt.Println("########## Welcome to Fossil Backup Framework ##########")
+
 	if *optAction == "backup" {
 		logger := util.GetLoggerInstance()
 
-		workflowId := client.StartBackupWorkflow(string(*optProfile),string(*optConfig),string(*optPolicy),config)
+		workflowResult := client.StartBackupWorkflow(string(*optProfile),string(*optConfig),string(*optPolicy),config)
+		util.LogResult(logger, workflowResult.Result)
+		if workflowResult.Result.Code != 0 {
+			os.Exit(1)
+		}
+
+		workflowId := workflowResult.Id
 		var completedSteps []int
 		// loop and wait for all workflow steps to complete
 		for {

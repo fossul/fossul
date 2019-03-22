@@ -14,6 +14,11 @@ type Workflow struct {
 	Steps []Step `json:"steps,omitempty"`
 }
 
+type WorkflowResult struct {
+	Id int `json:"id"`
+	Result Result `json:"result,omitempty"`
+}
+
 //func New() *Workflow {
 //	w := &Workflow{}
 //	return w

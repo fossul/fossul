@@ -16,30 +16,34 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 
 func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
+	var workflowResult util.WorkflowResult
 	workflow := &util.Workflow{}
 	workflow.Id =  util.SetWorkflowId()
 	workflow.Status = "RUNNING"
 
+	workflowResult.Id = workflow.Id
+
 	var config util.Config = util.GetConfig(w,r)
 	config.WorkflowId = util.IntToString(workflow.Id)
 
-	//errCodeIn := make(chan int,1)
-	go func() {
-		startBackupWorkflowImpl(dataDir,config,workflow)
-		/*if returnCode := startBackupWorkflowImpl(dataDir,config,workflow);returnCode != 0 {
-			errCodeIn <- 1
-		} else {
-			errCodeIn <- 0
-		}*/	
-	}()
+	value,ok := runningWorkflowMap[config.SelectedBackupPolicy]
+	if ok && value == config.ProfileName + "-" + config.ConfigName {
+		result := util.SetResultMessage(1,"ERROR","Backup workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Another workflow is running under profile [" + config.ProfileName + "] config [" + config.ConfigName + "] policy [" + config.SelectedBackupPolicy + "]")
+		workflowResult.Result = result
+		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
+		json.NewEncoder(w).Encode(workflowResult)		
+	} else {
+		runningWorkflowMap[config.SelectedBackupPolicy] = config.ProfileName + "-" + config.ConfigName
+
+		go func() {
+			startBackupWorkflowImpl(dataDir,config,workflow)
+		}()
 	
-	/*errCodeOut := <- errCodeIn
-	if errCodeOut != 0 {
-		log.Println("ERROR workflow failed!")
-	}*/
-	
-	_ = json.NewDecoder(r.Body).Decode(&workflow.Id)
-	json.NewEncoder(w).Encode(workflow.Id)
+		result := util.SetResultMessage(0,"INFO","Backup workflow id [" + util.IntToString(workflow.Id) + "] started successfully")
+		workflowResult.Result = result
+		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
+		json.NewEncoder(w).Encode(workflowResult)
+	}
 }
 
 func sendError(w http.ResponseWriter, r *http.Request, results []util.Result) {

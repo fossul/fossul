@@ -7,17 +7,15 @@ import (
 
 func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util.Workflow) int {
 		resultsDir := dataDir + config.ProfileName + "/" + config.ConfigName + "/" + util.IntToString(workflow.Id)
+		policy := config.SelectedBackupPolicy
 
-		commentMsg := "Welcome to Fossil Backup Framework, WorkflowId: " + util.IntToString(workflow.Id)
-		setComment(resultsDir,commentMsg,1,workflow)
-
-		commentMsg = "Performing Application Quiesce"
+		commentMsg := "Performing Application Quiesce"
 		setComment(resultsDir,commentMsg,2,workflow)
 	
 		if config.PreAppQuiesceCmd != "" {
 			stepInit(resultsDir,3,workflow)
 			result := client.PreQuiesceCmd(config)
-			if resultCode := stepErrorHandler(resultsDir,3,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,3,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}
@@ -25,7 +23,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.AppQuiesceCmd != "" {
 			stepInit(resultsDir,4,workflow)
 			result := client.QuiesceCmd(config)
-			if resultCode := stepErrorHandler(resultsDir,4,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,4,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}	
@@ -33,7 +31,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.AppPlugin != "" {
 			stepInit(resultsDir,5,workflow)
 			result := client.Quiesce(config)
-			if resultCode := stepErrorHandler(resultsDir,5,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,5,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}	
@@ -41,7 +39,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.PostAppQuiesceCmd != "" {
 			stepInit(resultsDir,6,workflow)
 			result := client.PostQuiesceCmd(config)
-			if resultCode := stepErrorHandler(resultsDir,6,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,6,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}	
@@ -52,7 +50,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.BackupCreateCmd != "" {
 			stepInit(resultsDir,8,workflow)
 			result := client.BackupCreateCmd(config)
-			if resultCode := stepErrorHandler(resultsDir,8,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,8,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}	
@@ -60,7 +58,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.StoragePlugin != "" {	
 			stepInit(resultsDir,9,workflow)
 			result := client.Backup(config)
-			if resultCode := stepErrorHandler(resultsDir,9,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,9,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}	
@@ -71,7 +69,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.PreAppUnquiesceCmd != "" {
 			stepInit(resultsDir,11,workflow)
 			result := client.PreUnquiesceCmd(config)
-			if resultCode := stepErrorHandler(resultsDir,11,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,11,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}	
@@ -79,7 +77,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.AppUnquiesceCmd != "" {
 			stepInit(resultsDir,12,workflow)
 			result := client.UnquiesceCmd(config)
-			if resultCode := stepErrorHandler(resultsDir,12,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,12,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}	
@@ -87,7 +85,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.AppPlugin != "" {
 			stepInit(resultsDir,13,workflow)
 			result := client.Unquiesce(config)
-			if resultCode := stepErrorHandler(resultsDir,13,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,13,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}	
@@ -95,7 +93,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.PostAppUnquiesceCmd != "" {
 			stepInit(resultsDir,14,workflow)
 			result := client.PostUnquiesceCmd(config)
-			if resultCode := stepErrorHandler(resultsDir,14,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,14,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}	
@@ -106,7 +104,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.BackupDeleteCmd != "" {
 			stepInit(resultsDir,16,workflow)
 			result := client.BackupDeleteCmd(config)
-			if resultCode := stepErrorHandler(resultsDir,16,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,16,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}	
@@ -115,7 +113,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.StoragePlugin != "" {	
 			stepInit(resultsDir,17,workflow)
 			result := client.BackupDelete(config)
-			if resultCode := stepErrorHandler(resultsDir,17,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,17,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}	
@@ -123,7 +121,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.SendTrapSuccessCmd != "" {
 			stepInit(resultsDir,18,workflow)
 			result := client.SendTrapSuccessCmd(config)
-			if resultCode := stepErrorHandler(resultsDir,18,workflow,result);resultCode != 0 {
+			if resultCode := stepErrorHandler(resultsDir,policy,18,workflow,result);resultCode != 0 {
 				return resultCode
 			}
 		}	
@@ -133,6 +131,9 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 
 		workflow = util.SetWorkflowStatusEnd(workflow)
 		util.SerializeWorkflow(resultsDir,workflow)
+
+		//remove workflow lock
+		delete(runningWorkflowMap,config.SelectedBackupPolicy)
 
 		return 0
 }
@@ -146,7 +147,7 @@ func setComment(resultsDir,msg string,stepId int,workflow *util.Workflow) {
 	util.SerializeWorkflow(resultsDir,workflow)
 }
 
-func stepErrorHandler(resultsDir string,stepId int,workflow *util.Workflow,result util.Result) int {
+func stepErrorHandler(resultsDir,policy string,stepId int,workflow *util.Workflow,result util.Result) int {
 	util.SerializeWorkflowStepResults(resultsDir,stepId,result)
 	//results = append(results, preQuiesceCmdResult)
 
@@ -155,6 +156,10 @@ func stepErrorHandler(resultsDir string,stepId int,workflow *util.Workflow,resul
 		workflow = util.SetWorkflowStep(workflow,step)
 		workflow = util.SetWorkflowStatusError(workflow)
 		util.SerializeWorkflow(resultsDir,workflow)
+
+		//remove workflow lock
+		delete(runningWorkflowMap,policy)
+
 		return 1
 	} else {
 		step := util.SetStep(stepId,"COMPLETE","Step " + util.IntToString(stepId))
