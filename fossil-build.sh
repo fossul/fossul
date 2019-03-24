@@ -29,7 +29,7 @@ go install engine/plugins/app/sample-app
 if [ $? != 0 ]; then exit 1; fi
 go install engine/plugins/storage/sample-storage
 if [ $? != 0 ]; then exit 1; fi
-go install engine/plugins/storage/openshift-rsync
+go install engine/plugins/storage/container-basic
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Services"
@@ -45,7 +45,7 @@ mv $GOBIN/sample-app $PLUGIN_DIR/app
 if [ $? != 0 ]; then exit 1; fi
 mv $GOBIN/sample-storage $PLUGIN_DIR/storage
 if [ $? != 0 ]; then exit 1; fi
-mv $GOBIN/openshift-rsync $PLUGIN_DIR/storage
+mv $GOBIN/container-basic $PLUGIN_DIR/storage
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying default configs"

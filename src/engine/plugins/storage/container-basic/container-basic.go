@@ -9,6 +9,7 @@ import (
 	"engine/plugins/pluginUtil"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 func main() {
@@ -60,7 +61,11 @@ func backup (configMap map[string]string) {
 
 	pluginUtil.CreateDir(backupPath,0755)
 
-	result := util.ExecuteCommand(configMap["RsyncCmdPath"],"rsync",podName + ":" + configMap["BackupSrcPath"],backupPath)
+	args := strings.Split(configMap["CopyCmd"], ",")
+	args = append(args,podName + ":" + configMap["BackupSrcPath"])
+	args = append(args,backupPath)
+	
+	result := util.ExecuteCommand(args...)
 	pluginUtil.LogResultMessages(result)
 			
 	if result.Code != 0 {
@@ -171,7 +176,7 @@ func getEnvParams() map[string]string {
 	configMap["AccessWithinCluster"] = os.Getenv("AccessWithinCluster")
 	configMap["Namespace"] = os.Getenv("Namespace")
 	configMap["ServiceName"] = os.Getenv("ServiceName")
-	configMap["RsyncCmdPath"] = os.Getenv("RsyncCmdPath")
+	configMap["CopyCmd"] = os.Getenv("CopyCmd")
 	configMap["BackupSrcPath"] = os.Getenv("BackupSrcPath")
 	configMap["BackupDestPath"] = os.Getenv("BackupDestPath")
 
