@@ -10,29 +10,47 @@ go get k8s.io/client-go/kubernetes/typed/core/v1
 go get k8s.io/client-go/rest
 go get github.com/BurntSushi/toml
 
+echo "Running Unit Tests"
+go test engine/util
+if [ $? != 0 ]; then exit 1; fi
+
 echo "Building Shared Libraries"
 go build engine/util
+if [ $? != 0 ]; then exit 1; fi
 go build engine/client
+if [ $? != 0 ]; then exit 1; fi
 go build engine/client/k8s
+if [ $? != 0 ]; then exit 1; fi
 go build engine/plugins/pluginUtil
+if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Plugins"
 go install engine/plugins/app/sample-app
+if [ $? != 0 ]; then exit 1; fi
 go install engine/plugins/storage/sample-storage
+if [ $? != 0 ]; then exit 1; fi
 go install engine/plugins/storage/openshift-rsync
+if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Services"
 go install engine/server
+if [ $? != 0 ]; then exit 1; fi
 go install engine/app
+if [ $? != 0 ]; then exit 1; fi
 go install engine/storage
+if [ $? != 0 ]; then exit 1; fi
 
 echo "Moving plugins to $PLUGIN_DIR"
 mv $GOBIN/sample-app $PLUGIN_DIR/app
+if [ $? != 0 ]; then exit 1; fi
 mv $GOBIN/sample-storage $PLUGIN_DIR/storage
+if [ $? != 0 ]; then exit 1; fi
 mv $GOBIN/openshift-rsync $PLUGIN_DIR/storage
+if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying default configs"
 cp -r $GOBIN/fossil/src/cli/configs/default $GOBIN/configs
+if [ $? != 0 ]; then exit 1; fi
 
 echo "Build completed successfully"
 
