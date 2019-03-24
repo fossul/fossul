@@ -19,6 +19,7 @@ type WorkflowResult struct {
 	Result Result `json:"result,omitempty"`
 }
 
+//another way to instantiate Workflow
 //func New() *Workflow {
 //	w := &Workflow{}
 //	return w
@@ -30,34 +31,37 @@ type Step struct {
 	Label string `json:"label,omitempty"`
 }
 
-func SetWorkflowId() int {
+func GetWorkflowId() int {
 	rand.Seed(time.Now().UnixNano())
 	id := rand.Intn(10000)
 	return id
 }
 
-func SetStep(id int,status,label string) Step {
+func CreateStep(status string, workflow *Workflow) Step {
+	id := len(workflow.Steps)
+
 	var step Step
 	step.Id = id
 	step.Status = status
-	step.Label = label
+	step.Label = "Step " + IntToString(id)
 
 	return step
 }
 
-func SetWorkflowStatusStart(workflow *Workflow) *Workflow {
+func UpdateStep(status string, step Step) {
+	step.Status = status
+}
+
+func SetWorkflowStatusStart(workflow *Workflow) {
 	workflow.Status = "RUNNING"
-	return workflow
 }
 
-func SetWorkflowStatusEnd(workflow *Workflow) *Workflow {
+func SetWorkflowStatusEnd(workflow *Workflow) {
 	workflow.Status = "COMPLETE"
-	return workflow
 }
 
-func SetWorkflowStatusError(workflow *Workflow) *Workflow {
+func SetWorkflowStatusError(workflow *Workflow) {
 	workflow.Status = "ERROR"
-	return workflow
 }
 
 func SerializeWorkflow(resultsDir string,workflow *Workflow) {
@@ -78,12 +82,10 @@ func SerializeWorkflowStepResults(resultsDir string,stepId int, results Result) 
 }
 
 
-func SetWorkflowStep(workflow *Workflow, step Step) *Workflow {
+func SetWorkflowStep(workflow *Workflow, step Step) {
 	steps := workflow.Steps
 	steps = append(steps, step)
-
 	workflow.Steps = steps
-	return workflow
 }
 
 func GetWorkflowSteps(w http.ResponseWriter, r *http.Request) []Step {

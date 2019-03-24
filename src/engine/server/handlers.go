@@ -18,7 +18,7 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	var workflowResult util.WorkflowResult
 	workflow := &util.Workflow{}
-	workflow.Id =  util.SetWorkflowId()
+	workflow.Id =  util.GetWorkflowId()
 	workflow.Status = "RUNNING"
 
 	workflowResult.Id = workflow.Id
