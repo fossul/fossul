@@ -149,7 +149,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 func setComment(resultsDir,msg string,workflow *util.Workflow)  {
 	commentResult := util.SetResultMessage(0,"COMMENT",msg)
 
-	step := util.CreateStep("COMPLETE",workflow)
+	step := util.CreateCommentStep(workflow)
 	util.SetWorkflowStep(workflow,step)
 	util.SerializeWorkflow(resultsDir,workflow)
 	util.SerializeWorkflowStepResults(resultsDir,step.Id,commentResult)
@@ -157,7 +157,8 @@ func setComment(resultsDir,msg string,workflow *util.Workflow)  {
 
 func stepErrorHandler(resultsDir,policy string,step util.Step,workflow *util.Workflow,result util.Result) int {
 	if result.Code != 0 {
-		workflow.Steps[step.Id].Status="ERROR"
+		//workflow.Steps[step.Id].Status="ERROR"
+		util.SetStepError(workflow,step)
 		util.SerializeWorkflowStepResults(resultsDir,step.Id,result)
 
 		util.SetWorkflowStatusError(workflow)
@@ -168,7 +169,8 @@ func stepErrorHandler(resultsDir,policy string,step util.Step,workflow *util.Wor
 
 		return 1
 	} else {
-		workflow.Steps[step.Id].Status="COMPLETE"
+		//workflow.Steps[step.Id].Status="COMPLETE"
+		util.SetStepComplete(workflow,step)
 		util.SerializeWorkflowStepResults(resultsDir,step.Id,result)
 		util.SerializeWorkflow(resultsDir,workflow)
 
@@ -177,7 +179,7 @@ func stepErrorHandler(resultsDir,policy string,step util.Step,workflow *util.Wor
 }
 
 func stepInit(resultsDir string,workflow *util.Workflow) util.Step {
-	step := util.CreateStep("RUNNING",workflow)
+	step := util.CreateStep(workflow)
 	util.SetWorkflowStep(workflow,step)
 	util.SerializeWorkflow(resultsDir,workflow)
 

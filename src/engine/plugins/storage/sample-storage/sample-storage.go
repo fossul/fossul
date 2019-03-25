@@ -49,12 +49,12 @@ func backup (configMap map[string]string) {
 
 func backupList (configMap map[string]string) {
 	printEnv(configMap)
-	pluginUtil.LogErrorMessage("*** Backup list ***")
+	pluginUtil.LogInfoMessage("*** Backup list ***")
 }
 
 func backupDelete (configMap map[string]string) {
 	printEnv(configMap)
-	pluginUtil.LogErrorMessage("*** Backup delete ***")
+	pluginUtil.LogInfoMessage("*** Backup delete ***")
 }
 
 func info () {

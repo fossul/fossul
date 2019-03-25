@@ -48,8 +48,15 @@ func CreateStep(workflow *Workflow) Step {
 	return step
 }
 
-func UpdateStep(status string, step Step) {
-	step.Status = status
+func CreateCommentStep(workflow *Workflow) Step {
+	id := len(workflow.Steps)
+
+	var step Step
+	step.Id = id
+	step.Status = "COMPLETE"
+	step.Label = "Step " + IntToString(id)
+
+	return step
 }
 
 func SetStepComplete(workflow *Workflow,step Step) {
