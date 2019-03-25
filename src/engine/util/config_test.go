@@ -2,12 +2,15 @@ package util
 
 import (
 	"testing"
+	"log"
 )
 
 func TestReadConfig(t *testing.T) {
 	configFile := "../../cli/configs/default/default.conf"
 
 	config := ReadConfig(configFile)
+
+	log.Println("Config Struct",config)
 
 	if config.AppPlugin != "sample-app" {
 		t.Fail()
@@ -22,6 +25,8 @@ func TestReadConfigToMap(t *testing.T) {
 	configFile := "../../cli/configs/default/default.conf"
 
 	configMap := ReadConfigToMap(configFile)
+
+	log.Println("Config Map",configMap)
 
 	if configMap["AppPlugin"] != "sample-app" {
 		t.Fail()

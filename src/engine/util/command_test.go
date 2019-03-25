@@ -3,6 +3,7 @@ package util
 import (
 	"testing"
 	"strings"
+	"log"
 )
 
 func TestExecuteCommand(t *testing.T) {
@@ -10,6 +11,8 @@ func TestExecuteCommand(t *testing.T) {
 	args := strings.Split(cmd, ",")
 
 	result := ExecuteCommand(args...)
+
+	log.Println(result)
 			
 	if result.Code != 0 {
 		t.Fail()

@@ -37,12 +37,12 @@ func GetWorkflowId() int {
 	return id
 }
 
-func CreateStep(status string, workflow *Workflow) Step {
+func CreateStep(workflow *Workflow) Step {
 	id := len(workflow.Steps)
 
 	var step Step
 	step.Id = id
-	step.Status = status
+	step.Status = "RUNNING"
 	step.Label = "Step " + IntToString(id)
 
 	return step
@@ -50,6 +50,14 @@ func CreateStep(status string, workflow *Workflow) Step {
 
 func UpdateStep(status string, step Step) {
 	step.Status = status
+}
+
+func SetStepComplete(workflow *Workflow,step Step) {
+	workflow.Steps[step.Id].Status = "COMPLETE"
+}
+
+func SetStepError(workflow *Workflow,step Step) {
+	workflow.Steps[step.Id].Status = "ERROR"
 }
 
 func SetWorkflowStatusStart(workflow *Workflow) {
