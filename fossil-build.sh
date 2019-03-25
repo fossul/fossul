@@ -13,6 +13,8 @@ go get github.com/BurntSushi/toml
 echo "Running Unit Tests"
 go test engine/util
 if [ $? != 0 ]; then exit 1; fi
+go test engine/plugins/pluginUtil
+if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Shared Libraries"
 go build engine/util
