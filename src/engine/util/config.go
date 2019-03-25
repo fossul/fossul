@@ -19,6 +19,7 @@ type Config struct {
 	PluginDir string `json:"pluginDir"`
 	AppPlugin string `json:"appPlugin"`
 	StoragePlugin string `json:"storagePlugin"`
+	ArchivePlugin string `json:"archivePlugin"`
 	BackupRetentions []BackupRetention `json:"backupRetentions"`
 	SelectedBackupPolicy string `json:"backupPolicy,omitmepty"`
 	SelectedBackupRetention int `json:"backupRetention,omitmepty"`
@@ -27,6 +28,8 @@ type Config struct {
 	PostAppQuiesceCmd string `json:"postAppQuiesceCmd,omitempty"`
 	BackupCreateCmd string `json:"backupCreateCmd,omitempty"`
 	BackupDeleteCmd string `json:"backupDeleteCmd,omitempty"`
+	ArchiveCreateCmd string `json:"archiveCreateCmd,omitempty"`
+	ArchiveDeleteCmd string `json:"archiveDeleteCmd,omitempty"`	
 	PreAppUnquiesceCmd string `json:"preAppUnquiesceCmd,omitempty"`
 	AppUnquiesceCmd string `json:"appUnquiesceCmd,omitempty"`
 	PostAppUnquiesceCmd string `json:"postAppUnquiesceCmd,omitempty"`

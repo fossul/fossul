@@ -82,5 +82,35 @@ var routes = Routes{
         "POST",
         "/backupDeleteCmd",
         BackupDeleteCmd,
-    },        
+    }, 
+    Route{
+        "Archive",
+        "POST",
+        "/archive",
+        Archive,
+    },
+    Route{
+        "ArchiveList",
+        "POST",
+        "/archiveList",
+        ArchiveList,
+    },      
+    Route{
+        "ArchiveDelete",
+        "POST",
+        "/archiveDelete",
+        ArchiveDelete,
+    },
+    Route{
+        "ArchiveCreateCmd",
+        "POST",
+        "/archiveCreateCmd",
+        ArchiveCreateCmd,
+    },
+    Route{
+        "ArchiveDeleteCmd",
+        "POST",
+        "/archiveDeleteCmd",
+        ArchiveDeleteCmd,
+    },                          
 }

@@ -29,6 +29,8 @@ go install engine/plugins/app/sample-app
 if [ $? != 0 ]; then exit 1; fi
 go install engine/plugins/storage/sample-storage
 if [ $? != 0 ]; then exit 1; fi
+go install engine/plugins/archive/sample-archive
+if [ $? != 0 ]; then exit 1; fi
 go install engine/plugins/storage/container-basic
 if [ $? != 0 ]; then exit 1; fi
 
@@ -41,9 +43,14 @@ go install engine/storage
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Moving plugins to $PLUGIN_DIR"
+if [ ! -d "$PLUGIN_DIR/app" ]; then mkdir $PLUGIN_DIR/app; fi
 mv $GOBIN/sample-app $PLUGIN_DIR/app
 if [ $? != 0 ]; then exit 1; fi
+if [ ! -d "$PLUGIN_DIR/storage" ]; then mkdir $PLUGIN_DIR/storage; fi
 mv $GOBIN/sample-storage $PLUGIN_DIR/storage
+if [ $? != 0 ]; then exit 1; fi
+if [ ! -d "$PLUGIN_DIR/archive" ]; then mkdir $PLUGIN_DIR/archive; fi
+mv $GOBIN/sample-archive $PLUGIN_DIR/archive
 if [ $? != 0 ]; then exit 1; fi
 mv $GOBIN/container-basic $PLUGIN_DIR/storage
 if [ $? != 0 ]; then exit 1; fi
