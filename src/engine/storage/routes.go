@@ -44,13 +44,13 @@ var routes = Routes{
     Route{
         "PluginList",
         "POST",
-        "/pluginList",
+        "/pluginList/{pluginType}",
         PluginList,
     }, 
     Route{
         "PluginInfo",
         "POST",
-        "/pluginInfo/{pluginName}",
+        "/pluginInfo/{pluginName}/{pluginType}",
         PluginInfo,
     },
     Route{

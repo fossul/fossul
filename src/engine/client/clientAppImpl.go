@@ -9,11 +9,11 @@ import (
 	"strings"
 )
 
-func AppPluginList(config util.Config) []string {
+func AppPluginList(pluginType string,config util.Config) []string {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginList", b)
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginList/" + pluginType, b)
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {
@@ -39,11 +39,11 @@ func AppPluginList(config util.Config) []string {
 
 }
 
-func AppPluginInfo(config util.Config, pluginName string) (util.ResultSimple, util.Plugin) {
+func AppPluginInfo(config util.Config, pluginName,pluginType string) (util.ResultSimple, util.Plugin) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginInfo/" + pluginName, b)
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginInfo/" + pluginName + "/" + pluginType, b)
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {

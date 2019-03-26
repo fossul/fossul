@@ -9,11 +9,11 @@ import (
 	"strings"
 )
 
-func StoragePluginList(config util.Config) []string {
+func StoragePluginList(pluginType string,config util.Config) []string {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginList", b)
+	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginList/" + pluginType, b)
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {
@@ -39,11 +39,11 @@ func StoragePluginList(config util.Config) []string {
 
 }
 
-func StoragePluginInfo(config util.Config, pluginName string) (util.ResultSimple, util.Plugin) {
+func StoragePluginInfo(config util.Config, pluginName,pluginType string) (util.ResultSimple, util.Plugin) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginInfo/" + pluginName, b)
+	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginInfo/" + pluginName + "/" + pluginType, b)
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {

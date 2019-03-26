@@ -9,6 +9,71 @@ import (
 	"strings"
 )
 
+func ArchivePluginList(pluginType string,config util.Config) []string {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginList/" + pluginType, b)
+	req.Header.Add("Content-Type", "application/json")
+
+	if err != nil {
+		log.Println("NewRequest: ", err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Do: ", err)
+	}
+
+	defer resp.Body.Close()
+
+	var plugins []string
+
+	if err := json.NewDecoder(resp.Body).Decode(&plugins); err != nil {
+		log.Println(err)
+	}
+
+	return plugins
+
+}
+
+func ArchivePluginInfo(config util.Config, pluginName,pluginType string) (util.ResultSimple, util.Plugin) {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginInfo/" + pluginName + "/" + pluginType, b)
+	req.Header.Add("Content-Type", "application/json")
+
+	if err != nil {
+		log.Println("NewRequest: ", err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Do: ", err)
+	}
+
+	defer resp.Body.Close()
+
+	var result util.ResultSimple
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		log.Println(err)
+	}
+
+	//unmarshall json response to plugin struct
+	var plugin util.Plugin
+	messages := strings.Join(result.Messages, "\n")
+	pluginByteArray := []byte(messages)
+
+	json.Unmarshal(pluginByteArray, &plugin)
+
+	return result, plugin
+}
+
 func Archive(config util.Config) util.Result {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)

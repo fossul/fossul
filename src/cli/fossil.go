@@ -15,8 +15,9 @@ func main() {
 	optConfig := getopt.StringLong("config",'c',"","Config name")
 	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
-	optAction := getopt.StringLong("action",'a',"","backup|backupList|appPluginList|storagePluginList|pluginInfo|status")
+	optAction := getopt.StringLong("action",'a',"","backup|backupList|appPluginList|storagePluginList|archivePluginList|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
+	optPluginType := getopt.StringLong("pluginType",'t',"","Plugin type app|storage|archive")
 	optGetDefaultConfig := getopt.BoolLong("get-default-config", 0,"Get the default config file")
 	optGetDefaultPluginConfig := getopt.BoolLong("get-default-plugin-config", 0,"Get the default config file")
     optHelp := getopt.BoolLong("help", 0, "Help")
@@ -66,7 +67,7 @@ func main() {
 			fmt.Println(k + " = " + "\""+ v + "\"")
 		}		
 		os.Exit(0)
-	}	
+	}
 
 	if getopt.IsSet("profile") != true {
 		fmt.Println("ERROR: missing parameter --profile")
@@ -175,7 +176,7 @@ func main() {
 		fmt.Println("### List of Application Plugins ###")
 
 		var plugins []string
-		var appPlugins []string = client.AppPluginList(config)
+		var appPlugins []string = client.AppPluginList("app",config)
 		plugins = util.JoinArray(appPlugins,plugins)
 
 		for _, plugin := range plugins {
@@ -185,41 +186,49 @@ func main() {
 		fmt.Println("### List of Storage Plugins ###")
 	
 		var plugins []string
-		var storagePlugins []string = client.StoragePluginList(config)
+		var storagePlugins []string = client.StoragePluginList("storage",config)
 		plugins = util.JoinArray(storagePlugins,plugins)
 	
 		for _, plugin := range plugins {
 			fmt.Println(plugin)
-		}		
+		}
+	} else if *optAction == "archivePluginList" {
+		fmt.Println("### List of Archive Plugins ###")
+		
+		var plugins []string
+		var archivePlugins []string = client.ArchivePluginList("archive",config)
+		plugins = util.JoinArray(archivePlugins,plugins)
+		
+		for _, plugin := range plugins {
+			fmt.Println(plugin)
+		}					
 	} else if *optAction == "pluginInfo" {
 		if getopt.IsSet("plugin") != true {
 			fmt.Println("ERROR: Missing parameter --plugin")
 			getopt.Usage()
 			os.Exit(1)
 		}
-		var pluginName string = *optPluginName
 
+		if getopt.IsSet("pluginType") != true {
+			fmt.Println("ERROR: Missing parameter --pluginType")
+			getopt.Usage()
+			os.Exit(1)
+		}
+
+		var pluginName string = *optPluginName
 		var result util.ResultSimple
 		var plugin util.Plugin
 
-		var appPlugins []string = client.AppPluginList(config)
-		isAppPlugin := util.ExistsInArray(appPlugins,pluginName)
-
-		if isAppPlugin == false {
-			var storagePlugins []string = client.StoragePluginList(config)	
-			isStoragePlugin := util.ExistsInArray(storagePlugins,pluginName)
-			if isStoragePlugin == true {
-				result, plugin = client.StoragePluginInfo(config,pluginName)
-			} else {
-				error := fmt.Sprintf("ERROR: Plugin %s not found!", plugin)
-				fmt.Println(error)
-			}
-		} else if isAppPlugin == true {
-			result, plugin = client.AppPluginInfo(config,pluginName)
+		if *optPluginType == "app" {
+			result, plugin = client.AppPluginInfo(config,pluginName,*optPluginType)
+		} else if *optPluginType == "storage" {
+			result, plugin = client.StoragePluginInfo(config,pluginName,*optPluginType)
+		} else if *optPluginType == "archive" {
+			result, plugin = client.ArchivePluginInfo(config,pluginName,*optPluginType)
 		} else {
-			error := fmt.Sprintf("ERROR: Plugin %s not found!", plugin)
+			error := fmt.Sprintf("ERROR: Plugin type must be app|storage|archive")
 			fmt.Println(error)
-		}				
+		}	
 
 		checkResult(result)
 
