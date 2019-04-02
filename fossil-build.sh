@@ -35,6 +35,9 @@ go install engine/plugins/archive/sample-archive
 if [ $? != 0 ]; then exit 1; fi
 go install engine/plugins/storage/container-basic
 if [ $? != 0 ]; then exit 1; fi
+if [ ! -d "$PLUGIN_DIR/app/mariadb" ]; then mkdir $PLUGIN_DIR/app/mariadb; fi
+go build -buildmode=plugin -o $PLUGIN_DIR/app/mariadb.so engine/plugins/app/mariadb
+if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Services"
 go install engine/server

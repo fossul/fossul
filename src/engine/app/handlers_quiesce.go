@@ -44,25 +44,37 @@ func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
 func Quiesce(w http.ResponseWriter, r *http.Request) {
 
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/app/" + config.AppPlugin
-	if _, err := os.Stat(plugin); os.IsNotExist(err) {
-		var errMsg string = "\nERROR: App plugin does not exist: " + plugin
-		log.Println(err, errMsg)
+	pluginPath := util.GetPluginPath(config.AppPlugin)
 
-		var messages []util.Message
-		message := util.SetMessage("ERROR", errMsg + " " + err.Error())
-		messages = append(messages, message)
+	if pluginPath == "" {
+		var plugin string = config.PluginDir + "/app/" + config.AppPlugin
+		if _, err := os.Stat(plugin); os.IsNotExist(err) {
+			var errMsg string = "\nERROR: App plugin does not exist: " + plugin
+			log.Println(err, errMsg)
+	
+			var messages []util.Message
+			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+			messages = append(messages, message)
+	
+			var result = util.SetResult(1, messages)
+	
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)
+		}
+	
+		var result util.Result
+		result = util.ExecutePlugin(config, "app", plugin, "--action", "quiesce")
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	} else {	
+		var result util.Result
+		plugin := util.GetAppInterface(pluginPath)
+		plugin.SetEnv(config)
 
-		var result = util.SetResult(1, messages)
-
+		result = plugin.Quiesce()
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}
-
-	var result util.Result
-	result = util.ExecutePlugin(config, "app", plugin, "--action", "quiesce")
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
 }
 
 func PostQuiesceCmd(w http.ResponseWriter, r *http.Request) {

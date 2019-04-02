@@ -44,26 +44,36 @@ func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 func Unquiesce(w http.ResponseWriter, r *http.Request) {
 
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/app/" + config.AppPlugin
+	pluginPath := util.GetPluginPath(config.AppPlugin)
+
+	if pluginPath == "" {
+		var plugin string = config.PluginDir + "/app/" + config.AppPlugin
+		if _, err := os.Stat(plugin); os.IsNotExist(err) {
+			var errMsg string = "\nERROR: App plugin does not exist: " + plugin
+			log.Println(err, errMsg)
 	
-	if _, err := os.Stat(plugin); os.IsNotExist(err) {
-		var errMsg string = "ERROR: App plugin does not exist"
-		log.Println(err, errMsg)
+			var messages []util.Message
+			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+			messages = append(messages, message)
+	
+			var result = util.SetResult(1, messages)
+	
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)
+		}
+	
+		var result util.Result
+		result = util.ExecutePlugin(config, "app", plugin, "--action", "unquiesce")
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	} else {	
+		var result util.Result
+		plugin := util.GetAppInterface(pluginPath)
 
-		var messages []util.Message
-		message := util.SetMessage("ERROR", errMsg + " " + err.Error())
-		messages = append(messages, message)
-
-		var result = util.SetResult(1, messages)
-
+		result = plugin.Unquiesce()
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}
-
-	var result util.Result
-	result = util.ExecutePlugin(config, "app", plugin, "--action", "unquiesce")
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
 }
 
 func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
