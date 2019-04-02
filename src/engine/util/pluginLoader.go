@@ -14,7 +14,7 @@ type AppPlugin interface {
 	SetEnv(Config)
 	Quiesce() (Result)
 	Unquiesce() (Result)
-	Info()
+	Info() (Plugin)
 }
 
 func GetPluginPath(pluginName string) string {
@@ -31,20 +31,16 @@ func GetPluginPath(pluginName string) string {
 }
 
 func GetAppInterface(path string) AppPlugin {
-	fmt.Println("HERE1")
 	plugin, err := plugin.Open(path)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
 	}
 
-	fmt.Println("HERE2")
 	symPlugin, err := plugin.Lookup("AppPlugin")
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	fmt.Println(symPlugin,"HERE3")
 	var appPlugin AppPlugin
 	appPlugin, ok := symPlugin.(AppPlugin)
 	if !ok {

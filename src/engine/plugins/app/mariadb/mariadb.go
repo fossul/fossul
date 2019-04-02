@@ -2,8 +2,8 @@ package main
 
 import (
 	"engine/util"
-	"engine/plugins/pluginUtil"
-	"encoding/json"
+//	"engine/plugins/pluginUtil"
+//	"encoding/json"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"fmt"
@@ -89,16 +89,18 @@ func (a appPlugin) Unquiesce() util.Result {
 
 }
 
-func (a appPlugin) Info() {
+func (a appPlugin) Info() util.Plugin {
 	var plugin util.Plugin = setPlugin()
 
+	return plugin
 	//output json
+	/*
 	b, err := json.Marshal(plugin)
     if err != nil {
         pluginUtil.LogErrorMessage(err.Error())
 	} else {
 		pluginUtil.PrintMessage(string(b))
-	}
+	}*/
 }
 
 func setPlugin() (plugin util.Plugin) {

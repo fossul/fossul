@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"io/ioutil"
+	"strings"
 )
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +39,14 @@ func PluginList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, file := range fileInfo {
-		plugins = append(plugins, file.Name())
+		fileName := file.Name()
+
+		//remove .so from built-in plugins
+		if strings.HasSuffix(fileName, ".so") {
+			fileName = strings.Replace(fileName, ".so", "", -1)
+		} 
+
+		plugins = append(plugins, fileName)
 	}
 
 	_ = json.NewDecoder(r.Body).Decode(&plugins)
@@ -51,11 +59,33 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var pluginType string = params["pluginType"]
 
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/" + pluginType + "/" + pluginName
+	pluginPath := util.GetPluginPath(config.AppPlugin)
 
-	var result util.ResultSimple
-	result = util.ExecutePluginSimple(config, pluginType, plugin, "--action", "info")
+	if pluginPath == "" {
+		var plugin string = config.PluginDir + "/" + pluginType + "/" + pluginName
 
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
+		var result util.ResultSimple
+		result = util.ExecutePluginSimple(config, pluginType, plugin, "--action", "info")
+	
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	} else {
+		plugin := util.GetAppInterface(pluginPath)
+		plugin.SetEnv(config)
+
+		var result util.ResultSimple
+		pluginInfo := plugin.Info()
+		b, err := json.Marshal(pluginInfo)
+		if err != nil {
+			result.Code = 1
+			result.Messages = append(result.Messages,err.Error())
+		} else {
+			result.Code = 0
+			outputArray := strings.Split(string(b), "\n")
+			result.Messages = outputArray
+		}
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
 }
