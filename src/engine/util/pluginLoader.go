@@ -11,7 +11,7 @@ import (
 )
 
 type AppPlugin interface {
-	SetEnv(Config)
+	SetEnv(Config) (Result)
 	Quiesce() (Result)
 	Unquiesce() (Result)
 	Info() (Plugin)

@@ -45,6 +45,7 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 
 	var config util.Config = util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(config.AppPlugin)
+	var messages []util.Message
 
 	if pluginPath == "" {
 		var plugin string = config.PluginDir + "/app/" + config.AppPlugin
@@ -52,7 +53,6 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 			var errMsg string = "\nERROR: App plugin does not exist: " + plugin
 			log.Println(err, errMsg)
 	
-			var messages []util.Message
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)
 	
@@ -69,11 +69,19 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 	} else {	
 		var result util.Result
 		plugin := util.GetAppInterface(pluginPath)
-		plugin.SetEnv(config)
-
-		result = plugin.Quiesce()
-		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)
+		setEnvResult := plugin.SetEnv(config)
+		if setEnvResult.Code != 0 {
+			_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
+			json.NewEncoder(w).Encode(setEnvResult)
+		} else {
+			result = plugin.Quiesce()
+			for _,msg := range setEnvResult.Messages {
+				messages = util.PrependMessage(msg,result.Messages)
+			}
+			result.Messages = messages
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)			
+		}
 	}
 }
 

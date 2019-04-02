@@ -20,14 +20,26 @@ type MySQL struct {
 		DB *sql.DB
 }
 
-func (a appPlugin) SetEnv(c util.Config) {
+func (a appPlugin) SetEnv(c util.Config) util.Result {
 	config = c
 	var err error
+	var result util.Result
+	var messages []util.Message
 
 	dsn := getDSN(config)
-	fmt.Println("HERE12121",dsn)
 	conn, err = getConn(dsn)
-	checkErr(err)
+	if conn == nil || err != nil {
+		msg := util.SetMessage("ERROR", "Couldn't connect to database [" + config.AppPluginParameters["MYSQL_DB"] + "] " + err.Error())
+		messages = append(messages,msg)
+
+		result = util.SetResult(1,messages)
+	} else {
+		msg := util.SetMessage("INFO", "Connection to database [" + config.AppPluginParameters["MYSQL_DB"] + "] established")
+		messages = append(messages,msg)
+		result = util.SetResult(0,messages)
+	}
+
+	return result
 }	
 
 func (a appPlugin) Quiesce() util.Result {	
@@ -42,7 +54,9 @@ func (a appPlugin) Quiesce() util.Result {
 	if err != nil {
 		msg = util.SetMessage("ERROR","Flushing tables with read lock for database [" + config.AppPluginParameters["MYSQL_DB"] + "] failed! " + err.Error())
 		messages = append(messages,msg)
-		resultCode = 1
+		result = util.SetResult(1,messages)
+
+		return result
 	} else {
 		msg = util.SetMessage("INFO","Flushing tables with read lock for database [" + config.AppPluginParameters["MYSQL_DB"] + "] successful")
 		messages = append(messages,msg)
@@ -55,7 +69,9 @@ func (a appPlugin) Quiesce() util.Result {
 	if err != nil {
 		msg = util.SetMessage("ERROR","Logs flushed for database [" + config.AppPluginParameters["MYSQL_DB"] + "] failed! " + err.Error())
 		messages = append(messages,msg)
-		resultCode = 1
+		result = util.SetResult(1,messages)
+
+		return result
 	} else {
 		msg = util.SetMessage("INFO","Flushing logs for database [" + config.AppPluginParameters["MYSQL_DB"] + "] successful")
 		messages = append(messages,msg)
@@ -78,10 +94,12 @@ func (a appPlugin) Unquiesce() util.Result {
 	if err != nil {	
 		msg = util.SetMessage("ERROR","Unlock tables for database[" + config.AppPluginParameters["MYSQL_DB"] + "] failed! " + err.Error())
 		messages = append(messages,msg)
+
+		result = util.SetResult(1,messages)
+		return result
 	} else {
 		msg = util.SetMessage("INFO","Unlock tables for database [" + config.AppPluginParameters["MYSQL_DB"] + "] successful")
 		messages = append(messages,msg)
-		resultCode = 1
 	}
 
 	result = util.SetResult(resultCode, messages)
@@ -91,16 +109,7 @@ func (a appPlugin) Unquiesce() util.Result {
 
 func (a appPlugin) Info() util.Plugin {
 	var plugin util.Plugin = setPlugin()
-
 	return plugin
-	//output json
-	/*
-	b, err := json.Marshal(plugin)
-    if err != nil {
-        pluginUtil.LogErrorMessage(err.Error())
-	} else {
-		pluginUtil.PrintMessage(string(b))
-	}*/
 }
 
 func setPlugin() (plugin util.Plugin) {
@@ -135,14 +144,14 @@ func checkErr(err error) {
 func getDSN(c util.Config) string {
 	var dsn string
 	
-	if c.AppPluginParameters["MYSQL_PASSWORD"] == "" {
-		dsn = c.AppPluginParameters["MYSQL_USER"] + "@" + c.AppPluginParameters["MYSQL_PROTO"] + "(" + 
-		c.AppPluginParameters["MYSQL_HOST"] + ":" + c.AppPluginParameters["MYSQL_PORT"] + ")/" + 
+	if c.AppPluginParameters["MysqlPassword"] == "" {
+		dsn = c.AppPluginParameters["MysqlUser"] + "@" + c.AppPluginParameters["MysqlProto"] + "(" + 
+		c.AppPluginParameters["MysqlHost"] + ":" + c.AppPluginParameters["MysqlPort"] + ")/" + 
 		c.AppPluginParameters["MYSQL_DB"]
 	} else {
-		dsn = c.AppPluginParameters["MYSQL_USER"] + ":" + c.AppPluginParameters["MYSQL_PASSWORD"] + "@" + 
-		c.AppPluginParameters["MYSQL_PROTO"] + "(" + c.AppPluginParameters["MYSQL_HOST"] + ":" + 
-		c.AppPluginParameters["MYSQL_PORT"] + ")/" + c.AppPluginParameters["MYSQL_DB"]
+		dsn = c.AppPluginParameters["MysqlUser"] + ":" + c.AppPluginParameters["MysqlPassword"] + "@" + 
+		c.AppPluginParameters["MysqlProto"] + "(" + c.AppPluginParameters["MysqlHost"] + ":" + 
+		c.AppPluginParameters["MysqlPort"] + ")/" + c.AppPluginParameters["MysqlDb"]
 	}
 	
 	return dsn

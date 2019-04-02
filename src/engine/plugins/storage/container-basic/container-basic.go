@@ -9,7 +9,6 @@ import (
 	"engine/plugins/pluginUtil"
 	"encoding/json"
 	"fmt"
-	"strings"
 )
 
 func main() {
@@ -61,8 +60,19 @@ func backup (configMap map[string]string) {
 
 	pluginUtil.CreateDir(backupPath,0755)
 
-	args := strings.Split(configMap["CopyCmd"], ",")
-	args = append(args,podName + ":" + configMap["BackupSrcPath"])
+	var args []string
+	args = append(args,configMap["CopyCmdPath"])
+	if configMap["ContainerPlatform"] == "openshift" {
+		args = append(args,"rsync")
+		args = append(args,"-n")
+		args = append(args,configMap["Namespace"])
+		args = append(args,podName + ":" + configMap["BackupSrcPath"])
+		} else if configMap["ContainerPlatform"] == "kubernetes" {
+			args = append(args,"cp")
+			args = append(args,configMap["Namespace"] + "/" + podName + ":" + configMap["BackupSrcPath"])
+	} else {
+
+	}	
 	args = append(args,backupPath)
 	
 	result := util.ExecuteCommand(args...)
@@ -173,10 +183,11 @@ func getEnvParams() map[string]string {
 	configMap["BackupPolicy"] = os.Getenv("BackupPolicy")
 	configMap["BackupRetention"] = os.Getenv("BackupRetention")
 	configMap["BackupName"] = os.Getenv("BackupName")
+	configMap["ContainerPlatform"] = os.Getenv("ContainerPlatform")
 	configMap["AccessWithinCluster"] = os.Getenv("AccessWithinCluster")
 	configMap["Namespace"] = os.Getenv("Namespace")
 	configMap["ServiceName"] = os.Getenv("ServiceName")
-	configMap["CopyCmd"] = os.Getenv("CopyCmd")
+	configMap["CopyCmdPath"] = os.Getenv("CopyCmdPath")
 	configMap["BackupSrcPath"] = os.Getenv("BackupSrcPath")
 	configMap["BackupDestPath"] = os.Getenv("BackupDestPath")
 
