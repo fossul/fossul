@@ -7,11 +7,18 @@ import (
 func TestCreateDeleteDir(t *testing.T)  {
 	dir := "/tmp/foobar456"
 
-	CreateDir(dir,0755)
+	err := CreateDir(dir,0755)
+	if err != nil {
+		t.Fail()
+	}
+
 	exists := ExistsPath(dir)
 
 	if exists == true {
-		RecursiveDirDelete(dir)
+		err := RecursiveDirDelete(dir)
+		if err != nil {
+			t.Fail()
+		}
 	} else {
 		t.Fail()
 	}

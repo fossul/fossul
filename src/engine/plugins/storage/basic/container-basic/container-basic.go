@@ -22,7 +22,7 @@ func main() {
 	}
 
 	if getopt.IsSet("action") != true {
-		pluginUtil.LogErrorMessage("missing parameter --action")
+		fmt.Println("ERROR missing parameter --action")
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -39,7 +39,7 @@ func main() {
 	} else if *optAction == "info" {
 		info()			
 	} else {
-		pluginUtil.LogErrorMessage("incorrect parameter" + *optAction)
+		fmt.Println("ERROR incorrect parameter" + *optAction)
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -49,16 +49,19 @@ func backup (configMap map[string]string) {
 	configMap = setWorkflowId(configMap)
 	printEnv(configMap)
 
-	pluginUtil.LogInfoMessage("Performing container backup")
+	fmt.Println("INFO Performing container backup")
 
-	podName := k8s.GetPod(configMap["Namespace"],configMap["ServiceName"],configMap["AccessWithinCluster"])
-	pluginUtil.LogErrorMessage("Performing backup for pod" + podName)
+	podName,err := k8s.GetPod(configMap["Namespace"],configMap["ServiceName"],configMap["AccessWithinCluster"])
+	checkError(err)
+
+	fmt.Println("INFO Performing backup for pod" + podName)
 
 	backupName := util.GetBackupName(configMap["BackupName"],configMap["BackupPolicy"],configMap["WorkflowId"])
-	backupPath := util.GetBackupPath(configMap)
-	pluginUtil.LogInfoMessage("Backup name is " + backupName + ", Backup path is " + backupPath)
+	backupPath := util.GetBackupPathFromMap(configMap)
+	fmt.Println("INFO Backup name is " + backupName + ", Backup path is " + backupPath)
 
-	pluginUtil.CreateDir(backupPath,0755)
+	err = pluginUtil.CreateDir(backupPath,0755)
+	checkError(err)
 
 	var args []string
 	args = append(args,configMap["CopyCmdPath"])
@@ -67,16 +70,19 @@ func backup (configMap map[string]string) {
 		args = append(args,"-n")
 		args = append(args,configMap["Namespace"])
 		args = append(args,podName + ":" + configMap["BackupSrcPath"])
-		} else if configMap["ContainerPlatform"] == "kubernetes" {
-			args = append(args,"cp")
-			args = append(args,configMap["Namespace"] + "/" + podName + ":" + configMap["BackupSrcPath"])
+	} else if configMap["ContainerPlatform"] == "kubernetes" {
+		args = append(args,"cp")
+		args = append(args,configMap["Namespace"] + "/" + podName + ":" + configMap["BackupSrcPath"])
 	} else {
-
+		fmt.Println("ERROR incorrect parameter set for ContainerPlatform [" + configMap["ContainerPlatform"] + "]")
+		os.Exit(1)
 	}	
 	args = append(args,backupPath)
 	
 	result := util.ExecuteCommand(args...)
-	pluginUtil.LogResultMessages(result)
+	for _, line := range result.Messages {
+		fmt.Println(line.Level, line.Message)
+	}
 			
 	if result.Code != 0 {
 		os.Exit(1)
@@ -84,22 +90,25 @@ func backup (configMap map[string]string) {
 }
 
 func backupList (configMap map[string]string) {
-	backupDir := util.GetBackupDir(configMap)
-	backups := pluginUtil.ListBackups(backupDir)
+	backupDir := util.GetBackupDirFromMap(configMap)
+	backups,err := pluginUtil.ListBackups(backupDir)
+	checkError(err)
 
 	b, err := json.Marshal(backups)
     if err != nil {
-        pluginUtil.LogErrorMessage(err.Error())
+        fmt.Println("ERROR " + err.Error())
 	} else {
-		pluginUtil.PrintMessage(string(b))
+		fmt.Println(string(b))
 	}
 }
 
 func backupDelete (configMap map[string]string) {
 	printEnv(configMap)
 
-	backupDir := util.GetBackupDir(configMap)
-	backups := pluginUtil.ListBackups(backupDir)
+	backupDir := util.GetBackupDirFromMap(configMap)
+	backups,err := pluginUtil.ListBackups(backupDir)
+	checkError(err)
+
 	backupsByPolicy := util.GetBackupsByPolicy(configMap["BackupPolicy"],backups)
 	backupCount := len(backupsByPolicy)
 	backupRetentionCount := util.StringToInt(configMap["BackupRetention"])
@@ -109,18 +118,19 @@ func backupDelete (configMap map[string]string) {
 		for backup := range pluginUtil.ReverseBackupList(backupsByPolicy) {
 			if count > backupRetentionCount {
 				msg := fmt.Sprintf("Number of backups [%d] greater than backup retention [%d]",backupCount,backupRetentionCount)
-				pluginUtil.LogInfoMessage(msg)
+				fmt.Println(msg)
 				backupCount = backupCount - 1
 
 				backupName := backup.Name + "_" + backup.Policy + "_" + backup.WorkflowId + "_" + util.IntToString(backup.Epoch)
-				pluginUtil.LogInfoMessage("Deleting backup " + backupName)
+				fmt.Println("INFO Deleting backup " + backupName)
 				backupPath := backupDir + "/" + backupName
 				pluginUtil.RecursiveDirDelete(backupPath)
-				pluginUtil.LogInfoMessage("Backup " + backupName + " deleted successfully")
+				fmt.Println("INFO Backup " + backupName + " deleted successfully")
 				
-				pluginUtil.LogInfoMessage("workflowId " + backup.WorkflowId)
 				result := client.DeleteWorkflowResults(configMap["ProfileName"],configMap["ConfigName"],backup.WorkflowId)
-				pluginUtil.LogResultMessages(result)
+				for _, line := range result.Messages {
+					fmt.Println(line.Level, line.Message)
+				}
 
 				if result.Code != 0 {
 					os.Exit(1)
@@ -129,8 +139,8 @@ func backupDelete (configMap map[string]string) {
 			count = count + 1
 		}
 	} else {
-		msg := fmt.Sprintf("Backup deletion skipped, there are [%d] backups but backup retention is [%d]",backupCount, backupRetentionCount)
-		pluginUtil.LogInfoMessage(msg)
+		msg := fmt.Sprintf("INFO Backup deletion skipped, there are [%d] backups but backup retention is [%d]",backupCount, backupRetentionCount)
+		fmt.Println(msg)
 	}
 }
 
@@ -139,15 +149,15 @@ func info () {
 
 	b, err := json.Marshal(plugin)
     if err != nil {
-        pluginUtil.LogErrorMessage(err.Error())
+        fmt.Println("ERROR " + err.Error())
 	} else {
-		pluginUtil.PrintMessage(string(b))
+		fmt.Println(string(b))
 	}
 }
 
 func setPlugin() (plugin util.Plugin) {
-	plugin.Name = "openshift-rsync"
-	plugin.Description = "OpenShift Backup Plugin that uses rsync to backup a pod"
+	plugin.Name = "container-basic"
+	plugin.Description = "Container Backup Plugin that uses rsync to backup a pod"
 	plugin.Type = "storage"
 
 	var capabilities []util.Capability
@@ -172,7 +182,7 @@ func setPlugin() (plugin util.Plugin) {
 
 func printEnv(configMap map[string]string) {
 	config := util.ConfigMapToJson(configMap)
-	pluginUtil.LogDebugMessage("Config Parameters: " + config + "\n")
+	fmt.Println("DEBUG Config Parameters: " + config + "\n")
 }
 
 func getEnvParams() map[string]string {
@@ -198,4 +208,11 @@ func setWorkflowId(configMap map[string]string) map[string]string {
 	configMap["WorkflowId"] = os.Getenv("WorkflowId")
 
 	return configMap
+}
+
+func checkError(err error) {
+	if err != nil {
+		fmt.Println("ERROR " + err.Error())
+		os.Exit(1)
+	}
 }

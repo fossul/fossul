@@ -17,20 +17,33 @@ func GetTimestamp() int64 {
 	return time
 }
 
-func GetBackupDir(configMap map[string]string) string {
+func GetBackupDirFromMap(configMap map[string]string) string {
 	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"]
 
 	return backupPath
 }
 
-func GetBackupPath(configMap map[string]string) string {
+func GetBackupDirFromConfig(config Config) string {
+	backupPath := config.StoragePluginParameters["BackupDestPath"] + "/" + config.ProfileName + "/" + config.ConfigName
+
+	return backupPath
+}
+
+func GetBackupPathFromMap(configMap map[string]string) string {
 	backupName := GetBackupName(configMap["BackupName"],configMap["BackupPolicy"],configMap["WorkflowId"])
 	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"] + "/" + backupName
 
 	return backupPath
 }
 
-func GetBackupName(name, policy,workflowId string) string {
+func GetBackupPathFromConfig(config Config) string {
+	backupName := GetBackupName(config.StoragePluginParameters["BackupName"],config.SelectedBackupPolicy,config.WorkflowId)
+	backupPath := config.StoragePluginParameters["BackupDestPath"] + "/" + config.ProfileName + "/" + config.ConfigName + "/" + backupName
+
+	return backupPath
+}
+
+func GetBackupName(name, policy, workflowId string) string {
 	time := GetTimestamp()
 	timeToString := fmt.Sprintf("%d",time)
 

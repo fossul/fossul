@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"engine/util"
 	"net/http"
-	"log"
 	"os"
 	"fmt"
 	"strings"
@@ -12,75 +11,133 @@ import (
 
 func Backup(w http.ResponseWriter, r *http.Request) {
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
-
-	if _, err := os.Stat(plugin); os.IsNotExist(err) {
-		var errMsg string = "ERROR: Storage plugin does not exist"
-		log.Println(err, errMsg)
-
-		var messages []util.Message
-		message := util.SetMessage("ERROR", errMsg + " " + err.Error())
-		messages = append(messages, message)
-
-		var result = util.SetResult(1, messages)
-
-		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)
-	}
-
+	pluginPath := util.GetPluginPath(config.StoragePlugin)
 	var result util.Result
-	result = util.ExecutePlugin(config, "storage", plugin, "--action", "backup")	
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
+	var messages []util.Message
+
+	if pluginPath == "" {
+		var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
+
+		if _, err := os.Stat(plugin); os.IsNotExist(err) {
+			var errMsg string = "Storage plugin does not exist"
+
+			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+			messages = append(messages, message)
+
+			result = util.SetResult(1, messages)
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)
+		}
+		result = util.ExecutePlugin(config, "storage", plugin, "--action", "backup")	
+		_ 	= json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	} else {
+		plugin := util.GetStorageInterface(pluginPath)
+		setEnvResult := plugin.SetEnv(config)
+		if setEnvResult.Code != 0 {
+			_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
+			json.NewEncoder(w).Encode(setEnvResult)
+		} else {
+			result = plugin.Backup()
+			for _,msg := range setEnvResult.Messages {
+				messages = util.PrependMessage(msg,result.Messages)
+			}
+
+			if len(messages) != 0 {
+				result.Messages = messages		
+			}
+
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)			
+		}		
+	}	
 }
 
 func BackupList(w http.ResponseWriter, r *http.Request) {
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
+	pluginPath := util.GetPluginPath(config.StoragePlugin)
+	var result util.ResultSimple
 
-	if _, err := os.Stat(plugin); os.IsNotExist(err) {
-		var errMsg string = "ERROR: Storage plugin does not exist"
-		log.Println(err, errMsg)
+	if pluginPath == "" {
+		var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
 
-		var messages []string
-		message := fmt.Sprintf("ERROR %s %s",errMsg,err.Error())
-		messages = append(messages, message)
+		if _, err := os.Stat(plugin); os.IsNotExist(err) {
+			var errMsg string = "Storage plugin does not exist"
 
-		var result = util.SetResultSimple(1, messages)
+			var messages []string
+			message := fmt.Sprintf("ERROR %s %s",errMsg,err.Error())
+			messages = append(messages, message)
+
+			var result = util.SetResultSimple(1, messages)
+
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)
+		}
+		result = util.ExecutePluginSimple(config, "storage", plugin, "--action", "backupList")
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
-	}
+	} else {
+		plugin := util.GetStorageInterface(pluginPath)
+		_= plugin.SetEnv(config)
 
-	var result util.ResultSimple
-	result = util.ExecutePluginSimple(config, "storage", plugin, "--action", "backupList")
-
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
+		backupList := plugin.BackupList()
+		b, err := json.Marshal(backupList)
+		if err != nil {
+			result.Code = 1
+			result.Messages = append(result.Messages,err.Error())
+		} else {
+			result.Code = 0
+			outputArray := strings.Split(string(b), "\n")
+			result.Messages = outputArray
+		}
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)						
+	}	
 }
 
 func BackupDelete(w http.ResponseWriter, r *http.Request) {
-
 	var config util.Config = util.GetConfig(w,r)
-	var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
-	if _, err := os.Stat(plugin); os.IsNotExist(err) {
-		var errMsg string = "ERROR: Storage plugin does not exist"
-		log.Println(err, errMsg)
+	pluginPath := util.GetPluginPath(config.StoragePlugin)
+	var result util.Result
+	var messages []util.Message
 
-		var messages []util.Message
-		message := util.SetMessage("ERROR", errMsg + " " + err.Error())
-		messages = append(messages, message)
+	if pluginPath == "" {
+		var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
+		if _, err := os.Stat(plugin); os.IsNotExist(err) {
+			var errMsg string = "Storage plugin does not exist"
 
-		var result = util.SetResult(1, messages)
+			var messages []util.Message
+			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+			messages = append(messages, message)
 
+			result = util.SetResult(1, messages)
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)
+		}
+		result = util.ExecutePlugin(config, "storage", plugin, "--action", "backupDelete")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
-	}
+	} else {
+		plugin := util.GetStorageInterface(pluginPath)
+		setEnvResult := plugin.SetEnv(config)
+		if setEnvResult.Code != 0 {
+			_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
+			json.NewEncoder(w).Encode(setEnvResult)
+		} else {
+			result = plugin.BackupDelete()
+			for _,msg := range setEnvResult.Messages {
+				messages = util.PrependMessage(msg,result.Messages)
+			}
 
-	var result util.Result
-	result = util.ExecutePlugin(config, "storage", plugin, "--action", "backupDelete")
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
+			if len(messages) != 0 {
+				result.Messages = messages		
+			}
+
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)			
+		}			
+	}	
 }
 
 func BackupCreateCmd(w http.ResponseWriter, r *http.Request) {

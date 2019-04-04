@@ -42,9 +42,9 @@ func PluginList(w http.ResponseWriter, r *http.Request) {
 		fileName := file.Name()
 
 		//remove .so from built-in plugins
-		if strings.HasSuffix(fileName, ".so") {
-			fileName = strings.Replace(fileName, ".so", "", -1)
-		} 
+		//if strings.HasSuffix(fileName, ".so") {
+		//	fileName = strings.Replace(fileName, ".so", "", -1)
+		//} 
 
 		plugins = append(plugins, fileName)
 	}
@@ -59,7 +59,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var pluginType string = params["pluginType"]
 
 	var config util.Config = util.GetConfig(w,r)
-	pluginPath := util.GetPluginPath(config.AppPlugin)
+	pluginPath := util.GetPluginPath(pluginName)
 
 	if pluginPath == "" {
 		var plugin string = config.PluginDir + "/" + pluginType + "/" + pluginName

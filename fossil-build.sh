@@ -27,15 +27,17 @@ go build engine/plugins/pluginUtil
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Plugins"
-go install engine/plugins/app/sample-app
+go install engine/plugins/app/basic/sample-app
 if [ $? != 0 ]; then exit 1; fi
-go install engine/plugins/storage/sample-storage
+go install engine/plugins/storage/basic/sample-storage
 if [ $? != 0 ]; then exit 1; fi
-go install engine/plugins/archive/sample-archive
+go install engine/plugins/archive/basic/sample-archive
 if [ $? != 0 ]; then exit 1; fi
-go install engine/plugins/storage/container-basic
+go install engine/plugins/storage/basic/container-basic
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $PLUGIN_DIR/app/mariadb.so engine/plugins/app/mariadb
+go build -buildmode=plugin -o $PLUGIN_DIR/app/mariadb.so engine/plugins/app/built-in/mariadb
+if [ $? != 0 ]; then exit 1; fi
+go build -buildmode=plugin -o $PLUGIN_DIR/storage/container-basic.so engine/plugins/storage/built-in/container-basic
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Services"

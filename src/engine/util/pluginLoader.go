@@ -7,48 +7,7 @@ import (
 	"strings"
 //	"reflect"
 	"fmt"
-	"plugin"
 )
-
-type AppPlugin interface {
-	SetEnv(Config) (Result)
-	Quiesce() (Result)
-	Unquiesce() (Result)
-	Info() (Plugin)
-}
-
-func GetPluginPath(pluginName string) string {
-	var path string
-	switch pluginName {
-	case "mariadb":
-		path = "./plugins/app/mariadb.so"
-	default:
-		fmt.Println("Plugin Not found!")
-		path = ""
-	}
-
-	return path
-}
-
-func GetAppInterface(path string) AppPlugin {
-	plugin, err := plugin.Open(path)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	symPlugin, err := plugin.Lookup("AppPlugin")
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	var appPlugin AppPlugin
-	appPlugin, ok := symPlugin.(AppPlugin)
-	if !ok {
-		fmt.Println(appPlugin,ok,"unexpected type from module symbol")
-	}
-
-	return appPlugin
-}
 
 func ExecutePlugin(config Config, pluginType string, args ...string) (result Result) {
 

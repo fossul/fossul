@@ -9,18 +9,18 @@ import (
 	"strings"
 )
 
-func GetPod(namespace, serviceName, accessWithinCluster string) string {
+func GetPod(namespace, serviceName, accessWithinCluster string) (string,error) {
 	var kubeConfig *rest.Config = getKubeConfig(accessWithinCluster)
 	
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(kubeConfig)
 	if err != nil {
-		fmt.Println(err.Error())
+		return "",err
 	}
 
     pods, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{})
     if err != nil {
-    	panic(err)
+    	return "",err
     }
 
 	fmt.Println("DEBUG: Pods in namespace", namespace)
@@ -48,5 +48,5 @@ func GetPod(namespace, serviceName, accessWithinCluster string) string {
 	}
 	*/
 
-	return ourPod
+	return ourPod,nil
 }

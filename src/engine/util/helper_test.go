@@ -7,7 +7,7 @@ import (
 
 func TestGetBackupDir(t *testing.T) {
 	configMap := getConfigMap()
-	backupDir := GetBackupDir(configMap)
+	backupDir := GetBackupDirFromMap(configMap)
 
 	if backupDir != "/backupdest/default/default" {
 		t.Fail()
@@ -16,7 +16,7 @@ func TestGetBackupDir(t *testing.T) {
 
 func TestGetBackupPath(t *testing.T) {
 	configMap := getConfigMap()
-	backupPath := GetBackupPath(configMap)
+	backupPath := GetBackupPathFromMap(configMap)
 
 	if ! strings.Contains(backupPath,"/backupdest/default/default/mybackup_daily_777") {
 		t.Fail()

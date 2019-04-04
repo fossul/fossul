@@ -7,6 +7,7 @@ import (
 	"engine/util"
 	"path/filepath"
 	"sort"
+	"errors"
 )
 
 func ExistsPath(path string) bool {
@@ -17,24 +18,20 @@ func ExistsPath(path string) bool {
 	}
 }
 
-func CreateDir(path string, mode os.FileMode) {
+func CreateDir(path string, mode os.FileMode) error {
 
 	if ExistsPath(path) == false {
 		if err := os.MkdirAll(path, mode); err != nil {
-			LogErrorMessage("creating directory " + path + " failed")
-			LogErrorMessage(err.Error())
-			os.Exit(1)
-		 } else {
-			LogInfoMessage("creating directory " + path + " completed successfully")
-		 }		
+			return errors.New("creating directory " + path + " failed!" + err.Error())
+		 }	
 	}
+	return nil
 }
 
-func ListBackups(path string) []util.Backup {
+func ListBackups(path string) ([]util.Backup, error) {
 	files, err := ioutil.ReadDir(path)
-    if err != nil {
-		LogErrorMessage(err.Error())
-		os.Exit(1)
+  if err != nil {
+		return nil,err
 	}
 
 	var backups []util.Backup
@@ -62,40 +59,37 @@ func ListBackups(path string) []util.Backup {
 
 	sort.Sort(util.ByEpoch(backups))
 
-	return backups
+	return backups,nil
 }
 
-func RecursiveDirDelete(dir string) {
+func RecursiveDirDelete(dir string) error {
 	if ExistsPath(dir) == true {
 		d, err := os.Open(dir)
 
 		if err != nil {
-			LogErrorMessage(err.Error())
-			os.Exit(1)
+			return err
 		}
 		defer d.Close()
 
 		names, err := d.Readdirnames(-1)
 		if err != nil {
-			LogErrorMessage(err.Error())
-			os.Exit(1)
+			return err
 		}
 
 		for _, name := range names {
 			err = os.RemoveAll(filepath.Join(dir, name))
 			if err != nil {
-				LogErrorMessage(err.Error())
-				os.Exit(1)
+				return err
 			}
 		}
 
 		err = os.Remove(dir)
 		if err != nil {
-			LogErrorMessage(err.Error())
-			os.Exit(1)
+			return err
 		}
-		LogInfoMessage("Removed directory " + dir + " completed successfully")
 	}	
+
+	return nil
 }
 
 func ReverseBackupList(backups []util.Backup) chan util.Backup {

@@ -4,8 +4,8 @@ import (
 	"os"
 	"github.com/pborman/getopt/v2"
 	"engine/util"
-	"engine/plugins/pluginUtil"
 	"encoding/json"
+	"fmt"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 	}
 
 	if getopt.IsSet("action") != true {
-		pluginUtil.LogErrorMessage("Incorrect parameter")
+		fmt.Println("ERROR Incorrect parameter")
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -36,7 +36,7 @@ func main() {
 	} else if *optAction == "info" {
 		info()		
 	} else {
-		pluginUtil.LogErrorMessage("Incorrect parameter" + *optAction + "\n")
+		fmt.Println("ERROR Incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -44,12 +44,12 @@ func main() {
 
 func quiesce (configMap map[string]string) {
 	printEnv(configMap)
-	pluginUtil.LogInfoMessage("*** Application quiesce ***")
+	fmt.Println("INFO *** Application quiesce ***")
 }
 
 func unquiesce (configMap map[string]string) {
 	printEnv(configMap)
-	pluginUtil.LogInfoMessage("*** Application unquiesce ***")
+	fmt.Println("INFO *** Application unquiesce ***")
 }
 
 func info () {
@@ -58,9 +58,9 @@ func info () {
 	//output json
 	b, err := json.Marshal(plugin)
     if err != nil {
-        pluginUtil.LogErrorMessage(err.Error())
+        fmt.Println("ERROR " + err.Error())
 	} else {
-		pluginUtil.PrintMessage(string(b))
+		fmt.Println(string(b))
 	}
 }
 
@@ -88,7 +88,7 @@ func setPlugin() (plugin util.Plugin) {
 
 func printEnv(configMap map[string]string) {
 	config := util.ConfigMapToJson(configMap)
-	pluginUtil.LogDebugMessage("Config Parameters: " + config)
+	fmt.Println("DEBUG Config Parameters: " + config)
 }
 
 func getEnvParams() map[string]string {

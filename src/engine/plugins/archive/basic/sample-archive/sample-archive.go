@@ -4,8 +4,8 @@ import (
 	"os"
 	"github.com/pborman/getopt/v2"
 	"engine/util"
-	"engine/plugins/pluginUtil"
 	"encoding/json"
+	"fmt"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 	}
 
 	if getopt.IsSet("action") != true {
-		pluginUtil.LogErrorMessage("Incorrect parameter\n")
+		fmt.Println("ERROR Incorrect parameter\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -36,7 +36,7 @@ func main() {
 	} else if *optAction == "info" {
 		info()			
 	} else {
-		pluginUtil.LogErrorMessage("Incorrect parameter" + *optAction + "\n")
+		fmt.Println("ERROR Incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -44,17 +44,17 @@ func main() {
 
 func archive (configMap map[string]string) {
 	printEnv(configMap)
-	pluginUtil.LogInfoMessage("*** Archive ***")
+	fmt.Println("INFO *** Archive ***")
 }
 
 func archiveList (configMap map[string]string) {
 	printEnv(configMap)
-	pluginUtil.LogInfoMessage("*** Archive list ***")
+	fmt.Println("INFO *** Archive list ***")
 }
 
 func archiveDelete (configMap map[string]string) {
 	printEnv(configMap)
-	pluginUtil.LogInfoMessage("*** Archive delete ***")
+	fmt.Println("INFO *** Archive delete ***")
 }
 
 func info () {
@@ -63,14 +63,14 @@ func info () {
 	//output json
 	b, err := json.Marshal(plugin)
     if err != nil {
-        pluginUtil.LogErrorMessage(err.Error())
+        fmt.Println("ERROR " + err.Error())
 	} else {
-		pluginUtil.PrintMessage(string(b))
+		fmt.Println(string(b))
 	}
 }
 
 func setPlugin() (plugin util.Plugin) {
-	plugin.Name = "sample"
+	plugin.Name = "sample-archive"
 	plugin.Description = "A sample archive plugin"
 	plugin.Type = "archive"
 
@@ -96,7 +96,7 @@ func setPlugin() (plugin util.Plugin) {
 
 func printEnv(configMap map[string]string) {
 	config := util.ConfigMapToJson(configMap)
-	pluginUtil.LogDebugMessage("Config Parameters: " + config + "\n")
+	fmt.Println("DEBUG Config Parameters: " + config + "\n")
 }
 
 func getEnvParams() map[string]string {
