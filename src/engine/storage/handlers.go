@@ -65,22 +65,48 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		plugin := util.GetStorageInterface(pluginPath)
-		plugin.SetEnv(config)
-
 		var result util.ResultSimple
-		pluginInfo := plugin.Info()
-		b, err := json.Marshal(pluginInfo)
-		if err != nil {
-			result.Code = 1
-			result.Messages = append(result.Messages,err.Error())
+		if pluginType == "storage" {
+			plugin,err := util.GetStorageInterface(pluginPath)
+			//need to implement proper result object for info
+			if err != nil {	
+			} else {
+				plugin.SetEnv(config)
+				pluginInfo := plugin.Info()
+				b, err := json.Marshal(pluginInfo)
+				if err != nil {
+					result.Code = 1
+					result.Messages = append(result.Messages,err.Error())
+				} else {
+					result.Code = 0
+					outputArray := strings.Split(string(b), "\n")
+					result.Messages = outputArray
+				}	
+				_ = json.NewDecoder(r.Body).Decode(&result)
+				json.NewEncoder(w).Encode(result)		
+			}			
+		} else if pluginType == "archive" {
+			plugin,err := util.GetArchiveInterface(pluginPath)
+			//need to implement proper result object for info
+			if err != nil {			
+			} else {
+				plugin.SetEnv(config)
+				pluginInfo := plugin.Info()
+				b, err := json.Marshal(pluginInfo)
+				if err != nil {
+					result.Code = 1
+					result.Messages = append(result.Messages,err.Error())
+				} else {
+					result.Code = 0
+					outputArray := strings.Split(string(b), "\n")
+					result.Messages = outputArray
+				}		
+				_ = json.NewDecoder(r.Body).Decode(&result)
+				json.NewEncoder(w).Encode(result)	
+			}	
 		} else {
-			result.Code = 0
-			outputArray := strings.Split(string(b), "\n")
-			result.Messages = outputArray
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)	
 		}
-
-		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)
 	}	
 }

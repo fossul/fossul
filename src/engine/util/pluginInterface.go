@@ -3,6 +3,7 @@ package util
 import (
 	"fmt"
 	"plugin"
+	"errors"
 )
 
 type AppPlugin interface {
@@ -20,6 +21,14 @@ type StoragePlugin interface {
 	Info() (Plugin)
 }
 
+type ArchivePlugin interface {
+	SetEnv(Config) (Result)
+	Archive() (Result)
+	ArchiveDelete() (Result)
+	ArchiveList() ([]Archive)
+	Info() (Plugin)
+}
+
 func GetPluginPath(pluginName string) string {
 	var path string
 	switch pluginName {
@@ -27,6 +36,12 @@ func GetPluginPath(pluginName string) string {
 		path = "./plugins/app/mariadb.so"
 	case "container-basic.so":
 		path = "./plugins/storage/container-basic.so"		
+	case "sample-app.so":
+		path = "./plugins/app/sample-app.so"	
+	case "sample-storage.so":
+		path = "./plugins/storage/sample-storage.so"	
+	case "sample-archive.so":
+		path = "./plugins/archive/sample-archive.so"						
 	default:
 		fmt.Println("Built-in plugin [" + pluginName + "] does not exist")
 		path = ""
@@ -35,42 +50,64 @@ func GetPluginPath(pluginName string) string {
 	return path
 }
 
-func GetAppInterface(path string) AppPlugin {
+func GetAppInterface(path string) (AppPlugin,error) {
 	plugin, err := plugin.Open(path)
 	if err != nil {
-		fmt.Println(err)
+		return nil,err
 	}
 
 	symPlugin, err := plugin.Lookup("AppPlugin")
 	if err != nil {
-		fmt.Println(err)
+		return nil,err
 	}
-
+	type Plugin interface {
+	
+	}
 	var appPlugin AppPlugin
 	appPlugin, ok := symPlugin.(AppPlugin)
 	if !ok {
-		fmt.Println(appPlugin,ok,"unexpected type from module symbol")
+		return nil,errors.New("Unexpected symbol type from module [ " + path + "], check plugin type, should be AppPlugin")
 	}
 
-	return appPlugin
+	return appPlugin,nil
 }
 
-func GetStorageInterface(path string) StoragePlugin {
+func GetStorageInterface(path string) (StoragePlugin,error) {
 	plugin, err := plugin.Open(path)
 	if err != nil {
-		fmt.Println(err)
+		return nil,err
 	}
 
 	symPlugin, err := plugin.Lookup("StoragePlugin")
 	if err != nil {
-		fmt.Println(err)
+		return nil,err
 	}
 
 	var storagePlugin StoragePlugin
 	storagePlugin, ok := symPlugin.(StoragePlugin)
 	if !ok {
-		fmt.Println(storagePlugin,ok,"unexpected type from module symbol")
+		return nil,errors.New("Unexpected symbol type from module [ " + path + "], check plugin type, should be StoragePlugin")
 	}
 
-	return storagePlugin
+	return storagePlugin,nil
+}
+
+func GetArchiveInterface(path string) (ArchivePlugin,error) {
+	plugin, err := plugin.Open(path)
+	if err != nil {
+		return nil,err
+	}
+
+	symPlugin, err := plugin.Lookup("ArchivePlugin")
+	if err != nil {
+		return nil,err
+	}
+
+	var archivePlugin ArchivePlugin
+	archivePlugin, ok := symPlugin.(ArchivePlugin)
+	if !ok {
+		return nil,errors.New("Unexpected symbol type from module [ " + path + "], check plugin type, should be ArchivePlugin and methods")
+	}
+
+	return archivePlugin,nil
 }

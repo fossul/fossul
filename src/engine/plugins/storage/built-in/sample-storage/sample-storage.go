@@ -15,9 +15,6 @@ func (s storagePlugin) SetEnv(c util.Config) util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
-	msg := util.SetMessage("INFO", "*** SetEnv ***")
-	messages = append(messages,msg)
-
 	result = util.SetResult(resultCode, messages)
 
 	return result
@@ -40,23 +37,17 @@ func (s storagePlugin) BackupDelete() util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
-	msg := util.SetMessage("INFO", "*** BackupDelete ***")
+	msg := util.SetMessage("INFO", "*** Backup Delete ***")
 	messages = append(messages,msg)
 
 	result = util.SetResult(resultCode, messages)
 	return result
 }
 
-func (s storagePlugin) BackupList() util.Result {	
-	var result util.Result
-	var messages []util.Message
-	var resultCode int = 0
+func (s storagePlugin) BackupList() []util.Backup {	
+	var backups []util.Backup
 
-	msg := util.SetMessage("INFO", "*** BackupList ***")
-	messages = append(messages,msg)
-
-	result = util.SetResult(resultCode, messages)
-	return result
+	return backups
 }
 
 func (s storagePlugin) Info() util.Plugin {

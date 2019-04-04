@@ -68,19 +68,32 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(result)
 	} else {	
 		var result util.Result
-		plugin := util.GetAppInterface(pluginPath)
-		setEnvResult := plugin.SetEnv(config)
-		if setEnvResult.Code != 0 {
-			_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
-			json.NewEncoder(w).Encode(setEnvResult)
-		} else {
-			result = plugin.Quiesce()
-			for _,msg := range setEnvResult.Messages {
-				messages = util.PrependMessage(msg,result.Messages)
-			}
-			result.Messages = messages
+		plugin,err := util.GetAppInterface(pluginPath)
+		if err != nil {
+			message := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, message)
+
+			var result = util.SetResult(1, messages)			
 			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)			
+			json.NewEncoder(w).Encode(result)		
+		} else {
+			setEnvResult := plugin.SetEnv(config)
+			if setEnvResult.Code != 0 {
+				_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
+				json.NewEncoder(w).Encode(setEnvResult)
+			} else {
+				result = plugin.Quiesce()
+				for _,msg := range setEnvResult.Messages {
+					messages = util.PrependMessage(msg,result.Messages)
+				}
+	
+				if len(messages) != 0 {
+					result.Messages = messages		
+				}
+
+				_ = json.NewDecoder(r.Body).Decode(&result)
+				json.NewEncoder(w).Encode(result)			
+			}
 		}
 	}
 }

@@ -2,6 +2,7 @@ package util
 
 type Backups struct {
 	Backups        []Backup `json:"backup,omitempty"`
+	Result         Result `json:"result,omitempty"`
 }
 
 type Backup struct {

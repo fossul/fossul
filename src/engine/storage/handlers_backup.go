@@ -32,24 +32,33 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 		_ 	= json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		plugin := util.GetStorageInterface(pluginPath)
-		setEnvResult := plugin.SetEnv(config)
-		if setEnvResult.Code != 0 {
-			_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
-			json.NewEncoder(w).Encode(setEnvResult)
-		} else {
-			result = plugin.Backup()
-			for _,msg := range setEnvResult.Messages {
-				messages = util.PrependMessage(msg,result.Messages)
-			}
+		plugin,err := util.GetStorageInterface(pluginPath)
+		if err != nil {
+			message := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, message)
 
-			if len(messages) != 0 {
-				result.Messages = messages		
-			}
-
+			var result = util.SetResult(1, messages)			
 			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)			
-		}		
+			json.NewEncoder(w).Encode(result)		
+		} else {
+			setEnvResult := plugin.SetEnv(config)
+			if setEnvResult.Code != 0 {
+				_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
+				json.NewEncoder(w).Encode(setEnvResult)
+			} else {
+				result = plugin.Backup()
+				for _,msg := range setEnvResult.Messages {
+					messages = util.PrependMessage(msg,result.Messages)
+				}
+	
+				if len(messages) != 0 {
+					result.Messages = messages		
+				}
+	
+				_ = json.NewDecoder(r.Body).Decode(&result)
+				json.NewEncoder(w).Encode(result)			
+			}	
+		}	
 	}	
 }
 
@@ -78,21 +87,26 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		plugin := util.GetStorageInterface(pluginPath)
-		_= plugin.SetEnv(config)
-
-		backupList := plugin.BackupList()
-		b, err := json.Marshal(backupList)
+		plugin,err := util.GetStorageInterface(pluginPath)
+		// need to implement proper result object for list
 		if err != nil {
-			result.Code = 1
-			result.Messages = append(result.Messages,err.Error())
+		
 		} else {
-			result.Code = 0
-			outputArray := strings.Split(string(b), "\n")
-			result.Messages = outputArray
-		}
-		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)						
+			_= plugin.SetEnv(config)
+
+			backupList := plugin.BackupList()
+			b, err := json.Marshal(backupList)
+			if err != nil {
+				result.Code = 1
+				result.Messages = append(result.Messages,err.Error())
+			} else {
+				result.Code = 0
+				outputArray := strings.Split(string(b), "\n")
+				result.Messages = outputArray
+			}
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)		
+		}				
 	}	
 }
 
@@ -107,7 +121,6 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "Storage plugin does not exist"
 
-			var messages []util.Message
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)
 
@@ -119,24 +132,33 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		plugin := util.GetStorageInterface(pluginPath)
-		setEnvResult := plugin.SetEnv(config)
-		if setEnvResult.Code != 0 {
-			_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
-			json.NewEncoder(w).Encode(setEnvResult)
-		} else {
-			result = plugin.BackupDelete()
-			for _,msg := range setEnvResult.Messages {
-				messages = util.PrependMessage(msg,result.Messages)
-			}
+		plugin,err := util.GetStorageInterface(pluginPath)
+		if err != nil {
+			message := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, message)
 
-			if len(messages) != 0 {
-				result.Messages = messages		
-			}
-
+			var result = util.SetResult(1, messages)			
 			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)			
-		}			
+			json.NewEncoder(w).Encode(result)		
+		} else {
+			setEnvResult := plugin.SetEnv(config)
+			if setEnvResult.Code != 0 {
+				_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
+				json.NewEncoder(w).Encode(setEnvResult)
+			} else {
+				result = plugin.BackupDelete()
+				for _,msg := range setEnvResult.Messages {
+					messages = util.PrependMessage(msg,result.Messages)
+				}
+	
+				if len(messages) != 0 {
+					result.Messages = messages		
+				}
+	
+				_ = json.NewDecoder(r.Body).Decode(&result)
+				json.NewEncoder(w).Encode(result)			
+			}	
+		}		
 	}	
 }
 

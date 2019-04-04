@@ -103,7 +103,7 @@ func Archive(config util.Config) util.Result {
 	return result
 }
 
-func ArchiveList(profileName,configName,policyName string,config util.Config) (util.ResultSimple, []util.Backup) {
+func ArchiveList(profileName,configName,policyName string,config util.Config) (util.ResultSimple, []util.Archive) {
 	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
 
 	b := new(bytes.Buffer)
@@ -131,7 +131,7 @@ func ArchiveList(profileName,configName,policyName string,config util.Config) (u
 	}
 
 	//unmarshall json response to plugin struct
-	var archives []util.Backup
+	var archives []util.Archive
 	messages := strings.Join(result.Messages, "\n")
 	backupByteArray := []byte(messages)
 

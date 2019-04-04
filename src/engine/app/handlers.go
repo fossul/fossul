@@ -70,22 +70,26 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		plugin := util.GetAppInterface(pluginPath)
-		plugin.SetEnv(config)
-
-		var result util.ResultSimple
-		pluginInfo := plugin.Info()
-		b, err := json.Marshal(pluginInfo)
+		plugin,err := util.GetAppInterface(pluginPath)
+		// need to implement proper result object for info
 		if err != nil {
-			result.Code = 1
-			result.Messages = append(result.Messages,err.Error())
 		} else {
-			result.Code = 0
-			outputArray := strings.Split(string(b), "\n")
-			result.Messages = outputArray
-		}
+			plugin.SetEnv(config)
 
-		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)
+			var result util.ResultSimple
+			pluginInfo := plugin.Info()
+			b, err := json.Marshal(pluginInfo)
+			if err != nil {
+				result.Code = 1
+				result.Messages = append(result.Messages,err.Error())
+			} else {
+				result.Code = 0
+				outputArray := strings.Split(string(b), "\n")
+				result.Messages = outputArray
+			}
+	
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)
+		}
 	}
 }
