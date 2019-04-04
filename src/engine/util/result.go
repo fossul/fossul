@@ -93,3 +93,17 @@ func PrependMessage(message Message,messages []Message) []Message {
 
 	return prependedMessages
 }
+
+func PrependMessages(prependedMessages,postpendedMessages []Message) []Message {
+	var messages []Message
+	
+	for _, msg := range prependedMessages {
+		messages = append(messages,msg)
+	}
+
+	for _, msg := range postpendedMessages {
+		messages = append(messages,msg)
+	}
+
+	return messages
+}

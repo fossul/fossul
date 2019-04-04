@@ -83,13 +83,16 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
 				result = plugin.Quiesce()
-				for _,msg := range setEnvResult.Messages {
+				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
+				result.Messages = messages
+				/*for _,msg := range setEnvResult.Messages {
+					fmt.Println("HERE123",msg)
 					messages = util.PrependMessage(msg,result.Messages)
 				}
 	
 				if len(messages) != 0 {
 					result.Messages = messages		
-				}
+				}*/
 
 				_ = json.NewDecoder(r.Body).Decode(&result)
 				json.NewEncoder(w).Encode(result)			

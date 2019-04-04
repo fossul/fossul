@@ -2,8 +2,6 @@ package main
 
 import (
 	"engine/util"
-//	"engine/plugins/pluginUtil"
-//	"encoding/json"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"fmt"
@@ -27,14 +25,24 @@ func (a appPlugin) SetEnv(c util.Config) util.Result {
 	var messages []util.Message
 
 	dsn := getDSN(config)
-	conn, err = getConn(dsn)
+
+	//reuse database connection
+	if conn == nil {
+		msg := util.SetMessage("INFO","Creating connection to database [" + config.AppPluginParameters["MysqlDb"] + "]")
+		messages = append(messages,msg)
+		conn, err = getConn(dsn)
+	} else {
+		msg := util.SetMessage("INFO","Reusing connection to database [" + config.AppPluginParameters["MysqlDb"] + "]")
+		messages = append(messages,msg)
+	}
+
 	if conn == nil || err != nil {
-		msg := util.SetMessage("ERROR", "Couldn't connect to database [" + config.AppPluginParameters["MYSQL_DB"] + "] " + err.Error())
+		msg := util.SetMessage("ERROR", "Couldn't connect to database [" + config.AppPluginParameters["MysqlDb"] + "] " + err.Error())
 		messages = append(messages,msg)
 
 		result = util.SetResult(1,messages)
 	} else {
-		msg := util.SetMessage("INFO", "Connection to database [" + config.AppPluginParameters["MYSQL_DB"] + "] established")
+		msg := util.SetMessage("INFO", "Connection to database [" + config.AppPluginParameters["MysqlDb"] + "] established")
 		messages = append(messages,msg)
 		result = util.SetResult(0,messages)
 	}
@@ -47,33 +55,33 @@ func (a appPlugin) Quiesce() util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
-	msg := util.SetMessage("INFO","Flushing tables with read lock for database [" + config.AppPluginParameters["MYSQL_DB"] + "]")
+	msg := util.SetMessage("INFO","Flushing tables with read lock for database [" + config.AppPluginParameters["MysqlDb"] + "]")
 	messages = append(messages,msg)
 
 	_, err := conn.DB.Exec("flush tables with read lock")
 	if err != nil {
-		msg = util.SetMessage("ERROR","Flushing tables with read lock for database [" + config.AppPluginParameters["MYSQL_DB"] + "] failed! " + err.Error())
+		msg = util.SetMessage("ERROR","Flushing tables with read lock for database [" + config.AppPluginParameters["MysqlDb"] + "] failed! " + err.Error())
 		messages = append(messages,msg)
 		result = util.SetResult(1,messages)
 
 		return result
 	} else {
-		msg = util.SetMessage("INFO","Flushing tables with read lock for database [" + config.AppPluginParameters["MYSQL_DB"] + "] successful")
+		msg = util.SetMessage("INFO","Flushing tables with read lock for database [" + config.AppPluginParameters["MysqlDb"] + "] successful")
 		messages = append(messages,msg)
 	}
 
-	msg = util.SetMessage("INFO","Flushing logs for database [" + config.AppPluginParameters["MYSQL_DB"] + "]")
+	msg = util.SetMessage("INFO","Flushing logs for database [" + config.AppPluginParameters["MysqlDb"] + "]")
 	messages = append(messages,msg)
 
 	_, err = conn.DB.Exec("flush logs")
 	if err != nil {
-		msg = util.SetMessage("ERROR","Logs flushed for database [" + config.AppPluginParameters["MYSQL_DB"] + "] failed! " + err.Error())
+		msg = util.SetMessage("ERROR","Logs flushed for database [" + config.AppPluginParameters["MysqlDb"] + "] failed! " + err.Error())
 		messages = append(messages,msg)
 		result = util.SetResult(1,messages)
 
 		return result
 	} else {
-		msg = util.SetMessage("INFO","Flushing logs for database [" + config.AppPluginParameters["MYSQL_DB"] + "] successful")
+		msg = util.SetMessage("INFO","Flushing logs for database [" + config.AppPluginParameters["MysqlDb"] + "] successful")
 		messages = append(messages,msg)
 	}
 
@@ -87,20 +95,23 @@ func (a appPlugin) Unquiesce() util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
-	msg := util.SetMessage("INFO","Unlocking tables for database [" + config.AppPluginParameters["MYSQL_DB"] + "]")
+	msg := util.SetMessage("INFO","Unlocking tables for database [" + config.AppPluginParameters["MysqlDb"] + "]")
 	messages = append(messages,msg)
 
 	_, err := conn.DB.Exec("unlock tables")
 	if err != nil {	
-		msg = util.SetMessage("ERROR","Unlock tables for database[" + config.AppPluginParameters["MYSQL_DB"] + "] failed! " + err.Error())
+		msg = util.SetMessage("ERROR","Unlock tables for database[" + config.AppPluginParameters["MysqlDb"] + "] failed! " + err.Error())
 		messages = append(messages,msg)
 
 		result = util.SetResult(1,messages)
 		return result
 	} else {
-		msg = util.SetMessage("INFO","Unlock tables for database [" + config.AppPluginParameters["MYSQL_DB"] + "] successful")
+		msg = util.SetMessage("INFO","Unlock tables for database [" + config.AppPluginParameters["MysqlDb"] + "] successful")
 		messages = append(messages,msg)
 	}
+
+	conn.DB.Close()
+	conn = nil
 
 	result = util.SetResult(resultCode, messages)
 	return result

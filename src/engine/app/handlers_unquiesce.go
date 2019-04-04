@@ -45,6 +45,7 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 
 	var config util.Config = util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(config.AppPlugin)
+	var result util.Result
 	var messages []util.Message
 
 	if pluginPath == "" {
@@ -62,12 +63,10 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(result)
 		}
 	
-		var result util.Result
 		result = util.ExecutePlugin(config, "app", plugin, "--action", "unquiesce")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
-	} else {	
-		var result util.Result
+	} else {
 		plugin,err := util.GetAppInterface(pluginPath)
 		if err != nil {
 			message := util.SetMessage("ERROR", err.Error())
@@ -77,10 +76,19 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)		
 		} else {
-			result = plugin.Unquiesce()
-		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)		
-		}
+			setEnvResult := plugin.SetEnv(config)
+			if setEnvResult.Code != 0 {
+				_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
+				json.NewEncoder(w).Encode(setEnvResult)
+			} else {
+				result = plugin.Unquiesce()
+				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
+				result.Messages = messages
+
+				_ = json.NewDecoder(r.Body).Decode(&result)
+				json.NewEncoder(w).Encode(result)			
+			}
+		}			
 	}
 }
 

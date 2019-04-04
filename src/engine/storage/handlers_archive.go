@@ -51,13 +51,8 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
 				result = plugin.Archive()
-				for _,msg := range setEnvResult.Messages {
-					messages = util.PrependMessage(msg,result.Messages)
-				}
-	
-				if len(messages) != 0 {
-					result.Messages = messages		
-				}
+				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
+				result.Messages = messages
 	
 				_ = json.NewDecoder(r.Body).Decode(&result)
 				json.NewEncoder(w).Encode(result)			
@@ -155,13 +150,8 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
 				result = plugin.ArchiveDelete()
-				for _,msg := range setEnvResult.Messages {
-					messages = util.PrependMessage(msg,result.Messages)
-				}
-	
-				if len(messages) != 0 {
-					result.Messages = messages		
-				}
+				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
+				result.Messages = messages
 	
 				_ = json.NewDecoder(r.Body).Decode(&result)
 				json.NewEncoder(w).Encode(result)			
