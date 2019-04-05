@@ -5,7 +5,6 @@ import (
 	"engine/util"
 	"net/http"
 	"os"
-	"fmt"
 	"strings"
 )
 
@@ -60,47 +59,60 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 func BackupList(w http.ResponseWriter, r *http.Request) {
 	var config util.Config = util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(config.StoragePlugin)
-	var result util.ResultSimple
 
+	var backups util.Backups
+	var result util.Result
+	var messages []util.Message
 	if pluginPath == "" {
 		var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
 
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
-			var errMsg string = "Storage plugin does not exist"
+			msg := util.SetMessage("ERROR","Storage plugin not found! " + err.Error())
+			messages = append(messages, msg)
 
-			var messages []string
-			message := fmt.Sprintf("ERROR %s %s",errMsg,err.Error())
-			messages = append(messages, message)
+			result = util.SetResult(1, messages)
+			backups.Result = result
 
-			var result = util.SetResultSimple(1, messages)
-
-			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)
+			_ = json.NewDecoder(r.Body).Decode(&backups)
+			json.NewEncoder(w).Encode(backups)
 		}
-		result = util.ExecutePluginSimple(config, "storage", plugin, "--action", "backupList")
+		var backups util.Backups
+		var backupList []util.Backup
+		resultSimple := util.ExecutePluginSimple(config, "storage", plugin, "--action", "backupList")
+		if resultSimple.Code != 0 {
+			msg := util.SetMessage("ERROR","BackupList failed")
+			messages = append(messages, msg)	
+			result := util.SetResult(1, messages)
+			backups.Result = result
 
-		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)
+			_ = json.NewDecoder(r.Body).Decode(&backups)
+			json.NewEncoder(w).Encode(backups)
+		} else {
+			backupListString := strings.Join(resultSimple.Messages," ")
+			json.Unmarshal([]byte(backupListString), &backupList)
+		
+			backups.Result.Code = resultSimple.Code
+			backups.Backups = backupList
+	
+			_ = json.NewDecoder(r.Body).Decode(&backups)
+			json.NewEncoder(w).Encode(backups)
+		}
 	} else {
 		plugin,err := util.GetStorageInterface(pluginPath)
-		// need to implement proper result object for list
 		if err != nil {
-		
+			msg := util.SetMessage("ERROR",err.Error())
+			messages = append(messages,msg)
+			result = util.SetResult(1,messages)
+			backups.Result = result
+
+			_ = json.NewDecoder(r.Body).Decode(&backups)
+			json.NewEncoder(w).Encode(backups)	
 		} else {
 			_= plugin.SetEnv(config)
 
-			backupList := plugin.BackupList()
-			b, err := json.Marshal(backupList)
-			if err != nil {
-				result.Code = 1
-				result.Messages = append(result.Messages,err.Error())
-			} else {
-				result.Code = 0
-				outputArray := strings.Split(string(b), "\n")
-				result.Messages = outputArray
-			}
-			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)		
+			backups := plugin.BackupList()
+			_ = json.NewDecoder(r.Body).Decode(&backups)
+			json.NewEncoder(w).Encode(backups)		
 		}				
 	}	
 }

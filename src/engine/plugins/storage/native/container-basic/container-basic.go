@@ -5,7 +5,6 @@ import (
 	"engine/client/k8s"
 	"engine/plugins/pluginUtil"
 	"engine/client"
-	"log"
 	"fmt"
 )
 
@@ -143,15 +142,25 @@ func (s storagePlugin) BackupDelete() util.Result {
 	return result
 }
 
-func (s storagePlugin) BackupList() []util.Backup {	
-	var backups []util.Backup
-	var err error
+func (s storagePlugin) BackupList() util.Backups {	
+	var backups util.Backups
+	var result util.Result
+	var messages []util.Message
 
 	backupDir := util.GetBackupDirFromConfig(config)
-	backups,err = pluginUtil.ListBackups(backupDir)
+	backupList,err := pluginUtil.ListBackups(backupDir)
 	if err != nil {
-		log.Println(err.Error())
+		msg := util.SetMessage("ERROR",err.Error())
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+		backups.Result = result
+
+		return backups
 	}
+
+	result = util.SetResult(0, messages)
+	backups.Result = result
+	backups.Backups = backupList
 
 	return backups
 }

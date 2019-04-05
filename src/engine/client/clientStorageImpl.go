@@ -103,7 +103,8 @@ func Backup(config util.Config) util.Result {
 	return result
 }
 
-func BackupList(profileName,configName,policyName string,config util.Config) (util.ResultSimple, []util.Backup) {
+//func BackupList(profileName,configName,policyName string,config util.Config) (util.ResultSimple, []util.Backup) {
+func BackupList(profileName,configName,policyName string,config util.Config) util.Backups {
 	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
 
 	b := new(bytes.Buffer)
@@ -125,11 +126,15 @@ func BackupList(profileName,configName,policyName string,config util.Config) (ut
 
 	defer resp.Body.Close()
 
-	var result util.ResultSimple
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	//var result util.ResultSimple
+	var backups util.Backups
+	if err := json.NewDecoder(resp.Body).Decode(&backups); err != nil {
 		log.Println(err)
 	}
 
+	return backups
+
+	/*
 	//unmarshall json response to plugin struct
 	var backups []util.Backup
 	messages := strings.Join(result.Messages, "\n")
@@ -138,6 +143,7 @@ func BackupList(profileName,configName,policyName string,config util.Config) (ut
 	json.Unmarshal(backupByteArray, &backups)
 
 	return result, backups
+	*/
 }
 
 func BackupDelete(config util.Config) util.Result {

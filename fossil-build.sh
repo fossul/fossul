@@ -29,21 +29,21 @@ if [ $? != 0 ]; then exit 1; fi
 echo "Building Plugins"
 go install engine/plugins/app/basic/sample-app
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $PLUGIN_DIR/app/sample-app.so engine/plugins/app/built-in/sample-app
+go build -buildmode=plugin -o $PLUGIN_DIR/app/sample-app.so engine/plugins/app/native/sample-app
 if [ $? != 0 ]; then exit 1; fi
 go install engine/plugins/storage/basic/sample-storage
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $PLUGIN_DIR/storage/sample-storage.so engine/plugins/storage/built-in/sample-storage
+go build -buildmode=plugin -o $PLUGIN_DIR/storage/sample-storage.so engine/plugins/storage/native/sample-storage
 if [ $? != 0 ]; then exit 1; fi
 go install engine/plugins/archive/basic/sample-archive
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $PLUGIN_DIR/archive/sample-archive.so engine/plugins/archive/built-in/sample-archive
+go build -buildmode=plugin -o $PLUGIN_DIR/archive/sample-archive.so engine/plugins/archive/native/sample-archive
 if [ $? != 0 ]; then exit 1; fi
 go install engine/plugins/storage/basic/container-basic
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $PLUGIN_DIR/storage/container-basic.so engine/plugins/storage/built-in/container-basic
+go build -buildmode=plugin -o $PLUGIN_DIR/storage/container-basic.so engine/plugins/storage/native/container-basic
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $PLUGIN_DIR/app/mariadb.so engine/plugins/app/built-in/mariadb
+go build -buildmode=plugin -o $PLUGIN_DIR/app/mariadb.so engine/plugins/app/native/mariadb
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Services"

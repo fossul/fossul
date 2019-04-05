@@ -17,7 +17,7 @@ type StoragePlugin interface {
 	SetEnv(Config) (Result)
 	Backup() (Result)
 	BackupDelete() (Result)
-	BackupList() ([]Backup)
+	BackupList() (Backups)
 	Info() (Plugin)
 }
 
@@ -66,7 +66,7 @@ func GetAppInterface(path string) (AppPlugin,error) {
 	var appPlugin AppPlugin
 	appPlugin, ok := symPlugin.(AppPlugin)
 	if !ok {
-		return nil,errors.New("Unexpected symbol type from module [ " + path + "], check plugin type, should be AppPlugin")
+		return nil,errors.New("Unexpected symbol type from module [ " + path + "], ensure plugin properly implements interface AppPlugin")
 	}
 
 	return appPlugin,nil
@@ -86,7 +86,7 @@ func GetStorageInterface(path string) (StoragePlugin,error) {
 	var storagePlugin StoragePlugin
 	storagePlugin, ok := symPlugin.(StoragePlugin)
 	if !ok {
-		return nil,errors.New("Unexpected symbol type from module [ " + path + "], check plugin type, should be StoragePlugin")
+		return nil,errors.New("Unexpected symbol type from module [ " + path + "], ensure plugin properly implements interface StoragePlugin")
 	}
 
 	return storagePlugin,nil
@@ -106,7 +106,7 @@ func GetArchiveInterface(path string) (ArchivePlugin,error) {
 	var archivePlugin ArchivePlugin
 	archivePlugin, ok := symPlugin.(ArchivePlugin)
 	if !ok {
-		return nil,errors.New("Unexpected symbol type from module [ " + path + "], check plugin type, should be ArchivePlugin and methods")
+		return nil,errors.New("Unexpected symbol type from module [ " + path + "], ensure plugin properly implements interface ArchivePlugin")
 	}
 
 	return archivePlugin,nil

@@ -161,13 +161,15 @@ func main() {
 			time.Sleep(4 * time.Second)
 		}
 	} else if *optAction == "backupList" {
+		logger := util.GetLoggerInstance()
 		msg := fmt.Sprintf("### List of Backups for policy [%s] ###",*optPolicy)
 		fmt.Println(msg)
 
-		result, backups := client.BackupList(string(*optProfile),string(*optConfig),string(*optPolicy),config)
-		backupsByPolicy := util.GetBackupsByPolicy(string(*optPolicy),backups)
+		backups := client.BackupList(string(*optProfile),string(*optConfig),string(*optPolicy),config)
+		util.LogResult(logger, backups.Result)
+		backupsByPolicy := util.GetBackupsByPolicy(string(*optPolicy),backups.Backups)
 
-		checkResult(result)
+		checkResultNormal(backups.Result)
 
 		for _, backup := range backupsByPolicy {
 			fmt.Println(backup.Name, backup.Policy, backup.WorkflowId, backup.Timestamp)
@@ -259,6 +261,14 @@ func main() {
 }
 
 func checkResult(result util.ResultSimple) {
+	if result.Code != 0 {
+		for _, line := range result.Messages {
+			fmt.Println(line)
+		}
+	}
+}
+
+func checkResultNormal(result util.Result) {
 	if result.Code != 0 {
 		for _, line := range result.Messages {
 			fmt.Println(line)
