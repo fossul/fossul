@@ -142,6 +142,9 @@ func setPlugin() (plugin util.Plugin) {
 
 	plugin.Capabilities = capabilities
 
+	conn.DB.Close()
+	conn = nil
+
 	return plugin
 }
 

@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"bytes"
-	"strings"
+//	"strings"
 )
 
 func AppPluginList(pluginType string,config util.Config) []string {
@@ -39,7 +39,7 @@ func AppPluginList(pluginType string,config util.Config) []string {
 
 }
 
-func AppPluginInfo(config util.Config, pluginName,pluginType string) (util.ResultSimple, util.Plugin) {
+func AppPluginInfo(config util.Config, pluginName,pluginType string) (util.PluginInfoResult) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
@@ -59,19 +59,19 @@ func AppPluginInfo(config util.Config, pluginName,pluginType string) (util.Resul
 
 	defer resp.Body.Close()
 
-	var result util.ResultSimple
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	var pluginInfoResult util.PluginInfoResult
+	if err := json.NewDecoder(resp.Body).Decode(&pluginInfoResult); err != nil {
 		log.Println(err)
 	}
 
 	//unmarshall json response to plugin struct
-	var plugin util.Plugin
-	messages := strings.Join(result.Messages, "\n")
-	pluginByteArray := []byte(messages)
+	//var plugin util.Plugin
+	//messages := strings.Join(result.Messages, "\n")
+	//pluginByteArray := []byte(messages)
 
-	json.Unmarshal(pluginByteArray, &plugin)
+	//json.Unmarshal(pluginByteArray, &plugin)
 
-	return result, plugin
+	return pluginInfoResult
 }
 
 func Quiesce(config util.Config) util.Result {

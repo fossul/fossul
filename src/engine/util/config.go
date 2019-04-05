@@ -44,39 +44,45 @@ type BackupRetention struct {
 }
 
 func ReadConfig(filename string) Config {
+	var config Config
     b, err := ioutil.ReadFile(filename)
     if err != nil {
-        log.Println(err)
-    }
+		log.Println("here",err)
+        return config
+    } else {
+		str := string(b)
+		config = decodeConfig(str)
 
-	str := string(b)
-	var config Config = decodeConfig(str)
-
-	return config
+		return config
+	}
 }
 
 func decodeConfig(blob string) Config {
 	var config Config
 	if _, err := toml.Decode(blob, &config); err != nil {
-  		log.Println(err)
+		log.Println(err)
+		return config
 	}
 
 	return config
 }
 
 func ReadConfigToMap(filename string) map[string]string {
+	var configMap = map[string]string{}
+
 	file, err := os.Open(filename)
     if err != nil {
-        log.Fatal(err)
+		log.Println(err)
+		return configMap
     }
     defer file.Close()
 
 	scanner := bufio.NewScanner(file)
 	if err := scanner.Err(); err != nil {
-        log.Fatal(err)
+		log.Println(err)
+		return configMap
 	}
 
-	var configMap = map[string]string{}
     for scanner.Scan() {
 		re := regexp.MustCompile(`(\S+)\s*=\s*\"(\S+)\"`)
 		match := re.FindStringSubmatch(scanner.Text())
@@ -116,12 +122,14 @@ func GetConfig(w http.ResponseWriter, r *http.Request) Config {
 	var config Config
 	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
 		log.Println(err)
+		return config
 	}
 	defer r.Body.Close()
  
 	res,err := json.Marshal(&config)
 	if err != nil {
-        log.Println(err)
+		log.Println(err)
+		return config
 	}
 
 	log.Println("DEBUG", string(res))
@@ -132,7 +140,8 @@ func GetConfig(w http.ResponseWriter, r *http.Request) Config {
 func ConfigMapToJson(configMap map[string]string) string {
 	jsonString, err := json.Marshal(configMap)
 	if err != nil {
-		log.Println(err)	
+		log.Println(err)
+		return ""	
 	}
 
 	return string(jsonString)

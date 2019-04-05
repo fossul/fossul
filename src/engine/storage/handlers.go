@@ -8,6 +8,7 @@ import (
 	"log"
 	"io/ioutil"
 	"strings"
+	"os"
 )
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -53,60 +54,109 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var pluginName string = params["pluginName"]
 	var pluginType string = params["pluginType"]
 
+	var pluginInfoResult util.PluginInfoResult
+	var pluginInfo util.Plugin
+	var result util.Result
+	var messages []util.Message
+
 	var config util.Config = util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(pluginName)
 
 	if pluginPath == "" {
 		var plugin string = config.PluginDir + "/" + pluginType + "/" + pluginName
+		if _, err := os.Stat(plugin); os.IsNotExist(err) {
+			msg := util.SetMessage("ERROR","Plugin not found! " + err.Error())
+			messages = append(messages, msg)
 
-		var result util.ResultSimple
-		result = util.ExecutePluginSimple(config, pluginType, plugin, "--action", "info")
+			result = util.SetResult(1, messages)
+			pluginInfoResult.Result = result
+
+			_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+			json.NewEncoder(w).Encode(pluginInfoResult)
+		}
+
+		var resultSimple util.ResultSimple
+		resultSimple = util.ExecutePluginSimple(config, pluginType, plugin, "--action", "info")
+		if resultSimple.Code != 0 {
+			msg := util.SetMessage("ERROR","Plugin Info failed!")
+			messages = append(messages, msg)	
+			result := util.SetResult(1, messages)
+			pluginInfoResult.Result = result
+
+			_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+			json.NewEncoder(w).Encode(pluginInfoResult)
+		} else {
+			pluginInfoString := strings.Join(resultSimple.Messages," ")
+			json.Unmarshal([]byte(pluginInfoString), &pluginInfo)
+		
+			pluginInfoResult.Result.Code = resultSimple.Code
+			pluginInfoResult.Plugin = pluginInfo
 	
-		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)
+			_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+			json.NewEncoder(w).Encode(pluginInfoResult)
+		}
 	} else {
-		var result util.ResultSimple
 		if pluginType == "storage" {
 			plugin,err := util.GetStorageInterface(pluginPath)
-			//need to implement proper result object for info
+
 			if err != nil {	
+				msg := util.SetMessage("ERROR",err.Error())
+				messages = append(messages,msg)
+				result = util.SetResult(1,messages)
+				pluginInfoResult.Result = result	
+				
+				_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+				json.NewEncoder(w).Encode(pluginInfoResult)	
 			} else {
-				plugin.SetEnv(config)
-				pluginInfo := plugin.Info()
-				b, err := json.Marshal(pluginInfo)
-				if err != nil {
-					result.Code = 1
-					result.Messages = append(result.Messages,err.Error())
-				} else {
-					result.Code = 0
-					outputArray := strings.Split(string(b), "\n")
-					result.Messages = outputArray
+				setEnvResult := plugin.SetEnv(config)
+				if setEnvResult.Code != 0 {
+					pluginInfoResult.Result = setEnvResult
+					_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+					json.NewEncoder(w).Encode(pluginInfoResult)
+				} else {		
+					pluginInfo := plugin.Info()
+
+					pluginInfoResult.Result.Code = 0
+					pluginInfoResult.Plugin = pluginInfo
+
+					_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+					json.NewEncoder(w).Encode(pluginInfoResult)		
 				}	
-				_ = json.NewDecoder(r.Body).Decode(&result)
-				json.NewEncoder(w).Encode(result)		
 			}			
 		} else if pluginType == "archive" {
 			plugin,err := util.GetArchiveInterface(pluginPath)
-			//need to implement proper result object for info
-			if err != nil {			
+			if err != nil {	
+				msg := util.SetMessage("ERROR",err.Error())
+				messages = append(messages,msg)
+				result = util.SetResult(1,messages)
+				pluginInfoResult.Result = result	
+				
+				_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+				json.NewEncoder(w).Encode(pluginInfoResult)	
 			} else {
-				plugin.SetEnv(config)
-				pluginInfo := plugin.Info()
-				b, err := json.Marshal(pluginInfo)
-				if err != nil {
-					result.Code = 1
-					result.Messages = append(result.Messages,err.Error())
-				} else {
-					result.Code = 0
-					outputArray := strings.Split(string(b), "\n")
-					result.Messages = outputArray
+				setEnvResult := plugin.SetEnv(config)
+				if setEnvResult.Code != 0 {
+					pluginInfoResult.Result = setEnvResult
+					_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+					json.NewEncoder(w).Encode(pluginInfoResult)
+				} else {		
+					pluginInfo := plugin.Info()
+
+					pluginInfoResult.Result.Code = 0
+					pluginInfoResult.Plugin = pluginInfo
+
+					_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+					json.NewEncoder(w).Encode(pluginInfoResult)		
 				}		
-				_ = json.NewDecoder(r.Body).Decode(&result)
-				json.NewEncoder(w).Encode(result)	
 			}	
 		} else {
-			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)	
+			msg := util.SetMessage("ERROR","Invalid plugin type [" + pluginType + "], must be app|archive")
+			messages = append(messages,msg)
+			result = util.SetResult(1,messages)
+			pluginInfoResult.Result = result	
+
+			_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+			json.NewEncoder(w).Encode(pluginInfoResult)	
 		}
 	}	
 }

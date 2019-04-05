@@ -30,7 +30,7 @@ func CreateDir(path string, mode os.FileMode) error {
 
 func ListBackups(path string) ([]util.Backup, error) {
 	files, err := ioutil.ReadDir(path)
-  if err != nil {
+	if err != nil {
 		return nil,err
 	}
 
@@ -38,7 +38,7 @@ func ListBackups(path string) ([]util.Backup, error) {
 	type timeSlice []util.Backup
 
 	re := regexp.MustCompile(`(\S+)_(\S+)_(\S+)_(\S+)`)
-  for _, f := range files {
+	for _, f := range files {
 		var backup util.Backup
 		match := re.FindStringSubmatch(f.Name())
 

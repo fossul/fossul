@@ -43,7 +43,7 @@ func GetPluginPath(pluginName string) string {
 	case "sample-archive.so":
 		path = "./plugins/archive/sample-archive.so"						
 	default:
-		fmt.Println("Built-in plugin [" + pluginName + "] does not exist")
+		fmt.Println("Native plugin [" + pluginName + "] does not exist, executing as basic plugin")
 		path = ""
 	}
 

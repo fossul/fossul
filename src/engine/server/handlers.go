@@ -55,7 +55,7 @@ func GetConfig(w http.ResponseWriter, r *http.Request) {
 
 	conf := configDir + profileName + "/" + configName + ".conf"
 	log.Println("DEBUG", "Config path is " + conf)
-	var config util.Config = util.ReadConfig(conf)
+	config := util.ReadConfig(conf)
 
 	_ = json.NewDecoder(r.Body).Decode(&config)
 	json.NewEncoder(w).Encode(config)

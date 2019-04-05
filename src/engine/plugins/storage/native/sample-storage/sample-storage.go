@@ -44,8 +44,8 @@ func (s storagePlugin) BackupDelete() util.Result {
 	return result
 }
 
-func (s storagePlugin) BackupList() []util.Backup {	
-	var backups []util.Backup
+func (s storagePlugin) BackupList() util.Backups {	
+	var backups util.Backups
 
 	return backups
 }

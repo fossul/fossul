@@ -108,11 +108,16 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 			_ = json.NewDecoder(r.Body).Decode(&backups)
 			json.NewEncoder(w).Encode(backups)	
 		} else {
-			_= plugin.SetEnv(config)
-
-			backups := plugin.BackupList()
-			_ = json.NewDecoder(r.Body).Decode(&backups)
-			json.NewEncoder(w).Encode(backups)		
+			setEnvResult := plugin.SetEnv(config)
+			if setEnvResult.Code != 0 {
+				backups.Result = setEnvResult
+				_ = json.NewDecoder(r.Body).Decode(&backups)
+				json.NewEncoder(w).Encode(backups)
+			} else {	
+				backups := plugin.BackupList()
+				_ = json.NewDecoder(r.Body).Decode(&backups)
+				json.NewEncoder(w).Encode(backups)	
+			}		
 		}				
 	}	
 }

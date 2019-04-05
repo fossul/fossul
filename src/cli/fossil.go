@@ -126,7 +126,7 @@ func main() {
 		config = util.SetStoragePluginParameters(storageConfigPath, config)
 	}
 
-	fmt.Println("########## Welcome to Fossil Backup Framework ##########")
+	fmt.Println("########## Welcome to Fossil Framework ##########")
 
 	if *optAction == "backup" {
 		logger := util.GetLoggerInstance()
@@ -161,15 +161,12 @@ func main() {
 			time.Sleep(4 * time.Second)
 		}
 	} else if *optAction == "backupList" {
-		logger := util.GetLoggerInstance()
 		msg := fmt.Sprintf("### List of Backups for policy [%s] ###",*optPolicy)
 		fmt.Println(msg)
 
 		backups := client.BackupList(string(*optProfile),string(*optConfig),string(*optPolicy),config)
-		util.LogResult(logger, backups.Result)
 		backupsByPolicy := util.GetBackupsByPolicy(string(*optPolicy),backups.Backups)
-
-		checkResultNormal(backups.Result)
+		checkResult(backups.Result)
 
 		for _, backup := range backupsByPolicy {
 			fmt.Println(backup.Name, backup.Policy, backup.WorkflowId, backup.Timestamp)
@@ -218,27 +215,26 @@ func main() {
 		}
 
 		var pluginName string = *optPluginName
-		var result util.ResultSimple
-		var plugin util.Plugin
+		var pluginInfoResult util.PluginInfoResult
 
 		if *optPluginType == "app" {
-			result, plugin = client.AppPluginInfo(config,pluginName,*optPluginType)
+			pluginInfoResult = client.AppPluginInfo(config,pluginName,*optPluginType)
 		} else if *optPluginType == "storage" {
-			result, plugin = client.StoragePluginInfo(config,pluginName,*optPluginType)
+			pluginInfoResult = client.StoragePluginInfo(config,pluginName,*optPluginType)
 		} else if *optPluginType == "archive" {
-			result, plugin = client.ArchivePluginInfo(config,pluginName,*optPluginType)
+			pluginInfoResult = client.ArchivePluginInfo(config,pluginName,*optPluginType)
 		} else {
 			error := fmt.Sprintf("ERROR: Plugin type must be app|storage|archive")
 			fmt.Println(error)
 		}	
 
-		checkResult(result)
+		checkResult(pluginInfoResult.Result)
 
 		fmt.Println("### Plugin Information ###")
-		fmt.Println("Name:", plugin.Name)
-		fmt.Println("Description:", plugin.Description)
-		fmt.Println("Type:", plugin.Type)
-		fmt.Println("Capabilities:", plugin.Capabilities)
+		fmt.Println("Name:", pluginInfoResult.Plugin.Name)
+		fmt.Println("Description:", pluginInfoResult.Plugin.Description)
+		fmt.Println("Type:", pluginInfoResult.Plugin.Type)
+		fmt.Println("Capabilities:", pluginInfoResult.Plugin.Capabilities)
 	} else if *optAction == "status" {
 		fmt.Println("### Checking status of services ###")
 
@@ -260,18 +256,10 @@ func main() {
 	}
 }
 
-func checkResult(result util.ResultSimple) {
+func checkResult(result util.Result) {
+	logger := util.GetLoggerInstance()
 	if result.Code != 0 {
-		for _, line := range result.Messages {
-			fmt.Println(line)
-		}
-	}
-}
-
-func checkResultNormal(result util.Result) {
-	if result.Code != 0 {
-		for _, line := range result.Messages {
-			fmt.Println(line)
-		}
+		util.LogResult(logger, result)
+		os.Exit(1)
 	}
 }
