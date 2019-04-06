@@ -10,6 +10,7 @@ type AppPlugin interface {
 	SetEnv(Config) (Result)
 	Quiesce() (Result)
 	Unquiesce() (Result)
+	Discover() (DiscoverResult)
 	Info() (Plugin)
 }
 
@@ -60,9 +61,7 @@ func GetAppInterface(path string) (AppPlugin,error) {
 	if err != nil {
 		return nil,err
 	}
-	type Plugin interface {
-	
-	}
+
 	var appPlugin AppPlugin
 	appPlugin, ok := symPlugin.(AppPlugin)
 	if !ok {

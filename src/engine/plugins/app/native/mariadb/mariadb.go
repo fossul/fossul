@@ -50,6 +50,20 @@ func (a appPlugin) SetEnv(c util.Config) util.Result {
 	return result
 }	
 
+func (a appPlugin) Discover() util.DiscoverResult {
+	var discoverResult util.DiscoverResult
+	var result util.Result
+	var messages []util.Message
+
+	msg := util.SetMessage("INFO", "*** Discovery Not Implemented ***")
+	messages = append(messages,msg)
+
+	result = util.SetResult(0, messages)
+	discoverResult.Result = result
+
+	return discoverResult
+}	
+
 func (a appPlugin) Quiesce() util.Result {	
 
 	var result util.Result

@@ -10,6 +10,17 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		policy := config.SelectedBackupPolicy
 		var isQuiesce bool = false
 
+		if config.AppPlugin != "" && config.AutoDiscovery == true {
+			commentMsg := "Performing Application Discovery"
+			setComment(resultsDir,commentMsg,workflow)
+
+			step := stepInit(resultsDir,workflow)
+			discoverResult := client.Discover(config)
+			if resultCode := stepErrorHandler(resultsDir,policy,step,workflow,discoverResult.Result,config);resultCode != 0 {
+				return resultCode
+			}
+		}	
+
 		commentMsg := "Performing Application Quiesce"
 		setComment(resultsDir,commentMsg,workflow)
 	

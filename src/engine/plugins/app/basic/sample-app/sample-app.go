@@ -6,10 +6,11 @@ import (
 	"engine/util"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 func main() {
-	optAction := getopt.StringLong("action",'a',"","quiesce|unquiesce|info")
+	optAction := getopt.StringLong("action",'a',"","discover|quiesce|unquiesce|info")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -35,10 +36,24 @@ func main() {
 		unquiesce(configMap)
 	} else if *optAction == "info" {
 		info()		
+	} else if *optAction == "discover" {
+		discover()			
 	} else {
 		fmt.Println("ERROR Incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
 		os.Exit(1)
+	}
+}	
+
+func discover () {
+	var discoverResult util.DiscoverResult = setDiscoverResult()
+
+	//output json
+	b, err := json.Marshal(discoverResult)
+    if err != nil {
+        fmt.Println("ERROR " + err.Error())
+	} else {
+		fmt.Println(string(b))
 	}
 }	
 
@@ -62,6 +77,47 @@ func info () {
 	} else {
 		fmt.Println(string(b))
 	}
+}
+
+func setDiscoverResult() (discoverResult util.DiscoverResult) {
+	var data []string
+	data = append(data,"/path/to/data/file1")
+	data = append(data,"/path/to/data/file2")
+
+	var logs []string
+	logs = append(logs,"/path/to/logs/file1")
+	logs = append(logs,"/path/to/logs/file2")
+
+	var discoverInst1 util.Discover
+	discoverInst1.Instance = "inst1"
+	discoverInst1.DataFiles = data
+	discoverInst1.LogFiles = logs
+
+	var discoverInst2 util.Discover
+	discoverInst2.Instance = "inst2"
+	discoverInst2.DataFiles = data
+	discoverInst2.LogFiles = logs
+
+	var discoverList []util.Discover
+	discoverList = append(discoverList, discoverInst1)
+	discoverList = append(discoverList, discoverInst2)
+
+	var messages []util.Message
+	msg := util.SetMessage("INFO","*** Application Discovery ***")
+	messages = append(messages,msg)
+
+	for _,discover := range discoverList {
+		dataFiles := strings.Join(discover.DataFiles," ")
+		logFiles := strings.Join(discover.LogFiles," ")
+		msg := util.SetMessage("INFO","Instance [" + discover.Instance + "] data files: [" + dataFiles + "] log files: [" + logFiles + "]")
+		messages = append(messages,msg)
+	}
+
+	result := util.SetResult(0,messages)
+	discoverResult.Result = result
+	discoverResult.DiscoverList = discoverList
+	
+	return discoverResult
 }
 
 func setPlugin() (plugin util.Plugin) {

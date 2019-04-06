@@ -2,6 +2,7 @@ package main
 
 import (
 	"engine/util"
+	"strings"
 )
 
 type appPlugin string
@@ -19,12 +20,17 @@ func (a appPlugin) SetEnv(c util.Config) util.Result {
 	return result
 }
 
+func (a appPlugin) Discover() util.DiscoverResult {
+	var discoverResult util.DiscoverResult = setDiscoverResult()
+	return discoverResult
+}
+
 func (a appPlugin) Quiesce() util.Result {	
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
 
-	msg := util.SetMessage("INFO", "*** Quiesce ***")
+	msg := util.SetMessage("INFO", "*** Application Quiesce ***")
 	messages = append(messages,msg)
 
 	result = util.SetResult(resultCode, messages)
@@ -36,7 +42,7 @@ func (a appPlugin) Unquiesce() util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
-	msg := util.SetMessage("INFO", "*** Unquiesce ***")
+	msg := util.SetMessage("INFO", "*** Application Unquiesce ***")
 	messages = append(messages,msg)
 
 	result = util.SetResult(resultCode, messages)
@@ -46,6 +52,47 @@ func (a appPlugin) Unquiesce() util.Result {
 func (a appPlugin) Info() util.Plugin {
 	var plugin util.Plugin = setPlugin()
 	return plugin
+}
+
+func setDiscoverResult() (discoverResult util.DiscoverResult) {
+	var data []string
+	data = append(data,"/path/to/data/file1")
+	data = append(data,"/path/to/data/file2")
+
+	var logs []string
+	logs = append(logs,"/path/to/logs/file1")
+	logs = append(logs,"/path/to/logs/file2")
+
+	var discoverInst1 util.Discover
+	discoverInst1.Instance = "inst1"
+	discoverInst1.DataFiles = data
+	discoverInst1.LogFiles = logs
+
+	var discoverInst2 util.Discover
+	discoverInst2.Instance = "inst2"
+	discoverInst2.DataFiles = data
+	discoverInst2.LogFiles = logs
+
+	var discoverList []util.Discover
+	discoverList = append(discoverList, discoverInst1)
+	discoverList = append(discoverList, discoverInst2)
+
+	var messages []util.Message
+	msg := util.SetMessage("INFO","*** Application Discovery ***")
+	messages = append(messages,msg)
+
+	for _,discover := range discoverList {
+		dataFiles := strings.Join(discover.DataFiles," ")
+		logFiles := strings.Join(discover.LogFiles," ")
+		msg := util.SetMessage("INFO","Instance [" + discover.Instance + "] data files: [" + dataFiles + "] log files: [" + logFiles + "]")
+		messages = append(messages,msg)
+	}
+
+	result := util.SetResult(0,messages)
+	discoverResult.Result = result
+	discoverResult.DiscoverList = discoverList
+	
+	return discoverResult
 }
 
 func setPlugin() (plugin util.Plugin) {

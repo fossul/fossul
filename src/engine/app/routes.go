@@ -100,5 +100,11 @@ var routes = Routes{
         "POST",
         "/postUnquiesceCmd",
         PostUnquiesceCmd,
-    },    
+    }, 
+    Route{
+        "Discover",
+        "POST",
+        "/discover",
+        Discover,
+    },       
 }

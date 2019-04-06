@@ -12,6 +12,7 @@ type Result struct {
 type ResultSimple struct {
 	Code int `json:"code,omitempty"`
 	Messages []string `json:"messages,omitempty"`
+	Data []string `json:"data,omitempty"`
 }
 
 type Message struct {

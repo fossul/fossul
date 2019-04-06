@@ -64,14 +64,36 @@ func AppPluginInfo(config util.Config, pluginName,pluginType string) (util.Plugi
 		log.Println(err)
 	}
 
-	//unmarshall json response to plugin struct
-	//var plugin util.Plugin
-	//messages := strings.Join(result.Messages, "\n")
-	//pluginByteArray := []byte(messages)
-
-	//json.Unmarshal(pluginByteArray, &plugin)
-
 	return pluginInfoResult
+}
+
+func Discover(config util.Config) util.DiscoverResult {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/discover", b)
+	req.Header.Add("Content-Type", "application/json")
+
+	if err != nil {
+		log.Println("NewRequest: ", err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Do: ", err)
+	}
+
+	defer resp.Body.Close()
+
+	var discoverResult util.DiscoverResult
+
+	if err := json.NewDecoder(resp.Body).Decode(&discoverResult); err != nil {
+		log.Println(err)
+	}
+
+	return discoverResult
 }
 
 func Quiesce(config util.Config) util.Result {
