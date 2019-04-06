@@ -52,14 +52,39 @@ func (a appPlugin) SetEnv(c util.Config) util.Result {
 
 func (a appPlugin) Discover() util.DiscoverResult {
 	var discoverResult util.DiscoverResult
+	var discoverList []util.Discover
+	var discover util.Discover
 	var result util.Result
 	var messages []util.Message
 
-	msg := util.SetMessage("INFO", "*** Discovery Not Implemented ***")
+	discover.Instance = config.AppPluginParameters["MysqlDb"]
+
+	var (
+		name string
+		value string
+	)
+
+	err := conn.DB.QueryRow("show global variables like 'datadir'").Scan(&name,&value)
+	if err != nil {
+		msg := util.SetMessage("ERROR","Discovery for database [" + config.AppPluginParameters["MysqlDb"] + "] failed! " + err.Error())
+		messages = append(messages,msg)
+		result = util.SetResult(1,messages)
+
+		discoverResult.Result = result
+		return discoverResult
+	}
+	var dataFiles []string
+	dataFiles = append(dataFiles,value)
+	discover.DataFiles = dataFiles
+
+	msg := util.SetMessage("INFO", "Data Directory is [" + value + "]")
 	messages = append(messages,msg)
+
+	discoverList = append(discoverList,discover)
 
 	result = util.SetResult(0, messages)
 	discoverResult.Result = result
+	discoverResult.DiscoverList = discoverList
 
 	return discoverResult
 }	
