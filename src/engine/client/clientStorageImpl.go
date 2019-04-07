@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"bytes"
-//	"strings"
 )
 
 func StoragePluginList(pluginType string,config util.Config) []string {
@@ -64,13 +63,6 @@ func StoragePluginInfo(config util.Config, pluginName,pluginType string) (util.P
 		log.Println(err)
 	}
 
-	//unmarshall json response to plugin struct
-	//var plugin util.Plugin
-	//messages := strings.Join(result.Messages, "\n")
-	//pluginByteArray := []byte(messages)
-
-	//json.Unmarshal(pluginByteArray, &plugin)
-
 	return pluginInfoResult
 }
 
@@ -103,7 +95,6 @@ func Backup(config util.Config) util.Result {
 	return result
 }
 
-//func BackupList(profileName,configName,policyName string,config util.Config) (util.ResultSimple, []util.Backup) {
 func BackupList(profileName,configName,policyName string,config util.Config) util.Backups {
 	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
 
@@ -126,24 +117,12 @@ func BackupList(profileName,configName,policyName string,config util.Config) uti
 
 	defer resp.Body.Close()
 
-	//var result util.ResultSimple
 	var backups util.Backups
 	if err := json.NewDecoder(resp.Body).Decode(&backups); err != nil {
 		log.Println(err)
 	}
 
 	return backups
-
-	/*
-	//unmarshall json response to plugin struct
-	var backups []util.Backup
-	messages := strings.Join(result.Messages, "\n")
-	backupByteArray := []byte(messages)
-
-	json.Unmarshal(backupByteArray, &backups)
-
-	return result, backups
-	*/
 }
 
 func BackupDelete(config util.Config) util.Result {

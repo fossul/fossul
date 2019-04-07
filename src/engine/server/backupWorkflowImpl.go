@@ -3,6 +3,7 @@ package main
 import (
 	"engine/util"
 	"engine/client"
+	"strings"
 )
 
 func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util.Workflow) int {
@@ -19,6 +20,13 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 			if resultCode := stepErrorHandler(resultsDir,policy,step,workflow,discoverResult.Result,config);resultCode != 0 {
 				return resultCode
 			}
+
+			// save discovered files in config struct
+			dataFiles,logFiles := setDiscoverFileList(config,discoverResult)
+			config.DiscoveryDataFileList = dataFiles
+			config.DiscoveryDataFileList = logFiles
+			// need to update container plugin to handle lists
+			config.StoragePluginParameters["BackupSrcPath"] = strings.Join(dataFiles," ")
 		}	
 
 		commentMsg := "Performing Application Quiesce"
@@ -273,4 +281,18 @@ func sendErrorNotification(resultsDir,policy string,step util.Step,workflow *uti
 		util.SerializeWorkflowStepResults(resultsDir,step.Id,result)
 		util.SerializeWorkflow(resultsDir,workflow)
 	}	
+}
+
+func setDiscoverFileList(config util.Config, discoverResult util.DiscoverResult) (dataFiles,logFiles []string) {
+	for _,discover := range discoverResult.DiscoverList {
+		for _,dataFile := range discover.DataFiles {
+			dataFiles = append(dataFiles,dataFile)
+		}
+
+		for _,logFile := range discover.LogFiles {
+			logFiles = append(logFiles,logFile)
+		}
+	}
+
+	return dataFiles,logFiles
 }

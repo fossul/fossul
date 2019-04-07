@@ -74,10 +74,11 @@ func (a appPlugin) Discover() util.DiscoverResult {
 		return discoverResult
 	}
 	var dataFiles []string
-	dataFiles = append(dataFiles,value)
+	dataDir := value + config.AppPluginParameters["MysqlDb"]
+	dataFiles = append(dataFiles,dataDir)
 	discover.DataFiles = dataFiles
 
-	msg := util.SetMessage("INFO", "Data Directory is [" + value + "]")
+	msg := util.SetMessage("INFO", "Data Directory is [" + value + config.AppPluginParameters["MysqlDb"] + "]")
 	messages = append(messages,msg)
 
 	discoverList = append(discoverList,discover)

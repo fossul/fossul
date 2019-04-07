@@ -34,8 +34,6 @@ func GetWorkflowStatus(profileName,configName string,id int) (workflow util.Work
 }
 
 func GetWorkflowStepResults(profileName,configName string,workflowId int, step int) (results []util.Result) {
-	//b := new(bytes.Buffer)
-	//json.NewEncoder(b).Encode(steps)
 
 	w := util.IntToString(workflowId)
 	s := util.IntToString(step)
@@ -240,7 +238,6 @@ func GetStorageServiceStatus() util.Status {
 
 }
 
-//func StartBackupWorkflow(profileName,configName,policyName string,config util.Config) (result []util.Result) {
 func StartBackupWorkflow(profileName,configName,policyName string,config util.Config) (result util.WorkflowResult) {
 
 	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
