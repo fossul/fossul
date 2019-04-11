@@ -156,6 +156,12 @@ func RecursiveDirDelete(dir string) error {
 	return nil
 }
 
+func BoolToString(b bool) string {
+	s := strconv.FormatBool(b)
+
+	return s
+}
+
 func IntToString(i int) string {
 	s := strconv.Itoa(i)
 

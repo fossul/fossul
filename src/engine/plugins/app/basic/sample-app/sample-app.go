@@ -90,13 +90,13 @@ func setDiscoverResult() (discoverResult util.DiscoverResult) {
 
 	var discoverInst1 util.Discover
 	discoverInst1.Instance = "inst1"
-	discoverInst1.DataFiles = data
-	discoverInst1.LogFiles = logs
+	discoverInst1.DataFilePaths = data
+	discoverInst1.LogFilePaths = logs
 
 	var discoverInst2 util.Discover
 	discoverInst2.Instance = "inst2"
-	discoverInst2.DataFiles = data
-	discoverInst2.LogFiles = logs
+	discoverInst2.DataFilePaths = data
+	discoverInst2.LogFilePaths = logs
 
 	var discoverList []util.Discover
 	discoverList = append(discoverList, discoverInst1)
@@ -107,8 +107,8 @@ func setDiscoverResult() (discoverResult util.DiscoverResult) {
 	messages = append(messages,msg)
 
 	for _,discover := range discoverList {
-		dataFiles := strings.Join(discover.DataFiles," ")
-		logFiles := strings.Join(discover.LogFiles," ")
+		dataFiles := strings.Join(discover.DataFilePaths," ")
+		logFiles := strings.Join(discover.LogFilePaths," ")
 		msg := util.SetMessage("INFO","Instance [" + discover.Instance + "] data files: [" + dataFiles + "] log files: [" + logFiles + "]")
 		messages = append(messages,msg)
 	}

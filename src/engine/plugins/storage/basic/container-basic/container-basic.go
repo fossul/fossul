@@ -9,6 +9,7 @@ import (
 	"engine/plugins/pluginUtil"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 func main() {
@@ -49,12 +50,36 @@ func backup (configMap map[string]string) {
 	configMap = setWorkflowId(configMap)
 	printEnv(configMap)
 
+	var backupSrcFilePaths []string
+	if configMap["AutoDiscovery"] == "true" {
+		dataPaths := strings.Split(configMap["DataFilePaths"],",")
+		logPaths := strings.Split(configMap["LogFilePaths"],",")
+
+		for _,dataPath := range dataPaths {
+			if dataPath == "" {
+				continue
+			}
+
+			backupSrcFilePaths = append(backupSrcFilePaths,dataPath)
+		}
+
+		for _,logPath := range logPaths {
+			if logPath == "" {
+				continue
+			}
+
+			backupSrcFilePaths = append(backupSrcFilePaths,logPath)
+		}
+	} else {
+		backupSrcFilePaths = strings.Split(configMap["BackupSrcPaths"],",")
+	}
+
 	fmt.Println("INFO Performing container backup")
 
 	podName,err := k8s.GetPod(configMap["Namespace"],configMap["ServiceName"],configMap["AccessWithinCluster"])
 	checkError(err)
 
-	fmt.Println("INFO Performing backup for pod" + podName)
+	fmt.Println("INFO Performing backup for pod " + podName)
 
 	backupName := util.GetBackupName(configMap["BackupName"],configMap["BackupPolicy"],configMap["WorkflowId"])
 	backupPath := util.GetBackupPathFromMap(configMap)
@@ -63,30 +88,32 @@ func backup (configMap map[string]string) {
 	err = pluginUtil.CreateDir(backupPath,0755)
 	checkError(err)
 
-	var args []string
-	args = append(args,configMap["CopyCmdPath"])
-	if configMap["ContainerPlatform"] == "openshift" {
-		args = append(args,"rsync")
-		args = append(args,"-n")
-		args = append(args,configMap["Namespace"])
-		args = append(args,podName + ":" + configMap["BackupSrcPath"])
-	} else if configMap["ContainerPlatform"] == "kubernetes" {
-		args = append(args,"cp")
-		args = append(args,configMap["Namespace"] + "/" + podName + ":" + configMap["BackupSrcPath"])
-	} else {
-		fmt.Println("ERROR incorrect parameter set for ContainerPlatform [" + configMap["ContainerPlatform"] + "]")
-		os.Exit(1)
-	}	
-	args = append(args,backupPath)
+	for _, backupSrcFilePath := range backupSrcFilePaths {
+		var args []string
+		args = append(args,configMap["CopyCmdPath"])
+		if configMap["ContainerPlatform"] == "openshift" {
+			args = append(args,"rsync")
+			args = append(args,"-n")
+			args = append(args,configMap["Namespace"])
+			args = append(args,podName + ":" + backupSrcFilePath)
+		} else if configMap["ContainerPlatform"] == "kubernetes" {
+			args = append(args,"cp")
+			args = append(args,configMap["Namespace"] + "/" + podName + ":" + backupSrcFilePath)
+		} else {
+			fmt.Println("ERROR incorrect parameter set for ContainerPlatform [" + configMap["ContainerPlatform"] + "]")
+			os.Exit(1)
+		}	
+		args = append(args,backupPath)
 	
-	result := util.ExecuteCommand(args...)
-	for _, line := range result.Messages {
-		fmt.Println(line.Level, line.Message)
-	}
+		result := util.ExecuteCommand(args...)
+		for _, line := range result.Messages {
+			fmt.Println(line.Level, line.Message)
+		}
 			
-	if result.Code != 0 {
-		os.Exit(1)
-	}
+		if result.Code != 0 {
+			os.Exit(1)
+		}
+	}	
 }
 
 func backupList (configMap map[string]string) {
@@ -190,6 +217,9 @@ func getEnvParams() map[string]string {
 
 	configMap["ProfileName"] = os.Getenv("ProfileName")
 	configMap["ConfigName"] = os.Getenv("ConfigName")
+	configMap["AutoDiscovery"] = os.Getenv("AutoDiscovery")
+	configMap["DataFilePaths"] = os.Getenv("DataFilePaths")
+	configMap["LogFilePaths"] = os.Getenv("LogFilePaths")
 	configMap["BackupPolicy"] = os.Getenv("BackupPolicy")
 	configMap["BackupRetention"] = os.Getenv("BackupRetention")
 	configMap["BackupName"] = os.Getenv("BackupName")
@@ -198,7 +228,7 @@ func getEnvParams() map[string]string {
 	configMap["Namespace"] = os.Getenv("Namespace")
 	configMap["ServiceName"] = os.Getenv("ServiceName")
 	configMap["CopyCmdPath"] = os.Getenv("CopyCmdPath")
-	configMap["BackupSrcPath"] = os.Getenv("BackupSrcPath")
+	configMap["BackupSrcPaths"] = os.Getenv("BackupSrcPaths")
 	configMap["BackupDestPath"] = os.Getenv("BackupDestPath")
 
 	return configMap

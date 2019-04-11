@@ -73,10 +73,10 @@ func (a appPlugin) Discover() util.DiscoverResult {
 		discoverResult.Result = result
 		return discoverResult
 	}
-	var dataFiles []string
+	var dataFilePaths []string
 	dataDir := value + config.AppPluginParameters["MysqlDb"]
-	dataFiles = append(dataFiles,dataDir)
-	discover.DataFiles = dataFiles
+	dataFilePaths = append(dataFilePaths,dataDir)
+	discover.DataFilePaths = dataFilePaths
 
 	msg := util.SetMessage("INFO", "Data Directory is [" + value + config.AppPluginParameters["MysqlDb"] + "]")
 	messages = append(messages,msg)
@@ -181,10 +181,7 @@ func setPlugin() (plugin util.Plugin) {
 	capabilities = append(capabilities,quiesceCap,unquiesceCap,infoCap)
 
 	plugin.Capabilities = capabilities
-
-	conn.DB.Close()
-	conn = nil
-
+	
 	return plugin
 }
 

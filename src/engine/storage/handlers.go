@@ -107,21 +107,14 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 				
 				_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
 				json.NewEncoder(w).Encode(pluginInfoResult)	
-			} else {
-				setEnvResult := plugin.SetEnv(config)
-				if setEnvResult.Code != 0 {
-					pluginInfoResult.Result = setEnvResult
-					_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
-					json.NewEncoder(w).Encode(pluginInfoResult)
-				} else {		
-					pluginInfo := plugin.Info()
+			} else {	
+				pluginInfo := plugin.Info()
 
-					pluginInfoResult.Result.Code = 0
-					pluginInfoResult.Plugin = pluginInfo
+				pluginInfoResult.Result.Code = 0
+				pluginInfoResult.Plugin = pluginInfo
 
-					_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
-					json.NewEncoder(w).Encode(pluginInfoResult)		
-				}	
+				_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+				json.NewEncoder(w).Encode(pluginInfoResult)		
 			}			
 		} else if pluginType == "archive" {
 			plugin,err := util.GetArchiveInterface(pluginPath)
@@ -133,21 +126,14 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 				
 				_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
 				json.NewEncoder(w).Encode(pluginInfoResult)	
-			} else {
-				setEnvResult := plugin.SetEnv(config)
-				if setEnvResult.Code != 0 {
-					pluginInfoResult.Result = setEnvResult
-					_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
-					json.NewEncoder(w).Encode(pluginInfoResult)
-				} else {		
-					pluginInfo := plugin.Info()
+			} else {	
+				pluginInfo := plugin.Info()
 
-					pluginInfoResult.Result.Code = 0
-					pluginInfoResult.Plugin = pluginInfo
+				pluginInfoResult.Result.Code = 0
+				pluginInfoResult.Plugin = pluginInfo
 
-					_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
-					json.NewEncoder(w).Encode(pluginInfoResult)		
-				}		
+				_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+				json.NewEncoder(w).Encode(pluginInfoResult)			
 			}	
 		} else {
 			msg := util.SetMessage("ERROR","Invalid plugin type [" + pluginType + "], must be app|archive")

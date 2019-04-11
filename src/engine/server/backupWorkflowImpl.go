@@ -22,11 +22,13 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 			}
 
 			// save discovered files in config struct
-			dataFiles,logFiles := setDiscoverFileList(config,discoverResult)
-			config.DiscoveryDataFileList = dataFiles
-			config.DiscoveryDataFileList = logFiles
-			// need to update container plugin to handle lists
-			config.StoragePluginParameters["BackupSrcPath"] = strings.Join(dataFiles," ")
+			dataFilePaths,logFilePaths := setDiscoverFileList(config,discoverResult)
+
+			dataFilePathsToString := strings.Join(dataFilePaths,",")
+			config.StoragePluginParameters["DataFilePaths"] = dataFilePathsToString
+
+			logFilePathsToString := strings.Join(logFilePaths,",")
+			config.StoragePluginParameters["LogFilePaths"] = logFilePathsToString
 		}	
 
 		commentMsg := "Performing Application Quiesce"
@@ -283,16 +285,16 @@ func sendErrorNotification(resultsDir,policy string,step util.Step,workflow *uti
 	}	
 }
 
-func setDiscoverFileList(config util.Config, discoverResult util.DiscoverResult) (dataFiles,logFiles []string) {
+func setDiscoverFileList(config util.Config, discoverResult util.DiscoverResult) (dataFilePaths,logFilePaths []string) {
 	for _,discover := range discoverResult.DiscoverList {
-		for _,dataFile := range discover.DataFiles {
-			dataFiles = append(dataFiles,dataFile)
+		for _,dataFilePath := range discover.DataFilePaths {
+			dataFilePaths = append(dataFilePaths,dataFilePath)
 		}
 
-		for _,logFile := range discover.LogFiles {
-			logFiles = append(logFiles,logFile)
+		for _,logFilePath := range discover.LogFilePaths {
+			logFilePaths = append(logFilePaths,logFilePath)
 		}
 	}
 
-	return dataFiles,logFiles
+	return dataFilePaths,logFilePaths
 }

@@ -37,8 +37,6 @@ type Config struct {
 	SendTrapSuccessCmd string `json:"sendTrapSuccessCmd,omitempty"`
 	AppPluginParameters map[string]string `json:"appPluginParameters,omitempty"`
 	StoragePluginParameters map[string]string `json:"storagePluginParameters,omitempty"`
-	DiscoveryDataFileList	[]string `json:"discoveryDataFileList,omitempty"`
-	DiscoveryLogFileList	[]string `json:"discoveryLogFileList,omitempty"`
 }
 
 type BackupRetention struct {

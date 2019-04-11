@@ -6,6 +6,7 @@ import (
 	"engine/plugins/pluginUtil"
 	"engine/client"
 	"fmt"
+	"strings"
 )
 
 type storagePlugin string
@@ -27,6 +28,30 @@ func (s storagePlugin) SetEnv(c util.Config) util.Result {
 func (s storagePlugin) Backup() util.Result {	
 	var result util.Result
 	var messages []util.Message
+	var backupSrcFilePaths []string
+
+	if config.AutoDiscovery == true {
+		dataPaths := strings.Split(config.StoragePluginParameters["DataFilePaths"],",")
+		logPaths := strings.Split(config.StoragePluginParameters["LogFilePaths"],",")
+
+		for _,dataPath := range dataPaths {
+			if dataPath == "" {
+				continue
+			}
+
+			backupSrcFilePaths = append(backupSrcFilePaths,dataPath)
+		}
+
+		for _,logPath := range logPaths {
+			if logPath == "" {
+				continue
+			}
+
+			backupSrcFilePaths = append(backupSrcFilePaths,logPath)
+		}
+	} else {
+		backupSrcFilePaths = strings.Split(config.StoragePluginParameters["BackupSrcPaths"],",")
+	}
 
 	msg := util.SetMessage("INFO", "Performing container backup")
 	messages = append(messages,msg)
@@ -56,29 +81,34 @@ func (s storagePlugin) Backup() util.Result {
 		return result
 	}
 
-	var args []string
-	args = append(args,config.StoragePluginParameters["CopyCmdPath"])
-	if config.StoragePluginParameters["ContainerPlatform"] == "openshift" {
-		args = append(args,"rsync")
-		args = append(args,"-n")
-		args = append(args,config.StoragePluginParameters["Namespace"])
-		args = append(args,podName + ":" + config.StoragePluginParameters["BackupSrcPath"])
-	} else if config.StoragePluginParameters["ContainerPlatform"] == "kubernetes" {
-		args = append(args,"cp")
-		args = append(args,config.StoragePluginParameters["Namespace"] + "/" + podName + ":" + config.StoragePluginParameters["BackupSrcPath"])
-	} else {
+	for _, backupSrcFilePath := range backupSrcFilePaths {
+		var args []string
+		args = append(args,config.StoragePluginParameters["CopyCmdPath"])
+		if config.StoragePluginParameters["ContainerPlatform"] == "openshift" {
+			args = append(args,"rsync")
+			args = append(args,"-n")
+			args = append(args,config.StoragePluginParameters["Namespace"])
+			args = append(args,podName + ":" + backupSrcFilePath)
+		} else if config.StoragePluginParameters["ContainerPlatform"] == "kubernetes" {
+			args = append(args,"cp")
+			args = append(args,config.StoragePluginParameters["Namespace"] + "/" + podName + ":" + config.StoragePluginParameters["BackupSrcPath"])
+		} else {
+			msg = util.SetMessage("ERROR", "Incorrect parameter set for ContainerPlatform [" + config.StoragePluginParameters["ContainerPlatform"] + "]")
+			messages = append(messages,msg)
 
-	}	
-	args = append(args,backupPath)
+			result = util.SetResult(1, messages)
+			return result
+		}	
+
+		args = append(args,backupPath)
 	
-	cmdResult := util.ExecuteCommand(args...)
-	if cmdResult.Code != 0 {
-		return cmdResult
-	} else {
-		for _,msg := range cmdResult.Messages {
-			messages = util.PrependMessage(msg,messages)
+		cmdResult := util.ExecuteCommand(args...)
+		if cmdResult.Code != 0 {
+			return cmdResult
+		} else {
+			messages = util.PrependMessages(cmdResult.Messages,messages)
 		}
-	}
+	}	
 
 	result = util.SetResult(0, messages)
 	return result
