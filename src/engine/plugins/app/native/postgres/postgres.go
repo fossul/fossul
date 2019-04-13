@@ -28,8 +28,8 @@ func (a appPlugin) Discover() util.DiscoverResult {
 	var messages []util.Message
 
 	dsn := getDSN(config)
+
 	conn,err := getConn(dsn)
-	defer conn.Close()
 
 	if err != nil {
 		msg := util.SetMessage("ERROR", "Couldn't connect to database [" + config.AppPluginParameters["PqDb"] + "] " + err.Error())
@@ -39,6 +39,7 @@ func (a appPlugin) Discover() util.DiscoverResult {
 		discoverResult.Result = result
 		return discoverResult
 	} else {
+		defer conn.Close()
 		msg := util.SetMessage("INFO", "Connection to database [" + config.AppPluginParameters["PqDb"] + "] established")
 		messages = append(messages,msg)
 		result = util.SetResult(0,messages)
@@ -82,7 +83,6 @@ func (a appPlugin) Quiesce() util.Result {
 
 	dsn := getDSN(config)
 	conn,err := getConn(dsn)
-	defer conn.Close()
 
 	if err != nil {
 		msg := util.SetMessage("ERROR", "Couldn't connect to database [" + config.AppPluginParameters["PqDb"] + "] " + err.Error())
@@ -91,9 +91,27 @@ func (a appPlugin) Quiesce() util.Result {
 		result = util.SetResult(1,messages)
 		return result
 	} else {
+		defer conn.Close()
 		msg := util.SetMessage("INFO", "Connection to database [" + config.AppPluginParameters["PqDb"] + "] established")
 		messages = append(messages,msg)
 		result = util.SetResult(0,messages)
+	}
+
+	backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"],config.SelectedBackupPolicy,config.WorkflowId)
+
+	msg := util.SetMessage("INFO","Entering backup mode using label " + backupName + " for database [" + config.AppPluginParameters["PqDb"] + "]")
+	messages = append(messages,msg)
+
+	_, err = conn.Exec("SELECT pg_start_backup('" + backupName + "')")
+	if err != nil {
+		msg = util.SetMessage("ERROR","Entering backup mode using label " + backupName + " for database [" + config.AppPluginParameters["PqDb"] + "] failed! " + err.Error())
+		messages = append(messages,msg)
+		result = util.SetResult(1,messages)
+
+		return result
+	} else {
+		msg = util.SetMessage("INFO","Entering backup mode using label " + backupName + " for database [" + config.AppPluginParameters["PqDb"] + "] successful")
+		messages = append(messages,msg)
 	}
 
 	result = util.SetResult(resultCode, messages)
@@ -109,7 +127,6 @@ func (a appPlugin) Unquiesce() util.Result {
 
 	dsn := getDSN(config)
 	conn,err := getConn(dsn)
-	defer conn.Close()
 
 	if err != nil {
 		msg := util.SetMessage("ERROR", "Couldn't connect to database [" + config.AppPluginParameters["PqDb"] + "] " + err.Error())
@@ -118,9 +135,25 @@ func (a appPlugin) Unquiesce() util.Result {
 		result = util.SetResult(1,messages)
 		return result
 	} else {
+		defer conn.Close()
 		msg := util.SetMessage("INFO", "Connection to database [" + config.AppPluginParameters["PqDb"] + "] established")
 		messages = append(messages,msg)
 		result = util.SetResult(0,messages)
+	}
+
+	msg := util.SetMessage("INFO","Exiting backup mode for database [" + config.AppPluginParameters["PqDb"] + "]")
+	messages = append(messages,msg)
+
+	_, err = conn.Exec("SELECT pg_stop_backup()")
+	if err != nil {
+		msg = util.SetMessage("ERROR","Exiting backup mode for database [" + config.AppPluginParameters["PqDb"] + "] failed! " + err.Error())
+		messages = append(messages,msg)
+		result = util.SetResult(1,messages)
+
+		return result
+	} else {
+		msg = util.SetMessage("INFO","Exiting backup mode for database [" + config.AppPluginParameters["PqDb"] + "] successful")
+		messages = append(messages,msg)
 	}
 
 	result = util.SetResult(resultCode, messages)

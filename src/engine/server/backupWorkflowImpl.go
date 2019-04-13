@@ -48,16 +48,16 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 			if resultCode := stepErrorHandler(resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
-			isQuiesce = true
 		}	
 		
 		if config.AppPlugin != "" {
+			isQuiesce = true
 			step := stepInit(resultsDir,workflow)
 			result := client.Quiesce(config)
 			if resultCode := stepErrorHandler(resultsDir,policy,step,workflow,result,config);resultCode != 0 {
+				unquiesceOnError(resultsDir,policy,isQuiesce,workflow,config)
 				return resultCode
 			}
-			isQuiesce = true
 		}	
 	
 		if config.PostAppQuiesceCmd != "" {
