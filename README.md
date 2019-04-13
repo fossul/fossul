@@ -11,7 +11,7 @@ We are happy to track and discuss ideas, topics and requests via 'Issues'.
 
 # Plugins
 
-## Application PLugins
+## Application Plugins
 
 ### PostgreSQL
 The postgres plugin requires WAL archive logging to be configured in order to perform backups. This is not enabled by default under OpenShift. First create an archive directory under `/var/lib/pgsql/data/userdata` by connecting to the pod via rsh. Next update the following parameters in the `/var/lib/pgsql/data/userdata/postgresql.conf`.
