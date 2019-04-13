@@ -35,6 +35,8 @@ func GetPluginPath(pluginName string) string {
 	switch pluginName {
 	case "mariadb.so":
 		path = "./plugins/app/mariadb.so"
+	case "postgres.so":
+		path = "./plugins/app/postgres.so"		
 	case "container-basic.so":
 		path = "./plugins/storage/container-basic.so"		
 	case "sample-app.so":

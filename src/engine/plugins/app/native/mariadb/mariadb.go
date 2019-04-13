@@ -169,6 +169,9 @@ func setPlugin() (plugin util.Plugin) {
 	plugin.Type = "app"
 
 	var capabilities []util.Capability
+	var discoverCap util.Capability
+	discoverCap.Name = "discover"
+
 	var quiesceCap util.Capability
 	quiesceCap.Name = "quiesce"
 
@@ -178,7 +181,7 @@ func setPlugin() (plugin util.Plugin) {
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,quiesceCap,unquiesceCap,infoCap)
+	capabilities = append(capabilities,discoverCap,quiesceCap,unquiesceCap,infoCap)
 
 	plugin.Capabilities = capabilities
 	

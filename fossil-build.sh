@@ -9,6 +9,8 @@ go get k8s.io/apimachinery/pkg/apis/meta/v1
 go get k8s.io/client-go/kubernetes/typed/core/v1 
 go get k8s.io/client-go/rest
 go get github.com/BurntSushi/toml
+go get github.com/lib/pq
+go get github.com/go-sql-driver/mysql
 
 echo "Running Unit Tests"
 go test engine/util
@@ -44,6 +46,8 @@ if [ $? != 0 ]; then exit 1; fi
 go build -buildmode=plugin -o $PLUGIN_DIR/storage/container-basic.so engine/plugins/storage/native/container-basic
 if [ $? != 0 ]; then exit 1; fi
 go build -buildmode=plugin -o $PLUGIN_DIR/app/mariadb.so engine/plugins/app/native/mariadb
+if [ $? != 0 ]; then exit 1; fi
+go build -buildmode=plugin -o $PLUGIN_DIR/app/postgres.so engine/plugins/app/native/postgres
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Services"
