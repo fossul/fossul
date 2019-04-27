@@ -68,6 +68,9 @@ func ExecuteCommand(podName, containerName, namespace, accessWithinCluster strin
 		Tty:    false,
 	})
 
+	message = util.SetMessage("DEBUG", "Command stdout: " + execOut.String())
+	messages = append(messages, message)
+
 	if err != nil {
 		message := util.SetMessage("ERROR", "Could not execute command: " + err.Error())
 		messages = append(messages, message)

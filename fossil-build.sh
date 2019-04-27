@@ -60,6 +60,8 @@ go build -buildmode=plugin -o $PLUGIN_DIR/app/postgres.so engine/plugins/app/nat
 if [ $? != 0 ]; then exit 1; fi
 go build -buildmode=plugin -o $PLUGIN_DIR/app/mongo.so engine/plugins/app/native/mongo
 if [ $? != 0 ]; then exit 1; fi
+go build -buildmode=plugin -o $PLUGIN_DIR/app/mongo-dump.so engine/plugins/app/native/mongo-dump
+if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Services"
 go install engine/server
