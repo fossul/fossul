@@ -5,9 +5,11 @@ PLUGIN_DIR="/home/ktenzer/plugins"
 echo "Installing Dependencies"
 go get github.com/pborman/getopt/v2
 go get github.com/gorilla/mux
-go get k8s.io/apimachinery/pkg/apis/meta/v1
 go get k8s.io/client-go/kubernetes/typed/core/v1 
 go get k8s.io/client-go/rest
+go get k8s.io/api/core/v1
+go get k8s.io/client-go/kubernetes/scheme
+go get k8s.io/client-go/tools/remotecommand
 go get github.com/BurntSushi/toml
 go get github.com/lib/pq
 go get github.com/go-sql-driver/mysql
@@ -16,7 +18,6 @@ go get go.mongodb.org/mongo-driver/mongo/options
 go get go.mongodb.org/mongo-driver/bson
 go get go.mongodb.org/mongo-driver/mongo/readpref
 go get go.mongodb.org/mongo-driver/x/bsonx
-
 
 echo "Running Unit Tests"
 go test engine/util

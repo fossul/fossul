@@ -7,6 +7,7 @@ import (
 type Result struct {
 	Code int `json:"code,omitempty"`
 	Messages []Message `json:"messages,omitempty"`
+	Data []string `json:"data,omitempty"`
 }
 
 type ResultSimple struct {
