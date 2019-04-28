@@ -25,10 +25,10 @@ func (a appPlugin) Discover() util.DiscoverResult {
 	var result util.Result
 	var messages []util.Message
 
-	discover.Instance = config.AppPluginParameters["MysqlDb"]
+	discover.Instance = config.AppPluginParameters["PqDb"]
 
 	var dataFilePaths []string
-	dumpPath := config.AppPluginParameters["MysqlDumpPath"] + "/" + config.WorkflowId 
+	dumpPath := config.AppPluginParameters["PqDumpPath"] + "/" + config.WorkflowId 
 	dataFilePaths = append(dataFilePaths,dumpPath)
 	discover.DataFilePaths = dataFilePaths
 
@@ -60,7 +60,7 @@ func (a appPlugin) Quiesce() util.Result {
 		return result
 	}
 
-	dumpPath := config.AppPluginParameters["MysqlDumpPath"] + "/" + config.WorkflowId 
+	dumpPath := config.AppPluginParameters["PqDumpPath"] + "/" + config.WorkflowId 
 
 	//create tmp directory for storing dump
 	mkdirArgs = append(mkdirArgs,"mkdir")
@@ -75,23 +75,22 @@ func (a appPlugin) Quiesce() util.Result {
 		messages = util.PrependMessages(messages,cmdResult.Messages)
 	}
 
-	//execute database dump
-	args = append(args,config.AppPluginParameters["MysqlDumpCmd"])
-	args = append(args,"-h")
-	args = append(args,config.AppPluginParameters["MysqlHost"])
-	args = append(args,"-P")
-	args = append(args,config.AppPluginParameters["MysqlPort"])
-	args = append(args,"-u")
-	args = append(args,config.AppPluginParameters["MysqlUser"])
+	// execute dump using pg_dump (requires ld_library_path)
+	filePath := dumpPath + "/postgres.sql"
+	
+	args = append(args,"/bin/sh")
+	args = append(args,"-c")
 
-	if config.AppPluginParameters["MysqlPassword"] != "" {
-		args = append(args,"-p" + config.AppPluginParameters["MysqlPassword"])
-	} 	
-
-	args = append(args,config.AppPluginParameters["MysqlDb"])
-
-	args = append(args,"-T")
-	args = append(args,dumpPath)
+	if config.AppPluginParameters["PqPassword"] != "" {
+		args = append(args,"PGPASSWORD=" + config.AppPluginParameters["PqPassword"] + " PGDATABASE=" + 
+		config.AppPluginParameters["PqDb"] + " LD_LIBRARY_PATH=" + config.AppPluginParameters["PqLibraryPath"] + 
+		" " + config.AppPluginParameters["PqDumpCmd"] + " --host " + config.AppPluginParameters["PqHost"] + " --port " + 
+		config.AppPluginParameters["PqPort"] + " --file " + filePath)
+	} else {
+		args = append(args," PGDATABASE=" + config.AppPluginParameters["PqDb"] + " LD_LIBRARY_PATH=" + 
+		config.AppPluginParameters["PqLibraryPath"] + " " + config.AppPluginParameters["PqDumpCmd"] + " --host " + 
+		config.AppPluginParameters["PqHost"] + " --port " + config.AppPluginParameters["PqPort"] + " --file " + filePath)	
+	}
 
 	cmdResult = k8s.ExecuteCommand(podName,config.AppPluginParameters["ContainerName"],config.AppPluginParameters["Namespace"],config.AppPluginParameters["AccessWithinCluster"],args...)
 
@@ -109,7 +108,7 @@ func (a appPlugin) Unquiesce() util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	dumpPath := config.AppPluginParameters["MysqlDumpPath"] + "/" + config.WorkflowId 
+	dumpPath := config.AppPluginParameters["PqDumpPath"] + "/" + config.WorkflowId 
 
 	var args []string
 	args = append(args,"rm")
@@ -143,8 +142,8 @@ func (a appPlugin) Info() util.Plugin {
 }
 
 func setPlugin() (plugin util.Plugin) {
-	plugin.Name = "mariadb-dump"
-	plugin.Description = "MariaDB plugin for backing up MySql or MariaDB using mysqldump utility"
+	plugin.Name = "postgres-dump"
+	plugin.Description = "Postgres plugin for backing up PostgreSQL databases using pg_dump utility"
 	plugin.Type = "app"
 
 	var capabilities []util.Capability
