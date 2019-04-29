@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"k8s.io/api/core/v1"
-	"k8s.io/client-go/rest"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/remotecommand"
@@ -20,7 +19,14 @@ func ExecuteCommand(podName, containerName, namespace, accessWithinCluster strin
 	var result util.Result
 	var messages []util.Message
 
-	var kubeConfig *rest.Config = getKubeConfig(accessWithinCluster)
+	err,kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		message := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+		return result
+	}
 
 	s0 := fmt.Sprintf("Executing command [%s %s] on pod [%s] container [%s]",baseCmd, strings.Join(cmdArgs, " "),podName,containerName)
 	message := util.SetMessage("CMD", s0)

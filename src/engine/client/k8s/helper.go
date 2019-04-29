@@ -5,9 +5,10 @@ import (
 	"k8s.io/client-go/rest"
 	"os"
 	"log"
+	"errors"
 )
 
-func getKubeConfig(accessWithinCluster string) *rest.Config {
+func getKubeConfig(accessWithinCluster string) (error,*rest.Config) {
 	var kubeConfig *rest.Config
 	var err error
 	if accessWithinCluster == "true" {
@@ -20,22 +21,27 @@ func getKubeConfig(accessWithinCluster string) *rest.Config {
 		if home := homeDir(); home != "" {
 			kubeconfigFile = home + "/.kube" + "/config"
 			if _, err := os.Stat(kubeconfigFile); os.IsNotExist(err) {
-				log.Fatal(err,"\n" + "ERROR: Kube config not found under " + kubeconfigFile)
+				log.Println(err,"\n" + "ERROR: Kube config not found under " + kubeconfigFile)
+				return err,nil
 			}
 		} else {
-			log.Fatal("ERROR: Could not find homedir, check environment!")
+			log.Println("ERROR: Could not find homedir, check environment!")
+			return err,nil
 		}
 
 		// use the current context in kubeconfig
 		kubeConfig, err = clientcmd.BuildConfigFromFlags("", kubeconfigFile)
 		if err != nil {
-			log.Fatal(err.Error())
+			log.Println(err.Error())
+			return err,nil
 		}		
 	} else {
-		log.Fatal("ERROR: Parameter AccessWithinCluster not set to true or false")
+		log.Println("ERROR: Parameter AccessWithinCluster not set to true or false")
+		err := errors.New("Parameter AccessWithinCluster not set to true or false")
+		return err,nil
 	}
 
-	return kubeConfig
+	return nil,kubeConfig
 }
 
 func homeDir() string {

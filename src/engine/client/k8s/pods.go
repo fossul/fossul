@@ -4,13 +4,15 @@ import (
 //	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"fmt"
 	"strings"
 )
 
 func GetPod(namespace, serviceName, accessWithinCluster string) (string,error) {
-	var kubeConfig *rest.Config = getKubeConfig(accessWithinCluster)
+	err,kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		return "",err
+	}
 	
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(kubeConfig)
