@@ -13,6 +13,8 @@ WORKDIR /app
 ENV GOPATH=/app
 ENV GOBIN=/app
 
+#RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
+
 RUN go get -u github.com/gorilla/mux
 
 RUN mkdir /backups
