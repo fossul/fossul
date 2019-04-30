@@ -1,8 +1,8 @@
 package main
 
 import (
-	"engine/util"
-	"engine/client/k8s"
+	"fossil/src/engine/util"
+	"fossil/src/engine/client/k8s"
 	"fmt"
 )
 

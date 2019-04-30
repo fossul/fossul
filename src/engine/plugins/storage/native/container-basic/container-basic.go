@@ -1,10 +1,10 @@
 package main
 
 import (
-	"engine/util"
-	"engine/client/k8s"
-	"engine/plugins/pluginUtil"
-	"engine/client"
+	"fossil/src/engine/util"
+	"fossil/src/engine/client/k8s"
+	"fossil/src/engine/plugins/pluginUtil"
+	"fossil/src/engine/client"
 	"fmt"
 	"strings"
 )

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"engine/util"
+	"fossil/src/engine/util"
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"

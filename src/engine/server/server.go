@@ -3,7 +3,7 @@ package main
 import (
     "log"
     "net/http"
-    "engine/util"
+    "fossil/src/engine/util"
 )
 
 const configDir = "configs/"

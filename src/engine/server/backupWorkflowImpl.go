@@ -1,8 +1,8 @@
 package main
 
 import (
-	"engine/util"
-	"engine/client"
+	"fossil/src/engine/util"
+	"fossil/src/engine/client"
 	"strings"
 )
 

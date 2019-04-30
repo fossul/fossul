@@ -1,7 +1,7 @@
 package main
 
 import (
-	"engine/util"
+	"fossil/src/engine/util"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"fmt"

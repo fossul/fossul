@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/pborman/getopt/v2"
 	"os"
-	"engine/util"
-	"engine/client"
+	"fossil/src/engine/util"
+	"fossil/src/engine/client"
 	"fmt"
 	"strconv"
 	"time"
