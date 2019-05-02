@@ -94,5 +94,11 @@ var routes = Routes{
         "POST",
         "/deleteWorkflowResults/{profileName}/{configName}/{id}",
         DeleteWorkflowResults,
-    },                                         
+    },
+    Route{
+        "GetJobs",
+        "GET",
+        "/getJobs/{profileName}/{configName}",
+        GetJobs,
+    },                                             
 }

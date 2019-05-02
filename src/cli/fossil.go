@@ -15,7 +15,7 @@ func main() {
 	optConfig := getopt.StringLong("config",'c',"","Config name")
 	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
-	optAction := getopt.StringLong("action",'a',"","backup|backupList|appPluginList|storagePluginList|archivePluginList|pluginInfo|status")
+	optAction := getopt.StringLong("action",'a',"","backup|backupList|jobList|appPluginList|storagePluginList|archivePluginList|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
 	optPluginType := getopt.StringLong("pluginType",'t',"","Plugin type app|storage|archive")
 	optGetDefaultConfig := getopt.BoolLong("get-default-config", 0,"Get the default config file")
@@ -171,6 +171,15 @@ func main() {
 		for _, backup := range backupsByPolicy {
 			fmt.Println(backup.Name, backup.Policy, backup.WorkflowId, backup.Timestamp)
 		}
+	} else if *optAction == "jobList" {	
+		msg := fmt.Sprintf("### List of Jobs for profile [%s] config [%s] ###",*optProfile,*optConfig)
+		fmt.Println(msg)
+
+		jobs := client.GetJobList(string(*optProfile),string(*optConfig))
+		checkResult(jobs.Result)
+		for _, job := range jobs.Jobs {
+			fmt.Println(job.Id, job.Status, job.Timestamp)
+		}		
 	} else if *optAction == "appPluginList" {
 		fmt.Println("### List of Application Plugins ###")
 

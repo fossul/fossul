@@ -279,3 +279,28 @@ func SetAdditionalConfigParams(profileName, configName, policyName string, confi
 
 	return config
 }
+
+func GetJobList(profileName,configName string) util.Jobs {
+
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getJobs/" + profileName + "/" + configName, nil)
+	req.Header.Add("Content-Type", "application/json")
+	if err != nil {
+		log.Println("NewRequest: ", err)
+	}
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("Do: ", err)
+	}
+
+	defer resp.Body.Close()
+
+	var jobs util.Jobs
+	if err := json.NewDecoder(resp.Body).Decode(&jobs); err != nil {
+		log.Println(err)
+	}
+
+	return jobs
+}

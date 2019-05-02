@@ -82,3 +82,36 @@ func GetDefaultPluginConfig(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&configMap)
 	json.NewEncoder(w).Encode(configMap)
 }
+
+func GetJobs(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)	
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+
+	jobsDir := dataDir + profileName + "/" + configName
+	log.Println("DEBUG", "Jobs directory is " + jobsDir)
+	
+	var result util.Result
+	var messages []util.Message
+
+	var jobs util.Jobs
+	var jobList []util.Job
+	jobList,err := util.ListJobs(jobsDir)
+
+	if err != nil {
+		msg := util.SetMessage("ERROR","Job list failed! " + err.Error())
+		messages = append(messages, msg)
+
+		result = util.SetResult(1, messages)
+		jobs.Result = result
+
+		_ = json.NewDecoder(r.Body).Decode(&jobs)
+		json.NewEncoder(w).Encode(jobs)
+	}
+
+	jobs.Result.Code = 0
+	jobs.Jobs = jobList
+
+	_ = json.NewDecoder(r.Body).Decode(&jobs)
+	json.NewEncoder(w).Encode(jobs)
+}

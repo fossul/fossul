@@ -6,6 +6,7 @@ import (
 	"fossil/src/engine/util"
 	"net/http"
 	"log"
+	"time"
 )
 
 func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
@@ -14,6 +15,9 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	workflow := &util.Workflow{}
 	workflow.Id =  util.GetWorkflowId()
 	workflow.Status = "RUNNING"
+
+	var timestamp string = time.Now().Format(time.RFC3339)
+	workflow.Timestamp = timestamp
 
 	workflowResult.Id = workflow.Id
 
