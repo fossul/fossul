@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+	"text/tabwriter"
 )
 
 func main() {
@@ -177,9 +178,15 @@ func main() {
 
 		jobs := client.GetJobList(string(*optProfile),string(*optConfig))
 		checkResult(jobs.Result)
+
+		// print friendly columns
+		tw := new(tabwriter.Writer)
+		tw.Init(os.Stdout, 10, 20, 5, ' ', 0)
+		fmt.Fprintln(tw, "WorkflowId\t Status\t Start Time\t")
 		for _, job := range jobs.Jobs {
-			fmt.Println(job.Id, job.Status, job.Timestamp)
+			fmt.Fprintln(tw, util.IntToString(job.Id) + "\t",job.Status + "\t",job.Timestamp + "\t")
 		}		
+		tw.Flush()
 	} else if *optAction == "appPluginList" {
 		fmt.Println("### List of Application Plugins ###")
 
