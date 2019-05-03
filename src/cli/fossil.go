@@ -16,9 +16,10 @@ func main() {
 	optConfig := getopt.StringLong("config",'c',"","Config name")
 	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
-	optAction := getopt.StringLong("action",'a',"","backup|backupList|jobList|appPluginList|storagePluginList|archivePluginList|pluginInfo|status")
+	optAction := getopt.StringLong("action",'a',"","backup|backupList|jobList|jobStatus|appPluginList|storagePluginList|archivePluginList|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
 	optPluginType := getopt.StringLong("pluginType",'t',"","Plugin type app|storage|archive")
+	optWorkflowId := getopt.StringLong("workflowId",'w',"","Workflow Id")
 	optGetDefaultConfig := getopt.BoolLong("get-default-config", 0,"Get the default config file")
 	optGetDefaultPluginConfig := getopt.BoolLong("get-default-plugin-config", 0,"Get the default config file")
     optHelp := getopt.BoolLong("help", 0, "Help")
@@ -187,6 +188,38 @@ func main() {
 			fmt.Fprintln(tw, util.IntToString(job.Id) + "\t",job.Status + "\t",job.Timestamp + "\t")
 		}		
 		tw.Flush()
+	} else if *optAction == "jobStatus" {
+		if getopt.IsSet("workflowId") != true {
+			fmt.Println("ERROR: Missing parameter --workflowId")
+			getopt.Usage()
+			os.Exit(1)
+		}
+
+		logger := util.GetLoggerInstance()
+
+		workflowId := util.StringToInt(*optWorkflowId)
+		var completedSteps []int
+		// loop and wait for all workflow steps to complete
+		for {
+			time.Sleep(1 * time.Second)
+			workflow := client.GetWorkflowStatus(*optProfile,*optConfig,workflowId)
+
+			// Print results for a step only once
+			for _, step := range workflow.Steps {
+				if step.Status == "COMPLETE" || step.Status == "ERROR" {
+					if !util.IntInSlice(step.Id,completedSteps) {
+						completedSteps = append(completedSteps,step.Id)
+						results := client.GetWorkflowStepResults(*optProfile,*optConfig,workflowId,step.Id)
+						util.LogResults(logger, results)
+					}
+				}
+			}
+
+			if workflow.Status == "COMPLETE" || workflow.Status == "ERROR"  {
+				break
+			}
+			time.Sleep(4 * time.Second)
+		}			
 	} else if *optAction == "appPluginList" {
 		fmt.Println("### List of Application Plugins ###")
 
