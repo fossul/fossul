@@ -154,7 +154,15 @@ func backupDelete (configMap map[string]string) {
 				pluginUtil.RecursiveDirDelete(backupPath)
 				fmt.Println("INFO Backup " + backupName + " deleted successfully")
 				
-				result := client.DeleteWorkflowResults(configMap["ProfileName"],configMap["ConfigName"],backup.WorkflowId)
+				var auth client.Auth
+				auth.Username = os.Getenv("MyUser")
+				auth.Password = os.Getenv("MyPass")
+
+				result,err := client.DeleteWorkflowResults(auth,configMap["ProfileName"],configMap["ConfigName"],backup.WorkflowId)
+				if err != nil {
+					fmt.Println("ERROR " + err.Error())
+					os.Exit(1)
+				}	
 				for _, line := range result.Messages {
 					fmt.Println(line.Level, line.Message)
 				}

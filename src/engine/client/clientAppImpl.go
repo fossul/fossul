@@ -3,153 +3,180 @@ package client
 import (
 	"encoding/json"
 	"fossil/src/engine/util"
-	"log"
 	"net/http"
 	"bytes"
+	"errors"
 //	"strings"
 )
 
-func AppPluginList(pluginType string,config util.Config) []string {
+func AppPluginList(auth Auth,pluginType string,config util.Config) ([]string,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
-
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginList/" + pluginType, b)
-	req.Header.Add("Content-Type", "application/json")
-
-	if err != nil {
-		log.Println("NewRequest: ", err)
-	}
-
-	client := &http.Client{}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println("Do: ", err)
-	}
-
-	defer resp.Body.Close()
 
 	var plugins []string
 
-	if err := json.NewDecoder(resp.Body).Decode(&plugins); err != nil {
-		log.Println(err)
-	}
-
-	return plugins
-
-}
-
-func AppPluginInfo(config util.Config, pluginName,pluginType string) (util.PluginInfoResult) {
-	b := new(bytes.Buffer)
-	json.NewEncoder(b).Encode(config)
-
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginInfo/" + pluginName + "/" + pluginType, b)
-	req.Header.Add("Content-Type", "application/json")
-
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginList/" + pluginType, b)
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return plugins,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return plugins,err
 	}
 
 	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&plugins); err != nil {
+			return plugins,err
+		}
+	} else {
+		return plugins,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return plugins,nil
+
+}
+
+func AppPluginInfo(auth Auth,config util.Config, pluginName,pluginType string) (util.PluginInfoResult,error) {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
 
 	var pluginInfoResult util.PluginInfoResult
-	if err := json.NewDecoder(resp.Body).Decode(&pluginInfoResult); err != nil {
-		log.Println(err)
-	}
 
-	return pluginInfoResult
-}
-
-func Discover(config util.Config) util.DiscoverResult {
-	b := new(bytes.Buffer)
-	json.NewEncoder(b).Encode(config)
-
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/discover", b)
-	req.Header.Add("Content-Type", "application/json")
-
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginInfo/" + pluginName + "/" + pluginType, b)
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return pluginInfoResult,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return pluginInfoResult,err
 	}
 
 	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&pluginInfoResult); err != nil {
+			return pluginInfoResult,err
+		}
+	} else {
+		return pluginInfoResult,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return pluginInfoResult,nil
+}
+
+func Discover(auth Auth,config util.Config) (util.DiscoverResult,error) {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
 
 	var discoverResult util.DiscoverResult
 
-	if err := json.NewDecoder(resp.Body).Decode(&discoverResult); err != nil {
-		log.Println(err)
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/discover", b)
+	if err != nil {
+		return discoverResult,err
 	}
 
-	return discoverResult
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return discoverResult,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&discoverResult); err != nil {
+			return discoverResult,err
+		}
+	} else {
+		return discoverResult,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return discoverResult,nil
 }
 
-func Quiesce(config util.Config) util.Result {
+func Quiesce(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
+
+	var result util.Result
 
 	req, err := http.NewRequest("POST", "http://fossil-app:8001/quiesce", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func Unquiesce(config util.Config) util.Result {
+func Unquiesce(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/unquiesce", b)
-	req.Header.Add("Content-Type", "application/json")
+	var result util.Result
 
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/unquiesce", b)
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
 
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }

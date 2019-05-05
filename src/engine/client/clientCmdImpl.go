@@ -3,355 +3,416 @@ package client
 import (
 	"encoding/json"
 	"fossil/src/engine/util"
-	"log"
 	"net/http"
 	"bytes"
+	"errors"
 )
 
-func PreQuiesceCmd(config util.Config) util.Result {
+func PreQuiesceCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-app:8001/preQuiesceCmd", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func QuiesceCmd(config util.Config) util.Result {
+func QuiesceCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-app:8001/quiesceCmd", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func PostQuiesceCmd(config util.Config) util.Result {
+func PostQuiesceCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-app:8001/postQuiesceCmd", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func PreUnquiesceCmd(config util.Config) util.Result {
+func PreUnquiesceCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-app:8001/preUnquiesceCmd", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func UnquiesceCmd(config util.Config) util.Result {
+func UnquiesceCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-app:8001/unquiesceCmd", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func BackupCreateCmd(config util.Config) util.Result {
+func BackupCreateCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-storage:8002/backupCreateCmd", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func BackupDeleteCmd(config util.Config) util.Result {
+func BackupDeleteCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-storage:8002/backupDeleteCmd", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func PostUnquiesceCmd(config util.Config) util.Result {
+func PostUnquiesceCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-app:8001/postUnquiesceCmd", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func SendTrapSuccessCmd(config util.Config) util.Result {
+
+func SendTrapSuccessCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/sendTrapSuccessCmd", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func SendTrapErrorCmd(config util.Config) util.Result {
+func SendTrapErrorCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/sendTrapErrorCmd", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func ArchiveCreateCmd(config util.Config) util.Result {
+func ArchiveCreateCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-storage:8002/archiveCreateCmd", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func ArchiveDeleteCmd(config util.Config) util.Result {
+func ArchiveDeleteCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-storage:8002/archiveDeleteCmd", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }

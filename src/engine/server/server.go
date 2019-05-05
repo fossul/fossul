@@ -8,6 +8,8 @@ import (
 
 const configDir = "configs/"
 const dataDir = "data/"
+const myUser = "admin"
+const myPass = "redhat123"
 var runningWorkflowMap map[string]string = make(map[string]string)
  
 func main() {

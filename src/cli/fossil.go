@@ -12,6 +12,8 @@ import (
 )
 
 func main() {
+	optUsername := getopt.StringLong("user",'u',"","Username")
+	optPassword := getopt.StringLong("pass",'s',"","Password")
 	optProfile := getopt.StringLong("profile",'p',"","Profile name")
 	optConfig := getopt.StringLong("config",'c',"","Config name")
 	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
@@ -30,8 +32,16 @@ func main() {
         os.Exit(0)
 	}
 
+	var auth client.Auth
+	auth.Username = *optUsername
+	auth.Password = *optPassword
+
 	if *optGetDefaultConfig {
-		var config util.Config = client.GetDefaultConfig()
+		config,err := client.GetDefaultConfig(auth)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
 
 		fmt.Println("### Default Config ###")
 		fmt.Println("PluginDir = " + "\""+ config.PluginDir + "\"")
@@ -62,7 +72,11 @@ func main() {
 			os.Exit(1)
 		}
 
-		var configMap map[string]string = client.GetDefaultPluginConfig(*optPluginName)
+		configMap,err := client.GetDefaultPluginConfig(auth,*optPluginName)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
 
 		fmt.Println("### Default Plugin Config ###")
 		for k,v := range configMap {
@@ -133,7 +147,12 @@ func main() {
 	if *optAction == "backup" {
 		logger := util.GetLoggerInstance()
 
-		workflowResult := client.StartBackupWorkflow(string(*optProfile),string(*optConfig),string(*optPolicy),config)
+		workflowResult,err := client.StartBackupWorkflow(auth,string(*optProfile),string(*optConfig),string(*optPolicy),config)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
+		
 		util.LogResult(logger, workflowResult.Result)
 		if workflowResult.Result.Code != 0 {
 			os.Exit(1)
@@ -144,14 +163,22 @@ func main() {
 		// loop and wait for all workflow steps to complete
 		for {
 			time.Sleep(1 * time.Second)
-			workflow := client.GetWorkflowStatus(*optProfile,*optConfig,workflowId)
+			workflow,err := client.GetWorkflowStatus(auth,*optProfile,*optConfig,workflowId)
+			if err != nil {
+				fmt.Println("ERROR: " + err.Error())
+				os.Exit(1)
+			}
 
 			// Print results for a step only once
 			for _, step := range workflow.Steps {
 				if step.Status == "COMPLETE" || step.Status == "ERROR" {
 					if !util.IntInSlice(step.Id,completedSteps) {
 						completedSteps = append(completedSteps,step.Id)
-						results := client.GetWorkflowStepResults(*optProfile,*optConfig,workflowId,step.Id)
+						results,err := client.GetWorkflowStepResults(auth,*optProfile,*optConfig,workflowId,step.Id)
+						if err != nil {
+							fmt.Println("ERROR: " + err.Error())
+							os.Exit(1)
+						}
 						util.LogResults(logger, results)
 					}
 				}
@@ -166,7 +193,12 @@ func main() {
 		msg := fmt.Sprintf("### List of Backups for policy [%s] ###",*optPolicy)
 		fmt.Println(msg)
 
-		backups := client.BackupList(string(*optProfile),string(*optConfig),string(*optPolicy),config)
+		backups,err := client.BackupList(auth,string(*optProfile),string(*optConfig),string(*optPolicy),config)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
+
 		backupsByPolicy := util.GetBackupsByPolicy(string(*optPolicy),backups.Backups)
 		checkResult(backups.Result)
 
@@ -177,7 +209,11 @@ func main() {
 		msg := fmt.Sprintf("### List of Jobs for profile [%s] config [%s] ###",*optProfile,*optConfig)
 		fmt.Println(msg)
 
-		jobs := client.GetJobList(string(*optProfile),string(*optConfig))
+		jobs,err := client.GetJobList(auth,string(*optProfile),string(*optConfig))
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
 		checkResult(jobs.Result)
 
 		// print friendly columns
@@ -202,14 +238,23 @@ func main() {
 		// loop and wait for all workflow steps to complete
 		for {
 			time.Sleep(1 * time.Second)
-			workflow := client.GetWorkflowStatus(*optProfile,*optConfig,workflowId)
+			workflow,err := client.GetWorkflowStatus(auth,*optProfile,*optConfig,workflowId)
+			if err != nil {
+				fmt.Println("ERROR: " + err.Error())
+				os.Exit(1)
+			}
 
 			// Print results for a step only once
 			for _, step := range workflow.Steps {
 				if step.Status == "COMPLETE" || step.Status == "ERROR" {
 					if !util.IntInSlice(step.Id,completedSteps) {
 						completedSteps = append(completedSteps,step.Id)
-						results := client.GetWorkflowStepResults(*optProfile,*optConfig,workflowId,step.Id)
+						results,err := client.GetWorkflowStepResults(auth,*optProfile,*optConfig,workflowId,step.Id)
+						if err != nil {
+							fmt.Println("ERROR: " + err.Error())
+							os.Exit(1)
+						}
+
 						util.LogResults(logger, results)
 					}
 				}
@@ -224,7 +269,12 @@ func main() {
 		fmt.Println("### List of Application Plugins ###")
 
 		var plugins []string
-		var appPlugins []string = client.AppPluginList("app",config)
+		appPlugins,err := client.AppPluginList(auth,"app",config)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
+
 		plugins = util.JoinArray(appPlugins,plugins)
 
 		for _, plugin := range plugins {
@@ -234,7 +284,12 @@ func main() {
 		fmt.Println("### List of Storage Plugins ###")
 	
 		var plugins []string
-		var storagePlugins []string = client.StoragePluginList("storage",config)
+		storagePlugins,err := client.StoragePluginList(auth,"storage",config)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
+
 		plugins = util.JoinArray(storagePlugins,plugins)
 	
 		for _, plugin := range plugins {
@@ -244,7 +299,12 @@ func main() {
 		fmt.Println("### List of Archive Plugins ###")
 		
 		var plugins []string
-		var archivePlugins []string = client.ArchivePluginList("archive",config)
+		archivePlugins,err := client.ArchivePluginList(auth,"archive",config)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
+
 		plugins = util.JoinArray(archivePlugins,plugins)
 		
 		for _, plugin := range plugins {
@@ -265,13 +325,26 @@ func main() {
 
 		var pluginName string = *optPluginName
 		var pluginInfoResult util.PluginInfoResult
+		var err error
 
 		if *optPluginType == "app" {
-			pluginInfoResult = client.AppPluginInfo(config,pluginName,*optPluginType)
+			pluginInfoResult,err = client.AppPluginInfo(auth,config,pluginName,*optPluginType)
+			if err != nil {
+				fmt.Println("ERROR: " + err.Error())
+				os.Exit(1)
+			}
 		} else if *optPluginType == "storage" {
-			pluginInfoResult = client.StoragePluginInfo(config,pluginName,*optPluginType)
+			pluginInfoResult,err = client.StoragePluginInfo(auth,config,pluginName,*optPluginType)
+			if err != nil {
+				fmt.Println("ERROR: " + err.Error())
+				os.Exit(1)
+			}
 		} else if *optPluginType == "archive" {
-			pluginInfoResult = client.ArchivePluginInfo(config,pluginName,*optPluginType)
+			pluginInfoResult,err = client.ArchivePluginInfo(auth,config,pluginName,*optPluginType)
+			if err != nil {
+				fmt.Println("ERROR: " + err.Error())
+				os.Exit(1)
+			}
 		} else {
 			error := fmt.Sprintf("ERROR: Plugin type must be app|storage|archive")
 			fmt.Println(error)
@@ -287,16 +360,25 @@ func main() {
 	} else if *optAction == "status" {
 		fmt.Println("### Checking status of services ###")
 
-		var workflowStatus util.Status
-		workflowStatus = client.GetWorkflowServiceStatus()
+		workflowStatus,err := client.GetWorkflowServiceStatus(auth)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
 		fmt.Println("Workflow Service:", workflowStatus)
 
-		var appStatus util.Status
-		appStatus = client.GetAppServiceStatus()
+		appStatus,err := client.GetAppServiceStatus(auth)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
 		fmt.Println("App Service:", appStatus)
 
-		var storageStatus util.Status
-		storageStatus = client.GetStorageServiceStatus()
+		storageStatus,err := client.GetStorageServiceStatus(auth)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
 		fmt.Println("Storage Service:", storageStatus)
 	} else {
 		fmt.Println("ERROR: incorrect parameter", *optAction)

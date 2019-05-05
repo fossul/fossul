@@ -6,266 +6,326 @@ import (
 	"fossil/src/engine/util"
 	"net/http"
 	"bytes"
+	"errors"
 )
 
-func GetWorkflowStatus(profileName,configName string,id int) (workflow util.Workflow) {
+type Auth struct {
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
+}
 
+func GetWorkflowStatus(auth Auth,profileName,configName string,id int) (util.Workflow,error) {
+	var workflow util.Workflow
 	idToString := util.IntToString(id)
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getWorkflowStatus/" + profileName + "/" + configName + "/" + idToString, nil)
-	req.Header.Add("Content-Type", "application/json")
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return workflow,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return workflow,err
 	}
 
 	defer resp.Body.Close()
 
-	if err := json.NewDecoder(resp.Body).Decode(&workflow); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&workflow); err != nil {
+			return workflow,err
+		}
+	} else {
+		return workflow,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return workflow
+	return workflow,nil
 }
 
-func GetWorkflowStepResults(profileName,configName string,workflowId int, step int) (results []util.Result) {
-
+func GetWorkflowStepResults(auth Auth,profileName,configName string,workflowId int, step int) ([]util.Result,error) {
+	var results []util.Result
 	w := util.IntToString(workflowId)
 	s := util.IntToString(step)
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getWorkflowStepResults/" + profileName + "/" + configName + "/" + w + "/" + s, nil)
-	req.Header.Add("Content-Type", "application/json")
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return results,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return results,err
 	}
 
 	defer resp.Body.Close()
 
-	if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
+			return results,err
+		}
+	} else {
+		return results,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return results
+	return results,nil
 }
 
-func DeleteWorkflowResults(profileName,configName string,workflowId string) util.Result {
-
-	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/deleteWorkflowResults/" + profileName + "/" + configName + "/" + workflowId, nil)
-	req.Header.Add("Content-Type", "application/json")
-	if err != nil {
-		log.Println("NewRequest: ", err)
-	}
-
-	client := &http.Client{}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println("Do: ", err)
-	}
-
-	defer resp.Body.Close()
-
+func DeleteWorkflowResults(auth Auth,profileName,configName string,workflowId string) (util.Result,error) {
 	var result util.Result
 
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/deleteWorkflowResults/" + profileName + "/" + configName + "/" + workflowId, nil)
+	if err != nil {
+		return result,err
 	}
 
-	return result
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result,nil
 }
 
-func GetConfig(profileName,configName string) util.Config {
+func GetConfig(auth Auth,profileName,configName string) (util.Config,error) {
+	var config util.Config
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getConfig/" + profileName + "/" + configName, nil)
-	req.Header.Add("Content-Type", "application/json")
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return config,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return config,err
 	}
 
 	defer resp.Body.Close()
 
-	var config util.Config
-	if err := json.NewDecoder(resp.Body).Decode(&config); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&config); err != nil {
+			return config,err
+		}
+	} else {
+		return config,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return config
+	return config,nil
 }
 
-func GetDefaultConfig() util.Config {
+func GetDefaultConfig(auth Auth) (util.Config,error) {
+	var config util.Config
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getDefaultConfig", nil)
-	req.Header.Add("Content-Type", "application/json")
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return config,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return config,err
 	}
 
 	defer resp.Body.Close()
 
-	var config util.Config
-	if err := json.NewDecoder(resp.Body).Decode(&config); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&config); err != nil {
+			return config,err
+		}
+	} else {
+		return config,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return config
+	return config,nil
 }
 
-func GetDefaultPluginConfig(pluginName string) map[string]string {
+func GetDefaultPluginConfig(auth Auth,pluginName string) (map[string]string,error) {
+	var configMap map[string]string
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getDefaultPluginConfig/" + pluginName, nil)
-	req.Header.Add("Content-Type", "application/json")
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return configMap,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return configMap,err
 	}
 
 	defer resp.Body.Close()
 
-	var configMap map[string]string
-	if err := json.NewDecoder(resp.Body).Decode(&configMap); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&configMap); err != nil {
+			return configMap,err
+		}
+	} else {
+		return configMap,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return configMap
+	return configMap,nil
 }
 
-func GetWorkflowServiceStatus() util.Status {
+func GetWorkflowServiceStatus(auth Auth) (util.Status,error) {
+	var status util.Status
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/status", nil)
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
 
+	req.SetBasicAuth(auth.Username, auth.Password)
+
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return status,err
 	}
 
 	defer resp.Body.Close()
 
-	var status util.Status
-
-	if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
+			return status,err
+		}
+	} else {
+		return status,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return status
-
+	return status,nil
 }
 
-func GetAppServiceStatus() util.Status {
+func GetAppServiceStatus(auth Auth) (util.Status,error) {
+	var status util.Status
 
 	req, err := http.NewRequest("GET", "http://fossil-app:8001/status", nil)
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return status,err
 	}
+
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return status,err
 	}
 
 	defer resp.Body.Close()
 
-	var status util.Status
-
-	if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
+			return status,err
+		}
+	} else {
+		return status,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return status
+	return status,nil
 
 }
 
-func GetStorageServiceStatus() util.Status {
+func GetStorageServiceStatus(auth Auth) (util.Status,error) {
+	var status util.Status
 
 	req, err := http.NewRequest("GET", "http://fossil-storage:8002/status", nil)
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return status,err
 	}
+
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return status,err
 	}
 
 	defer resp.Body.Close()
 
-	var status util.Status
-
-	if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
+			return status,err
+		}
+	} else {
+		return status,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return status
+	return status,nil
 
 }
 
-func StartBackupWorkflow(profileName,configName,policyName string,config util.Config) (result util.WorkflowResult) {
-
+func StartBackupWorkflow(auth Auth,profileName,configName,policyName string,config util.Config) (util.WorkflowResult,error) {
+	var result util.WorkflowResult
 	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/startBackupWorkflow", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 
 }
 
@@ -280,27 +340,34 @@ func SetAdditionalConfigParams(profileName, configName, policyName string, confi
 	return config
 }
 
-func GetJobList(profileName,configName string) util.Jobs {
+func GetJobList(auth Auth,profileName,configName string) (util.Jobs,error) {
+
+	var jobs util.Jobs
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getJobs/" + profileName + "/" + configName, nil)
-	req.Header.Add("Content-Type", "application/json")
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return jobs,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return jobs,err
 	}
 
 	defer resp.Body.Close()
 
-	var jobs util.Jobs
-	if err := json.NewDecoder(resp.Body).Decode(&jobs); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&jobs); err != nil {
+			return jobs,err
+		}
+	} else {
+		return jobs,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return jobs
+	return jobs,nil
 }

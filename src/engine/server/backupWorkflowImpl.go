@@ -7,36 +7,46 @@ import (
 )
 
 func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util.Workflow) int {
-		resultsDir := dataDir + config.ProfileName + "/" + config.ConfigName + "/" + util.IntToString(workflow.Id)
-		policy := config.SelectedBackupPolicy
-		var isQuiesce bool = false
+	auth := setAuth()
+	resultsDir := dataDir + config.ProfileName + "/" + config.ConfigName + "/" + util.IntToString(workflow.Id)
+	policy := config.SelectedBackupPolicy
+	var isQuiesce bool = false
+	
+	if config.AppPlugin != "" && config.AutoDiscovery == true {
+		commentMsg := "Performing Application Discovery"
+		setComment(resultsDir,commentMsg,workflow)
 
-		if config.AppPlugin != "" && config.AutoDiscovery == true {
-			commentMsg := "Performing Application Discovery"
-			setComment(resultsDir,commentMsg,workflow)
+		step := stepInit(resultsDir,workflow)
+			
+		discoverResult,err := client.Discover(auth,config)
+		if err != nil {
+			httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,discoverResult.Result,config)
+			return 1
+		}
+		if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,discoverResult.Result,config);resultCode != 0 {
+			return resultCode
+		}
 
-			step := stepInit(resultsDir,workflow)
-			discoverResult := client.Discover(config)
-			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,discoverResult.Result,config);resultCode != 0 {
-				return resultCode
-			}
+		// save discovered files in config struct
+		dataFilePaths,logFilePaths := setDiscoverFileList(config,discoverResult)
+			
+		dataFilePathsToString := strings.Join(dataFilePaths,",")
+		config.StoragePluginParameters["DataFilePaths"] = dataFilePathsToString
 
-			// save discovered files in config struct
-			dataFilePaths,logFilePaths := setDiscoverFileList(config,discoverResult)
-
-			dataFilePathsToString := strings.Join(dataFilePaths,",")
-			config.StoragePluginParameters["DataFilePaths"] = dataFilePathsToString
-
-			logFilePathsToString := strings.Join(logFilePaths,",")
-			config.StoragePluginParameters["LogFilePaths"] = logFilePathsToString
-		}	
+		logFilePathsToString := strings.Join(logFilePaths,",")
+		config.StoragePluginParameters["LogFilePaths"] = logFilePathsToString
+	}	
 
 		commentMsg := "Performing Application Quiesce"
 		setComment(resultsDir,commentMsg,workflow)
 	
 		if config.PreAppQuiesceCmd != "" {
 			step := stepInit(resultsDir,workflow)
-			result := client.PreQuiesceCmd(config)
+			result,err := client.PreQuiesceCmd(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -44,7 +54,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 	
 		if config.AppQuiesceCmd != "" {
 			step := stepInit(resultsDir,workflow)
-			result := client.QuiesceCmd(config)
+			result,err := client.QuiesceCmd(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -54,7 +68,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		if config.AppPlugin != "" {
 			isQuiesce = true
 			step := stepInit(resultsDir,workflow)
-			result := client.Quiesce(config)
+			result,err := client.Quiesce(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -62,7 +80,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 	
 		if config.PostAppQuiesceCmd != "" {
 			step := stepInit(resultsDir,workflow)
-			result := client.PostQuiesceCmd(config)
+			result,err := client.PostQuiesceCmd(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -73,7 +95,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 	
 		if config.BackupCreateCmd != "" {
 			step := stepInit(resultsDir,workflow)
-			result := client.BackupCreateCmd(config)
+			result,err := client.BackupCreateCmd(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {			
 				return resultCode
 			}
@@ -81,7 +107,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 	
 		if config.StoragePlugin != "" {	
 			step := stepInit(resultsDir,workflow)
-			result := client.Backup(config)
+			result,err := client.Backup(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -92,7 +122,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 	
 		if config.PreAppUnquiesceCmd != "" {
 			step := stepInit(resultsDir,workflow)
-			result := client.PreUnquiesceCmd(config)
+			result,err := client.PreUnquiesceCmd(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -100,16 +134,24 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 	
 		if config.AppUnquiesceCmd != "" {
 			step := stepInit(resultsDir,workflow)
-			result := client.UnquiesceCmd(config)
+			result,err := client.UnquiesceCmd(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
 			isQuiesce = false
-		}	
+		}
 	
 		if config.AppPlugin != "" {
 			step := stepInit(resultsDir,workflow)
-			result := client.Unquiesce(config)
+			result,err := client.Unquiesce(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				//unquiesceOnError(resultsDir,policy,isQuiesce,workflow,config)
 				return resultCode
@@ -119,7 +161,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 
 		if config.PostAppUnquiesceCmd != "" {
 			step := stepInit(resultsDir,workflow)
-			result := client.PostUnquiesceCmd(config)
+			result,err := client.PostUnquiesceCmd(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -130,7 +176,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 	
 		if config.BackupDeleteCmd != "" {
 			step := stepInit(resultsDir,workflow)
-			result := client.BackupDeleteCmd(config)
+			result,err := client.BackupDeleteCmd(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -139,7 +189,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 	
 		if config.StoragePlugin != "" {	
 			step := stepInit(resultsDir,workflow)
-			result := client.BackupDelete(config)
+			result,err := client.BackupDelete(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -150,7 +204,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 
 		if config.ArchiveCreateCmd != "" {
 			step := stepInit(resultsDir,workflow)
-			result := client.ArchiveCreateCmd(config)
+			result,err := client.ArchiveCreateCmd(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -158,7 +216,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		
 		if config.ArchivePlugin != "" {	
 			step := stepInit(resultsDir,workflow)
-			result := client.Archive(config)
+			result,err := client.Archive(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -166,7 +228,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 
 		if config.ArchiveDeleteCmd != "" {
 			step := stepInit(resultsDir,workflow)
-			result := client.ArchiveDeleteCmd(config)
+			result,err := client.ArchiveDeleteCmd(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -174,7 +240,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		
 		if config.ArchivePlugin != "" {	
 			step := stepInit(resultsDir,workflow)
-			result := client.ArchiveDelete(config)
+			result,err := client.ArchiveDelete(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -185,7 +255,11 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 	
 		if config.SendTrapSuccessCmd != "" {
 			step := stepInit(resultsDir,workflow)
-			result := client.SendTrapSuccessCmd(config)
+			result,err := client.SendTrapSuccessCmd(auth,config)
+			if err != nil {
+				httpErrorHandler(err,isQuiesce,resultsDir,policy,step,workflow,result,config)
+				return 1
+			}
 			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
 				return resultCode
 			}
@@ -213,6 +287,8 @@ func setComment(resultsDir,msg string,workflow *util.Workflow)  {
 }
 
 func stepErrorHandler(isQuiesce bool,resultsDir,policy string,step util.Step,workflow *util.Workflow,result util.Result,config util.Config) int {
+	auth := setAuth()
+
 	if result.Code != 0 {
 		util.SetStepError(workflow,step)
 		util.SerializeWorkflowStepResults(resultsDir,step.Id,result)
@@ -223,14 +299,16 @@ func stepErrorHandler(isQuiesce bool,resultsDir,policy string,step util.Step,wor
 	
 			if config.AppUnquiesceCmd != "" {
 				step := stepInit(resultsDir,workflow)
-				result := client.UnquiesceCmd(config)
+				result,_ := client.UnquiesceCmd(auth,config)
+
 				util.SetStepError(workflow,step)
 				util.SerializeWorkflowStepResults(resultsDir,step.Id,result)
 			}
 		
 			if config.AppPlugin != "" {
 				step := stepInit(resultsDir,workflow)
-				result := client.Unquiesce(config)
+				result,_ := client.Unquiesce(auth,config)
+
 				util.SetStepError(workflow,step)
 				util.SerializeWorkflowStepResults(resultsDir,step.Id,result)
 			}
@@ -253,6 +331,43 @@ func stepErrorHandler(isQuiesce bool,resultsDir,policy string,step util.Step,wor
 	}
 }
 
+func httpErrorHandler(err error,isQuiesce bool,resultsDir,policy string,step util.Step,workflow *util.Workflow,result util.Result,config util.Config) {
+	auth := setAuth()
+
+	msg := util.SetMessage("ERROR",err.Error())
+	result.Messages = util.PrependMessage(msg,result.Messages)
+	result.Code = 1
+	
+	util.SetStepError(workflow,step)
+	util.SerializeWorkflowStepResults(resultsDir,step.Id,result)
+
+	if isQuiesce {
+		commentMsg := "Performing Application Unquiesce"
+		setComment(resultsDir,commentMsg,workflow)
+	
+		if config.AppUnquiesceCmd != "" {
+			step := stepInit(resultsDir,workflow)
+			result,_ := client.UnquiesceCmd(auth,config)
+			util.SetStepError(workflow,step)
+			util.SerializeWorkflowStepResults(resultsDir,step.Id,result)
+		}
+		
+		if config.AppPlugin != "" {
+			step := stepInit(resultsDir,workflow)
+			result,_ := client.Unquiesce(auth,config)
+			util.SetStepError(workflow,step)
+			util.SerializeWorkflowStepResults(resultsDir,step.Id,result)
+		}
+	}	
+
+	sendErrorNotification(resultsDir,policy,step,workflow,result,config)
+	util.SetWorkflowStatusError(workflow)
+	util.SerializeWorkflow(resultsDir,workflow)
+
+	//remove workflow lock
+	delete(runningWorkflowMap,policy)
+}
+
 func stepInit(resultsDir string,workflow *util.Workflow) util.Step {
 	step := util.CreateStep(workflow)
 	util.SetWorkflowStep(workflow,step)
@@ -262,12 +377,14 @@ func stepInit(resultsDir string,workflow *util.Workflow) util.Step {
 }
 
 func sendErrorNotification(resultsDir,policy string,step util.Step,workflow *util.Workflow,result util.Result,config util.Config) {
+	auth := setAuth()
+
 	if config.SendTrapErrorCmd != "" {
 		commentMsg := "Sending Error Notifications"
 		setComment(resultsDir,commentMsg,workflow)	
 
 		step := stepInit(resultsDir,workflow)
-		result := client.SendTrapErrorCmd(config)
+		result,_ := client.SendTrapErrorCmd(auth,config)
 
 		if result.Code != 0 {
 			util.SetStepError(workflow,step)
@@ -292,4 +409,12 @@ func setDiscoverFileList(config util.Config, discoverResult util.DiscoverResult)
 	}
 
 	return dataFilePaths,logFilePaths
+}
+
+func setAuth() client.Auth {
+	var auth client.Auth
+	auth.Username = myUser
+	auth.Password = myPass
+
+	return auth
 }

@@ -7,164 +7,184 @@ import (
 	"net/http"
 	"bytes"
 	"strings"
+	"errors"
 )
 
-func ArchivePluginList(pluginType string,config util.Config) []string {
+func ArchivePluginList(auth Auth,pluginType string,config util.Config) ([]string,error) {
+	var plugins []string
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginList/" + pluginType, b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return plugins,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return plugins,err
 	}
 
 	defer resp.Body.Close()
 
-	var plugins []string
-
-	if err := json.NewDecoder(resp.Body).Decode(&plugins); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&plugins); err != nil {
+			return plugins,err
+		}
+	} else {
+		return plugins,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return plugins
+	return plugins,nil
 
 }
 
-func ArchivePluginInfo(config util.Config, pluginName,pluginType string) (util.PluginInfoResult) {
+func ArchivePluginInfo(auth Auth,config util.Config, pluginName,pluginType string) (util.PluginInfoResult,error) {
+	var pluginInfoResult util.PluginInfoResult
+	
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginInfo/" + pluginName + "/" + pluginType, b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return pluginInfoResult,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return pluginInfoResult,err
 	}
 
 	defer resp.Body.Close()
 
-	var pluginInfoResult util.PluginInfoResult
-	if err := json.NewDecoder(resp.Body).Decode(&pluginInfoResult); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&pluginInfoResult); err != nil {
+			return pluginInfoResult,err
+		}
+	} else {
+		return pluginInfoResult,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	//unmarshall json response to plugin struct
-	//var plugin util.Plugin
-	//messages := strings.Join(result.Messages, "\n")
-	//pluginByteArray := []byte(messages)
-
-	//json.Unmarshal(pluginByteArray, &plugin)
-
-	return pluginInfoResult
+	return pluginInfoResult,nil
 }
 
-func Archive(config util.Config) util.Result {
+func Archive(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+	
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-storage:8002/archive", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func ArchiveList(profileName,configName,policyName string,config util.Config) (util.ResultSimple, []util.Archive) {
+func ArchiveList(auth Auth,profileName,configName,policyName string,config util.Config) (util.ResultSimple, []util.Archive, error) {
+	var result util.ResultSimple
+	var archives []util.Archive
 	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-storage:8002/archiveList", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result, archives, err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result, archives, err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.ResultSimple
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result, archives, err
+		}
+	} else {
+		return result,archives,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
 	//unmarshall json response to plugin struct
-	var archives []util.Archive
 	messages := strings.Join(result.Messages, "\n")
 	backupByteArray := []byte(messages)
 
 	json.Unmarshal(backupByteArray, &archives)
 
-	return result, archives
+	return result, archives, nil
 }
 
-func ArchiveDelete(config util.Config) util.Result {
+func ArchiveDelete(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://fossil-storage:8002/archiveDelete", b)
-	req.Header.Add("Content-Type", "application/json")
-
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }

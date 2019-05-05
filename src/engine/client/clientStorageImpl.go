@@ -3,70 +3,83 @@ package client
 import (
 	"encoding/json"
 	"fossil/src/engine/util"
-	"log"
 	"net/http"
 	"bytes"
+	"errors"
 )
 
-func StoragePluginList(pluginType string,config util.Config) []string {
+func StoragePluginList(auth Auth,pluginType string,config util.Config) ([]string,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
-
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginList/" + pluginType, b)
-	req.Header.Add("Content-Type", "application/json")
-
-	if err != nil {
-		log.Println("NewRequest: ", err)
-	}
-
-	client := &http.Client{}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println("Do: ", err)
-	}
-
-	defer resp.Body.Close()
 
 	var plugins []string
 
-	if err := json.NewDecoder(resp.Body).Decode(&plugins); err != nil {
-		log.Println(err)
-	}
-
-	return plugins
-
-}
-
-func StoragePluginInfo(config util.Config, pluginName,pluginType string) (util.PluginInfoResult) {
-	b := new(bytes.Buffer)
-	json.NewEncoder(b).Encode(config)
-
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginInfo/" + pluginName + "/" + pluginType, b)
-	req.Header.Add("Content-Type", "application/json")
-
+	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginList/" + pluginType, b)
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return plugins,err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return plugins,err
 	}
 
 	defer resp.Body.Close()
 
-	var pluginInfoResult util.PluginInfoResult
-	if err := json.NewDecoder(resp.Body).Decode(&pluginInfoResult); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&plugins); err != nil {
+			return plugins,err
+		}
+	} else {
+		return plugins,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return pluginInfoResult
+	return plugins,nil
+
 }
 
-func Backup(config util.Config) util.Result {
+func StoragePluginInfo(auth Auth,config util.Config, pluginName,pluginType string) (util.PluginInfoResult,error) {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	var pluginInfoResult util.PluginInfoResult
+
+	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginInfo/" + pluginName + "/" + pluginType, b)
+	if err != nil {
+		return pluginInfoResult,err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return pluginInfoResult,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&pluginInfoResult); err != nil {
+			return pluginInfoResult,err
+		}
+	} else {
+		return pluginInfoResult,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return pluginInfoResult,nil
+}
+
+func Backup(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
@@ -74,28 +87,32 @@ func Backup(config util.Config) util.Result {
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }
 
-func BackupList(profileName,configName,policyName string,config util.Config) util.Backups {
+func BackupList(auth Auth,profileName,configName,policyName string,config util.Config) (util.Backups,error) {
+	var backups util.Backups
+
 	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
 
 	b := new(bytes.Buffer)
@@ -105,27 +122,32 @@ func BackupList(profileName,configName,policyName string,config util.Config) uti
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return backups,err
 	}
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return backups,err
 	}
 
 	defer resp.Body.Close()
 
-	var backups util.Backups
-	if err := json.NewDecoder(resp.Body).Decode(&backups); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&backups); err != nil {
+			return backups,err
+		}
+	} else {
+		return backups,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return backups
+	return backups,nil
 }
 
-func BackupDelete(config util.Config) util.Result {
+func BackupDelete(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
@@ -133,23 +155,25 @@ func BackupDelete(config util.Config) util.Result {
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {
-		log.Println("NewRequest: ", err)
+		return result,err
 	}
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Do: ", err)
+		return result,err
 	}
 
 	defer resp.Body.Close()
 
-	var result util.Result
-
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Println(err)
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result
+	return result,nil
 }

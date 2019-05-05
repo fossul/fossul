@@ -7,6 +7,7 @@ import (
 	"fossil/src/engine/client"
 	"fmt"
 	"strings"
+	"os"
 )
 
 type storagePlugin string
@@ -148,7 +149,18 @@ func (s storagePlugin) BackupDelete() util.Result {
 				msg = util.SetMessage("INFO", "Backup " + backupName + " deleted successfully")
 				messages = append(messages,msg)
 
-				deleteWorkflowResult := client.DeleteWorkflowResults(config.ProfileName,config.ConfigName,backup.WorkflowId)
+				var auth client.Auth
+				auth.Username = os.Getenv("MyUser")
+				auth.Password = os.Getenv("MyPass")
+				
+				deleteWorkflowResult,err := client.DeleteWorkflowResults(auth,config.ProfileName,config.ConfigName,backup.WorkflowId)
+				if err != nil {
+					msg := util.SetMessage("ERROR", err.Error())
+					messages = append(messages,msg)
+					result = util.SetResult(1, messages)
+					return result			
+				}
+				
 				if deleteWorkflowResult.Code != 0 {
 					for _,msg := range deleteWorkflowResult.Messages {
 						messages = append(messages,msg)

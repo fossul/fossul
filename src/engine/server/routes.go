@@ -24,6 +24,8 @@ func NewRouter() *mux.Router {
         handler = route.HandlerFunc
         handler = util.LogApi(handler, route.Name)
  
+        handler = basicAuth(handler)
+
         router.
             Methods(route.Method).
             Path(route.Pattern).
@@ -32,6 +34,20 @@ func NewRouter() *mux.Router {
     }
  
     return router
+}
+
+func basicAuth(h http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        user, pass, _ := r.BasicAuth()
+
+        if myUser != user || myPass != pass {
+            w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+            http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+            return
+        }
+
+        h.ServeHTTP(w, r)
+    })
 }
 
 var routes = Routes{
@@ -100,5 +116,17 @@ var routes = Routes{
         "GET",
         "/getJobs/{profileName}/{configName}",
         GetJobs,
-    },                                             
+    },
+    Route{
+        "AddConfig",
+        "GET",
+        "/addConfig/{profileName}/{configName}",
+        AddConfig,
+    },
+    Route{
+        "DeleteProfile",
+        "GET",
+        "/deleteConfig/{profileName}",
+        DeleteProfile,
+    },                                                      
 }
