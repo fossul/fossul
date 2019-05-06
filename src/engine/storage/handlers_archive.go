@@ -11,7 +11,7 @@ import (
 )
 
 func Archive(w http.ResponseWriter, r *http.Request) {
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(config.ArchivePlugin)
 	var result util.Result
 	var messages []util.Message
@@ -62,7 +62,7 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 }
 
 func ArchiveList(w http.ResponseWriter, r *http.Request) {
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(config.ArchivePlugin)
 	var result util.ResultSimple
 	var messages []string
@@ -112,7 +112,7 @@ func ArchiveList(w http.ResponseWriter, r *http.Request) {
 }
 
 func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(config.ArchivePlugin)
 	var result util.Result
 	var messages []util.Message
@@ -162,7 +162,7 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 
 func ArchiveCreateCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 
 	if config.BackupCreateCmd != "" {
 		args := strings.Split(config.ArchiveCreateCmd, ",")
@@ -178,7 +178,7 @@ func ArchiveCreateCmd(w http.ResponseWriter, r *http.Request) {
 
 func ArchiveDeleteCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 
 	if config.BackupDeleteCmd != "" {
 		args := strings.Split(config.ArchiveDeleteCmd, ",")

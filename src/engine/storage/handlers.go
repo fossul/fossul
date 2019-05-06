@@ -22,7 +22,7 @@ func PluginList(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var pluginType string = params["pluginType"]
 
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 	var pluginDir string
 
 	if pluginType == "storage" {
@@ -59,7 +59,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
 
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(pluginName)
 
 	if pluginPath == "" {

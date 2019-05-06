@@ -9,7 +9,7 @@ import (
 )
 
 func Backup(w http.ResponseWriter, r *http.Request) {
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(config.StoragePlugin)
 	var result util.Result
 	var messages []util.Message
@@ -57,7 +57,7 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 }
 
 func BackupList(w http.ResponseWriter, r *http.Request) {
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(config.StoragePlugin)
 
 	var backups util.Backups
@@ -123,7 +123,7 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 }
 
 func BackupDelete(w http.ResponseWriter, r *http.Request) {
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(config.StoragePlugin)
 	var result util.Result
 	var messages []util.Message
@@ -171,7 +171,7 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 
 func BackupCreateCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 
 	if config.BackupCreateCmd != "" {
 		args := strings.Split(config.BackupCreateCmd, ",")
@@ -187,7 +187,7 @@ func BackupCreateCmd(w http.ResponseWriter, r *http.Request) {
 
 func BackupDeleteCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 
 	if config.BackupDeleteCmd != "" {
 		args := strings.Split(config.BackupDeleteCmd, ",")

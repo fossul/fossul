@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"encoding/json"
 	"net/http"
+	"bytes"
 )
 
 type Config struct {
@@ -44,108 +45,182 @@ type BackupRetention struct {
 	RetentionDays int `json:"retentionDays"`	
 }
 
-func ReadConfig(filename string) Config {
+func ReadConfig(filePath string) (Config,error) {
 	var config Config
-    b, err := ioutil.ReadFile(filename)
-    if err != nil {
-		log.Println("here",err)
-        return config
-    } else {
+	b, err := ioutil.ReadFile(filePath)
+	
+  if err != nil {
+    return config,err
+  } else {
 		str := string(b)
-		config = decodeConfig(str)
+		config,err = decodeConfig(str)
 
-		return config
+		if err != nil {
+			return config,err
+		}
+
+		return config,nil
 	}
 }
 
-func decodeConfig(blob string) Config {
+func WriteConfig(filePath string,config Config) error {
+	buf,err := encodeConfig(config)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(filePath, buf.Bytes(), 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func WritePluginConfig(filePath string,configMap map[string]string) error {
+	buf,err := encodePluginConfig(configMap)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(filePath, buf.Bytes(), 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func encodePluginConfig(configMap map[string]string) (*bytes.Buffer,error) {
+	buf := new(bytes.Buffer)
+	if err := toml.NewEncoder(buf).Encode(configMap); err != nil {
+		return buf,err
+	}
+
+	return buf,nil
+}
+
+func encodeConfig(config Config) (*bytes.Buffer,error) {
+	buf := new(bytes.Buffer)
+	if err := toml.NewEncoder(buf).Encode(config); err != nil {
+		return buf,err
+	}
+
+	return buf,nil
+}
+
+func decodeConfig(blob string) (Config,error) {
 	var config Config
 	if _, err := toml.Decode(blob, &config); err != nil {
-		log.Println(err)
-		return config
+		return config,err
 	}
 
-	return config
+	return config,nil
 }
 
-func ReadConfigToMap(filename string) map[string]string {
+func ReadConfigToMap(filePath string) (map[string]string,error) {
 	var configMap = map[string]string{}
 
-	file, err := os.Open(filename)
+	file, err := os.Open(filePath)
     if err != nil {
-		log.Println(err)
-		return configMap
+			return configMap,err
     }
     defer file.Close()
 
 	scanner := bufio.NewScanner(file)
 	if err := scanner.Err(); err != nil {
-		log.Println(err)
-		return configMap
+		return configMap,err
 	}
 
-    for scanner.Scan() {
+  for scanner.Scan() {
 		re := regexp.MustCompile(`(\S+)\s*=\s*\"(\S+)\"`)
 		match := re.FindStringSubmatch(scanner.Text())
 
 		if len(match) != 0 {
 			configMap[match[1]] = match[2]
 		}
-    }
+  }
 	
-	return configMap
+	return configMap,nil
 }
 
-func SetAppPluginParameters(appConfigPath string, config Config) Config {
+func SetAppPluginParameters(appConfigPath string, config Config) (Config,error) {
+	var err error
 	configAppMap := make(map[string]string)
 
 	if len(config.AppPlugin) != 0 {
-		configAppMap = ReadConfigToMap(appConfigPath)
+		configAppMap,err = ReadConfigToMap(appConfigPath)
+		if err != nil {
+			return config,err
+		}
 	}
 	config.AppPluginParameters = configAppMap
 
-	return config
+	return config,nil
 }
 
-func SetStoragePluginParameters(storageConfigPath string, config Config) Config {
+func SetStoragePluginParameters(storageConfigPath string, config Config) (Config,error) {
+	var err error
 	configStorageMap := make(map[string]string)
 
 	if len(config.StoragePlugin) != 0 {
-		configStorageMap = ReadConfigToMap(storageConfigPath)
+		configStorageMap,err = ReadConfigToMap(storageConfigPath)
+		if err != nil {
+			return config,err
+		}
 	}
 	config.StoragePluginParameters = configStorageMap
 
-	return config
+	return config,nil
 }
 
-func GetConfig(w http.ResponseWriter, r *http.Request) Config {
+func GetConfig(w http.ResponseWriter, r *http.Request) (Config,error) {
 
 	var config Config
 	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
 		log.Println(err)
-		return config
+		return config,err
 	}
 	defer r.Body.Close()
  
 	res,err := json.Marshal(&config)
 	if err != nil {
 		log.Println(err)
-		return config
+		return config,err
 	}
 
 	log.Println("DEBUG", string(res))
 
-	return config
+	return config,nil
 }
 
-func ConfigMapToJson(configMap map[string]string) string {
-	jsonString, err := json.Marshal(configMap)
+func GetPluginConfig(w http.ResponseWriter, r *http.Request) (map[string]string,error) {
+
+	var configMap map[string]string
+	if err := json.NewDecoder(r.Body).Decode(&configMap); err != nil {
+		log.Println(err)
+		return configMap,err
+	}
+	defer r.Body.Close()
+ 
+	res,err := json.Marshal(&configMap)
 	if err != nil {
 		log.Println(err)
-		return ""	
+		return configMap,err
 	}
 
-	return string(jsonString)
+	log.Println("DEBUG", string(res))
+
+	return configMap,nil
+}
+
+func ConfigMapToJson(configMap map[string]string) (string,error) {
+	jsonString, err := json.Marshal(configMap)
+	if err != nil {
+		return " ",err
+	}
+
+	return string(jsonString),nil
 }
 
 func ExistsBackupRetention(policy string, retentions []BackupRetention) bool {

@@ -95,7 +95,10 @@ func setPlugin() (plugin util.Plugin) {
 }
 
 func printEnv(configMap map[string]string) {
-	config := util.ConfigMapToJson(configMap)
+	config,err := util.ConfigMapToJson(configMap)
+	if err != nil {
+		fmt.Println("ERROR " + err.Error())
+	}
 	fmt.Println("DEBUG Config Parameters: " + config + "\n")
 }
 

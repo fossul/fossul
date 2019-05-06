@@ -16,8 +16,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 
 func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 
 	if config.SendTrapSuccessCmd != "" {
 		args := strings.Split(config.SendTrapSuccessCmd, ",")
@@ -33,8 +32,7 @@ func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 
 func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 
 	if config.SendTrapSuccessCmd != "" {
 		args := strings.Split(config.SendTrapErrorCmd, ",")
@@ -46,41 +44,6 @@ func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}
-}
-
-func GetConfig(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)	
-	var profileName string = params["profileName"]
-	var configName string = params["configName"]
-
-	conf := configDir + profileName + "/" + configName + ".conf"
-	log.Println("DEBUG", "Config path is " + conf)
-	config := util.ReadConfig(conf)
-
-	_ = json.NewDecoder(r.Body).Decode(&config)
-	json.NewEncoder(w).Encode(config)
-}
-
-func GetDefaultConfig(w http.ResponseWriter, r *http.Request) {
-
-	conf := configDir + "default" + "/" + "default.conf"
-	log.Println("DEBUG", "Default config path is " + conf)
-	var config util.Config = util.ReadConfig(conf)
-
-	_ = json.NewDecoder(r.Body).Decode(&config)
-	json.NewEncoder(w).Encode(config)
-}
-
-func GetDefaultPluginConfig(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)	
-	var pluginName string = params["pluginName"]
-
-	conf := configDir + "default" + "/" + pluginName + ".conf"
-	log.Println("DEBUG", "Config path is " + conf)
-	configMap := util.ReadConfigToMap(conf)
-
-	_ = json.NewDecoder(r.Body).Decode(&configMap)
-	json.NewEncoder(w).Encode(configMap)
 }
 
 func GetJobs(w http.ResponseWriter, r *http.Request) {
@@ -114,62 +77,4 @@ func GetJobs(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewDecoder(r.Body).Decode(&jobs)
 	json.NewEncoder(w).Encode(jobs)
-}
-
-func AddConfig(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)	
-	var profileName string = params["profileName"]
-	var configName string = params["configName"]
-
-	var result util.Result
-	var messages []util.Message
-
-	var config util.Config = util.GetConfig(w,r)
-
-	dir := configDir + "/" + profileName
-	util.CreateDir(dir,0755)
-
-	conf := dir + "/" + configName + ".conf"
-	err := util.WriteGob(conf,config)
-
-	if err != nil {
-		msg := util.SetMessage("ERROR","Add configuration [" + conf + "] failed!" + err.Error())
-		messages = append(messages, msg)
-
-		result.Code = 1
-	} else {
-		msg := util.SetMessage("INFO","Configuration [" + conf + "] create completed successfully")
-		messages = append(messages, msg)
-
-		result.Code = 0
-	}
-
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
-}
-
-func DeleteProfile(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)	
-	var profileName string = params["profileName"]
-
-	var result util.Result
-	var messages []util.Message
-
-	dir := configDir + "/" + profileName
-	err := util.RecursiveDirDelete(dir)
-
-	if err != nil {
-		msg := util.SetMessage("ERROR","Profile delete [" + dir + "] failed!" + err.Error())
-		messages = append(messages, msg)
-
-		result.Code = 1
-	} else {
-		msg := util.SetMessage("INFO","Profile delete [" + dir + "] completed successfully")
-		messages = append(messages, msg)
-
-		result.Code = 0
-	}
-
-	_ = json.NewDecoder(r.Body).Decode(&result)
-	json.NewEncoder(w).Encode(result)
 }

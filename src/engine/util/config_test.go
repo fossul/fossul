@@ -8,7 +8,10 @@ import (
 func TestReadConfig(t *testing.T) {
 	configFile := "../../cli/configs/default/default.conf"
 
-	config := ReadConfig(configFile)
+	config,err := ReadConfig(configFile)
+	if err != nil {
+		t.Fail()
+	}
 
 	log.Println("Config Struct",config)
 
@@ -24,7 +27,10 @@ func TestReadConfig(t *testing.T) {
 func TestReadConfigToMap(t *testing.T) {
 	configFile := "../../cli/configs/default/default.conf"
 
-	configMap := ReadConfigToMap(configFile)
+	configMap,err := ReadConfigToMap(configFile)
+	if err != nil {
+		t.Fail()
+	}
 
 	log.Println("Config Map",configMap)
 
@@ -41,9 +47,15 @@ func TestSetAppPluginParameters(t *testing.T) {
 	configFile := "../../cli/configs/default/default.conf"
 	appPluginFile := "../../cli/configs/default/sample-app.conf"
 
-	config := ReadConfig(configFile)
+	config,err := ReadConfig(configFile)
+	if err != nil {
+		t.Fail()
+	}
 
-	config = SetAppPluginParameters(appPluginFile,config)
+	config,err = SetAppPluginParameters(appPluginFile,config)
+	if err != nil {
+		t.Fail()
+	}
 
 	if config.AppPluginParameters["SampleAppVar1"] != "foo" {
 		t.Fail()
@@ -58,9 +70,15 @@ func TestSetStoragePluginParameters(t *testing.T) {
 	configFile := "../../cli/configs/default/default.conf"
 	storagePluginFile := "../../cli/configs/default/sample-storage.conf"
 
-	config := ReadConfig(configFile)
+	config,err := ReadConfig(configFile)
+	if err != nil {
+		t.Fail()
+	}
 
-	config = SetStoragePluginParameters(storagePluginFile,config)
+	config,err = SetStoragePluginParameters(storagePluginFile,config)
+	if err != nil {
+		t.Fail()
+	}
 
 	if config.StoragePluginParameters["SampleStorageVar1"] != "foo" {
 		t.Fail()
@@ -73,7 +91,10 @@ func TestSetStoragePluginParameters(t *testing.T) {
 
 func TestExistsBackupRetention(t *testing.T) {
 	configFile := "../../cli/configs/default/default.conf"
-	config := ReadConfig(configFile)
+	config,err := ReadConfig(configFile)
+	if err != nil {
+		t.Fail()
+	}
 
 	exists := ExistsBackupRetention("daily",config.BackupRetentions)
 
@@ -84,7 +105,10 @@ func TestExistsBackupRetention(t *testing.T) {
 
 func TestGetBackupRetention(t *testing.T) {
 	configFile := "../../cli/configs/default/default.conf"
-	config := ReadConfig(configFile)
+	config,err := ReadConfig(configFile)
+	if err != nil {
+		t.Fail()
+	}
 
 	retentionDaily := GetBackupRetention("daily",config.BackupRetentions)
 

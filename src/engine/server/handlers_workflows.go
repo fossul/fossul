@@ -21,7 +21,7 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	workflowResult.Id = workflow.Id
 
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 	config.WorkflowId = util.IntToString(workflow.Id)
 
 	value,ok := runningWorkflowMap[config.SelectedBackupPolicy]

@@ -151,7 +151,11 @@ func backupDelete (configMap map[string]string) {
 				backupName := backup.Name + "_" + backup.Policy + "_" + backup.WorkflowId + "_" + util.IntToString(backup.Epoch)
 				fmt.Println("INFO Deleting backup " + backupName)
 				backupPath := backupDir + "/" + backupName
-				pluginUtil.RecursiveDirDelete(backupPath)
+				err := pluginUtil.RecursiveDirDelete(backupPath)
+				if err != nil {
+					fmt.Println("ERROR Backup " + backupName + " delete failed! " + err.Error())
+					os.Exit(1)
+				}
 				fmt.Println("INFO Backup " + backupName + " deleted successfully")
 				
 				var auth client.Auth
@@ -216,7 +220,10 @@ func setPlugin() (plugin util.Plugin) {
 }
 
 func printEnv(configMap map[string]string) {
-	config := util.ConfigMapToJson(configMap)
+	config,err := util.ConfigMapToJson(configMap)
+	if err != nil {
+		fmt.Println("ERROR " + err.Error())
+	}
 	fmt.Println("DEBUG Config Parameters: " + config + "\n")
 }
 

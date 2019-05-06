@@ -11,7 +11,7 @@ import (
 
 func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.PreAppQuiesceCmd, ",")
@@ -27,7 +27,7 @@ func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
 func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.AppQuiesceCmd, ",")
@@ -43,7 +43,7 @@ func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
 func Quiesce(w http.ResponseWriter, r *http.Request) {
 
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(config.AppPlugin)
 	var messages []util.Message
 
@@ -95,7 +95,7 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 
 func PostQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.PostAppQuiesceCmd, ",")

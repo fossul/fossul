@@ -81,8 +81,12 @@ func SetWorkflowStatusError(workflow *Workflow) {
 }
 
 func SerializeWorkflow(resultsDir string,workflow *Workflow) {
-	CreateDir(resultsDir,0755)
-	err := WriteGob(resultsDir + "/workflow",workflow)
+	err := CreateDir(resultsDir,0755)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	err = WriteGob(resultsDir + "/workflow",workflow)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -90,8 +94,12 @@ func SerializeWorkflow(resultsDir string,workflow *Workflow) {
 
 func SerializeWorkflowStepResults(resultsDir string,stepId int, results Result) {
 	stepIdToString := IntToString(stepId)
-	CreateDir(resultsDir,0755)
-	err := WriteGob(resultsDir + "/" + stepIdToString,results)
+	err := CreateDir(resultsDir,0755)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	err = WriteGob(resultsDir + "/" + stepIdToString,results)
 	if err != nil {
 		log.Println(err.Error())
 	}

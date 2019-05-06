@@ -11,7 +11,7 @@ import (
 
 func Discover(w http.ResponseWriter, r *http.Request) {
 
-	var config util.Config = util.GetConfig(w,r)
+	config,_ := util.GetConfig(w,r)
 	pluginPath := util.GetPluginPath(config.AppPlugin)
 	var discoverResult util.DiscoverResult
 	var messages []util.Message

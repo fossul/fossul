@@ -13,8 +13,15 @@ const myPass = "redhat123"
 var runningWorkflowMap map[string]string = make(map[string]string)
  
 func main() {
-    util.CreateDir(configDir,0755)
-    util.CreateDir(dataDir,0755)
+    err := util.CreateDir(configDir,0755)
+    if err != nil {
+        log.Fatal(err)
+    }
+    
+    err = util.CreateDir(dataDir,0755)
+    if err != nil {
+        log.Fatal(err)
+    }
 
     router := NewRouter()
  

@@ -145,7 +145,13 @@ func (s storagePlugin) BackupDelete() util.Result {
 				messages = append(messages,msg)
 	
 				backupPath := backupDir + "/" + backupName
-				pluginUtil.RecursiveDirDelete(backupPath)
+				err := pluginUtil.RecursiveDirDelete(backupPath)
+				if err != nil {
+					msg := util.SetMessage("ERROR", "Backup " + backupName + " delete failed! " + err.Error())
+					messages = append(messages,msg)
+					result = util.SetResult(1, messages)
+					return result	
+				}
 				msg = util.SetMessage("INFO", "Backup " + backupName + " deleted successfully")
 				messages = append(messages,msg)
 

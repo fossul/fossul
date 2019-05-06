@@ -112,16 +112,17 @@ func ExistsPath(path string) bool {
 	}
 }
 
-func CreateDir(path string, mode os.FileMode) {
+func CreateDir(path string, mode os.FileMode) error {
 
 	if ExistsPath(path) == false {
 		if err := os.MkdirAll(path, mode); err != nil {
-			log.Println("Creating directory " + path + " failed")
-			log.Println(err.Error())
+			return err
 		 } else {
 			log.Println("Creating directory " + path + " completed successfully")
+			return nil
 		 }		
 	}
+	return nil
 }
 
 func RecursiveDirDelete(dir string) error {
