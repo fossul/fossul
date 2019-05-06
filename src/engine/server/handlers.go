@@ -51,7 +51,7 @@ func GetJobs(w http.ResponseWriter, r *http.Request) {
 	var profileName string = params["profileName"]
 	var configName string = params["configName"]
 
-	jobsDir := dataDir + profileName + "/" + configName
+	jobsDir := dataDir + "/" + profileName + "/" + configName
 	log.Println("DEBUG", "Jobs directory is " + jobsDir)
 	
 	var result util.Result

@@ -50,7 +50,7 @@ func GetWorkflowStatus(w http.ResponseWriter, r *http.Request) {
 	var configName string = params["configName"]
 	var id string = params["id"]
 
-	resultsDir := dataDir + profileName + "/" + configName + "/" + id
+	resultsDir := dataDir + "/" + profileName + "/" + configName + "/" + id
 
 	workflow := &util.Workflow{}
 
@@ -72,7 +72,7 @@ func GetWorkflowStepResults(w http.ResponseWriter, r *http.Request) {
 	var stepId string = params["stepId"]
 
 	var results []util.Result	
-	resultsFile := dataDir + profileName + "/" + configName + "/" + workflowId + "/" + stepId
+	resultsFile := dataDir + "/" + profileName + "/" + configName + "/" + workflowId + "/" + stepId
 
 	var result util.Result
 	err := util.ReadGob(resultsFile,&result)
@@ -98,7 +98,7 @@ func DeleteWorkflowResults(w http.ResponseWriter, r *http.Request) {
 	var configName string = params["configName"]
 	var id string = params["id"]
 
-	resultsDir := dataDir + profileName + "/" + configName + "/" + id
+	resultsDir := dataDir + "/" + profileName + "/" + configName + "/" + id
 
 	var result util.Result
 	err := util.RecursiveDirDelete(resultsDir)

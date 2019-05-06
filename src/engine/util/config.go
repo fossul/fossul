@@ -64,7 +64,7 @@ func ReadConfig(filePath string) (Config,error) {
 }
 
 func WriteConfig(filePath string,config Config) error {
-	buf,err := encodeConfig(config)
+	buf,err := EncodeConfig(config)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func WriteConfig(filePath string,config Config) error {
 }
 
 func WritePluginConfig(filePath string,configMap map[string]string) error {
-	buf,err := encodePluginConfig(configMap)
+	buf,err := EncodePluginConfig(configMap)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func WritePluginConfig(filePath string,configMap map[string]string) error {
 	return nil
 }
 
-func encodePluginConfig(configMap map[string]string) (*bytes.Buffer,error) {
+func EncodePluginConfig(configMap map[string]string) (*bytes.Buffer,error) {
 	buf := new(bytes.Buffer)
 	if err := toml.NewEncoder(buf).Encode(configMap); err != nil {
 		return buf,err
@@ -100,7 +100,7 @@ func encodePluginConfig(configMap map[string]string) (*bytes.Buffer,error) {
 	return buf,nil
 }
 
-func encodeConfig(config Config) (*bytes.Buffer,error) {
+func EncodeConfig(config Config) (*bytes.Buffer,error) {
 	buf := new(bytes.Buffer)
 	if err := toml.NewEncoder(buf).Encode(config); err != nil {
 		return buf,err

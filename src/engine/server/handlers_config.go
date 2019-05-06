@@ -14,7 +14,7 @@ func GetConfig(w http.ResponseWriter, r *http.Request) {
 	var profileName string = params["profileName"]
 	var configName string = params["configName"]
 
-	conf := configDir + profileName + "/" + configName + ".conf"
+	conf := configDir + "/" + profileName + "/" + configName + "/" + configName + ".conf"
 	log.Println("DEBUG", "Config path is " + conf)
 	config,_ := util.ReadConfig(conf)
 
@@ -24,10 +24,11 @@ func GetConfig(w http.ResponseWriter, r *http.Request) {
 
 func GetPluginConfig(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	var profileName string = params["profileName"]	
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]	
 	var pluginName string = params["pluginName"]
 
-	conf := configDir + profileName + "/" + pluginName + ".conf"
+	conf := configDir + "/" + profileName + "/" + configName + "/" + pluginName + ".conf"
 	log.Println("DEBUG", "Plugin config path is " + conf)
 	configMap,_ := util.ReadConfigToMap(conf)
 
@@ -37,7 +38,7 @@ func GetPluginConfig(w http.ResponseWriter, r *http.Request) {
 
 func GetDefaultConfig(w http.ResponseWriter, r *http.Request) {
 
-	conf := configDir + "default" + "/" + "default.conf"
+	conf := configDir + "/" + "default" + "/" + "default" + "/" + "default.conf"
 	log.Println("DEBUG", "Default config path is " + conf)
 	config,_ := util.ReadConfig(conf)
 
@@ -49,7 +50,7 @@ func GetDefaultPluginConfig(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var pluginName string = params["pluginName"]
 
-	conf := configDir + "default" + "/" + pluginName + ".conf"
+	conf := configDir + "/" + "default" + "/" + "default" + "/" + pluginName + ".conf"
 	log.Println("DEBUG", "Config path is " + conf)
 	configMap,_ := util.ReadConfigToMap(conf)
 
@@ -79,7 +80,20 @@ func AddConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dir := configDir + "/" + profileName
+	dir := configDir + "/" + profileName + "/" + configName
+	err = util.CreateDir(dir,0755)
+	if err != nil {
+		msg := util.SetMessage("ERROR","Couldn't create config directory! " + err.Error()) 
+		messages = append(messages, msg)
+
+		result.Code = 1
+		result.Messages = messages	
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 	conf := dir + "/" + configName + ".conf"
 
 	if util.ExistsPath(dir) != true {
@@ -116,6 +130,7 @@ func AddConfig(w http.ResponseWriter, r *http.Request) {
 func AddPluginConfig(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]
+	var configName string = params["configName"]
 	var pluginName string = params["pluginName"]
 
 	var result util.Result
@@ -135,7 +150,21 @@ func AddPluginConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dir := configDir + "/" + profileName
+	dir := configDir + "/" + profileName + "/" + configName
+	err = util.CreateDir(dir,0755)
+	if err != nil {
+		msg := util.SetMessage("ERROR","Couldn't create config directory! " + err.Error()) 
+		messages = append(messages, msg)
+
+		result.Code = 1
+		result.Messages = messages	
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
+
 	conf := dir + "/" + pluginName + ".conf"
 
 	if util.ExistsPath(dir) != true {
@@ -264,7 +293,7 @@ func DeleteConfig(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		configPath := configDir + "/" + profileName + "/" + configName + ".conf"
+		configPath := configDir + "/" + profileName + "/" + configName + "/" + configName + ".conf"
 		err := os.Remove(configPath)
 	
 		if err != nil {
@@ -283,4 +312,82 @@ func DeleteConfig(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}	
+}
+
+func ListProfiles(w http.ResponseWriter, r *http.Request) {
+	var result util.Result
+	var messages []util.Message
+
+	profiles,err := util.DirectoryList(configDir)
+	if err != nil {
+		msg := util.SetMessage("ERROR","Profile list failed! " + err.Error())
+		messages = append(messages, msg)
+
+		result.Code = 1
+		result.Messages = messages	
+		
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	} else {
+		result.Code = 0
+		result.Data = profiles
+		
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
+}
+
+func ListConfigs(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var profileName string = params["profileName"]
+
+	var result util.Result
+	var messages []util.Message
+	var configs []string
+
+	configs,err := util.DirectoryList(configDir + "/" + profileName)
+	if err != nil {
+		msg := util.SetMessage("ERROR","Config list failed! " + err.Error())
+		messages = append(messages, msg)
+
+		result.Code = 1
+		result.Messages = messages	
+		
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+		return
+	}
+
+	result.Code = 0
+	result.Data = configs
+		
+	_ = json.NewDecoder(r.Body).Decode(&result)
+	json.NewEncoder(w).Encode(result)
+}
+
+func ListPluginConfigs(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]	
+
+	var result util.Result
+	var messages []util.Message
+
+	plugins,err := util.PluginList(configDir + "/" + profileName + "/" + configName,configName)
+	if err != nil {
+		msg := util.SetMessage("ERROR","Plugin list failed! " + err.Error())
+		messages = append(messages, msg)
+
+		result.Code = 1
+		result.Messages = messages	
+		
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	} else {
+		result.Code = 0
+		result.Data = plugins
+		
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
 }

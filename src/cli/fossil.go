@@ -19,14 +19,16 @@ func main() {
 	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
 	optConfigFile := getopt.StringLong("configFile",'f',"","Path to config file")
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
-	optAction := getopt.StringLong("action",'a',"","backup|backupList|addConfig|addPluginConfig|deleteConfig|addProfile|deleteProfilejobList|jobStatus|appPluginList|storagePluginList|archivePluginList|pluginInfo|status")
+	optAction := getopt.StringLong("action",'a',"","backup|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|deleteProfilejobList|jobStatus|appPluginList|storagePluginList|archivePluginList|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
 	optPluginType := getopt.StringLong("pluginType",'t',"","Plugin type app|storage|archive")
 	optWorkflowId := getopt.StringLong("workflowId",'w',"","Workflow Id")
 	optLocalConfig := getopt.BoolLong("local", 0,"Use a local configuration file")
 	optGetDefaultConfig := getopt.BoolLong("get-default-config", 0,"Get the default config file")
 	optGetDefaultPluginConfig := getopt.BoolLong("get-default-plugin-config", 0,"Get the default config file")
-    optHelp := getopt.BoolLong("help", 0, "Help")
+	optGetConfig := getopt.BoolLong("get-config", 0,"Get config file")
+	optGetPluginConfig := getopt.BoolLong("get-plugin-config", 0,"Get plugin config file")
+	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
     if *optHelp {
@@ -99,16 +101,82 @@ func main() {
 		os.Exit(0)
 	}
 
-	if getopt.IsSet("profile") != true {
-		fmt.Println("ERROR: missing parameter --profile")
-		getopt.Usage()
-		os.Exit(1)
+	if *optGetConfig {
+		config,err := client.GetConfig(auth,string(*optProfile),string(*optConfig))
+		if err != nil {
+			fmt.Println(err,"\n" + "ERROR: Couldn't get config [" + string(*optProfile) + "] config [" + string(*optConfig) + "! " + err.Error())
+			os.Exit(1)	
+		}
+		buf,err := util.EncodeConfig(config)
+		if err != nil {
+			fmt.Println(err,"\n" + "ERROR: Couldn't encode config [" + string(*optProfile) + "] config [" + string(*optConfig) + "! " + err.Error())
+			os.Exit(1)	
+		}		
+		fmt.Println(buf.String())
+		os.Exit(0)		
+	}	
+
+	if *optGetPluginConfig {
+		if getopt.IsSet("plugin") != true {
+			fmt.Println("ERROR: Missing parameter --plugin")
+			getopt.Usage()
+			os.Exit(1)
+		}
+
+		pluginConfigMap,err := client.GetPluginConfig(auth,string(*optProfile),string(*optConfig),string(*optPluginName))
+		if err != nil {
+			fmt.Println(err,"\n" + "ERROR: Couldn't get config [" + string(*optProfile) + "] config [" + string(*optPluginName) + "! " + err.Error())
+			os.Exit(1)	
+		}
+		
+		buf,err := util.EncodePluginConfig(pluginConfigMap)
+		if err != nil {
+			fmt.Println(err,"\n" + "ERROR: Couldn't encode config [" + string(*optProfile) + "] config [" + string(*optConfig) + "! " + err.Error())
+			os.Exit(1)	
+		}	
+		fmt.Println(buf.String())	
+		os.Exit(0)
 	}		
+
 	if getopt.IsSet("action") != true {
 		fmt.Println("ERROR: missing parameter --action")
 		getopt.Usage()
 		os.Exit(1)
 	}
+
+	if *optAction == "listProfiles" {
+		fmt.Println("### Profile List ###")
+		result,err := client.ListProfiles(auth)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
+		checkResult(result)
+		for _,profile := range result.Data {
+			fmt.Println(profile)
+		}
+		os.Exit(0)
+	}	
+
+	if getopt.IsSet("profile") != true {
+		fmt.Println("ERROR: missing parameter --profile")
+		getopt.Usage()
+		os.Exit(1)
+	}	
+	
+	if *optAction == "listConfigs" {
+		fmt.Println("### Config List ###")
+		result,err := client.ListConfigs(auth,string(*optProfile))
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
+		checkResult(result)
+		for _,config := range result.Data {
+			fmt.Println(config)
+		}
+		os.Exit(0)
+	}	
 
 	if *optAction == "addProfile" {
 		result,err := client.AddProfile(auth,string(*optProfile))
@@ -134,6 +202,20 @@ func main() {
 		getopt.Usage()
 		os.Exit(1)
 	}	
+
+	if *optAction == "listPluginConfigs" {
+		fmt.Println("### Config List ###")
+		result,err := client.ListPluginConfigs(auth,string(*optProfile),string(*optConfig))
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
+		checkResult(result)
+		for _,plugin := range result.Data {
+			fmt.Println(plugin)
+		}
+		os.Exit(0)
+	}
 	
 	if *optAction == "addConfig" {
 		if getopt.IsSet("configFile") != true {
@@ -167,7 +249,7 @@ func main() {
 			fmt.Println("ERROR: " + err.Error())
 			os.Exit(1)
 		}
-		result,err := client.AddPluginConfig(auth,string(*optProfile),string(*optConfig),configMap)
+		result,err := client.AddPluginConfig(auth,string(*optProfile),string(*optConfig),string(*optPluginName),configMap)
 		if err != nil {
 			fmt.Println("ERROR: " + err.Error())
 			os.Exit(1)
@@ -192,11 +274,11 @@ func main() {
 		var configPath string
 		var configDir string
 		if getopt.IsSet("configPath") == true {
-			configPath = *optConfigPath + "/" + *optProfile + "/" + *optConfig + ".conf"
-			configDir = *optConfigPath + "/" + *optProfile 
+			configPath = *optConfigPath + "/" + *optProfile + "/" + *optConfig + "/" + *optConfig + ".conf"
+			configDir = *optConfigPath + "/" + *optProfile + "/" + *optConfig 
 		} else {
-			configPath = "configs/" + *optProfile + "/" + *optConfig + ".conf"
-			configDir = "configs/" + *optProfile 
+			configPath = "configs/" + *optProfile + "/" + *optConfig + "/" + *optConfig + ".conf"
+			configDir = "configs/" + *optProfile + "/" + *optConfig
 		}
 
 		if _, err := os.Stat(configPath); os.IsNotExist(err) {
@@ -239,7 +321,7 @@ func main() {
 
 		//load dynamic plugin parameters into config struct
 		if config.AppPlugin != "" {
-			appConfigMap,err := client.GetPluginConfig(auth,string(*optProfile),config.AppPlugin)
+			appConfigMap,err := client.GetPluginConfig(auth,string(*optProfile),string(*optConfig),config.AppPlugin)
 			if err != nil {
 				fmt.Println(err,"\n" + "ERROR: Couldn't get profile [" + string(*optProfile) + "] config [" + config.AppPlugin + "! " + err.Error())
 				os.Exit(1)	
@@ -247,7 +329,7 @@ func main() {
 			config.AppPluginParameters = appConfigMap		
 		}
 		if config.StoragePlugin != "" {
-			storageConfigMap,err := client.GetPluginConfig(auth,string(*optProfile),config.StoragePlugin)
+			storageConfigMap,err := client.GetPluginConfig(auth,string(*optProfile),string(*optConfig),config.StoragePlugin)
 			if err != nil {
 				fmt.Println(err,"\n" + "ERROR: Couldn't get profile [" + string(*optProfile) + "] config [" + config.StoragePlugin + "! " + err.Error())
 				os.Exit(1)	

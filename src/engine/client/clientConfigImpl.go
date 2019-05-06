@@ -39,10 +39,10 @@ func GetConfig(auth Auth,profileName,configName string) (util.Config,error) {
 	return config,nil
 }
 
-func GetPluginConfig(auth Auth,profileName,pluginName string) (map[string]string,error) {
+func GetPluginConfig(auth Auth,profileName,configName,pluginName string) (map[string]string,error) {
 	var configMap map[string]string
 
-	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getPluginConfig/" + profileName + "/" + pluginName, nil)
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getPluginConfig/" + profileName + "/" + configName + "/" + pluginName, nil)
 	if err != nil {
 		return configMap,err
 	}
@@ -166,13 +166,13 @@ func AddConfig(auth Auth,profileName,configName string,config util.Config) (util
 	return result,nil
 }
 
-func AddPluginConfig(auth Auth,profileName,pluginName string,configMap map[string]string) (util.Result,error) {
+func AddPluginConfig(auth Auth,profileName,configName,pluginName string,configMap map[string]string) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(configMap)
 
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/addPluginConfig/" + profileName + "/" + pluginName, b)
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/addPluginConfig/" + profileName + "/" + configName + "/" + pluginName, b)
 	if err != nil {
 		return result,err
 	}
@@ -266,6 +266,99 @@ func DeleteProfile(auth Auth,profileName string) (util.Result,error) {
 	var result util.Result
 
 	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/deleteProfile/" + profileName, nil)
+	if err != nil {
+		return result,err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result,nil
+}
+
+func ListProfiles(auth Auth) (util.Result,error) {
+	var result util.Result
+
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/listProfiles", nil)
+	if err != nil {
+		return result,err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result,nil
+}
+
+func ListConfigs(auth Auth,profileName string) (util.Result,error) {
+	var result util.Result
+
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/listConfigs/" + profileName, nil)
+	if err != nil {
+		return result,err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result,nil
+}
+
+func ListPluginConfigs(auth Auth,profileName,configName string) (util.Result,error) {
+	var result util.Result
+
+	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/listPluginConfigs/" + profileName + "/" + configName, nil)
 	if err != nil {
 		return result,err
 	}

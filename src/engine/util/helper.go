@@ -8,6 +8,7 @@ import (
 	"os"
 	"log"
 	"path/filepath"
+	"io/ioutil"
 )
 
 
@@ -155,6 +156,41 @@ func RecursiveDirDelete(dir string) error {
 		log.Println("Removing directory " + dir + " completed successfully")
 	}	
 	return nil
+}
+
+func DirectoryList(path string) ([]string,error) {
+	files, err := ioutil.ReadDir(path)
+	var dirList []string
+    if err != nil {
+        return dirList,err
+    }
+
+    for _, f := range files {
+            if f.IsDir() {
+				dirList = append(dirList,f.Name())
+			}
+	}
+	
+	return dirList,nil
+}
+
+func PluginList(path,configName string) ([]string,error) {
+	files, err := ioutil.ReadDir(path)
+	var pluginList []string
+    if err != nil {
+        return pluginList,err
+	}
+
+    for _, f := range files {
+			if configName + ".conf" == f.Name() {
+				continue
+			}
+            if ! f.IsDir() {
+				pluginList = append(pluginList,f.Name())
+			}
+	}
+	
+	return pluginList,nil
 }
 
 func BoolToString(b bool) string {

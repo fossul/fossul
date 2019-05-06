@@ -8,7 +8,7 @@ import (
 
 func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util.Workflow) int {
 	auth := setAuth()
-	resultsDir := dataDir + config.ProfileName + "/" + config.ConfigName + "/" + util.IntToString(workflow.Id)
+	resultsDir := dataDir + "/" + config.ProfileName + "/" + config.ConfigName + "/" + util.IntToString(workflow.Id)
 	policy := config.SelectedBackupPolicy
 	var isQuiesce bool = false
 	

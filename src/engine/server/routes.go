@@ -84,7 +84,7 @@ var routes = Routes{
     Route{
         "GetPluginConfig",
         "GET",
-        "/getPluginConfig/{profileName}/{pluginName}",
+        "/getPluginConfig/{profileName}/{configName}/{pluginName}",
         GetPluginConfig,
     },    
     Route{
@@ -132,7 +132,7 @@ var routes = Routes{
     Route{
         "AddPluginConfig",
         "GET",
-        "/addPluginConfig/{profileName}/{pluginName}",
+        "/addPluginConfig/{profileName}/{configName}/{pluginName}",
         AddPluginConfig,
     },    
     Route{
@@ -152,5 +152,23 @@ var routes = Routes{
         "GET",
         "/deleteProfile/{profileName}",
         DeleteProfile,
-    },                                                      
+    },
+    Route{
+        "ListProfiles",
+        "GET",
+        "/listProfiles",
+        ListProfiles,
+    },
+    Route{
+        "ListConfigs",
+        "GET",
+        "/listConfigs/{profileName}",
+        ListConfigs,
+    },
+    Route{
+        "ListPluginConfigs",
+        "GET",
+        "/listPluginConfigs/{profileName}/{configName}",
+        ListPluginConfigs,
+    },                                                                          
 }
