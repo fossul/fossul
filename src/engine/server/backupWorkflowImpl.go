@@ -7,7 +7,7 @@ import (
 )
 
 func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util.Workflow) int {
-	auth := setAuth()
+	auth := SetAuth()
 	resultsDir := dataDir + "/" + config.ProfileName + "/" + config.ConfigName + "/" + util.IntToString(workflow.Id)
 	policy := config.SelectedBackupPolicy
 	var isQuiesce bool = false
@@ -28,13 +28,21 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		}
 
 		// save discovered files in config struct
+		if len(config.StoragePluginParameters) == 0 {
+			config.StoragePluginParameters = map[string]string{}
+		}
+
 		dataFilePaths,logFilePaths := setDiscoverFileList(config,discoverResult)
 			
 		dataFilePathsToString := strings.Join(dataFilePaths,",")
-		config.StoragePluginParameters["DataFilePaths"] = dataFilePathsToString
+		if len(dataFilePathsToString) != 0 {
+			config.StoragePluginParameters["DataFilePaths"] = dataFilePathsToString		
+		}
 
 		logFilePathsToString := strings.Join(logFilePaths,",")
-		config.StoragePluginParameters["LogFilePaths"] = logFilePathsToString
+		if len(logFilePathsToString) != 0 {
+			config.StoragePluginParameters["LogFilePaths"] = logFilePathsToString	
+		}
 	}	
 
 		commentMsg := "Performing Application Quiesce"
@@ -272,7 +280,7 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 		util.SerializeWorkflow(resultsDir,workflow)
 
 		//remove workflow lock
-		delete(runningWorkflowMap,config.SelectedBackupPolicy)
+		delete(runningWorkflowMap,config.ProfileName + "-" + config.ConfigName)
 
 		return 0
 }
@@ -287,7 +295,7 @@ func setComment(resultsDir,msg string,workflow *util.Workflow)  {
 }
 
 func stepErrorHandler(isQuiesce bool,resultsDir,policy string,step util.Step,workflow *util.Workflow,result util.Result,config util.Config) int {
-	auth := setAuth()
+	auth := SetAuth()
 
 	if result.Code != 0 {
 		util.SetStepError(workflow,step)
@@ -319,7 +327,7 @@ func stepErrorHandler(isQuiesce bool,resultsDir,policy string,step util.Step,wor
 		util.SerializeWorkflow(resultsDir,workflow)
 
 		//remove workflow lock
-		delete(runningWorkflowMap,policy)
+		delete(runningWorkflowMap,config.ProfileName + "-" + config.ConfigName)
 
 		return 1
 	} else {
@@ -332,7 +340,7 @@ func stepErrorHandler(isQuiesce bool,resultsDir,policy string,step util.Step,wor
 }
 
 func httpErrorHandler(err error,isQuiesce bool,resultsDir,policy string,step util.Step,workflow *util.Workflow,result util.Result,config util.Config) {
-	auth := setAuth()
+	auth := SetAuth()
 
 	msg := util.SetMessage("ERROR",err.Error())
 	result.Messages = util.PrependMessage(msg,result.Messages)
@@ -365,7 +373,7 @@ func httpErrorHandler(err error,isQuiesce bool,resultsDir,policy string,step uti
 	util.SerializeWorkflow(resultsDir,workflow)
 
 	//remove workflow lock
-	delete(runningWorkflowMap,policy)
+	delete(runningWorkflowMap,config.ProfileName + "-" + config.ConfigName)
 }
 
 func stepInit(resultsDir string,workflow *util.Workflow) util.Step {
@@ -377,7 +385,7 @@ func stepInit(resultsDir string,workflow *util.Workflow) util.Step {
 }
 
 func sendErrorNotification(resultsDir,policy string,step util.Step,workflow *util.Workflow,result util.Result,config util.Config) {
-	auth := setAuth()
+	auth := SetAuth()
 
 	if config.SendTrapErrorCmd != "" {
 		commentMsg := "Sending Error Notifications"
@@ -411,7 +419,7 @@ func setDiscoverFileList(config util.Config, discoverResult util.DiscoverResult)
 	return dataFilePaths,logFilePaths
 }
 
-func setAuth() client.Auth {
+func SetAuth() client.Auth {
 	var auth client.Auth
 	auth.Username = myUser
 	auth.Password = myPass

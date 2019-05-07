@@ -3,6 +3,7 @@ package util
 import (
 	"io/ioutil"
 	"sort"
+	"strings"
 )
 
 type Jobs struct {
@@ -28,20 +29,22 @@ func ListJobs(jobsDir string) ([]Job,error) {
 	})
 
 	for _, f := range files {
-		var job Job
-		workflowFile := jobsDir + "/" + f.Name() + "/workflow"
+		if ! strings.Contains(f.Name(), "jobSchedule_") {
+			var job Job
+			workflowFile := jobsDir + "/" + f.Name() + "/workflow"
 
-		workflow := &Workflow{}
-		err := ReadGob(workflowFile,&workflow)
-		if err != nil {
-			return nil,err
-		}
+			workflow := &Workflow{}
+			err := ReadGob(workflowFile,&workflow)
+			if err != nil {
+				return nil,err
+			}
 
-		job.Id = workflow.Id
-		job.Status = workflow.Status
-		job.Timestamp = workflow.Timestamp
+			job.Id = workflow.Id
+			job.Status = workflow.Status
+			job.Timestamp = workflow.Timestamp
 
-		jobs = append(jobs,job)
+			jobs = append(jobs,job)
+		}	
 	}
 	
 	return jobs,nil

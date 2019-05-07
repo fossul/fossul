@@ -327,6 +327,14 @@
   version = "v0.9.0"
 
 [[projects]]
+  digest = "1:1b5bfd9bb80abea7e92e7b728cd7197b0c6f632779ca72e437e454370374f1e2"
+  name = "gopkg.in/robfig/cron.v3"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0f01e6b177f4bd77ee0d887fe74ac66da30a6e00"
+  version = "v3.0.0-rc1"
+
+[[projects]]
   digest = "1:4d2e5a73dc1500038e504a8d78b986630e3626dc027bc030ba5c75da257cdb96"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
@@ -535,6 +543,7 @@
     "go.mongodb.org/mongo-driver/mongo/options",
     "go.mongodb.org/mongo-driver/mongo/readpref",
     "go.mongodb.org/mongo-driver/x/bsonx",
+    "gopkg.in/robfig/cron.v3",
     "k8s.io/api/core/v1",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/client-go/kubernetes",

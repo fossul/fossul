@@ -24,14 +24,14 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	config,_ := util.GetConfig(w,r)
 	config.WorkflowId = util.IntToString(workflow.Id)
 
-	value,ok := runningWorkflowMap[config.SelectedBackupPolicy]
-	if ok && value == config.ProfileName + "-" + config.ConfigName {
-		result := util.SetResultMessage(1,"ERROR","Backup workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Another workflow is running under profile [" + config.ProfileName + "] config [" + config.ConfigName + "] policy [" + config.SelectedBackupPolicy + "]")
+	_,ok := runningWorkflowMap[config.ProfileName + "-" + config.ConfigName]
+	if ok {	
+		result := util.SetResultMessage(1,"ERROR","Backup workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Another workflow is running under profile [" + config.ProfileName + "] config [" + config.ConfigName + "]")
 		workflowResult.Result = result
 		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
 		json.NewEncoder(w).Encode(workflowResult)		
 	} else {
-		runningWorkflowMap[config.SelectedBackupPolicy] = config.ProfileName + "-" + config.ConfigName
+		runningWorkflowMap[config.ProfileName + "-" + config.ConfigName] = config.SelectedBackupPolicy
 
 		go func() {
 			startBackupWorkflowImpl(dataDir,config,workflow)

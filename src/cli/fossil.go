@@ -19,11 +19,13 @@ func main() {
 	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
 	optConfigFile := getopt.StringLong("configFile",'f',"","Path to config file")
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
-	optAction := getopt.StringLong("action",'a',"","backup|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|deleteProfilejobList|jobStatus|appPluginList|storagePluginList|archivePluginList|pluginInfo|status")
+	optAction := getopt.StringLong("action",'a',"","backup|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|addSchedule|deleteSchedule|listSchedules|jobStatus|appPluginList|storagePluginList|archivePluginList|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
 	optPluginType := getopt.StringLong("pluginType",'t',"","Plugin type app|storage|archive")
 	optWorkflowId := getopt.StringLong("workflowId",'w',"","Workflow Id")
+	optCronSchedule := getopt.StringLong("cronSchedule",'r',"","Cron Schedule Format - (min) (hour) (dayOfMOnth) (month) (dayOfWeek)")
 	optLocalConfig := getopt.BoolLong("local", 0,"Use a local configuration file")
+	optListSchedules := getopt.BoolLong("list-schedules", 0,"List schedules")
 	optGetDefaultConfig := getopt.BoolLong("get-default-config", 0,"Get the default config file")
 	optGetDefaultPluginConfig := getopt.BoolLong("get-default-plugin-config", 0,"Get the default config file")
 	optGetConfig := getopt.BoolLong("get-config", 0,"Get config file")
@@ -80,6 +82,27 @@ func main() {
 		}
 		os.Exit(0)
 	}
+
+	if *optListSchedules {
+		fmt.Println("### Job Schedules ###")
+		jobScheduleResult,err := client.ListSchedules(auth)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
+		checkResult(jobScheduleResult.Result)
+
+		// print friendly columns
+		tw := new(tabwriter.Writer)
+		tw.Init(os.Stdout, 10, 20, 5, ' ', 0)
+		fmt.Fprintln(tw, "CronSchedule\t ProfileName\t ConfigName\t Policy\t")
+		for _,schedule := range jobScheduleResult.JobSchedules {	
+			fmt.Fprintln(tw, schedule.CronSchedule + "\t",schedule.ProfileName + "\t",schedule.ConfigName + "\t",schedule.BackupPolicy + "\t")
+		}		
+		tw.Flush()
+	
+		os.Exit(0)
+	}	
 	
 	if *optGetDefaultPluginConfig {
 		if getopt.IsSet("plugin") != true {
@@ -589,6 +612,28 @@ func main() {
 			os.Exit(1)
 		}
 		fmt.Println("Storage Service:", storageStatus)
+	} else if *optAction == "addSchedule" {
+		if getopt.IsSet("cronSchedule") != true {
+			fmt.Println("ERROR: Missing parameter --cronSchedule")
+			getopt.Usage()
+			os.Exit(1)
+		}
+
+		result,err := client.AddSchedule(auth,*optProfile,*optConfig,*optPolicy,*optCronSchedule)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
+		printResult(result)
+		os.Exit(0)
+	} else if *optAction == "deleteSchedule" {
+		result,err := client.DeleteSchedule(auth,*optProfile,*optConfig,*optPolicy)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
+		printResult(result)
+		os.Exit(0)	
 	} else {
 		fmt.Println("ERROR: incorrect parameter", *optAction)
 		getopt.Usage()

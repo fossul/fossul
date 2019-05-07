@@ -170,5 +170,23 @@ var routes = Routes{
         "GET",
         "/listPluginConfigs/{profileName}/{configName}",
         ListPluginConfigs,
-    },                                                                          
+    },
+    Route{
+        "AddSchedule",
+        "GET",
+        "/addSchedule/{profileName}/{configName}/{policy}",
+        AddSchedule,
+    },
+    Route{
+        "DeleteSchedule",
+        "GET",
+        "/deleteSchedule/{profileName}/{configName}/{policy}",
+        DeleteSchedule,
+    },
+    Route{
+        "ListSchedules",
+        "GET",
+        "/listSchedules",
+        ListSchedules,
+    },                                                                                             
 }

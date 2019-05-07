@@ -24,6 +24,12 @@ func main() {
     }
 
     router := NewRouter()
- 
+
+    StartCron()
+    err = LoadCronSchedules()
+    if err != nil {
+        log.Fatal(err)
+    }
+
     log.Fatal(http.ListenAndServe(":8000", router))
 }

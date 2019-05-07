@@ -174,6 +174,22 @@ func DirectoryList(path string) ([]string,error) {
 	return dirList,nil
 }
 
+func FileList(path string) ([]string,error) {
+	files, err := ioutil.ReadDir(path)
+	var fileList []string
+    if err != nil {
+        return fileList,err
+    }
+
+    for _, f := range files {
+            if ! f.IsDir() {
+				fileList = append(fileList,f.Name())
+			}
+	}
+	
+	return fileList,nil
+}
+
 func PluginList(path,configName string) ([]string,error) {
 	files, err := ioutil.ReadDir(path)
 	var pluginList []string
