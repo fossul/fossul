@@ -173,7 +173,6 @@ func (a appPlugin) Unquiesce() util.Result {
 		messages = append(messages,msg)
 
 		result = util.SetResult(1,messages)
-		fmt.Println("HERE4",result)
 		return result
 	} else {
 		msg := util.SetMessage("INFO","Unlocking database [" + config.AppPluginParameters["MongoDb"] + "] successful")

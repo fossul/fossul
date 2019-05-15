@@ -126,8 +126,14 @@ func writeJobSchedule(id cron.EntryID,cronSchedule,profileName,configName,policy
 	jobSchedule.ConfigName = configName
 	jobSchedule.BackupPolicy = policy
 
+	scheduleFileDir := dataDir + "/" + profileName + "/" + configName
 	scheduleFile := dataDir + "/" + profileName + "/" + configName + "/jobSchedule_" + policy
-	err := util.WriteGob(scheduleFile,jobSchedule)
+	err := util.CreateDir(scheduleFileDir,0755)
+	if err != nil {
+		return err
+	}
+
+	err = util.WriteGob(scheduleFile,jobSchedule)
 	if err != nil {
 		return err
 	}
