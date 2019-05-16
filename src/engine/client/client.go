@@ -200,14 +200,46 @@ func GetStorageServiceStatus(auth Auth) (util.Status,error) {
 
 }
 
-func StartBackupWorkflow(auth Auth,profileName,configName,policyName string,config util.Config) (util.WorkflowResult,error) {
+func StartBackupWorkflowLocalConfig(auth Auth,profileName,configName,policyName string,config util.Config) (util.WorkflowResult,error) {
 	var result util.WorkflowResult
 	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/startBackupWorkflow", b)
+	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/startBackupWorkflowLocalConfig", b)
+	if err != nil {
+		return result,err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result,nil
+
+}
+
+func StartBackupWorkflow(auth Auth,profileName,configName,policyName string) (util.WorkflowResult,error) {
+	var result util.WorkflowResult
+
+	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/startBackupWorkflow/"+ profileName + "/" + configName + "/" + policyName, nil)
 	if err != nil {
 		return result,err
 	}

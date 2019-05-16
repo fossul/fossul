@@ -263,10 +263,57 @@ func ImportServerConfig(auth client.Auth,profileName,configName string) (util.Co
 	return config,nil
 }	
 
-func Backup(auth client.Auth,profileName,configName,policyName string,config util.Config) {
+func BackupWithLocalConfig(auth client.Auth,profileName,configName,policyName string,config util.Config) {
 	logger := util.GetLoggerInstance()
 
-	workflowResult,err := client.StartBackupWorkflow(auth,profileName,configName,policyName,config)
+	workflowResult,err := client.StartBackupWorkflowLocalConfig(auth,profileName,configName,policyName,config)
+	if err != nil {
+		fmt.Println("ERROR: " + err.Error())
+		os.Exit(1)
+	}
+		
+	util.LogResult(logger, workflowResult.Result)
+	if workflowResult.Result.Code != 0 {
+		os.Exit(1)
+	}
+
+	workflowId := workflowResult.Id
+	var completedSteps []int
+	// loop and wait for all workflow steps to complete
+	for {
+		time.Sleep(1 * time.Second)
+		workflow,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
+		if err != nil {
+			fmt.Println("ERROR: " + err.Error())
+			os.Exit(1)
+		}
+
+		// Print results for a step only once
+		for _, step := range workflow.Steps {
+			if step.Status == "COMPLETE" || step.Status == "ERROR" {
+				if !util.IntInSlice(step.Id,completedSteps) {
+					completedSteps = append(completedSteps,step.Id)
+					results,err := client.GetWorkflowStepResults(auth,profileName,configName,workflowId,step.Id)
+					if err != nil {
+						fmt.Println("ERROR: " + err.Error())
+						os.Exit(1)
+					}
+					util.LogResults(logger, results)
+				}
+			}
+		}
+
+		if workflow.Status == "COMPLETE" || workflow.Status == "ERROR"  {
+			break
+		}
+		time.Sleep(4 * time.Second)
+	}
+}
+
+func Backup(auth client.Auth,profileName,configName,policyName string) {
+	logger := util.GetLoggerInstance()
+
+	workflowResult,err := client.StartBackupWorkflow(auth,profileName,configName,policyName)
 	if err != nil {
 		fmt.Println("ERROR: " + err.Error())
 		os.Exit(1)

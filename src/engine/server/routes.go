@@ -58,9 +58,15 @@ var routes = Routes{
         GetStatus,
     },
     Route{
+        "StartBackupWorkflowLocalConfig",
+        "POST",
+        "/startBackupWorkflowLocalConfig",
+        StartBackupWorkflowLocalConfig,
+    },       
+    Route{
         "StartBackupWorkflow",
         "POST",
-        "/startBackupWorkflow",
+        "/startBackupWorkflow/{profileName}/{configName}/{policy}",
         StartBackupWorkflow,
     },   
     Route{

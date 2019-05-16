@@ -9,8 +9,7 @@ import (
 	"time"
 )
 
-func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
-
+func StartBackupWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	var workflowResult util.WorkflowResult
 	workflow := &util.Workflow{}
 	workflow.Id =  util.GetWorkflowId()
@@ -22,6 +21,53 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	workflowResult.Id = workflow.Id
 
 	config,_ := util.GetConfig(w,r)
+	config.WorkflowId = util.IntToString(workflow.Id)
+
+	_,ok := runningWorkflowMap[config.ProfileName + "-" + config.ConfigName]
+	if ok {	
+		result := util.SetResultMessage(1,"ERROR","Backup workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Another workflow is running under profile [" + config.ProfileName + "] config [" + config.ConfigName + "]")
+		workflowResult.Result = result
+		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
+		json.NewEncoder(w).Encode(workflowResult)		
+	} else {
+		runningWorkflowMap[config.ProfileName + "-" + config.ConfigName] = config.SelectedBackupPolicy
+
+		go func() {
+			startBackupWorkflowImpl(dataDir,config,workflow)
+		}()
+	
+		result := util.SetResultMessage(0,"INFO","Backup workflow id [" + util.IntToString(workflow.Id) + "] started successfully")
+		workflowResult.Result = result
+		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
+		json.NewEncoder(w).Encode(workflowResult)
+	}
+}
+
+
+func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)	
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+	var policyName string = params["policy"]
+
+	var workflowResult util.WorkflowResult
+	workflow := &util.Workflow{}
+	workflow.Id =  util.GetWorkflowId()
+	workflow.Status = "RUNNING"
+
+	var timestamp string = time.Now().Format(time.RFC3339)
+	workflow.Timestamp = timestamp
+
+	workflowResult.Id = workflow.Id
+
+	config,err := GetConsolidatedConfig(profileName,configName,policyName)
+	if err != nil {
+		result := util.SetResultMessage(1,"ERROR","Backup workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Couldn't read config using profile [" + profileName + "] config [" + configName + "]")
+		workflowResult.Result = result
+		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
+		json.NewEncoder(w).Encode(workflowResult)	
+	}
+
 	config.WorkflowId = util.IntToString(workflow.Id)
 
 	_,ok := runningWorkflowMap[config.ProfileName + "-" + config.ConfigName]

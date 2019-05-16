@@ -13,8 +13,8 @@ func main() {
 	optPassword := getopt.StringLong("pass",'s',"","Password")
 	optProfile := getopt.StringLong("profile",'p',"","Profile name")
 	optConfig := getopt.StringLong("config",'c',"","Config name")
-	optConfigPath := getopt.StringLong("configPath",'o',"","Path to configs directory")
-	optConfigFile := getopt.StringLong("configFile",'f',"","Path to config file")
+	optConfigPath := getopt.StringLong("config-path",'o',"","Path to configs directory")
+	optConfigFile := getopt.StringLong("config-file",'f',"","Path to config file")
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
 	optAction := getopt.StringLong("action",'a',"","backup|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|addSchedule|deleteSchedule|jobStatus|appPluginList|storagePluginList|archivePluginList|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
@@ -150,8 +150,8 @@ func main() {
 	}
 	
 	if *optAction == "addConfig" {
-		if getopt.IsSet("configFile") != true {
-			fmt.Println("ERROR: Missing parameter --configFile")
+		if getopt.IsSet("config-file") != true {
+			fmt.Println("ERROR: Missing parameter --config-file")
 			getopt.Usage()
 			os.Exit(1)
 		}
@@ -166,8 +166,8 @@ func main() {
 			os.Exit(1)
 		}	
 
-		if getopt.IsSet("configFile") != true {
-			fmt.Println("ERROR: Missing parameter --configFile")
+		if getopt.IsSet("config-file") != true {
+			fmt.Println("ERROR: Missing parameter --config-file")
 			getopt.Usage()
 			os.Exit(1)
 		}
@@ -185,7 +185,7 @@ func main() {
 	if *optLocalConfig {	
 		var configPath string
 		var configDir string
-		if getopt.IsSet("configPath") == true {
+		if getopt.IsSet("config-path") == true {
 			configPath = *optConfigPath + "/" + *optProfile + "/" + *optConfig + "/" + *optConfig + ".conf"
 			configDir = *optConfigPath + "/" + *optProfile + "/" + *optConfig 
 		} else {
@@ -219,7 +219,7 @@ func main() {
 			os.Exit(1)	
 		}
 		if util.ExistsBackupRetention(*optPolicy,config.BackupRetentions) != true {
-			fmt.Println("ERROR: policy [" + *optPolicy + "] does npot match policy defined in config")
+			fmt.Println("ERROR: policy [" + *optPolicy + "] does not match policy defined in config")
 			os.Exit(1)
 		}	
 	}
@@ -227,7 +227,11 @@ func main() {
 	fmt.Println("########## Welcome to Fossil Framework ##########")
 
 	if *optAction == "backup" {
-		Backup(auth,string(*optProfile),string(*optConfig),string(*optPolicy),config)
+		if *optLocalConfig {
+			BackupWithLocalConfig(auth,string(*optProfile),string(*optConfig),string(*optPolicy),config)
+		} else {
+			Backup(auth,string(*optProfile),string(*optConfig),string(*optPolicy))	
+		}	
 	} else if *optAction == "backupList" {
 		BackupList(auth,string(*optProfile),string(*optConfig),string(*optPolicy),config)
 	} else if *optAction == "jobList" {	
