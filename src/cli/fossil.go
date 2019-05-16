@@ -16,13 +16,17 @@ func main() {
 	optConfigPath := getopt.StringLong("config-path",'o',"","Path to configs directory")
 	optConfigFile := getopt.StringLong("config-file",'f',"","Path to config file")
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
-	optAction := getopt.StringLong("action",'a',"","backup|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|addSchedule|deleteSchedule|jobStatus|appPluginList|storagePluginList|archivePluginList|pluginInfo|status")
+	optAction := getopt.StringLong("action",'a',"","backup|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|addSchedule|deleteSchedule|jobStatus|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
 	optPluginType := getopt.StringLong("plugin-type",'t',"","Plugin type app|storage|archive")
 	optWorkflowId := getopt.StringLong("workflow-id",'w',"","Workflow Id")
 	optCronSchedule := getopt.StringLong("cron-schedule",'r',"","Cron Schedule Format - (min) (hour) (dayOfMOnth) (month) (dayOfWeek)")
 	optLocalConfig := getopt.BoolLong("local", 0,"Use a local configuration file")
 	optListSchedules := getopt.BoolLong("list-schedules", 0,"List schedules")
+	optAppPluginList := getopt.BoolLong("list-app-plugins", 0,"List app plugins")
+	optStoragePluginList := getopt.BoolLong("list-storage-plugins", 0,"List storage plugins")
+	optArchivePluginList := getopt.BoolLong("list-archive-plugins", 0,"List archive plugins")
+
 	optGetDefaultConfig := getopt.BoolLong("get-default-config", 0,"Get the default config file")
 	optGetDefaultPluginConfig := getopt.BoolLong("get-default-plugin-config", 0,"Get the default config file")
 	optGetConfig := getopt.BoolLong("get-config", 0,"Get config file")
@@ -109,7 +113,20 @@ func main() {
 		}
 
 		GetPluginConfig(auth,string(*optProfile),string(*optConfig),string(*optPluginName))
-	}		
+	}
+	
+	if *optAppPluginList {
+		fmt.Println("HERE")
+		AppPluginList(auth)
+	}
+
+	if *optStoragePluginList {
+		StoragePluginList(auth)
+	}	
+	
+	if *optArchivePluginList {
+		ArchivePluginList(auth)		
+	}
 
 	if getopt.IsSet("action") != true {
 		fmt.Println("ERROR: missing parameter --action")
@@ -243,13 +260,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		JobStatus(auth,*optProfile,*optConfig,*optWorkflowId)		
-	} else if *optAction == "appPluginList" {
-		AppPluginList(auth,config)
-	} else if *optAction == "storagePluginList" {
-		StoragePluginList(auth,config)
-	} else if *optAction == "archivePluginList" {
-		ArchivePluginList(auth,config)			
+		JobStatus(auth,*optProfile,*optConfig,*optWorkflowId)			
 	} else if *optAction == "pluginInfo" {
 		if getopt.IsSet("plugin") != true {
 			fmt.Println("ERROR: Missing parameter --plugin")

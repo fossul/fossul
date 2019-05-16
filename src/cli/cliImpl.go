@@ -19,7 +19,6 @@ func GetDefaultConfig(auth client.Auth) {
 	}
 
 	fmt.Println("### Default Config ###")
-	fmt.Println("PluginDir = " + "\""+ config.PluginDir + "\"")
 	fmt.Println("AppPlugin = " + "\"" + config.AppPlugin + "\"")
 	fmt.Println("PreAppQuiesceCmd = " + "\"" + config.PreAppQuiesceCmd + "\"")
 	fmt.Println("PostAppQuiesceCmd = " + "\"" + config.PostAppQuiesceCmd + "\"")
@@ -433,11 +432,11 @@ func JobStatus(auth client.Auth,profileName,configName,workflowId string) {
 	}
 }
 
-func AppPluginList(auth client.Auth,config util.Config) {
+func AppPluginList(auth client.Auth) {
 	fmt.Println("### List of Application Plugins ###")
 
 	var plugins []string
-	appPlugins,err := client.AppPluginList(auth,"app",config)
+	appPlugins,err := client.AppPluginList(auth,"app")
 	if err != nil {
 		fmt.Println("ERROR: " + err.Error())
 		os.Exit(1)
@@ -448,13 +447,14 @@ func AppPluginList(auth client.Auth,config util.Config) {
 	for _, plugin := range plugins {
 		fmt.Println(plugin)
 	}
+	os.Exit(0)
 }
 
-func StoragePluginList(auth client.Auth,config util.Config) {
+func StoragePluginList(auth client.Auth) {
 	fmt.Println("### List of Storage Plugins ###")
 	
 	var plugins []string
-	storagePlugins,err := client.StoragePluginList(auth,"storage",config)
+	storagePlugins,err := client.StoragePluginList(auth,"storage")
 	if err != nil {
 		fmt.Println("ERROR: " + err.Error())
 		os.Exit(1)
@@ -465,13 +465,14 @@ func StoragePluginList(auth client.Auth,config util.Config) {
 	for _, plugin := range plugins {
 		fmt.Println(plugin)
 	}
+	os.Exit(0)
 }
 
-func ArchivePluginList(auth client.Auth,config util.Config) {
+func ArchivePluginList(auth client.Auth) {
 	fmt.Println("### List of Archive Plugins ###")
 		
 	var plugins []string
-	archivePlugins,err := client.ArchivePluginList(auth,"archive",config)
+	archivePlugins,err := client.ArchivePluginList(auth,"archive")
 	if err != nil {
 		fmt.Println("ERROR: " + err.Error())
 		os.Exit(1)
@@ -482,6 +483,7 @@ func ArchivePluginList(auth client.Auth,config util.Config) {
 	for _, plugin := range plugins {
 		fmt.Println(plugin)
 	}
+	os.Exit(0)
 }
 
 func PluginInfo(auth client.Auth,config util.Config,pluginName,pluginType string) {

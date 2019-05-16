@@ -17,7 +17,7 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 	var messages []util.Message
 
 	if pluginPath == "" {
-		var plugin string = config.PluginDir + "/archive/" + config.ArchivePlugin
+		var plugin string = pluginDir + "/archive/" + config.ArchivePlugin
 
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "ERROR: Archive plugin does not exist"
@@ -68,7 +68,7 @@ func ArchiveList(w http.ResponseWriter, r *http.Request) {
 	var messages []string
 
 	if pluginPath == "" {
-		var plugin string = config.PluginDir + "/archive/" + config.ArchivePlugin
+		var plugin string = pluginDir + "/archive/" + config.ArchivePlugin
 
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "ERROR: Archive plugin does not exist"
@@ -118,7 +118,7 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 	var messages []util.Message
 
 	if pluginPath == "" {
-		var plugin string = config.PluginDir + "/archive/" + config.ArchivePlugin
+		var plugin string = pluginDir + "/archive/" + config.ArchivePlugin
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "ERROR: Archive plugin does not exist"
 			log.Println(err, errMsg)

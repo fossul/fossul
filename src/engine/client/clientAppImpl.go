@@ -9,13 +9,10 @@ import (
 //	"strings"
 )
 
-func AppPluginList(auth Auth,pluginType string,config util.Config) ([]string,error) {
-	b := new(bytes.Buffer)
-	json.NewEncoder(b).Encode(config)
-
+func AppPluginList(auth Auth,pluginType string) ([]string,error) {
 	var plugins []string
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginList/" + pluginType, b)
+	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginList/" + pluginType, nil)
 	if err != nil {
 		return plugins,err
 	}

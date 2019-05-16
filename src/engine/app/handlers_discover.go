@@ -17,7 +17,7 @@ func Discover(w http.ResponseWriter, r *http.Request) {
 	var messages []util.Message
 
 	if pluginPath == "" {
-		var plugin string = config.PluginDir + "/app/" + config.AppPlugin
+		var plugin string = pluginDir + "/app/" + config.AppPlugin
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "\nERROR: App plugin does not exist: " + plugin
 			log.Println(err, errMsg)

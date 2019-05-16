@@ -15,7 +15,7 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 	var messages []util.Message
 
 	if pluginPath == "" {
-		var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
+		var plugin string = pluginDir + "/storage/" + config.StoragePlugin
 
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "Storage plugin does not exist"
@@ -64,7 +64,7 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
 	if pluginPath == "" {
-		var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
+		var plugin string = pluginDir + "/storage/" + config.StoragePlugin
 
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			msg := util.SetMessage("ERROR","Storage plugin not found! " + err.Error())
@@ -129,7 +129,7 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 	var messages []util.Message
 
 	if pluginPath == "" {
-		var plugin string = config.PluginDir + "/storage/" + config.StoragePlugin
+		var plugin string = pluginDir + "/storage/" + config.StoragePlugin
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "Storage plugin does not exist"
 

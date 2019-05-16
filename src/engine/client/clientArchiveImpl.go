@@ -10,13 +10,10 @@ import (
 	"errors"
 )
 
-func ArchivePluginList(auth Auth,pluginType string,config util.Config) ([]string,error) {
+func ArchivePluginList(auth Auth,pluginType string) ([]string,error) {
 	var plugins []string
 
-	b := new(bytes.Buffer)
-	json.NewEncoder(b).Encode(config)
-
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginList/" + pluginType, b)
+	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginList/" + pluginType, nil)
 	if err != nil {
 		return plugins,err
 	}

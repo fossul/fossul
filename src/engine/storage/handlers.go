@@ -22,13 +22,11 @@ func PluginList(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var pluginType string = params["pluginType"]
 
-	config,_ := util.GetConfig(w,r)
-	var pluginDir string
-
+	var storagePluginDir string
 	if pluginType == "storage" {
-		pluginDir = config.PluginDir + "/storage"
+		storagePluginDir = pluginDir + "/storage"
 	} else if pluginType == "archive" {
-		pluginDir = config.PluginDir + "/archive"
+		storagePluginDir = pluginDir + "/archive"
 	} else {
 		log.Println("ERROR plugin type " + pluginType + " must be storage|archive")
 
@@ -36,7 +34,7 @@ func PluginList(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(plugins)
 	}
 
-	fileInfo, err := ioutil.ReadDir(pluginDir)
+	fileInfo, err := ioutil.ReadDir(storagePluginDir)
 	if err != nil {
 		log.Println(err)
 	}
@@ -63,7 +61,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	pluginPath := util.GetPluginPath(pluginName)
 
 	if pluginPath == "" {
-		var plugin string = config.PluginDir + "/" + pluginType + "/" + pluginName
+		var plugin string = pluginDir + "/" + pluginType + "/" + pluginName
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			msg := util.SetMessage("ERROR","Plugin not found! " + err.Error())
 			messages = append(messages, msg)
