@@ -91,5 +91,13 @@ echo "Copying default configs"
 cp -r $GOPATH/src/fossil/src/cli/configs/default $GOBIN/configs/default/default
 if [ $? != 0 ]; then exit 1; fi
 
+echo "Copying startup scripts"
+cp $GOPATH/src/fossil/fossil-server-startup.sh $GOBIN
+if [ $? != 0 ]; then exit 1; fi
+cp $GOPATH/src/fossil/fossil-app-startup.sh $GOBIN
+if [ $? != 0 ]; then exit 1; fi
+cp $GOPATH/src/fossil/fossil-storage-startup.sh $GOBIN
+if [ $? != 0 ]; then exit 1; fi
+
 echo "Build completed successfully"
 

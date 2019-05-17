@@ -7,21 +7,26 @@ LABEL ios.k8s.display-name="fossil-storage" \
 RUN dnf install -y golang
 
 RUN mkdir /app
+RUN mkdir /app/go
+RUN mkdir /app/go/src
+RUN mkdir /app/go/src/fossil
 
 WORKDIR /app
 
-ENV GOPATH=/app
+ENV GOPATH=/app/go
 ENV GOBIN=/app
 
-#RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
+RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
 
-RUN go get -u github.com/gorilla/mux
+#RUN go get -u github.com/gorilla/mux
 
 RUN mkdir /backups
 
-COPY . /app
+COPY . /app/go/src/fossil
 
-RUN cd /app && go build engine/util && go install engine/storage
+CMD /bin/bash /app/go/src/fossil/fossil-storage-build.sh
+
+#RUN cd /app && go build engine/util && go install engine/storage
 
 RUN chown -R 1001:0 /app && \
     chown -R 1001:0 /backups && \
@@ -34,4 +39,4 @@ RUN echo "1.0" > /etc/imageversion
 
 USER 1001
 
-CMD /app/storage
+CMD /bin/bash /app/fossil-storage-startup.sh

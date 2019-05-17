@@ -4,12 +4,15 @@ import (
     "log"
     "net/http"
     "fossil/src/engine/util"
+    "os"
 )
 
-const configDir = "configs"
-const dataDir = "data"
-const myUser = "admin"
-const myPass = "redhat123"
+var port string = os.Getenv("FOSSIL_SERVER_PORT")
+var configDir string = os.Getenv("FOSSIL_SERVER_CONFIG_DIR")
+var dataDir string = os.Getenv("FOSSIL_SERVER_DATA_DIR")
+var myUser string = os.Getenv("FOSSIL_USERNAME")
+var myPass string = os.Getenv("FOSSIL_PASSWORD")
+
 var runningWorkflowMap map[string]string = make(map[string]string)
  
 func main() {
@@ -31,5 +34,6 @@ func main() {
         log.Fatal(err)
     }
 
-    log.Fatal(http.ListenAndServe(":8000", router))
+    log.Println("Starting server service on port [" + port + "]")
+    log.Fatal(http.ListenAndServe(":" + port, router))
 }

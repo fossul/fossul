@@ -7,9 +7,10 @@ import (
     "fossil/src/engine/util"
 )
 
-const pluginDir = "plugins"
-const myUser = "admin"
-const myPass = "redhat123"
+var port string = os.Getenv("FOSSIL_STORAGE_PORT")
+var pluginDir string = os.Getenv("FOSSIL_STORAGE_PLUGIN_DIR")
+var myUser string = os.Getenv("FOSSIL_USERNAME")
+var myPass string = os.Getenv("FOSSIL_PASSWORD")
  
 func main() {
     err := util.CreateDir(pluginDir,0755)
@@ -22,5 +23,6 @@ func main() {
     
     router := NewRouter()
  
-    log.Fatal(http.ListenAndServe(":8002", router))
+    log.Println("Starting storage service on port [" + port + "]")
+    log.Fatal(http.ListenAndServe(":" + port, router))
 }
