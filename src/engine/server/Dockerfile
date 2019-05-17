@@ -13,6 +13,7 @@ RUN mkdir /app/go/src/fossil
 
 WORKDIR /app
 
+ENV FOSSIL_BUILD_PLUGIN_DIR=/app
 ENV GOPATH=/app/go
 ENV GOBIN=/app
 

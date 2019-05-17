@@ -2,6 +2,10 @@
 
 PLUGIN_DIR="/home/ktenzer/plugins"
 
+if [[ -z "${FOSSIL_BUILD_PLUGIN_DIR}" ]]; then
+    export FOSSIL_BUILD_PLUGIN_DIR=$PLUGIN_DIR
+fi  
+
 echo "Installing Dependencies"
 $GOBIN/dep ensure
 #go get github.com/pborman/getopt/v2
