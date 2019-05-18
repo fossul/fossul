@@ -25,5 +25,5 @@ if [[ -z "${FOSSIL_PASSWORD}" ]]; then
     export FOSSIL_PASSWORD=$PASSWORD
 fi   
 
-cd $GOBIN;$GOBIN/server
+$GOBIN/server
 

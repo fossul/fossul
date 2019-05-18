@@ -92,6 +92,11 @@ mv $GOBIN/container-basic $PLUGIN_DIR/storage
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying default configs"
+if [ ! $GOBIN/configs/default/default ]; then
+  mkdir -p $GOBIN/configs/default/default
+  if [ $? != 0 ]; then exit 1; fi
+fi
+
 cp -r $GOPATH/src/fossil/src/cli/configs/default $GOBIN/configs/default/default
 if [ $? != 0 ]; then exit 1; fi
 
