@@ -29,6 +29,8 @@ RUN chown -R 1001:0 /app && \
 
 RUN chmod -R 777 /tmp
 
+RUN ls -l /app
+
 RUN echo "1.0" > /etc/imageversion
 
 USER 1001
