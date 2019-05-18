@@ -8,6 +8,7 @@ RUN dnf install -y golang
 
 RUN mkdir -p /go/src/fossil
 RUN mkdir /app
+RUN mkdir /app/backups
 
 WORKDIR /go/src/fossil
 
@@ -26,7 +27,6 @@ CMD /bin/bash /go/src/fossil/fossil-storage-build.sh
 #RUN cd /app && go build engine/util && go install engine/storage
 
 RUN chown -R 1001:0 /app && \
-    chown -R 1001:0 /backups && \
     chmod -R ug+rwX /app
 
 RUN chmod -R 777 /tmp

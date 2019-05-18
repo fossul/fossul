@@ -469,17 +469,17 @@ parameters:
   - name: CONTEXT_DIR_SERVER
     displayName: Context Dir for server
     description: Context Dir for server
-    value: engine/server
+    value: src/engine/server
     required: true    
   - name: CONTEXT_DIR_APP
     displayName: Context Dir for app
     description: Context Dir for app
-    value: engine/app
+    value: src/engine/app
     required: true   
   - name: CONTEXT_DIR_STORAGE
     displayName: Context Dir for storage
     description: Context Dir for storage
-    value: engine/storage
+    value: src/engine/storage
     required: true             
   - name: SOURCE_REPOSITORY_REF_SERVER
     displayName: Source Repository Reference Tag
