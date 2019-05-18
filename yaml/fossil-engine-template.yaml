@@ -10,16 +10,16 @@ objects:
   kind: Service
   metadata:
     annotations:
-      description: Fossil workflow port
+      description: Fossil server port
     labels:
-      app: ${APPLICATION_NAME}-workflow
-    name: ${APPLICATION_NAME}-workflow
+      app: ${APPLICATION_NAME}-server
+    name: ${APPLICATION_NAME}-server
   spec:
     ports:
     - port: 8000
       targetPort: 8000
     selector:
-      app: ${APPLICATION_NAME}-workflow
+      app: ${APPLICATION_NAME}-server
 - apiVersion: v1
   kind: Service
   metadata:
@@ -53,12 +53,12 @@ objects:
   metadata:
     annotations:
       template.openshift.io/expose-uri: http://{.spec.host}{.spec.path}
-    name: ${APPLICATION_NAME}-workflow
+    name: ${APPLICATION_NAME}-server
   spec:
     host: ${APPLICATION_DOMAIN}
     to:
       kind: Service
-      name: ${APPLICATION_NAME}-workflow
+      name: ${APPLICATION_NAME}-server
 - apiVersion: v1
   kind: BuildConfig
   metadata:
@@ -66,23 +66,23 @@ objects:
       openshift.io/generated-by: OpenShiftNewApp
     creationTimestamp: null
     labels:
-      app: "${APPLICATION_NAME}-workflow"
-    name: "${APPLICATION_NAME}-workflow" 
+      app: "${APPLICATION_NAME}-server"
+    name: "${APPLICATION_NAME}-server" 
   spec:
     output:
       to:
         kind: ImageStreamTag
-        name: "${APPLICATION_NAME}-workflow:latest"
+        name: "${APPLICATION_NAME}-server:latest"
     runPolicy: Serial
     source:
       git:
-        uri: "${SOURCE_REPOSITORY_URL_WORKFLOW}" 
-        ref: "${SOURCE_REPOSITORY_REF_WORKFLOW}"
-        contextDir: "${CONTEXT_DIR_WORKFLOW}"
+        uri: "${SOURCE_REPOSITORY_URL_SERVER}" 
+        ref: "${SOURCE_REPOSITORY_REF_SERVER}"
+        contextDir: "${CONTEXT_DIR_SERVER}"
         type: Git
     strategy:
       dockerStrategy:
-        dockerfilePath: src/engine/workflow/Dockerfile
+        dockerfilePath: src/engine/server/Dockerfile
         from:
           kind: ImageStreamTag
           name: fedora:latest
@@ -194,23 +194,23 @@ objects:
   metadata:
     annotations:
       template.alpha.openshift.io/wait-for-ready: "true"
-    name: "${APPLICATION_NAME}-workflow" 
+    name: "${APPLICATION_NAME}-server" 
   spec:
     replicas: 1
     selector:
-      app: "${APPLICATION_NAME}-workflow"
+      app: "${APPLICATION_NAME}-server"
     strategy:
       type: Recreate
     template:
       metadata:
         labels:
-          app: "${APPLICATION_NAME}-workflow"
+          app: "${APPLICATION_NAME}-server"
       spec:
         containers:
         - capabilities: {}
           image: ' '
           imagePullPolicy: IfNotPresent
-          name: "${APPLICATION_NAME}-workflow"
+          name: "${APPLICATION_NAME}-server"
           terminationMessagePath: /dev/termination-log
           ports:
           -containerPort: 8080
@@ -220,10 +220,10 @@ objects:
     - imageChangeParams:
         automatic: true
         containerNames:
-        - "${APPLICATION_NAME}-workflow"
+        - "${APPLICATION_NAME}-server"
         from:
           kind: ImageStreamTag
-          name: "${APPLICATION_NAME}-workflow:latest"
+          name: "${APPLICATION_NAME}-server:latest"
         lastTriggeredImage: ""
       type: ImageChange
     - type: ConfigChange
@@ -321,8 +321,8 @@ objects:
     creationTimestamp: null
     generation: 1
     labels:
-      app: "${APPLICATION_NAME}-workflow"
-    name: "${APPLICATION_NAME}-workflow"
+      app: "${APPLICATION_NAME}-server"
+    name: "${APPLICATION_NAME}-server"
   spec:
     lookupPolicy:
       local: false
@@ -382,7 +382,7 @@ objects:
     annotations:
     generation: 2
     labels:
-      app: "${APPLICATION_NAME}-workflow"
+      app: "${APPLICATION_NAME}-server"
     name: fedora
   spec:
     lookupPolicy:
@@ -451,7 +451,7 @@ parameters:
   - name: APPLICATION_DOMAIN
     displayName: Application Domain
     description: Application domain name used in route to service
-  - name: SOURCE_REPOSITORY_URL_WORKFLOW
+  - name: SOURCE_REPOSITORY_URL_SERVER
     displayName: Source Repository URL
     description: The URL of the repository with your application source code
     value: https://github.com/ktenzer/fossil.git
@@ -466,10 +466,10 @@ parameters:
     description: The URL of the repository with your application source code
     value: https://github.com/ktenzer/fossil.git
     required: true    
-  - name: CONTEXT_DIR_WORKFLOW
-    displayName: Context Dir for workflow
-    description: Context Dir for workflow
-    value: engine/workflow
+  - name: CONTEXT_DIR_SERVER
+    displayName: Context Dir for server
+    description: Context Dir for server
+    value: engine/server
     required: true    
   - name: CONTEXT_DIR_APP
     displayName: Context Dir for app
@@ -481,7 +481,7 @@ parameters:
     description: Context Dir for storage
     value: engine/storage
     required: true             
-  - name: SOURCE_REPOSITORY_REF_WORKFLOW
+  - name: SOURCE_REPOSITORY_REF_SERVER
     displayName: Source Repository Reference Tag
     description: The Branch tag to use
     value: master
@@ -494,5 +494,5 @@ parameters:
     description: The Branch tag to use
     value: master    
   - name: STORAGE_CAPACITY
-    description: Storage needed for ML Models
+    description: Storage required
     value: 10Gi

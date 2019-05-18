@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var pluginDir string = os.Getenv("FOSSIL_BUILD_PLUGIN_DIR")
+var :q string = os.Getenv("FOSSIL_BUILD_PLUGIN_DIR")
 
 func TestExecutePlugin(t *testing.T) {
 	configFile := "../../cli/configs/default/default.conf"
