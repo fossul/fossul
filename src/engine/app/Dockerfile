@@ -25,11 +25,10 @@ COPY . /go/src/fossil
 RUN /go/src/fossil/fossil-app-build.sh
 
 RUN chown -R 1001:0 /app && \
-    chmod -R ug+rwX /app
+    chmod -R 777 /app
+ #   chmod -R ug+rwX /app
 
 RUN chmod -R 777 /tmp
-
-RUN ls -l /app
 
 RUN echo "1.0" > /etc/imageversion
 
