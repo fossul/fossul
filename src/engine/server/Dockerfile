@@ -27,8 +27,6 @@ RUN /go/src/fossil/fossil-server-build.sh
 
 #RUN cd /app && go build engine/util && go install engine/workflow
 
-WORKDIR /app
-
 RUN chown -R 1001:0 /app && \
     chmod -R 777 /app
 

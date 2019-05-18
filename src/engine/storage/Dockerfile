@@ -26,8 +26,6 @@ RUN /go/src/fossil/fossil-storage-build.sh
 
 #RUN cd /app && go build engine/util && go install engine/storage
 
-WORKDIR /app
-
 RUN chown -R 1001:0 /app && \
     chmod -R 777 /app
 

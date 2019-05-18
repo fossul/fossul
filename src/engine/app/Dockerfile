@@ -24,8 +24,6 @@ COPY . /go/src/fossil
 #RUN cd /app && go build engine/util && go install engine/app
 RUN /go/src/fossil/fossil-app-build.sh
 
-WORKDIR /app
-
 RUN chown -R 1001:0 /app && \
     chmod -R 777 /app
  #   chmod -R ug+rwX /app
