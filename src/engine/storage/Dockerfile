@@ -22,7 +22,7 @@ RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
 
 COPY . /go/src/fossil
 
-CMD /go/src/fossil/fossil-storage-build.sh
+RUN /go/src/fossil/fossil-storage-build.sh
 
 #RUN cd /app && go build engine/util && go install engine/storage
 

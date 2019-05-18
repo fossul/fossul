@@ -32,6 +32,8 @@ RUN chmod -R 777 /tmp
 
 RUN echo "1.0" > /etc/imageversion
 
+RUN ls -l /app
+
 USER 1001
 
 CMD /app/fossil-app-startup.sh
