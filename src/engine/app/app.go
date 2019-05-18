@@ -25,5 +25,6 @@ func main() {
     router := NewRouter()
  
     log.Println("Starting app service on port [" + port + "]")
-    log.Fatal(http.ListenAndServe(":" + port, router))
+    //log.Fatal(http.ListenAndServe(":" + port, router))
+    log.Fatal(http.ListenAndServe(":8001", router))
 }

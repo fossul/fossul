@@ -36,5 +36,6 @@ func main() {
     }
 
     log.Println("Starting server service on port [" + port + "]")
-    log.Fatal(http.ListenAndServe(":" + port, router))
+    //log.Fatal(http.ListenAndServe(":" + port, router))
+    log.Fatal(http.ListenAndServe(":8000", router))
 }
