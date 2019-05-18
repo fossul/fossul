@@ -1,6 +1,6 @@
 #!/bin/bash
 PORT="8002"
-PLUGIN_DIR="./plugins"
+PLUGIN_DIR="/app/plugins"
 USERNAME="admin"
 PASSWORD="redhat123"
 

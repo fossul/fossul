@@ -1,7 +1,7 @@
 #!/bin/bash
 PORT="8000"
-CONFIG_DIR="./configs"
-DATA_DIR="./data"
+CONFIG_DIR="/app/configs"
+DATA_DIR="/app/data"
 USERNAME="admin"
 PASSWORD="redhat123"
 
