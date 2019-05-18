@@ -9,7 +9,7 @@ RUN dnf install -y golang
 RUN mkdir -p /go/src/fossil
 RUN mkdir /app
 
-WORKDIR /go/src/fossil
+WORKDIR /app
 
 ENV FOSSIL_BUILD_PLUGIN_DIR=/app/plugins
 ENV GOPATH=/go

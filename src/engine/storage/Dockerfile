@@ -10,7 +10,7 @@ RUN mkdir -p /go/src/fossil
 RUN mkdir /app
 RUN mkdir /app/backups
 
-WORKDIR /go/src/fossil
+WORKDIR /app
 
 ENV FOSSIL_BUILD_PLUGIN_DIR=/app/plugins
 ENV GOPATH=/go

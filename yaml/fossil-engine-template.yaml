@@ -213,22 +213,7 @@ objects:
         labels:
           app: "${APPLICATION_NAME}-server"
       spec:
-        containers:
-        - env:
-          - name: FOSSIL_SERVER_CONFIG_DIR
-            value: ${FOSSIL_SERVER_CONFIG_DIR}
-          - name: FOSSIL_SERVER_DATA_DIR
-            value: ${FOSSIL_SERVER_DATA_DIR}            
-          - name: FOSSIL_USERNAME
-            valueFrom:
-              secretKeyRef:
-                key: admin-user
-                name: ${APPLICATION_NAME}-secrets
-          - name: FOSSIL_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: admin-password
-                name: ${APPLICATION_NAME}-secrets                            
+        containers:                           
         - capabilities: {}
           image: ' '
           imagePullPolicy: IfNotPresent
@@ -267,20 +252,7 @@ objects:
         labels:
           app: "${APPLICATION_NAME}-app"
       spec:
-        containers:
-        - env:
-          - name: FOSSIL_APP_PLUGIN_DIR
-            value: ${FOSSIL_APP_PLUGIN_DIR}          
-          - name: FOSSIL_USERNAME
-            valueFrom:
-              secretKeyRef:
-                key: admin-user
-                name: ${APPLICATION_NAME}-secrets
-          - name: FOSSIL_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: admin-password
-                name: ${APPLICATION_NAME}-secrets              
+        containers:       
         - capabilities: {}
           image: ' '
           imagePullPolicy: IfNotPresent
@@ -319,20 +291,7 @@ objects:
         labels:
           app: "${APPLICATION_NAME}-storage"
       spec:
-        containers:
-        - env:
-          - name: FOSSIL_STORAGE_PLUGIN_DIR
-            value: ${FOSSIL_STORAGE_PLUGIN_DIR}          
-          - name: FOSSIL_USERNAME
-            valueFrom:
-              secretKeyRef:
-                key: admin-user
-                name: ${APPLICATION_NAME}-secrets
-          - name: FOSSIL_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: admin-password
-                name: ${APPLICATION_NAME}-secrets                 
+        containers:             
         - capabilities: {}
           image: ' '
           imagePullPolicy: IfNotPresent

@@ -11,7 +11,7 @@ RUN mkdir /app
 RUN mkdir /app/data
 RUN mkdir -p /app/configs/default
 
-WORKDIR /go/src/fossil
+WORKDIR /app
 
 ENV FOSSIL_BUILD_PLUGIN_DIR=/app/plugins
 ENV GOPATH=/go
