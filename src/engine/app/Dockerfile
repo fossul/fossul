@@ -25,7 +25,7 @@ COPY . /go/src/fossil
 RUN /bin/bash /go/src/fossil/fossil-app-build.sh
 
 RUN chown -R 1001:0 /app && \
-    chmod -R ug+rwX /app &&
+    chmod -R ug+rwX /app
 
 RUN chmod -R 777 /tmp
 
