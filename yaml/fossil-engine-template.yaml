@@ -7,6 +7,13 @@ metadata:
   name: fossil-engine
 objects:
 - apiVersion: v1
+  kind: Secret
+  metadata:
+    name: ${APPLICATION_NAME}-secrets
+  stringData:
+    admin-user: ${FOSSIL_USERNAME}
+    admin-password: ${FOSSIL_PASSWORD}  
+- apiVersion: v1
   kind: Service
   metadata:
     annotations:
@@ -207,6 +214,23 @@ objects:
           app: "${APPLICATION_NAME}-server"
       spec:
         containers:
+        - env:
+          - name: FOSSIL_SERVER_PORT
+            value: ${FOSSIL_SERVER_PORT}
+          - name: FOSSIL_SERVER_CONFIG_DIR
+            value: ${FOSSIL_SERVER_CONFIG_DIR}
+          - name: FOSSIL_SERVER_DATA_DIR
+            value: ${FOSSIL_SERVER_DATA_DIR}            
+          - name: FOSSIL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: admin-user
+                name: ${APPLICATION_NAME}-secrets
+          - name: FOSSIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: admin-password
+                name: ${APPLICATION_NAME}-secrets                            
         - capabilities: {}
           image: ' '
           imagePullPolicy: IfNotPresent
@@ -246,6 +270,21 @@ objects:
           app: "${APPLICATION_NAME}-app"
       spec:
         containers:
+        - env:
+          - name: FOSSIL_APP_PORT
+            value: ${FOSSIL_APP_PORT}
+          - name: FOSSIL_APP_PLUGIN_DIR
+            value: ${FOSSIL_APP_PLUGIN_DIR}          
+          - name: FOSSIL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: admin-user
+                name: ${APPLICATION_NAME}-secrets
+          - name: FOSSIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: admin-password
+                name: ${APPLICATION_NAME}-secrets              
         - capabilities: {}
           image: ' '
           imagePullPolicy: IfNotPresent
@@ -285,6 +324,21 @@ objects:
           app: "${APPLICATION_NAME}-storage"
       spec:
         containers:
+        - env:
+          - name: FOSSIL_STORAGE_PORT
+            value: ${FOSSIL_STORAGE_PORT}
+          - name: FOSSIL_STORAGE_PLUGIN_DIR
+            value: ${FOSSIL_STORAGE_PLUGIN_DIR}          
+          - name: FOSSIL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: admin-user
+                name: ${APPLICATION_NAME}-secrets
+          - name: FOSSIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: admin-password
+                name: ${APPLICATION_NAME}-secrets                 
         - capabilities: {}
           image: ' '
           imagePullPolicy: IfNotPresent
@@ -465,17 +519,62 @@ parameters:
     displayName: Source Repository URL
     description: The URL of the repository with your application source code
     value: https://github.com/ktenzer/fossil.git
-    required: true    
+    required: true
+  - name: FOSSIL_USERNAME
+    displayName: Username for API Services
+    description: Username for API Services
+    value: admin
+    required: true
+  - name: FOSSIL_PASSWORD
+    displayName: Password for API Services
+    description: Password for API Services
+    value: redhat123
+    required: true 
+  - name: FOSSIL_SERVER_PORT
+    displayName: Port for server service
+    description: Port for server service
+    value: 8000
+    required: true
+  - name: FOSSIL_SERVER_CONFIG_DIR
+    displayName: DIrectory for configs
+    description: Directory for configs
+    value: configs
+    required: true 
+  - name: FOSSIL_SERVER_DATA_DIR
+    displayName: Directory for data and metadata
+    description: Directory for data and metadata
+    value: data
+    required: true                                 
   - name: CONTEXT_DIR_SERVER
     displayName: Context Dir for server
     description: Context Dir for server
     value: src/engine/server
-    required: true    
+    required: true
+  - name: FOSSIL_APP_PORT
+    displayName: Port for app service
+    description: Port for app service
+    value: 8001
+    required: true       
+  - name: FOSSIL_APP_PLUGIN_DIR
+    displayName: Directory for app plugins
+    description: Directory for app plugins
+    value: plugins
+    required: true           
   - name: CONTEXT_DIR_APP
     displayName: Context Dir for app
     description: Context Dir for app
     value: src/engine/app
     required: true   
+  - name: FOSSIL_STORAGE_PORT
+    displayName: Port for storage service
+    description: Port for storage service
+    value: 8002
+    required: true       
+  - name: FOSSIL_STORAGE_PLUGIN_DIR
+    displayName: Directory for storage plugins
+    description: Directory for storage plugins
+    value: plugins
+    required: true      
   - name: CONTEXT_DIR_STORAGE
     displayName: Context Dir for storage
     description: Context Dir for storage
