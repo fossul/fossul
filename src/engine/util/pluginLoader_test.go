@@ -1,11 +1,12 @@
 package util
 
 import (
-	"testing"
-	"log"
-	"os"
+//	"testing"
+//	"log"
+//	"os"
 )
 
+/*
 var pluginDir string = os.Getenv("FOSSIL_BUILD_PLUGIN_DIR")
 
 func TestExecutePlugin(t *testing.T) {
@@ -41,3 +42,4 @@ func TestExecutePluginSimple(t *testing.T) {
 		t.Fail()
 	}
 }
+*/
