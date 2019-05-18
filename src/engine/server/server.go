@@ -16,6 +16,7 @@ var myPass string = os.Getenv("FOSSIL_PASSWORD")
 var runningWorkflowMap map[string]string = make(map[string]string)
  
 func main() {
+    log.Println("Configs directory [" + configDir + "] Data directory [" + dataDir + "]")
     err := util.CreateDir(configDir,0755)
     if err != nil {
         log.Fatal(err)

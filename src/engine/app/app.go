@@ -13,6 +13,7 @@ var myUser string = os.Getenv("FOSSIL_USERNAME")
 var myPass string = os.Getenv("FOSSIL_PASSWORD")
  
 func main() {
+    log.Println("Plugin directory [" + pluginDir + "]")
     err := util.CreateDir(pluginDir,0755)
     if err != nil {
         log.Fatal(err)
