@@ -216,7 +216,7 @@ objects:
         containers:
         - env:
           - name: FOSSIL_SERVER_PORT
-            value: ${FOSSIL_SERVER_PORT}
+            value: 8000
           - name: FOSSIL_SERVER_CONFIG_DIR
             value: ${FOSSIL_SERVER_CONFIG_DIR}
           - name: FOSSIL_SERVER_DATA_DIR
@@ -272,7 +272,7 @@ objects:
         containers:
         - env:
           - name: FOSSIL_APP_PORT
-            value: ${FOSSIL_APP_PORT}
+            value: 8001
           - name: FOSSIL_APP_PLUGIN_DIR
             value: ${FOSSIL_APP_PLUGIN_DIR}          
           - name: FOSSIL_USERNAME
@@ -326,7 +326,7 @@ objects:
         containers:
         - env:
           - name: FOSSIL_STORAGE_PORT
-            value: ${FOSSIL_STORAGE_PORT}
+            value: 8002
           - name: FOSSIL_STORAGE_PLUGIN_DIR
             value: ${FOSSIL_STORAGE_PLUGIN_DIR}          
           - name: FOSSIL_USERNAME
@@ -530,11 +530,6 @@ parameters:
     description: Password for API Services
     value: redhat123
     required: true 
-  - name: FOSSIL_SERVER_PORT
-    displayName: Port for server service
-    description: Port for server service
-    value: 8000
-    required: true
   - name: FOSSIL_SERVER_CONFIG_DIR
     displayName: DIrectory for configs
     description: Directory for configs
@@ -549,12 +544,7 @@ parameters:
     displayName: Context Dir for server
     description: Context Dir for server
     value: src/engine/server
-    required: true
-  - name: FOSSIL_APP_PORT
-    displayName: Port for app service
-    description: Port for app service
-    value: 8001
-    required: true       
+    required: true  
   - name: FOSSIL_APP_PLUGIN_DIR
     displayName: Directory for app plugins
     description: Directory for app plugins
@@ -564,12 +554,7 @@ parameters:
     displayName: Context Dir for app
     description: Context Dir for app
     value: src/engine/app
-    required: true   
-  - name: FOSSIL_STORAGE_PORT
-    displayName: Port for storage service
-    description: Port for storage service
-    value: 8002
-    required: true       
+    required: true      
   - name: FOSSIL_STORAGE_PLUGIN_DIR
     displayName: Directory for storage plugins
     description: Directory for storage plugins
