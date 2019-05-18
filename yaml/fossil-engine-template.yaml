@@ -215,8 +215,6 @@ objects:
       spec:
         containers:
         - env:
-          - name: FOSSIL_SERVER_PORT
-            value: 8000
           - name: FOSSIL_SERVER_CONFIG_DIR
             value: ${FOSSIL_SERVER_CONFIG_DIR}
           - name: FOSSIL_SERVER_DATA_DIR
@@ -271,8 +269,6 @@ objects:
       spec:
         containers:
         - env:
-          - name: FOSSIL_APP_PORT
-            value: 8001
           - name: FOSSIL_APP_PLUGIN_DIR
             value: ${FOSSIL_APP_PLUGIN_DIR}          
           - name: FOSSIL_USERNAME
@@ -325,8 +321,6 @@ objects:
       spec:
         containers:
         - env:
-          - name: FOSSIL_STORAGE_PORT
-            value: 8002
           - name: FOSSIL_STORAGE_PLUGIN_DIR
             value: ${FOSSIL_STORAGE_PLUGIN_DIR}          
           - name: FOSSIL_USERNAME
