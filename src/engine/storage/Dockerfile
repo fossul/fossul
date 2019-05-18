@@ -10,7 +10,7 @@ RUN mkdir -p /go/src/fossil
 RUN mkdir /app
 RUN mkdir /app/backups
 
-WORKDIR /app
+WORKDIR /go/src/fossil
 
 ENV FOSSIL_BUILD_PLUGIN_DIR=/app/plugins
 ENV GOPATH=/go
@@ -25,6 +25,8 @@ COPY . /go/src/fossil
 RUN /go/src/fossil/fossil-storage-build.sh
 
 #RUN cd /app && go build engine/util && go install engine/storage
+
+WORKDIR /app
 
 RUN chown -R 1001:0 /app && \
     chmod -R 777 /app

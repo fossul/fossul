@@ -9,7 +9,7 @@ RUN dnf install -y golang
 RUN mkdir -p /go/src/fossil
 RUN mkdir /app
 
-WORKDIR /app
+WORKDIR /go/src/fossil
 
 ENV FOSSIL_BUILD_PLUGIN_DIR=/app/plugins
 ENV GOPATH=/go
@@ -23,6 +23,8 @@ COPY . /go/src/fossil
 
 #RUN cd /app && go build engine/util && go install engine/app
 RUN /go/src/fossil/fossil-app-build.sh
+
+WORKDIR /app
 
 RUN chown -R 1001:0 /app && \
     chmod -R 777 /app

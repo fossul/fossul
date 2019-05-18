@@ -11,7 +11,7 @@ RUN mkdir /app
 RUN mkdir /app/data
 RUN mkdir -p /app/configs/default
 
-WORKDIR /app
+WORKDIR /go/src/fossil
 
 ENV FOSSIL_BUILD_PLUGIN_DIR=/app/plugins
 ENV GOPATH=/go
@@ -26,6 +26,8 @@ COPY . /go/src/fossil
 RUN /go/src/fossil/fossil-server-build.sh
 
 #RUN cd /app && go build engine/util && go install engine/workflow
+
+WORKDIR /app
 
 RUN chown -R 1001:0 /app && \
     chmod -R 777 /app
