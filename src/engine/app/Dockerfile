@@ -22,7 +22,7 @@ RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
 COPY . /go/src/fossil
 
 #RUN cd /app && go build engine/util && go install engine/app
-RUN /bin/bash /go/src/fossil/fossil-app-build.sh
+RUN /go/src/fossil/fossil-app-build.sh
 
 RUN chown -R 1001:0 /app && \
     chmod -R ug+rwX /app
@@ -35,4 +35,4 @@ RUN echo "1.0" > /etc/imageversion
 
 USER 1001
 
-CMD /bin/bash /app/fossil-app-startup.sh
+CMD /app/fossil-app-startup.sh

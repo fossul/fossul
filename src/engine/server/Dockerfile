@@ -9,7 +9,7 @@ RUN dnf install -y golang
 RUN mkdir -p /go/src/fossil
 RUN mkdir /app
 RUN mkdir /app/data
-RUN mkdir /app/configs
+RUN mkdir -p /app/configs/default
 
 WORKDIR /go/src/fossil
 
@@ -23,7 +23,7 @@ RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
 
 COPY . /go/src/fossil
 
-RUN /bin/bash /go/src/fossil/fossil-server-build.sh
+RUN /go/src/fossil/fossil-server-build.sh
 
 #RUN cd /app && go build engine/util && go install engine/workflow
 
@@ -36,4 +36,4 @@ RUN echo "1.0" > /etc/imageversion
 
 USER 1001
 
-CMD /bin/bash /app/fossil-server-startup.sh
+CMD /app/fossil-server-startup.sh
