@@ -7,7 +7,7 @@ import (
     "fossil/src/engine/util"
 )
 
-var port string = os.Getenv("FOSSIL_APP_PORT")
+var port string = os.Getenv("FOSSIL_APP_SERVICE_PORT")
 var pluginDir string = os.Getenv("FOSSIL_APP_PLUGIN_DIR")
 var myUser string = os.Getenv("FOSSIL_USERNAME")
 var myPass string = os.Getenv("FOSSIL_PASSWORD")
@@ -25,6 +25,5 @@ func main() {
     router := NewRouter()
  
     log.Println("Starting app service on port [" + port + "]")
-    //log.Fatal(http.ListenAndServe(":" + port, router))
-    log.Fatal(http.ListenAndServe(":8001", router))
+    log.Fatal(http.ListenAndServe(":" + port, router))
 }

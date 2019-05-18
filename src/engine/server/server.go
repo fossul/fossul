@@ -7,7 +7,7 @@ import (
     "os"
 )
 
-var port string = os.Getenv("FOSSIL_SERVER_PORT")
+var port string = os.Getenv("FOSSIL_SERVER_SERVICE_PORT")
 var configDir string = os.Getenv("FOSSIL_SERVER_CONFIG_DIR")
 var dataDir string = os.Getenv("FOSSIL_SERVER_DATA_DIR")
 var myUser string = os.Getenv("FOSSIL_USERNAME")
@@ -36,6 +36,5 @@ func main() {
     }
 
     log.Println("Starting server service on port [" + port + "]")
-    //log.Fatal(http.ListenAndServe(":" + port, router))
-    log.Fatal(http.ListenAndServe(":8000", router))
+    log.Fatal(http.ListenAndServe(":" + port, router))
 }

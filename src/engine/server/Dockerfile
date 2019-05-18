@@ -36,4 +36,6 @@ RUN echo "1.0" > /etc/imageversion
 
 USER 1001
 
+WORKDIR /app
+
 CMD /app/fossil-server-startup.sh

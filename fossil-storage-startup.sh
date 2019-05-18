@@ -1,11 +1,11 @@
 #!/bin/bash
 PORT="8002"
-PLUGIN_DIR="/app/plugins"
+PLUGIN_DIR="plugins"
 USERNAME="admin"
 PASSWORD="redhat123"
 
-if [[ -z "${FOSSIL_STORAGE_PORT}" ]]; then
-    export FOSSIL_STORAGE_PORT=$PORT
+if [[ -z "${FOSSIL_STORAGE_SERVICE_PORT}" ]]; then
+    export FOSSIL_STORAGE_SERVICE_PORT=$PORT
 fi    
 
 if [[ -z "${FOSSIL_STORAGE_PLUGIN_DIR}" ]]; then

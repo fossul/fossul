@@ -36,4 +36,6 @@ RUN ls -l /app
 
 USER 1001
 
+WORKDIR /app
+
 CMD /app/fossil-app-startup.sh

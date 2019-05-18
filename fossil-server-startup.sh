@@ -1,12 +1,12 @@
 #!/bin/bash
 PORT="8000"
-CONFIG_DIR="/app/configs"
-DATA_DIR="/app/data"
+CONFIG_DIR="configs"
+DATA_DIR="data"
 USERNAME="admin"
 PASSWORD="redhat123"
 
-if [[ -z "${FOSSIL_SERVER_PORT}" ]]; then
-    export FOSSIL_SERVER_PORT=$PORT
+if [[ -z "${FOSSIL_SERVER_SERVICE_PORT}" ]]; then
+    export FOSSIL_SERVER_SERVICE_PORT=$PORT
 fi    
 
 if [[ -z "${FOSSIL_SERVER_CONFIG_DIR}" ]]; then
