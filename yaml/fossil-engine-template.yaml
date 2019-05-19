@@ -67,6 +67,28 @@ objects:
       kind: Service
       name: ${APPLICATION_NAME}-server
 - apiVersion: v1
+  kind: Route
+  metadata:
+    annotations:
+      template.openshift.io/expose-uri: http://{.spec.host}{.spec.path}
+    name: ${APPLICATION_NAME}-app
+  spec:
+    host: ${APPLICATION_DOMAIN}
+    to:
+      kind: Service
+      name: ${APPLICATION_NAME}-app
+- apiVersion: v1
+  kind: Route
+  metadata:
+    annotations:
+      template.openshift.io/expose-uri: http://{.spec.host}{.spec.path}
+    name: ${APPLICATION_NAME}-storage
+  spec:
+    host: ${APPLICATION_DOMAIN}
+    to:
+      kind: Service
+      name: ${APPLICATION_NAME}-storage          
+- apiVersion: v1
   kind: BuildConfig
   metadata:
     annotations:
@@ -185,11 +207,21 @@ objects:
     - imageChange: {}
       type: ImageChange
   status:
-    lastVersion: 0    
+    lastVersion: 0
 - apiVersion: v1
   kind: PersistentVolumeClaim
   metadata:
-    name: "${APPLICATION_NAME}-data" 
+    name: "${APPLICATION_NAME}-server-data" 
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: "${SERVER_CAPACITY}"        
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: "${APPLICATION_NAME}-storage-data" 
   spec:
     accessModes:
     - ReadWriteOnce
@@ -221,8 +253,15 @@ objects:
           terminationMessagePath: /dev/termination-log
           ports:
           -containerPort: 8080
+          volumeMounts:
+          - mountPath: /backup
+            name: "${APPLICATION_NAME}-server-data"
         dnsPolicy: ClusterFirst
         restartPolicy: Always
+        volumes:
+        - name: "${APPLICATION_NAME}-server-data" 
+          persistentVolumeClaim:
+            claimName: "${APPLICATION_NAME}-server-data"          
     triggers:
     - imageChangeParams:
         automatic: true
@@ -301,13 +340,13 @@ objects:
           -containerPort: 8080
           volumeMounts:
           - mountPath: /backup
-            name: "${APPLICATION_NAME}-data"
+            name: "${APPLICATION_NAME}-storage-data"
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         volumes:
-        - name: "${APPLICATION_NAME}-data" 
+        - name: "${APPLICATION_NAME}-storage-data" 
           persistentVolumeClaim:
-            claimName: "${APPLICATION_NAME}-data"
+            claimName: "${APPLICATION_NAME}-storage-data"
     triggers:
     - imageChangeParams:
         automatic: true
@@ -529,7 +568,10 @@ parameters:
   - name: SOURCE_REPOSITORY_REF_STORAGE
     displayName: Source Repository Reference Tag
     description: The Branch tag to use
-    value: master    
+    value: master
+  - name: SERVER_CAPACITY
+    description: Storage for Server Service
+    value: 10Gi      
   - name: STORAGE_CAPACITY
-    description: Storage required
-    value: 10Gi
+    description: Storage for Storage Service
+    value: 25Gi
