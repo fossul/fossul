@@ -421,6 +421,12 @@ func setDiscoverFileList(config util.Config, discoverResult util.DiscoverResult)
 
 func SetAuth() client.Auth {
 	var auth client.Auth
+	auth.ServerHostname = serverHostname
+	auth.ServerPort = serverPort
+	auth.AppHostname = appHostname
+	auth.AppPort = appPort
+	auth.StorageHostname = storageHostname
+	auth.StoragePort = storagePort
 	auth.Username = myUser
 	auth.Password = myPass
 

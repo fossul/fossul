@@ -159,6 +159,12 @@ func backupDelete (configMap map[string]string) {
 				fmt.Println("INFO Backup " + backupName + " deleted successfully")
 				
 				var auth client.Auth
+				auth.ServerHostname = os.Getenv("FOSSIL_SERVER_CLIENT_HOSTNAME")
+				auth.ServerPort = os.Getenv("FOSSIL_SERVER_CLIENT_PORT")
+				auth.AppHostname = os.Getenv("FOSSIL_APP_CLIENT_HOSTNAME")
+				auth.AppPort = os.Getenv("FOSSIL_APP_CLIENT_PORT")
+				auth.StorageHostname = os.Getenv("FOSSIL_STORAGE_CLIENT_HOSTNAME")
+				auth.StoragePort = os.Getenv("FOSSIL_STORAGE_CLIENT_PORT")
 				auth.Username = os.Getenv("MyUser")
 				auth.Password = os.Getenv("MyPass")
 

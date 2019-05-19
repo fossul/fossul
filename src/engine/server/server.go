@@ -12,6 +12,12 @@ var configDir string = os.Getenv("FOSSIL_SERVER_CONFIG_DIR")
 var dataDir string = os.Getenv("FOSSIL_SERVER_DATA_DIR")
 var myUser string = os.Getenv("FOSSIL_USERNAME")
 var myPass string = os.Getenv("FOSSIL_PASSWORD")
+var serverHostname string = os.Getenv("FOSSIL_SERVER_CLIENT_HOSTNAME")
+var serverPort string = os.Getenv("FOSSIL_SERVER_CLIENT_PORT")
+var appHostname string = os.Getenv("FOSSIL_APP_CLIENT_HOSTNAME")
+var appPort string = os.Getenv("FOSSIL_APP_CLIENT_PORT")
+var storageHostname string = os.Getenv("FOSSIL_STORAGE_CLIENT_HOSTNAME")
+var storagePort string = os.Getenv("FOSSIL_STORAGE_CLIENT_PORT")
 
 var runningWorkflowMap map[string]string = make(map[string]string)
  

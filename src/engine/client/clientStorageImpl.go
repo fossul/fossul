@@ -11,7 +11,7 @@ import (
 func StoragePluginList(auth Auth,pluginType string) ([]string,error) {
 	var plugins []string
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginList/" + pluginType, nil)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/pluginList/" + pluginType, nil)
 	if err != nil {
 		return plugins,err
 	}
@@ -46,7 +46,7 @@ func StoragePluginInfo(auth Auth,config util.Config, pluginName,pluginType strin
 
 	var pluginInfoResult util.PluginInfoResult
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginInfo/" + pluginName + "/" + pluginType, b)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/pluginInfo/" + pluginName + "/" + pluginType, b)
 	if err != nil {
 		return pluginInfoResult,err
 	}
@@ -80,7 +80,7 @@ func Backup(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/backup", b)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/backup", b)
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {
@@ -115,7 +115,7 @@ func BackupList(auth Auth,profileName,configName,policyName string,config util.C
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/backupList", b)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/backupList", b)
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {
@@ -148,7 +148,7 @@ func BackupDelete(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/backupDelete", b)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/backupDelete", b)
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {

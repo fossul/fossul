@@ -14,7 +14,7 @@ func PreQuiesceCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/preQuiesceCmd", b)
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/preQuiesceCmd", b)
 	if err != nil {
 		return result,err
 	}
@@ -48,7 +48,7 @@ func QuiesceCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/quiesceCmd", b)
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/quiesceCmd", b)
 	if err != nil {
 		return result,err
 	}
@@ -82,7 +82,7 @@ func PostQuiesceCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/postQuiesceCmd", b)
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/postQuiesceCmd", b)
 	if err != nil {
 		return result,err
 	}
@@ -116,7 +116,7 @@ func PreUnquiesceCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/preUnquiesceCmd", b)
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/preUnquiesceCmd", b)
 	if err != nil {
 		return result,err
 	}
@@ -150,7 +150,7 @@ func UnquiesceCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/unquiesceCmd", b)
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/unquiesceCmd", b)
 	if err != nil {
 		return result,err
 	}
@@ -184,7 +184,7 @@ func BackupCreateCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/backupCreateCmd", b)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/backupCreateCmd", b)
 	if err != nil {
 		return result,err
 	}
@@ -218,7 +218,7 @@ func BackupDeleteCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/backupDeleteCmd", b)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/backupDeleteCmd", b)
 	if err != nil {
 		return result,err
 	}
@@ -252,7 +252,7 @@ func PostUnquiesceCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/postUnquiesceCmd", b)
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/postUnquiesceCmd", b)
 	if err != nil {
 		return result,err
 	}
@@ -287,7 +287,7 @@ func SendTrapSuccessCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-server:8000/sendTrapSuccessCmd", b)
+	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/sendTrapSuccessCmd", b)
 	if err != nil {
 		return result,err
 	}
@@ -321,7 +321,7 @@ func SendTrapErrorCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-server:8000/sendTrapErrorCmd", b)
+	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/sendTrapErrorCmd", b)
 	if err != nil {
 		return result,err
 	}
@@ -355,7 +355,7 @@ func ArchiveCreateCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/archiveCreateCmd", b)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/archiveCreateCmd", b)
 	if err != nil {
 		return result,err
 	}
@@ -389,7 +389,7 @@ func ArchiveDeleteCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/archiveDeleteCmd", b)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/archiveDeleteCmd", b)
 	if err != nil {
 		return result,err
 	}

@@ -15,7 +15,7 @@ func AddSchedule(auth Auth,profileName,configName,policy,cronSchedule string) (u
 
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/addSchedule/" + profileName + "/" + configName + "/" + policy, b)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/addSchedule/" + profileName + "/" + configName + "/" + policy, b)
 	if err != nil {
 		return result,err
 	}
@@ -46,7 +46,7 @@ func AddSchedule(auth Auth,profileName,configName,policy,cronSchedule string) (u
 func DeleteSchedule(auth Auth,profileName,configName,policy string) (util.Result,error) {
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/deleteSchedule/" + profileName + "/" + configName + "/" + policy, nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/deleteSchedule/" + profileName + "/" + configName + "/" + policy, nil)
 	if err != nil {
 		return result,err
 	}
@@ -77,7 +77,7 @@ func DeleteSchedule(auth Auth,profileName,configName,policy string) (util.Result
 func ListSchedules(auth Auth) (util.JobScheduleResult,error) {
 	var jobScheduleResult util.JobScheduleResult
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/listSchedules", nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/listSchedules", nil)
 	if err != nil {
 		return jobScheduleResult,err
 	}

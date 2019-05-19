@@ -13,7 +13,7 @@ import (
 func ArchivePluginList(auth Auth,pluginType string) ([]string,error) {
 	var plugins []string
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginList/" + pluginType, nil)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/pluginList/" + pluginType, nil)
 	if err != nil {
 		return plugins,err
 	}
@@ -48,7 +48,7 @@ func ArchivePluginInfo(auth Auth,config util.Config, pluginName,pluginType strin
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/pluginInfo/" + pluginName + "/" + pluginType, b)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/pluginInfo/" + pluginName + "/" + pluginType, b)
 	if err != nil {
 		return pluginInfoResult,err
 	}
@@ -82,7 +82,7 @@ func Archive(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/archive", b)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/archive", b)
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -118,7 +118,7 @@ func ArchiveList(auth Auth,profileName,configName,policyName string,config util.
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/archiveList", b)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/archiveList", b)
 	if err != nil {
 		return result, archives, err
 	}
@@ -158,7 +158,7 @@ func ArchiveDelete(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-storage:8002/archiveDelete", b)
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/archiveDelete", b)
 	if err != nil {
 		return result,err
 	}

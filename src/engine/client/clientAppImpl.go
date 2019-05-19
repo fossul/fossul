@@ -12,7 +12,7 @@ import (
 func AppPluginList(auth Auth,pluginType string) ([]string,error) {
 	var plugins []string
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginList/" + pluginType, nil)
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/pluginList/" + pluginType, nil)
 	if err != nil {
 		return plugins,err
 	}
@@ -47,7 +47,7 @@ func AppPluginInfo(auth Auth,config util.Config, pluginName,pluginType string) (
 
 	var pluginInfoResult util.PluginInfoResult
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/pluginInfo/" + pluginName + "/" + pluginType, b)
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/pluginInfo/" + pluginName + "/" + pluginType, b)
 	if err != nil {
 		return pluginInfoResult,err
 	}
@@ -81,7 +81,7 @@ func Discover(auth Auth,config util.Config) (util.DiscoverResult,error) {
 
 	var discoverResult util.DiscoverResult
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/discover", b)
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/discover", b)
 	if err != nil {
 		return discoverResult,err
 	}
@@ -115,7 +115,7 @@ func Quiesce(auth Auth,config util.Config) (util.Result,error) {
 
 	var result util.Result
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/quiesce", b)
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/quiesce", b)
 	if err != nil {
 		return result,err
 	}
@@ -149,7 +149,7 @@ func Unquiesce(auth Auth,config util.Config) (util.Result,error) {
 
 	var result util.Result
 
-	req, err := http.NewRequest("POST", "http://fossil-app:8001/unquiesce", b)
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/unquiesce", b)
 	if err != nil {
 		return result,err
 	}

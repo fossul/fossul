@@ -11,7 +11,7 @@ import (
 func GetConfig(auth Auth,profileName,configName string) (util.Config,error) {
 	var config util.Config
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/getConfig/" + profileName + "/" + configName, nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/getConfig/" + profileName + "/" + configName, nil)
 	if err != nil {
 		return config,err
 	}
@@ -42,7 +42,7 @@ func GetConfig(auth Auth,profileName,configName string) (util.Config,error) {
 func GetPluginConfig(auth Auth,profileName,configName,pluginName string) (map[string]string,error) {
 	var configMap map[string]string
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/getPluginConfig/" + profileName + "/" + configName + "/" + pluginName, nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/getPluginConfig/" + profileName + "/" + configName + "/" + pluginName, nil)
 	if err != nil {
 		return configMap,err
 	}
@@ -73,7 +73,7 @@ func GetPluginConfig(auth Auth,profileName,configName,pluginName string) (map[st
 func GetDefaultConfig(auth Auth) (util.Config,error) {
 	var config util.Config
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/getDefaultConfig", nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/getDefaultConfig", nil)
 	if err != nil {
 		return config,err
 	}
@@ -104,7 +104,7 @@ func GetDefaultConfig(auth Auth) (util.Config,error) {
 func GetDefaultPluginConfig(auth Auth,pluginName string) (map[string]string,error) {
 	var configMap map[string]string
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/getDefaultPluginConfig/" + pluginName, nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/getDefaultPluginConfig/" + pluginName, nil)
 	if err != nil {
 		return configMap,err
 	}
@@ -138,7 +138,7 @@ func AddConfig(auth Auth,profileName,configName string,config util.Config) (util
 
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/addConfig/" + profileName + "/" + configName, b)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/addConfig/" + profileName + "/" + configName, b)
 	if err != nil {
 		return result,err
 	}
@@ -172,7 +172,7 @@ func AddPluginConfig(auth Auth,profileName,configName,pluginName string,configMa
 
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/addPluginConfig/" + profileName + "/" + configName + "/" + pluginName, b)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/addPluginConfig/" + profileName + "/" + configName + "/" + pluginName, b)
 	if err != nil {
 		return result,err
 	}
@@ -203,7 +203,7 @@ func AddPluginConfig(auth Auth,profileName,configName,pluginName string,configMa
 func DeleteConfig(auth Auth,profileName,configName string) (util.Result,error) {
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/deleteConfig/" + profileName + "/" + configName, nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/deleteConfig/" + profileName + "/" + configName, nil)
 	if err != nil {
 		return result,err
 	}
@@ -234,7 +234,7 @@ func DeleteConfig(auth Auth,profileName,configName string) (util.Result,error) {
 func AddProfile(auth Auth,profileName string) (util.Result,error) {
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/addProfile/" + profileName, nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/addProfile/" + profileName, nil)
 	if err != nil {
 		return result,err
 	}
@@ -265,7 +265,7 @@ func AddProfile(auth Auth,profileName string) (util.Result,error) {
 func DeleteProfile(auth Auth,profileName string) (util.Result,error) {
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/deleteProfile/" + profileName, nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/deleteProfile/" + profileName, nil)
 	if err != nil {
 		return result,err
 	}
@@ -296,7 +296,7 @@ func DeleteProfile(auth Auth,profileName string) (util.Result,error) {
 func ListProfiles(auth Auth) (util.Result,error) {
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/listProfiles", nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/listProfiles", nil)
 	if err != nil {
 		return result,err
 	}
@@ -327,7 +327,7 @@ func ListProfiles(auth Auth) (util.Result,error) {
 func ListConfigs(auth Auth,profileName string) (util.Result,error) {
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/listConfigs/" + profileName, nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/listConfigs/" + profileName, nil)
 	if err != nil {
 		return result,err
 	}
@@ -358,7 +358,7 @@ func ListConfigs(auth Auth,profileName string) (util.Result,error) {
 func ListPluginConfigs(auth Auth,profileName,configName string) (util.Result,error) {
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://fossil-server:8000/listPluginConfigs/" + profileName + "/" + configName, nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/listPluginConfigs/" + profileName + "/" + configName, nil)
 	if err != nil {
 		return result,err
 	}

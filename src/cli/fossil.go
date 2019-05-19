@@ -4,16 +4,22 @@ import (
 	"github.com/pborman/getopt/v2"
 	"os"
 	"fossil/src/engine/util"
-	"fossil/src/engine/client"
 	"fmt"
 )
 
 func main() {
+	optServerHostname := getopt.StringLong("server-host",'q',"","Server service hostname")
+	optServerPort := getopt.StringLong("server-port",'j',"","Server service port")
+	optAppHostname := getopt.StringLong("app-host",'v',"","App service hostname")
+	optAppPort := getopt.StringLong("app-port",'x',"","App service port")
+	optStorageHostname := getopt.StringLong("storage-host",'y',"","Storage service hostname")
+	optStoragePort := getopt.StringLong("storage-port",'z',"","Storage service port")
 	optUsername := getopt.StringLong("user",'u',"","Username")
 	optPassword := getopt.StringLong("pass",'s',"","Password")
 	optProfile := getopt.StringLong("profile",'p',"","Profile name")
 	optConfig := getopt.StringLong("config",'c',"","Config name")
 	optConfigPath := getopt.StringLong("config-path",'o',"","Path to configs directory")
+	optCredentialFile := getopt.StringLong("credential-file",'h',"","Path to credential file")
 	optConfigFile := getopt.StringLong("config-file",'f',"","Path to config file")
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
 	optAction := getopt.StringLong("action",'a',"","backup|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|addSchedule|deleteSchedule|jobStatus|pluginInfo|status")
@@ -21,6 +27,7 @@ func main() {
 	optPluginType := getopt.StringLong("plugin-type",'t',"","Plugin type app|storage|archive")
 	optWorkflowId := getopt.StringLong("workflow-id",'w',"","Workflow Id")
 	optCronSchedule := getopt.StringLong("cron-schedule",'r',"","Cron Schedule Format - (min) (hour) (dayOfMOnth) (month) (dayOfWeek)")
+	optSetCredentials := getopt.BoolLong("set-credentials", 0,"Save credentials to a file")
 	optLocalConfig := getopt.BoolLong("local", 0,"Use a local configuration file")
 	optListSchedules := getopt.BoolLong("list-schedules", 0,"List schedules")
 	optAppPluginList := getopt.BoolLong("list-app-plugins", 0,"List app plugins")
@@ -39,21 +46,66 @@ func main() {
         os.Exit(0)
 	}
 
-	if getopt.IsSet("user") != true {
-		fmt.Println("ERROR: Missing parameter --user")
-		getopt.Usage()
+	var credentialFile string
+	if getopt.IsSet("credential-file") != true {
+		credentialFile = os.Getenv("HOME") + "/.fossil-credentials"
+	} else {
+		credentialFile = *optCredentialFile
+	}
+
+	if *optSetCredentials {
+		if getopt.IsSet("user") != true {
+			fmt.Println("ERROR: Missing parameter --user")
+			getopt.Usage()
+			os.Exit(1)
+		}
+
+		if getopt.IsSet("pass") != true {
+			fmt.Println("ERROR: Missing parameter --pass")
+			getopt.Usage()
+			os.Exit(1)
+		}
+
+		if getopt.IsSet("server-host") != true {
+			fmt.Println("ERROR: Missing parameter --server-host")
+			getopt.Usage()
+			os.Exit(1)
+		}
+		if getopt.IsSet("server-port") != true {
+			fmt.Println("ERROR: Missing parameter --server-port")
+			getopt.Usage()
+			os.Exit(1)
+		}
+		if getopt.IsSet("app-host") != true {
+			fmt.Println("ERROR: Missing parameter --app-host")
+			getopt.Usage()
+			os.Exit(1)
+		}
+		if getopt.IsSet("app-port") != true {
+			fmt.Println("ERROR: Missing parameter --app-port")
+			getopt.Usage()
+			os.Exit(1)
+		}
+		if getopt.IsSet("storage-host") != true {
+			fmt.Println("ERROR: Missing parameter --storage-host")
+			getopt.Usage()
+			os.Exit(1)
+		}
+		if getopt.IsSet("storage-port") != true {
+			fmt.Println("ERROR: Missing parameter --storage-port")
+			getopt.Usage()
+			os.Exit(1)
+		}		
+
+		WriteCredentialFile(credentialFile,*optServerHostname,*optServerPort,*optAppHostname,*optAppPort,*optStorageHostname,*optStoragePort,*optUsername,*optPassword)
+	}
+
+	if ! util.ExistsPath(credentialFile) {
+		fmt.Println("ERROR: missing credential file! [" + credentialFile + "]")
 		os.Exit(1)
 	}
 
-	if getopt.IsSet("pass") != true {
-		fmt.Println("ERROR: Missing parameter --pass")
-		getopt.Usage()
-		os.Exit(1)
-	}
-
-	var auth client.Auth
-	auth.Username = *optUsername
-	auth.Password = *optPassword
+	auth := ReadCredentialFile(credentialFile)
 
 	if *optAction == "status" {
 		Status(auth)
@@ -116,7 +168,6 @@ func main() {
 	}
 	
 	if *optAppPluginList {
-		fmt.Println("HERE")
 		AppPluginList(auth)
 	}
 

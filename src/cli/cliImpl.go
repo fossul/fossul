@@ -11,6 +11,37 @@ import (
 	"errors"
 )
 
+func WriteCredentialFile(credentialFile,serverHostname,serverPort,appHostname,appPort,storageHostname,storagePort,username,password string) {
+	var auth client.Auth
+	auth.ServerHostname = serverHostname
+	auth.ServerPort = serverPort
+	auth.AppHostname = appHostname
+	auth.AppPort = appPort
+	auth.StorageHostname = storageHostname
+	auth.StoragePort = storagePort
+	auth.Username = username
+	auth.Password = password
+
+	err := util.WriteGob(credentialFile,auth)
+	if err != nil {
+		fmt.Println("ERROR: " + err.Error())
+		os.Exit(1)
+	}
+	os.Exit(0)
+}
+
+func ReadCredentialFile(credentialFile string) (client.Auth) {
+	auth := &client.Auth{}
+
+	err := util.ReadGob(credentialFile,&auth)
+	if err != nil {
+		fmt.Println("ERROR: " + err.Error())
+		os.Exit(1)
+	}
+
+	return *auth
+}
+
 func GetDefaultConfig(auth client.Auth) {
 	config,err := client.GetDefaultConfig(auth)
 	if err != nil {
