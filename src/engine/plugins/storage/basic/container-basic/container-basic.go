@@ -5,7 +5,6 @@ import (
 	"github.com/pborman/getopt/v2"
 	"fossil/src/engine/util"
 	"fossil/src/engine/client/k8s"
-	"fossil/src/engine/client"
 	"fossil/src/engine/plugins/pluginUtil"
 	"encoding/json"
 	"fmt"
@@ -157,29 +156,6 @@ func backupDelete (configMap map[string]string) {
 					os.Exit(1)
 				}
 				fmt.Println("INFO Backup " + backupName + " deleted successfully")
-				
-				var auth client.Auth
-				auth.ServerHostname = os.Getenv("FOSSIL_SERVER_CLIENT_HOSTNAME")
-				auth.ServerPort = os.Getenv("FOSSIL_SERVER_CLIENT_PORT")
-				auth.AppHostname = os.Getenv("FOSSIL_APP_CLIENT_HOSTNAME")
-				auth.AppPort = os.Getenv("FOSSIL_APP_CLIENT_PORT")
-				auth.StorageHostname = os.Getenv("FOSSIL_STORAGE_CLIENT_HOSTNAME")
-				auth.StoragePort = os.Getenv("FOSSIL_STORAGE_CLIENT_PORT")
-				auth.Username = os.Getenv("MyUser")
-				auth.Password = os.Getenv("MyPass")
-
-				result,err := client.DeleteWorkflowResults(auth,configMap["ProfileName"],configMap["ConfigName"],backup.WorkflowId)
-				if err != nil {
-					fmt.Println("ERROR " + err.Error())
-					os.Exit(1)
-				}	
-				for _, line := range result.Messages {
-					fmt.Println(line.Level, line.Message)
-				}
-
-				if result.Code != 0 {
-					os.Exit(1)
-				}
 			}
 			count = count + 1
 		}

@@ -258,6 +258,15 @@ func startBackupWorkflowImpl (dataDir string, config util.Config, workflow *util
 			}
 		}
 
+		if config.JobRetention != 0 {
+			step := stepInit(resultsDir,workflow)
+			result := util.DeleteJobs(dataDir,config.ProfileName,config.ConfigName,config.JobRetention)
+
+			if resultCode := stepErrorHandler(isQuiesce,resultsDir,policy,step,workflow,result,config);resultCode != 0 {
+				return resultCode
+			}
+		}
+
 		commentMsg = "Sending Notifications"
 		setComment(resultsDir,commentMsg,workflow)	
 	

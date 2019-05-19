@@ -26,28 +26,6 @@ func AddCronSchedule(profileName,configName,policy,cronSchedule string) (cron.En
 
 	auth := SetAuth()
 
-	/*conf := configDir + "/" + profileName + "/" + configName + "/" + configName + ".conf"
-	config,_ := util.ReadConfig(conf)
-
-	configFileDir := configDir + "/" + profileName + "/" + configName
-	if config.AppPlugin != "" {
-		appConfigPath := configFileDir + "/" + config.AppPlugin + ".conf"
-		config,err = util.SetAppPluginParameters(appConfigPath, config)
-		if err != nil {
-			fmt.Println("ERROR: " + err.Error())
-			return id,err
-
-		}
-	}
-	if config.StoragePlugin != "" {
-		storageConfigPath := configFileDir + "/" + config.StoragePlugin + ".conf"
-		config,err = util.SetStoragePluginParameters(storageConfigPath, config)
-		if err != nil {
-			fmt.Println("ERROR: " + err.Error())
-			return id,err
-		}
-	}*/	
-
 	id,err = c.cronScheduler.AddFunc(cronSchedule, func() {
 		client.StartBackupWorkflow(auth,profileName,configName,policy)
 	})

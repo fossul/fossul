@@ -20,6 +20,7 @@ type Config struct {
 	StoragePlugin string `json:"storagePlugin"`
 	ArchivePlugin string `json:"archivePlugin"`
 	AutoDiscovery bool `json:"autoDiscovery"`
+	JobRetention int `json:"jobRetention"`
 	BackupRetentions []BackupRetention `json:"backupRetentions"`
 	SelectedBackupPolicy string `json:"backupPolicy,omitmepty"`
 	SelectedBackupRetention int `json:"backupRetention,omitmepty"`

@@ -20,12 +20,6 @@ type WorkflowResult struct {
 	Result Result `json:"result,omitempty"`
 }
 
-//another way to instantiate Workflow
-//func New() *Workflow {
-//	w := &Workflow{}
-//	return w
-//}
-
 type Step struct {
 	Id int `json:"id"`
 	Status string `json:"status"`
