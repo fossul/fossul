@@ -287,7 +287,7 @@ func SendTrapSuccessCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/sendTrapSuccessCmd", b)
+	req, err := http.NewRequest("POST", "http://fossil-server:8000/sendTrapSuccessCmd", b)
 	if err != nil {
 		return result,err
 	}
@@ -321,7 +321,7 @@ func SendTrapErrorCmd(auth Auth,config util.Config) (util.Result,error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/sendTrapErrorCmd", b)
+	req, err := http.NewRequest("POST", "http://fossil-server:8000/sendTrapErrorCmd", b)
 	if err != nil {
 		return result,err
 	}

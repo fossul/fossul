@@ -17,7 +17,7 @@ type Auth struct {
 func GetWorkflowStatus(auth Auth,profileName,configName string,id int) (util.Workflow,error) {
 	var workflow util.Workflow
 	idToString := util.IntToString(id)
-	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getWorkflowStatus/" + profileName + "/" + configName + "/" + idToString, nil)
+	req, err := http.NewRequest("GET", "http://fossil-server:8000/getWorkflowStatus/" + profileName + "/" + configName + "/" + idToString, nil)
 	if err != nil {
 		return workflow,err
 	}
@@ -49,7 +49,7 @@ func GetWorkflowStepResults(auth Auth,profileName,configName string,workflowId i
 	var results []util.Result
 	w := util.IntToString(workflowId)
 	s := util.IntToString(step)
-	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getWorkflowStepResults/" + profileName + "/" + configName + "/" + w + "/" + s, nil)
+	req, err := http.NewRequest("GET", "http://fossil-server:8000/getWorkflowStepResults/" + profileName + "/" + configName + "/" + w + "/" + s, nil)
 	if err != nil {
 		return results,err
 	}
@@ -80,7 +80,7 @@ func GetWorkflowStepResults(auth Auth,profileName,configName string,workflowId i
 func DeleteWorkflowResults(auth Auth,profileName,configName string,workflowId string) (util.Result,error) {
 	var result util.Result
 
-	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/deleteWorkflowResults/" + profileName + "/" + configName + "/" + workflowId, nil)
+	req, err := http.NewRequest("POST", "http://fossil-server:8000/deleteWorkflowResults/" + profileName + "/" + configName + "/" + workflowId, nil)
 	if err != nil {
 		return result,err
 	}
@@ -111,7 +111,7 @@ func DeleteWorkflowResults(auth Auth,profileName,configName string,workflowId st
 func GetWorkflowServiceStatus(auth Auth) (util.Status,error) {
 	var status util.Status
 
-	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/status", nil)
+	req, err := http.NewRequest("GET", "http://fossil-server:8000/status", nil)
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -207,7 +207,7 @@ func StartBackupWorkflowLocalConfig(auth Auth,profileName,configName,policyName 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/startBackupWorkflowLocalConfig", b)
+	req, err := http.NewRequest("POST", "http://fossil-server:8000/startBackupWorkflowLocalConfig", b)
 	if err != nil {
 		return result,err
 	}
@@ -239,7 +239,7 @@ func StartBackupWorkflowLocalConfig(auth Auth,profileName,configName,policyName 
 func StartBackupWorkflow(auth Auth,profileName,configName,policyName string) (util.WorkflowResult,error) {
 	var result util.WorkflowResult
 
-	req, err := http.NewRequest("POST", "http://fossil-workflow:8000/startBackupWorkflow/"+ profileName + "/" + configName + "/" + policyName, nil)
+	req, err := http.NewRequest("POST", "http://fossil-server:8000/startBackupWorkflow/"+ profileName + "/" + configName + "/" + policyName, nil)
 	if err != nil {
 		return result,err
 	}
@@ -283,7 +283,7 @@ func GetJobList(auth Auth,profileName,configName string) (util.Jobs,error) {
 
 	var jobs util.Jobs
 
-	req, err := http.NewRequest("GET", "http://fossil-workflow:8000/getJobs/" + profileName + "/" + configName, nil)
+	req, err := http.NewRequest("GET", "http://fossil-server:8000/getJobs/" + profileName + "/" + configName, nil)
 	if err != nil {
 		return jobs,err
 	}
