@@ -62,7 +62,7 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	config,err := GetConsolidatedConfig(profileName,configName,policyName)
 	if err != nil {
-		result := util.SetResultMessage(1,"ERROR","Workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Couldn't read config using profile [" + profileName + "] config [" + configName + "]")
+		result := util.SetResultMessage(1,"ERROR","Workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Couldn't read config using profile [" + profileName + "] config [" + configName + "] " + err.Error())
 		workflowResult.Result = result
 		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
 		json.NewEncoder(w).Encode(workflowResult)	
@@ -72,7 +72,7 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	_,ok := runningWorkflowMap[config.ProfileName + "-" + config.ConfigName]
 	if ok {	
-		result := util.SetResultMessage(1,"ERROR","Workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Another workflow is running under profile [" + config.ProfileName + "] config [" + config.ConfigName + "]")
+		result := util.SetResultMessage(1,"ERROR","Workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Another workflow is running under profile [" + config.ProfileName + "] config [" + config.ConfigName + "] " + err.Error())
 		workflowResult.Result = result
 		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
 		json.NewEncoder(w).Encode(workflowResult)		
