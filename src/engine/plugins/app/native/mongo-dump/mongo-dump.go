@@ -4,6 +4,7 @@ import (
 	"fossil/src/engine/util"
 	"fossil/src/engine/client/k8s"
 	"fmt"
+	"strings"
 )
 
 type appPlugin string
@@ -94,7 +95,7 @@ func (a appPlugin) Quiesce() util.Result {
 	args = append(args,"--out")
 	args = append(args,dumpPath)
 
-	args = append(args,"--quiet")
+	//args = append(args,"--quiet")
 
 	cmdResult = k8s.ExecuteCommand(podName,config.AppPluginParameters["ContainerName"],config.AppPluginParameters["Namespace"],config.AppPluginParameters["AccessWithinCluster"],args...)
 
@@ -157,8 +158,81 @@ func (a appPlugin) PostRestore() util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	msg := util.SetMessage("INFO","PostRestore Not implemented")
-	messages = append(messages,msg)
+	podName,err := k8s.GetPod(config.AppPluginParameters["Namespace"],config.AppPluginParameters["ServiceName"],config.AppPluginParameters["AccessWithinCluster"])
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages,msg)
+
+		result = util.SetResult(1, messages)
+		return result
+	}
+
+	var lsDirArgs []string
+	lsDirArgs = append(lsDirArgs,"ls")
+	lsDirArgs = append(lsDirArgs,"/tmp/" + util.IntToString(config.SelectedWorkflowId))
+
+	cmdResult,restoreDir := k8s.ExecuteCommandWithStdout(podName,config.AppPluginParameters["ContainerName"],config.AppPluginParameters["Namespace"],config.AppPluginParameters["AccessWithinCluster"],lsDirArgs...)
+
+	if cmdResult.Code != 0 {
+		return cmdResult
+	} else {
+		messages = util.PrependMessages(messages,cmdResult.Messages)
+	}
+
+	restorePath := "/tmp/" + util.IntToString(config.SelectedWorkflowId) + "/" + strings.TrimSpace(restoreDir) + "/" + util.IntToString(config.SelectedWorkflowId) + "/" + config.AppPluginParameters["MongoDb"]
+	
+	//execute database restore
+	var restoreArgs []string
+	restoreArgs = append(restoreArgs,"/bin/sh")
+	restoreArgs = append(restoreArgs,"-c")
+
+	if config.AppPluginParameters["MongoPassword"] != "" {
+		restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoRestoreCmd"] + " --host " + config.AppPluginParameters["MongoHost"] +
+		" --port " + config.AppPluginParameters["MongoPort"] + " --db " + config.AppPluginParameters["MongoDb"] + " --username " +
+		config.AppPluginParameters["MongoUser"] + " --password " + config.AppPluginParameters["MongoPassword"] + " " + restorePath)
+	} else {
+		restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoRestoreCmd"] + " --host " + config.AppPluginParameters["MongoHost"] +
+		" --port " + config.AppPluginParameters["MongoPort"] + " --db " + config.AppPluginParameters["MongoDb"] + " --username " +
+		config.AppPluginParameters["MongoPassword"] + " " + restorePath)	
+	}
+
+	/*restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoRestoreCmd"])
+	restoreArgs = append(restoreArgs,"--host")
+	restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoHost"])
+	restoreArgs = append(restoreArgs,"--port")
+	restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoPort"])
+	restoreArgs = append(restoreArgs,"--db")
+	restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoDb"])
+	restoreArgs = append(restoreArgs,"--username")
+	restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoUser"])
+
+	if config.AppPluginParameters["MongoPassword"] != "" {
+		restoreArgs = append(restoreArgs,"--password")
+		restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoPassword"])
+	} 	
+
+	restoreArgs = append(restoreArgs," " + restorePath)*/
+
+	cmdResult = k8s.ExecuteCommand(podName,config.AppPluginParameters["ContainerName"],config.AppPluginParameters["Namespace"],config.AppPluginParameters["AccessWithinCluster"],restoreArgs...)
+
+	if cmdResult.Code != 0 {
+		return cmdResult
+	} else {
+		messages = util.PrependMessages(messages,cmdResult.Messages)
+	}
+
+	var rmDirArgs []string
+	rmDirArgs = append(rmDirArgs,"rm")
+	rmDirArgs = append(rmDirArgs,"-rf")
+	rmDirArgs = append(rmDirArgs,restorePath)
+
+	cmdResult = k8s.ExecuteCommand(podName,config.AppPluginParameters["ContainerName"],config.AppPluginParameters["Namespace"],config.AppPluginParameters["AccessWithinCluster"],rmDirArgs...)
+
+	if cmdResult.Code != 0 {
+		return cmdResult
+	} else {
+		messages = util.PrependMessages(messages,cmdResult.Messages)
+	}
 
 	result = util.SetResult(0, messages)
 	return result

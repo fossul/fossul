@@ -74,7 +74,7 @@ func ExecuteCommand(podName, containerName, namespace, accessWithinCluster strin
 		Tty:    false,
 	})
 
-	message = util.SetMessage("DEBUG", "Command stdout: " + execOut.String())
+	message = util.SetMessage("DEBUG", "STDOUT: " + execOut.String())
 	messages = append(messages, message)
 
 	if err != nil {
@@ -86,11 +86,8 @@ func ExecuteCommand(podName, containerName, namespace, accessWithinCluster strin
 	}
 
 	if execErr.Len() > 0 {
-		message := util.SetMessage("ERROR", "Stderr: " + execErr.String())
+		message := util.SetMessage("WARN", "STDERR: " + execErr.String())
 		messages = append(messages, message)
-
-		result = util.SetResult(1, messages)
-		return result
 	}
 
 	s1 := fmt.Sprintf("Command [%s %s] on pod [%s] container [%s] completed successfully",baseCmd, strings.Join(cmdArgs, " "),podName,containerName)
