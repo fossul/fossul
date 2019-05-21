@@ -32,6 +32,18 @@ func (s storagePlugin) Backup() util.Result {
 	return result
 }
 
+func (s storagePlugin) Restore() util.Result {	
+	var result util.Result
+	var messages []util.Message
+	var resultCode int = 0
+
+	msg := util.SetMessage("INFO", "*** Restore ***")
+	messages = append(messages,msg)
+
+	result = util.SetResult(resultCode, messages)
+	return result
+}
+
 func (s storagePlugin) BackupDelete() util.Result {	
 	var result util.Result
 	var messages []util.Message

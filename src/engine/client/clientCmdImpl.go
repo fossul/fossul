@@ -416,3 +416,105 @@ func ArchiveDeleteCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	return result,nil
 }
+
+func PreAppRestoreCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/preAppRestoreCmd", b)
+	if err != nil {
+		return result,err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result,nil
+}
+
+func RestoreCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/restoreCmd", b)
+	if err != nil {
+		return result,err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result,nil
+}
+
+func PostAppRestoreCmd(auth Auth,config util.Config) (util.Result,error) {
+	var result util.Result
+
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/postAppRestoreCmd", b)
+	if err != nil {
+		return result,err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result,nil
+}

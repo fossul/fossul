@@ -112,5 +112,17 @@ var routes = Routes{
         "POST",
         "/archiveDeleteCmd",
         ArchiveDeleteCmd,
-    },                          
+    },
+    Route{
+        "Restore",
+        "POST",
+        "/restore",
+        Restore,
+    },    
+    Route{
+        "RestoreCmd",
+        "POST",
+        "/restoreCmd",
+        RestoreCmd,
+    },                                   
 }

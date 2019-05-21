@@ -68,7 +68,19 @@ var routes = Routes{
         "POST",
         "/startBackupWorkflow/{profileName}/{configName}/{policy}",
         StartBackupWorkflow,
-    },   
+    },
+    Route{
+        "StartRestoreWorkflowLocalConfig",
+        "POST",
+        "/startRestoreWorkflowLocalConfig/{workflowId}",
+        StartRestoreWorkflowLocalConfig,
+    },       
+    Route{
+        "StartRestoreWorkflow",
+        "POST",
+        "/startRestoreWorkflow/{profileName}/{configName}/{policy}/{workflowId}",
+        StartRestoreWorkflow,
+    },        
     Route{
         "SendTrapSuccessCmd",
         "POST",

@@ -24,6 +24,7 @@ type Config struct {
 	BackupRetentions []BackupRetention `json:"backupRetentions"`
 	SelectedBackupPolicy string `json:"backupPolicy,omitmepty"`
 	SelectedBackupRetention int `json:"backupRetention,omitmepty"`
+	SelectedWorkflowId int `json:"selectedWorkflowId,omitmepty"`
 	PreAppQuiesceCmd string `json:"preAppQuiesceCmd,omitempty"`
 	AppQuiesceCmd string `json:"appQuiesceCmd,omitempty"`
 	PostAppQuiesceCmd string `json:"postAppQuiesceCmd,omitempty"`
@@ -34,6 +35,9 @@ type Config struct {
 	PreAppUnquiesceCmd string `json:"preAppUnquiesceCmd,omitempty"`
 	AppUnquiesceCmd string `json:"appUnquiesceCmd,omitempty"`
 	PostAppUnquiesceCmd string `json:"postAppUnquiesceCmd,omitempty"`
+	PreAppRestoreCmd string `json:"preAppRestoreCmd,omitempty"`
+	RestoreCmd string `json:"restoreCmd,omitempty"`
+	PostAppRestoreCmd string `json:"postAppRestoreCmd,omitempty"`
 	SendTrapErrorCmd string `json:"sendTrapErrorCmd,omitempty"`
 	SendTrapSuccessCmd string `json:"sendTrapSuccessCmd,omitempty"`
 	AppPluginParameters map[string]string `json:"appPluginParameters,omitempty"`

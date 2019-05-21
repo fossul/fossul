@@ -28,6 +28,15 @@ func CreateDir(path string, mode os.FileMode) error {
 	return nil
 }
 
+func ListDir(path string) ([]os.FileInfo,error) {
+	files, err := ioutil.ReadDir(path)
+    if err != nil {
+        return nil,err
+    }
+
+	return files,nil
+}
+
 func ListBackups(path string) ([]util.Backup, error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
@@ -60,6 +69,15 @@ func ListBackups(path string) ([]util.Backup, error) {
 	sort.Sort(util.ByEpoch(backups))
 
 	return backups,nil
+}
+
+func GetDirFromPath(path string) string {
+	re := regexp.MustCompile(`\S+\/(\S+)$`)
+	match := re.FindStringSubmatch(path)
+
+	dir := match[1]
+
+	return dir
 }
 
 func RecursiveDirDelete(dir string) error {

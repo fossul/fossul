@@ -177,3 +177,71 @@ func Unquiesce(auth Auth,config util.Config) (util.Result,error) {
 
 	return result,nil
 }
+
+func PreRestore(auth Auth,config util.Config) (util.Result,error) {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	var result util.Result
+
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/preRestore", b)
+	if err != nil {
+		return result,err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result,nil
+}
+
+func PostRestore(auth Auth,config util.Config) (util.Result,error) {
+	b := new(bytes.Buffer)
+	json.NewEncoder(b).Encode(config)
+
+	var result util.Result
+
+	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/postRestore", b)
+	if err != nil {
+		return result,err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result,nil
+}

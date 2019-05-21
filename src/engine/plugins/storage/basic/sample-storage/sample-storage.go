@@ -29,6 +29,8 @@ func main() {
 
 	if *optAction == "backup" {
 		backup(configMap)
+	} else if *optAction == "restore" {
+		restore(configMap)		
 	} else if *optAction == "backupList" {
 		backupList(configMap)
 	} else if *optAction == "backupDelete" {
@@ -45,6 +47,11 @@ func main() {
 func backup (configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Backup ***")
+}
+
+func restore (configMap map[string]string) {
+	printEnv(configMap)
+	fmt.Println("INFO *** Restore ***")
 }
 
 func backupList (configMap map[string]string) {
@@ -108,6 +115,11 @@ func getEnvParams() map[string]string {
 	configMap["ProfileName"] = os.Getenv("ProfileName")
 	configMap["ConfigName"] = os.Getenv("ConfigName")
 	configMap["BackupName"] = os.Getenv("BackupName")
+	configMap["SelectedWorkflowId"] = os.Getenv("SelectedWorkflowId")
+	configMap["AutoDiscovery"] = os.Getenv("AutoDiscovery")
+	configMap["DataFilePaths"] = os.Getenv("DataFilePaths")
+	configMap["LogFilePaths"] = os.Getenv("LogFilePaths")
+	configMap["BackupPolicy"] = os.Getenv("BackupPolicy")
 	configMap["SampleStorageVar1"] = os.Getenv("SampleStorageVar1")
 	configMap["SampleStorageVar2"] = os.Getenv("SampleStorageVar2")
 

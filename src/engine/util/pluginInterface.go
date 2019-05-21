@@ -10,6 +10,8 @@ type AppPlugin interface {
 	SetEnv(Config) (Result)
 	Quiesce() (Result)
 	Unquiesce() (Result)
+	PreRestore() (Result)
+	PostRestore() (Result)
 	Discover() (DiscoverResult)
 	Info() (Plugin)
 }
@@ -17,6 +19,7 @@ type AppPlugin interface {
 type StoragePlugin interface {
 	SetEnv(Config) (Result)
 	Backup() (Result)
+	Restore() (Result)
 	BackupDelete() (Result)
 	BackupList() (Backups)
 	Info() (Plugin)

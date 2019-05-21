@@ -34,6 +34,12 @@ func main() {
 	} else if *optAction == "unquiesce" {
 		printEnv(configMap)
 		unquiesce(configMap)
+	} else if *optAction == "preRestore" {
+		printEnv(configMap)
+		preRestore(configMap)
+	} else if *optAction == "postRestore" {
+		printEnv(configMap)
+		postRestore(configMap)					
 	} else if *optAction == "info" {
 		info()		
 	} else if *optAction == "discover" {
@@ -65,6 +71,16 @@ func quiesce (configMap map[string]string) {
 func unquiesce (configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Application unquiesce ***")
+}
+
+func preRestore (configMap map[string]string) {
+	printEnv(configMap)
+	fmt.Println("INFO *** Application Pre Restore ***")
+}
+
+func postRestore (configMap map[string]string) {
+	printEnv(configMap)
+	fmt.Println("INFO *** Application Post Restore ***")
 }
 
 func info () {
@@ -126,16 +142,25 @@ func setPlugin() (plugin util.Plugin) {
 	plugin.Type = "app"
 
 	var capabilities []util.Capability
+	var discoverCap util.Capability
+	discoverCap.Name = "discover"
+	
 	var quiesceCap util.Capability
 	quiesceCap.Name = "quiesce"
 
 	var unquiesceCap util.Capability
 	unquiesceCap.Name = "unquiesce"
 
+	var preRestoreCap util.Capability
+	preRestoreCap.Name = "preRestore"
+
+	var postRestoreCap util.Capability
+	postRestoreCap.Name = "postRestore"
+
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,quiesceCap,unquiesceCap,infoCap)
+	capabilities = append(capabilities,discoverCap,quiesceCap,unquiesceCap,preRestoreCap,postRestoreCap,infoCap)
 
 	plugin.Capabilities = capabilities
 
@@ -155,6 +180,12 @@ func getEnvParams() map[string]string {
 
 	configMap["ProfileName"] = os.Getenv("ProfileName")
 	configMap["ConfigName"] = os.Getenv("ConfigName")
+	configMap["BackupName"] = os.Getenv("BackupName")
+	configMap["SelectedWorkflowId"] = os.Getenv("SelectedWorkflowId")
+	configMap["AutoDiscovery"] = os.Getenv("AutoDiscovery")
+	configMap["DataFilePaths"] = os.Getenv("DataFilePaths")
+	configMap["LogFilePaths"] = os.Getenv("LogFilePaths")
+	configMap["BackupPolicy"] = os.Getenv("BackupPolicy")
 	configMap["SampleAppVar1"] = os.Getenv("SampleAppVar1")
 	configMap["SampleAppVar2"] = os.Getenv("SampleAppVar2")
 

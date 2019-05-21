@@ -106,5 +106,29 @@ var routes = Routes{
         "POST",
         "/discover",
         Discover,
-    },       
+    },
+    Route{
+        "PreRestore",
+        "POST",
+        "/preRestore",
+        PreRestore,
+    }, 
+    Route{
+        "PostRestore",
+        "POST",
+        "/postRestore",
+        PostRestore,
+    },              
+    Route{
+        "PreAppRestoreCmd",
+        "POST",
+        "/preAppRestoreCmd",
+        PreAppRestoreCmd,
+    },
+    Route{
+        "PostAppRestoreCmd",
+        "POST",
+        "/postAppRestoreCmd",
+        PostAppRestoreCmd,
+    },                
 }

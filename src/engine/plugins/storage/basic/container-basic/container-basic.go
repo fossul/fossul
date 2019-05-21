@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	optAction := getopt.StringLong("action",'a',"","backup|backupList|backupDelete|info")
+	optAction := getopt.StringLong("action",'a',"","backup|restore|backupList|backupDelete|info")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -32,6 +32,8 @@ func main() {
 
 	if *optAction == "backup" {
 		backup(configMap)
+	} else if *optAction == "restore" {
+		restore(configMap)		
 	} else if *optAction == "backupList" {
 		backupList(configMap)
 	} else if *optAction == "backupDelete" {
@@ -49,29 +51,7 @@ func backup (configMap map[string]string) {
 	configMap = setWorkflowId(configMap)
 	printEnv(configMap)
 
-	var backupSrcFilePaths []string
-	if configMap["AutoDiscovery"] == "true" {
-		dataPaths := strings.Split(configMap["DataFilePaths"],",")
-		logPaths := strings.Split(configMap["LogFilePaths"],",")
-
-		for _,dataPath := range dataPaths {
-			if dataPath == "" {
-				continue
-			}
-
-			backupSrcFilePaths = append(backupSrcFilePaths,dataPath)
-		}
-
-		for _,logPath := range logPaths {
-			if logPath == "" {
-				continue
-			}
-
-			backupSrcFilePaths = append(backupSrcFilePaths,logPath)
-		}
-	} else {
-		backupSrcFilePaths = strings.Split(configMap["BackupSrcPaths"],",")
-	}
+	backupSrcFilePaths := getBackupSrcPaths(configMap)
 
 	fmt.Println("INFO Performing container backup")
 
@@ -111,9 +91,54 @@ func backup (configMap map[string]string) {
 			
 		if result.Code != 0 {
 			os.Exit(1)
-		}
+		} 
 	}	
 }
+
+func restore (configMap map[string]string) {
+	configMap = setWorkflowId(configMap)
+	printEnv(configMap)
+
+	fmt.Println("INFO Performing container restore")
+
+	podName,err := k8s.GetPod(configMap["Namespace"],configMap["ServiceName"],configMap["AccessWithinCluster"])
+	checkError(err)
+
+	fmt.Println("INFO Performing restore for pod " + podName)
+
+	restorePath,err := util.GetRestoreSrcPathFromMap(configMap)
+	checkError(err)
+
+	fmt.Println("INFO Restore source path is [" + restorePath + "]")
+
+	restoreDestPath := "/tmp/" + configMap["SelectedWorkflowId"]
+
+	var args []string
+	args = append(args,configMap["CopyCmdPath"])
+	if configMap["ContainerPlatform"] == "openshift" {
+		args = append(args,"rsync")
+		args = append(args,"-n")
+		args = append(args,configMap["Namespace"])
+		args = append(args,restorePath)
+		args = append(args,podName + ":" + restoreDestPath)
+	} else if configMap["ContainerPlatform"] == "kubernetes" {
+		args = append(args,"cp")
+		args = append(args,restorePath)
+		args = append(args,configMap["Namespace"] + "/" + podName + ":" + restoreDestPath)
+	} else {
+		fmt.Println("ERROR incorrect parameter set for ContainerPlatform [" + configMap["ContainerPlatform"] + "]")
+		os.Exit(1)
+	}	
+	
+	result := util.ExecuteCommand(args...)
+	for _, line := range result.Messages {
+		fmt.Println(line.Level, line.Message)
+	}
+			
+	if result.Code != 0 {
+		os.Exit(1)
+	} 	
+}	
 
 func backupList (configMap map[string]string) {
 	backupDir := util.GetBackupDirFromMap(configMap)
@@ -191,10 +216,13 @@ func setPlugin() (plugin util.Plugin) {
 	var backupDeleteCap util.Capability
 	backupDeleteCap.Name = "backupDelete"
 
+	var restoreCap util.Capability
+	restoreCap.Name = "restore"
+
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,backupCap,backupListCap,backupDeleteCap,infoCap)
+	capabilities = append(capabilities,backupCap,backupListCap,backupDeleteCap,restoreCap,infoCap)
 
 	plugin.Capabilities = capabilities
 
@@ -214,6 +242,7 @@ func getEnvParams() map[string]string {
 
 	configMap["ProfileName"] = os.Getenv("ProfileName")
 	configMap["ConfigName"] = os.Getenv("ConfigName")
+	configMap["SelectedWorkflowId"] = os.Getenv("SelectedWorkflowId")
 	configMap["AutoDiscovery"] = os.Getenv("AutoDiscovery")
 	configMap["DataFilePaths"] = os.Getenv("DataFilePaths")
 	configMap["LogFilePaths"] = os.Getenv("LogFilePaths")
@@ -242,4 +271,32 @@ func checkError(err error) {
 		fmt.Println("ERROR " + err.Error())
 		os.Exit(1)
 	}
+}
+
+func getBackupSrcPaths(configMap map[string]string) ([]string) {
+	var backupSrcFilePaths []string
+	if configMap["AutoDiscovery"] == "true" {
+		dataPaths := strings.Split(configMap["DataFilePaths"],",")
+		logPaths := strings.Split(configMap["LogFilePaths"],",")
+
+		for _,dataPath := range dataPaths {
+			if dataPath == "" {
+				continue
+			}
+
+			backupSrcFilePaths = append(backupSrcFilePaths,dataPath)
+		}
+
+		for _,logPath := range logPaths {
+			if logPath == "" {
+				continue
+			}
+
+			backupSrcFilePaths = append(backupSrcFilePaths,logPath)
+		}
+	} else {
+		backupSrcFilePaths = strings.Split(configMap["BackupSrcPaths"],",")
+	}
+	
+	return backupSrcFilePaths
 }

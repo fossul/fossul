@@ -22,7 +22,7 @@ func main() {
 	optCredentialFile := getopt.StringLong("credential-file",'h',"","Path to credential file")
 	optConfigFile := getopt.StringLong("config-file",'f',"","Path to config file")
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
-	optAction := getopt.StringLong("action",'a',"","backup|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|addSchedule|deleteSchedule|jobList|jobStatus|pluginInfo|status")
+	optAction := getopt.StringLong("action",'a',"","backup|restore|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|addSchedule|deleteSchedule|jobList|jobStatus|pluginInfo|status")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
 	optPluginType := getopt.StringLong("plugin-type",'t',"","Plugin type app|storage|archive")
 	optWorkflowId := getopt.StringLong("workflow-id",'w',"","Workflow Id")
@@ -280,7 +280,7 @@ func main() {
 	}	
 
 	// Check retention policy
-	if *optAction == "backup" || *optAction == "backupList" {
+	if *optAction == "backup" || *optAction == "backupList" || *optAction == "restore" {
 		if getopt.IsSet("policy") != true {
 			fmt.Println("ERROR: missing parameter --policy")
 			getopt.Usage()
@@ -300,6 +300,18 @@ func main() {
 		} else {
 			Backup(auth,string(*optProfile),string(*optConfig),string(*optPolicy))	
 		}	
+	} else if *optAction == "restore" {	
+		if getopt.IsSet("workflow-id") != true {
+			fmt.Println("ERROR: Missing parameter --workflow-id")
+			getopt.Usage()
+			os.Exit(1)
+		}
+
+		if *optLocalConfig {
+			RestoreWithLocalConfig(auth,string(*optProfile),string(*optConfig),string(*optPolicy),string(*optWorkflowId),config)
+		} else {
+			Restore(auth,string(*optProfile),string(*optConfig),string(*optPolicy),string(*optWorkflowId))	
+		}			
 	} else if *optAction == "backupList" {
 		BackupList(auth,string(*optProfile),string(*optConfig),string(*optPolicy),config)
 	} else if *optAction == "jobList" {	

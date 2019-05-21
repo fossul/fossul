@@ -9,6 +9,7 @@ import (
 	"log"
 	"path/filepath"
 	"io/ioutil"
+	"strings"
 )
 
 
@@ -51,6 +52,36 @@ func GetBackupName(name, policy, workflowId string) string {
 	backupName := fmt.Sprintf(name + "_" + policy + "_" + workflowId + "_" + timeToString)
 
 	return backupName
+}
+
+func GetRestoreSrcPath(config Config) (string,error) {
+	backupPath := config.StoragePluginParameters["BackupDestPath"] + "/" + config.ProfileName + "/" + config.ConfigName
+	backupNameSubString := config.StoragePluginParameters["BackupName"] + "_" + config.SelectedBackupPolicy + "_" + IntToString(config.SelectedWorkflowId)
+	files, err := ioutil.ReadDir(backupPath)
+	if err != nil {
+		return "",err
+	}
+	for _, f := range files {
+    	if strings.Contains(f.Name(), backupNameSubString) {
+			return backupPath + "/" + f.Name(),nil
+		}
+	}
+	return "",nil
+}
+
+func GetRestoreSrcPathFromMap(configMap map[string]string) (string,error) {
+	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"]
+	backupNameSubString := configMap["BackupName"] + "_" + configMap["BackupPolicy"] + "_" + configMap["SelectedWorkflowId"]
+	files, err := ioutil.ReadDir(backupPath)
+	if err != nil {
+		return "",err
+	}
+	for _, f := range files {
+    	if strings.Contains(f.Name(), backupNameSubString) {
+			return backupPath + "/" + f.Name(),nil
+		}
+	}
+	return "",nil
 }
 
 func ConvertEpoch(epoch string) string {

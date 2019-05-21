@@ -108,6 +108,11 @@ func getEnvParams() map[string]string {
 	configMap["ProfileName"] = os.Getenv("ProfileName")
 	configMap["ConfigName"] = os.Getenv("ConfigName")
 	configMap["BackupName"] = os.Getenv("BackupName")
+	configMap["SelectedWorkflowId"] = os.Getenv("SelectedWorkflowId")
+	configMap["AutoDiscovery"] = os.Getenv("AutoDiscovery")
+	configMap["DataFilePaths"] = os.Getenv("DataFilePaths")
+	configMap["LogFilePaths"] = os.Getenv("LogFilePaths")
+	configMap["BackupPolicy"] = os.Getenv("BackupPolicy")
 	configMap["SampleArchiveVar1"] = os.Getenv("SampleArchiveVar1")
 	configMap["SampleArchiveVar2"] = os.Getenv("SampleArchiveVar2")
 

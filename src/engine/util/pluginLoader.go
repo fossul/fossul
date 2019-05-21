@@ -125,6 +125,7 @@ func setBasePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd  {
 	cmd.Env = append(cmd.Env, "ConfigName=" + config.ConfigName)
 	cmd.Env = append(cmd.Env, "AutoDiscovery=" + BoolToString(config.AutoDiscovery))
 	cmd.Env = append(cmd.Env, "WorkflowId=" + config.WorkflowId)
+	cmd.Env = append(cmd.Env, "SelectedWorkflowId=" +  IntToString(config.SelectedWorkflowId))
 	cmd.Env = append(cmd.Env, "BackupPolicy=" + config.SelectedBackupPolicy)
 
 	backupRetentionToString := IntToString(config.SelectedBackupRetention)

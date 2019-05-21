@@ -137,6 +137,30 @@ func (a appPlugin) Unquiesce() util.Result {
 	return result
 }
 
+func (a appPlugin) PreRestore() util.Result {	
+
+	var result util.Result
+	var messages []util.Message
+
+	msg := util.SetMessage("INFO","PreRestore Not implemented")
+	messages = append(messages,msg)
+
+	result = util.SetResult(0, messages)
+	return result
+}	
+
+func (a appPlugin) PostRestore() util.Result {	
+
+	var result util.Result
+	var messages []util.Message
+
+	msg := util.SetMessage("INFO","PostRestore Not implemented")
+	messages = append(messages,msg)
+
+	result = util.SetResult(0, messages)
+	return result
+}	
+
 func (a appPlugin) Info() util.Plugin {
 	var plugin util.Plugin = setPlugin()
 	return plugin
@@ -157,10 +181,16 @@ func setPlugin() (plugin util.Plugin) {
 	var unquiesceCap util.Capability
 	unquiesceCap.Name = "unquiesce"
 
+	var preRestoreCap util.Capability
+	preRestoreCap.Name = "preRestore"
+
+	var postRestoreCap util.Capability
+	postRestoreCap.Name = "postRestore"
+
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,discoverCap,quiesceCap,unquiesceCap,infoCap)
+	capabilities = append(capabilities,discoverCap,quiesceCap,unquiesceCap,preRestoreCap,postRestoreCap,infoCap)
 
 	plugin.Capabilities = capabilities
 	

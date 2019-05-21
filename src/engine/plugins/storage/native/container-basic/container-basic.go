@@ -27,30 +27,7 @@ func (s storagePlugin) SetEnv(c util.Config) util.Result {
 func (s storagePlugin) Backup() util.Result {	
 	var result util.Result
 	var messages []util.Message
-	var backupSrcFilePaths []string
-
-	if config.AutoDiscovery == true {
-		dataPaths := strings.Split(config.StoragePluginParameters["DataFilePaths"],",")
-		logPaths := strings.Split(config.StoragePluginParameters["LogFilePaths"],",")
-
-		for _,dataPath := range dataPaths {
-			if dataPath == "" {
-				continue
-			}
-
-			backupSrcFilePaths = append(backupSrcFilePaths,dataPath)
-		}
-
-		for _,logPath := range logPaths {
-			if logPath == "" {
-				continue
-			}
-
-			backupSrcFilePaths = append(backupSrcFilePaths,logPath)
-		}
-	} else {
-		backupSrcFilePaths = strings.Split(config.StoragePluginParameters["BackupSrcPaths"],",")
-	}
+	backupSrcFilePaths := getBackupSrcPaths(config)
 
 	msg := util.SetMessage("INFO", "Performing container backup")
 	messages = append(messages,msg)
@@ -112,6 +89,69 @@ func (s storagePlugin) Backup() util.Result {
 	result = util.SetResult(0, messages)
 	return result
 }
+
+func (s storagePlugin) Restore() util.Result {
+	var result util.Result
+	var messages []util.Message
+
+	msg := util.SetMessage("INFO", "Performing container restore")
+	messages = append(messages,msg)
+
+	podName,err := k8s.GetPod(config.StoragePluginParameters["Namespace"],config.StoragePluginParameters["ServiceName"],config.StoragePluginParameters["AccessWithinCluster"])
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages,msg)
+
+		result = util.SetResult(1, messages)
+		return result
+	}
+
+	msg = util.SetMessage("INFO", "Performing restore for pod " + podName)
+	messages = append(messages,msg)
+
+	restorePath,err := util.GetRestoreSrcPath(config)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages,msg)
+		result = util.SetResult(1, messages)
+		return result
+	}
+
+	msg = util.SetMessage("INFO", "Restore source path is [" + restorePath + "]")
+	messages = append(messages,msg)
+
+	restoreDestPath := "/tmp/" + util.IntToString(config.SelectedWorkflowId)
+
+	var args []string
+	args = append(args,config.StoragePluginParameters["CopyCmdPath"])
+	if config.StoragePluginParameters["ContainerPlatform"] == "openshift" {
+		args = append(args,"rsync")
+		args = append(args,"-n")
+		args = append(args,config.StoragePluginParameters["Namespace"])
+		args = append(args,restorePath)
+		args = append(args,podName + ":" + restoreDestPath)
+	} else if config.StoragePluginParameters["ContainerPlatform"] == "kubernetes" {
+		args = append(args,"cp")
+		args = append(args,restorePath)
+		args = append(args,config.StoragePluginParameters["Namespace"] + "/" + podName + ":" + restoreDestPath)
+	} else {
+		msg = util.SetMessage("ERROR", "Incorrect parameter set for ContainerPlatform [" + config.StoragePluginParameters["ContainerPlatform"] + "]")
+		messages = append(messages,msg)
+
+		result = util.SetResult(1, messages)
+		return result
+	}	
+	
+	cmdResult := util.ExecuteCommand(args...)
+	if cmdResult.Code != 0 {
+		return cmdResult
+	} else {
+		messages = util.PrependMessages(cmdResult.Messages,messages)
+	}	
+
+	result = util.SetResult(0, messages)
+	return result
+}	
 
 func (s storagePlugin) BackupDelete() util.Result {	
 	var result util.Result
@@ -207,14 +247,46 @@ func setPlugin() (plugin util.Plugin) {
 	var backupDeleteCap util.Capability
 	backupDeleteCap.Name = "backupDelete"
 
+	var restoreCap util.Capability
+	restoreCap.Name = "restore"
+
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,backupCap,backupListCap,backupDeleteCap,infoCap)
+	capabilities = append(capabilities,backupCap,backupListCap,backupDeleteCap,restoreCap,infoCap)
 
 	plugin.Capabilities = capabilities
 
 	return plugin
+}
+
+func getBackupSrcPaths(config util.Config) ([]string) {
+	var backupSrcFilePaths []string
+
+	if config.AutoDiscovery == true {
+		dataPaths := strings.Split(config.StoragePluginParameters["DataFilePaths"],",")
+		logPaths := strings.Split(config.StoragePluginParameters["LogFilePaths"],",")
+
+		for _,dataPath := range dataPaths {
+			if dataPath == "" {
+				continue
+			}
+
+			backupSrcFilePaths = append(backupSrcFilePaths,dataPath)
+		}
+
+		for _,logPath := range logPaths {
+			if logPath == "" {
+				continue
+			}
+
+			backupSrcFilePaths = append(backupSrcFilePaths,logPath)
+		}
+	} else {
+		backupSrcFilePaths = strings.Split(config.StoragePluginParameters["BackupSrcPaths"],",")
+	}
+
+	return backupSrcFilePaths
 }
 
 func main() {}
