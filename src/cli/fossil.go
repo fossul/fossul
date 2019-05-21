@@ -253,13 +253,14 @@ func main() {
 	if *optLocalConfig {	
 		var configPath string
 		var configDir string
-		if getopt.IsSet("config-path") == true {
-			configPath = *optConfigPath + "/" + *optProfile + "/" + *optConfig + "/" + *optConfig + ".conf"
-			configDir = *optConfigPath + "/" + *optProfile + "/" + *optConfig 
-		} else {
-			configPath = "configs/" + *optProfile + "/" + *optConfig + "/" + *optConfig + ".conf"
-			configDir = "configs/" + *optProfile + "/" + *optConfig
+		if getopt.IsSet("config-path") != true {
+			fmt.Println("ERROR: missing parameter --config-path")
+			getopt.Usage()
+			os.Exit(1)	
 		}
+
+		configPath = *optConfigPath + "/" + *optProfile + "/" + *optConfig + "/" + *optConfig + ".conf"
+		configDir = *optConfigPath + "/" + *optProfile + "/" + *optConfig 
 
 		if _, err := os.Stat(configPath); os.IsNotExist(err) {
 			fmt.Println(err,"\n" + "ERROR: Profile of Config don't exist")
