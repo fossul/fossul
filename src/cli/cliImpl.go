@@ -241,11 +241,18 @@ func DeleteConfig(auth client.Auth,profileName,configName string) {
 	os.Exit(0)
 }
 
-func ImportLocalConfig(configDir,configPath string) (util.Config,error) {
+func ImportLocalConfig(profileName,configName,policyName,configDir,configPath string) (util.Config,error) {
 	config,err := util.ReadConfig(configPath)
 	if err != nil {
 		return config,err
 	}
+
+	config.ProfileName = profileName
+	config.ConfigName = configName
+
+	backupRetention := util.GetBackupRetention(policyName,config.BackupRetentions)
+	config.SelectedBackupRetention = backupRetention
+	config.SelectedBackupPolicy = policyName
 
 	//load dynamic plugin parameters into config struct
 	if config.AppPlugin != "" {
@@ -513,9 +520,9 @@ func JobList(auth client.Auth,profileName,configName string) {
 	// print friendly columns
 	tw := new(tabwriter.Writer)
 	tw.Init(os.Stdout, 10, 20, 5, ' ', 0)
-	fmt.Fprintln(tw, "WorkflowId\t Type\t Status\t Start Time\t")
+	fmt.Fprintln(tw, "WorkflowId\t Type\t Status\t Policy\t Start Time\t")
 	for _, job := range jobs.Jobs {
-		fmt.Fprintln(tw, util.IntToString(job.Id) + "\t",job.Type + "\t",job.Status + "\t",job.Timestamp + "\t")
+		fmt.Fprintln(tw, util.IntToString(job.Id) + "\t",job.Type + "\t",job.Status + "\t",job.Policy + "\t",job.Timestamp + "\t")
 	}		
 	tw.Flush()
 }

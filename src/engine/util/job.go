@@ -15,6 +15,7 @@ type Job struct {
 	Id int `json:"id,omitempty"`
 	Status string `json:"status,omitempty"`
 	Type string `json:"type,omitempty"`
+	Policy string `json:"policy"`
 	Timestamp string    `json:"timestamp,omitempty"`
 }
 
@@ -43,6 +44,7 @@ func ListJobs(jobsDir string) ([]Job,error) {
 			job.Id = workflow.Id
 			job.Status = workflow.Status
 			job.Type = workflow.Type
+			job.Policy = workflow.Policy
 			job.Timestamp = workflow.Timestamp
 
 			jobs = append(jobs,job)

@@ -291,7 +291,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		config,err = ImportLocalConfig(configDir,configPath)
+		config,err = ImportLocalConfig(string(*optProfile),string(*optConfig),string(*optPolicy),configDir,configPath)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
