@@ -58,7 +58,7 @@ func GetRestoreSrcPath(config Config) (string,error) {
 	backupPath := config.StoragePluginParameters["BackupDestPath"] + "/" + config.ProfileName + "/" + config.ConfigName
 	backupNameSubString := config.StoragePluginParameters["BackupName"] + "_" + config.SelectedBackupPolicy + "_" + IntToString(config.SelectedWorkflowId)
 	
-	fmt.Println("DEBIUG: restore path [" + backupPath + "] search string [" + backupNameSubString + "]")
+	fmt.Println("DEBUG: restore path [" + backupPath + "] search string [" + backupNameSubString + "]")
 	files, err := ioutil.ReadDir(backupPath)
 	if err != nil {
 		return "",err
@@ -75,7 +75,7 @@ func GetRestoreSrcPathFromMap(configMap map[string]string) (string,error) {
 	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"]
 	backupNameSubString := configMap["BackupName"] + "_" + configMap["BackupPolicy"] + "_" + configMap["SelectedWorkflowId"]
 	
-	fmt.Println("DEBIUG: restore path [" + backupPath + "] search string [" + backupNameSubString + "]")
+	fmt.Println("DEBUG: restore path [" + backupPath + "] search string [" + backupNameSubString + "]")
 	files, err := ioutil.ReadDir(backupPath)
 	if err != nil {
 		return "",err

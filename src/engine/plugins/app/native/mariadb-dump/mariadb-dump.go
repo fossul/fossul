@@ -139,8 +139,29 @@ func (a appPlugin) PreRestore() util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	msg := util.SetMessage("INFO","PreRestore Not implemented")
-	messages = append(messages,msg)
+	podName,err := k8s.GetPod(config.AppPluginParameters["Namespace"],config.AppPluginParameters["ServiceName"],config.AppPluginParameters["AccessWithinCluster"])
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages,msg)
+
+		result = util.SetResult(1, messages)
+		return result
+	}
+
+	//create tmp directory for storing dump
+	var mkdirArgs []string
+	restoreDir := "/tmp/" + util.IntToString(config.SelectedWorkflowId)
+	mkdirArgs = append(mkdirArgs,"mkdir")
+	mkdirArgs = append(mkdirArgs,"-p")
+	mkdirArgs = append(mkdirArgs,restoreDir)
+	
+	cmdResult := k8s.ExecuteCommand(podName,config.AppPluginParameters["ContainerName"],config.AppPluginParameters["Namespace"],config.AppPluginParameters["AccessWithinCluster"],mkdirArgs...)
+	
+	if cmdResult.Code != 0 {
+		return cmdResult
+	} else {
+		messages = util.PrependMessages(messages,cmdResult.Messages)
+	}
 
 	result = util.SetResult(0, messages)
 	return result
@@ -197,9 +218,10 @@ func (a appPlugin) PostRestore() util.Result {
 	}
 
 	var rmDirArgs []string
+	restoreTmpDir := "/tmp/" + util.IntToString(config.SelectedWorkflowId)
 	rmDirArgs = append(rmDirArgs,"rm")
 	rmDirArgs = append(rmDirArgs,"-rf")
-	rmDirArgs = append(rmDirArgs,restorePath)
+	rmDirArgs = append(rmDirArgs,restoreTmpDir)
 
 	cmdResult = k8s.ExecuteCommand(podName,config.AppPluginParameters["ContainerName"],config.AppPluginParameters["Namespace"],config.AppPluginParameters["AccessWithinCluster"],rmDirArgs...)
 
