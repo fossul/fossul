@@ -72,6 +72,7 @@ func info () {
 func setPlugin() (plugin util.Plugin) {
 	plugin.Name = "sample-archive"
 	plugin.Description = "A sample archive plugin"
+	plugin.Version = "1.0.0"
 	plugin.Type = "archive"
 
 	var capabilities []util.Capability

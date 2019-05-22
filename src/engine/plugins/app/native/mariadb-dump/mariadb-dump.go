@@ -221,6 +221,7 @@ func (a appPlugin) Info() util.Plugin {
 func setPlugin() (plugin util.Plugin) {
 	plugin.Name = "mariadb-dump"
 	plugin.Description = "MariaDB plugin for backing up MySql or MariaDB using mysqldump utility"
+	plugin.Version = "1.0.0"
 	plugin.Type = "app"
 
 	var capabilities []util.Capability

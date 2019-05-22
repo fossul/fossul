@@ -114,7 +114,7 @@ func DeleteWorkflowResults(auth Auth,profileName,configName string,workflowId st
 	return result,nil
 }
 
-func GetWorkflowServiceStatus(auth Auth) (util.Status,error) {
+func GetServerServiceStatus(auth Auth) (util.Status,error) {
 	var status util.Status
 
 	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/status", nil)

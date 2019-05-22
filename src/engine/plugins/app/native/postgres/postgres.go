@@ -193,6 +193,7 @@ func (a appPlugin) Info() util.Plugin {
 func setPlugin() (plugin util.Plugin) {
 	plugin.Name = "postgres"
 	plugin.Description = "Postgres plugin for backing up PostgreSQL databases"
+	plugin.Version = "1.0.0"
 	plugin.Type = "app"
 
 	var capabilities []util.Capability

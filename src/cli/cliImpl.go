@@ -611,7 +611,9 @@ func ArchivePluginList(auth client.Auth) {
 	os.Exit(0)
 }
 
-func PluginInfo(auth client.Auth,config util.Config,pluginName,pluginType string) {
+//func PluginInfo(auth client.Auth,config util.Config,pluginName,pluginType string) {
+func PluginInfo(auth client.Auth,pluginName,pluginType string) {	
+	var config util.Config
 	var pluginInfoResult util.PluginInfoResult
 	var err error
 
@@ -643,19 +645,22 @@ func PluginInfo(auth client.Auth,config util.Config,pluginName,pluginType string
 	fmt.Println("### Plugin Information ###")
 	fmt.Println("Name:", pluginInfoResult.Plugin.Name)
 	fmt.Println("Description:", pluginInfoResult.Plugin.Description)
+	fmt.Println("Version:", pluginInfoResult.Plugin.Version)
 	fmt.Println("Type:", pluginInfoResult.Plugin.Type)
 	fmt.Println("Capabilities:", pluginInfoResult.Plugin.Capabilities)
+
+	os.Exit(0)
 }
 
 func Status(auth client.Auth) {
-	fmt.Println("### Checking status of services ###")
+	fmt.Println("### Status of Services ###")
 
-	workflowStatus,err := client.GetWorkflowServiceStatus(auth)
+	workflowStatus,err := client.GetServerServiceStatus(auth)
 	if err != nil {
 		fmt.Println("ERROR: " + err.Error())
 		os.Exit(1)
 	}
-	fmt.Println("Workflow Service:", workflowStatus)
+	fmt.Println("Server Service:", workflowStatus)
 
 	appStatus,err := client.GetAppServiceStatus(auth)
 	if err != nil {

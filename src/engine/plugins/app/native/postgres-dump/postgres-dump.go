@@ -226,6 +226,7 @@ func (a appPlugin) Info() util.Plugin {
 func setPlugin() (plugin util.Plugin) {
 	plugin.Name = "postgres-dump"
 	plugin.Description = "Postgres plugin for backing up PostgreSQL databases using pg_dump utility"
+	plugin.Version = "1.0.0"
 	plugin.Type = "app"
 
 	var capabilities []util.Capability

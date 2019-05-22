@@ -7,6 +7,8 @@ import (
     "os"
 )
 
+const version = "1.0.0"
+
 var port string = os.Getenv("FOSSIL_SERVER_SERVICE_PORT")
 var configDir string = os.Getenv("FOSSIL_SERVER_CONFIG_DIR")
 var dataDir string = os.Getenv("FOSSIL_SERVER_DATA_DIR")

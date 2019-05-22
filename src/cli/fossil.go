@@ -7,6 +7,8 @@ import (
 	"fmt"
 )
 
+const version = "1.0.0"
+
 func main() {
 	optServerHostname := getopt.StringLong("server-host",'q',"","Server service hostname")
 	optServerPort := getopt.StringLong("server-port",'j',"","Server service port")
@@ -22,7 +24,7 @@ func main() {
 	optCredentialFile := getopt.StringLong("credential-file",'h',"","Path to credential file")
 	optConfigFile := getopt.StringLong("config-file",'f',"","Path to config file")
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
-	optAction := getopt.StringLong("action",'a',"","backup|restore|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|addSchedule|deleteSchedule|jobList|jobStatus|pluginInfo|status")
+	optAction := getopt.StringLong("action",'a',"","backup|restore|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|addSchedule|deleteSchedule|jobList|jobStatus|pluginInfo")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
 	optPluginType := getopt.StringLong("plugin-type",'t',"","Plugin type app|storage|archive")
 	optWorkflowId := getopt.StringLong("workflow-id",'w',"","Workflow Id")
@@ -33,17 +35,24 @@ func main() {
 	optAppPluginList := getopt.BoolLong("list-app-plugins", 0,"List app plugins")
 	optStoragePluginList := getopt.BoolLong("list-storage-plugins", 0,"List storage plugins")
 	optArchivePluginList := getopt.BoolLong("list-archive-plugins", 0,"List archive plugins")
-
+	optGetPluginInfo := getopt.BoolLong("get-plugin-info", 0,"Plugin information and version")
 	optGetDefaultConfig := getopt.BoolLong("get-default-config", 0,"Get the default config file")
 	optGetDefaultPluginConfig := getopt.BoolLong("get-default-plugin-config", 0,"Get the default config file")
 	optGetConfig := getopt.BoolLong("get-config", 0,"Get config file")
 	optGetPluginConfig := getopt.BoolLong("get-plugin-config", 0,"Get plugin config file")
+	optGetServiceStatus := getopt.BoolLong("status", 0,"Service status and version information")
+	optGetVersion := getopt.BoolLong("version", 0,"CLI version")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
     if *optHelp {
         getopt.Usage()
         os.Exit(0)
+	}
+
+	if *optGetVersion {
+		fmt.Println(version)
+		os.Exit(0)
 	}
 
 	var credentialFile string
@@ -107,10 +116,25 @@ func main() {
 
 	auth := ReadCredentialFile(credentialFile)
 
-	if *optAction == "status" {
+	if *optGetServiceStatus {
 		Status(auth)
 	}
 
+	if *optGetPluginInfo {
+		if getopt.IsSet("plugin") != true {
+			fmt.Println("ERROR: Missing parameter --plugin")
+			getopt.Usage()
+			os.Exit(1)
+		}
+
+		if getopt.IsSet("plugin-type") != true {
+			fmt.Println("ERROR: Missing parameter --plugin-type")
+			getopt.Usage()
+			os.Exit(1)
+		}
+
+		PluginInfo(auth,*optPluginName,*optPluginType)
+	}
 	if *optGetDefaultConfig {
 		GetDefaultConfig(auth)
 	}
@@ -324,7 +348,8 @@ func main() {
 			os.Exit(1)
 		}
 
-		JobStatus(auth,*optProfile,*optConfig,*optWorkflowId)			
+		JobStatus(auth,*optProfile,*optConfig,*optWorkflowId)
+		/*			
 	} else if *optAction == "pluginInfo" {
 		if getopt.IsSet("plugin") != true {
 			fmt.Println("ERROR: Missing parameter --plugin")
@@ -338,7 +363,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		PluginInfo(auth,config,*optPluginName,*optPluginType)
+		PluginInfo(auth,config,*optPluginName,*optPluginType)*/
 	} else if *optAction == "addSchedule" {
 		if getopt.IsSet("policy") != true {
 			fmt.Println("ERROR: missing parameter --policy")

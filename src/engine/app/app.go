@@ -7,6 +7,8 @@ import (
     "fossil/src/engine/util"
 )
 
+const version = "1.0.0"
+
 var port string = os.Getenv("FOSSIL_APP_SERVICE_PORT")
 var pluginDir string = os.Getenv("FOSSIL_APP_PLUGIN_DIR")
 var myUser string = os.Getenv("FOSSIL_USERNAME")

@@ -196,23 +196,6 @@ func (a appPlugin) PostRestore() util.Result {
 		config.AppPluginParameters["MongoPassword"] + " " + restorePath)	
 	}
 
-	/*restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoRestoreCmd"])
-	restoreArgs = append(restoreArgs,"--host")
-	restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoHost"])
-	restoreArgs = append(restoreArgs,"--port")
-	restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoPort"])
-	restoreArgs = append(restoreArgs,"--db")
-	restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoDb"])
-	restoreArgs = append(restoreArgs,"--username")
-	restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoUser"])
-
-	if config.AppPluginParameters["MongoPassword"] != "" {
-		restoreArgs = append(restoreArgs,"--password")
-		restoreArgs = append(restoreArgs,config.AppPluginParameters["MongoPassword"])
-	} 	
-
-	restoreArgs = append(restoreArgs," " + restorePath)*/
-
 	cmdResult = k8s.ExecuteCommand(podName,config.AppPluginParameters["ContainerName"],config.AppPluginParameters["Namespace"],config.AppPluginParameters["AccessWithinCluster"],restoreArgs...)
 
 	if cmdResult.Code != 0 {
@@ -246,6 +229,7 @@ func (a appPlugin) Info() util.Plugin {
 func setPlugin() (plugin util.Plugin) {
 	plugin.Name = "mongo-dump"
 	plugin.Description = "Mongo plugin for backing up Mongo database using mongodump utility"
+	plugin.Version = "1.0.0"
 	plugin.Type = "app"
 
 	var capabilities []util.Capability

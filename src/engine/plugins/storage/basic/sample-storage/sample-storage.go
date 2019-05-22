@@ -79,6 +79,7 @@ func info () {
 func setPlugin() (plugin util.Plugin) {
 	plugin.Name = "sample-storage"
 	plugin.Description = "A sample storage plugin"
+	plugin.Version = "1.0.0"
 	plugin.Type = "storage"
 
 	var capabilities []util.Capability

@@ -10,7 +10,10 @@ import (
 )
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
-	var status = util.Status{Msg: "OK"}
+	var status util.Status
+	status.Msg = "OK"
+	status.Version = version
+	
 	json.NewEncoder(w).Encode(status)
 }
 

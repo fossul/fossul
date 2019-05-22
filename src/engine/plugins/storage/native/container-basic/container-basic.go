@@ -235,6 +235,7 @@ func (s storagePlugin) Info() util.Plugin {
 func setPlugin() (plugin util.Plugin) {
 	plugin.Name = "container-basic"
 	plugin.Description = "Container Backup Plugin that uses rsync to backup a pod"
+	plugin.Version = "1.0.0"
 	plugin.Type = "storage"
 
 	var capabilities []util.Capability

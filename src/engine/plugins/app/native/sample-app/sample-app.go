@@ -122,6 +122,7 @@ func setDiscoverResult() (discoverResult util.DiscoverResult) {
 func setPlugin() (plugin util.Plugin) {
 	plugin.Name = "sample"
 	plugin.Description = "A sample plugin"
+	plugin.Version = "1.0.0"
 	plugin.Type = "app"
 
 	var capabilities []util.Capability
