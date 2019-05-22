@@ -13,6 +13,7 @@ func StartBackupWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	var workflowResult util.WorkflowResult
 	workflow := &util.Workflow{}
 	workflow.Id =  util.GetWorkflowId()
+	workflow.Type = "backup"
 	workflow.Status = "RUNNING"
 
 	var timestamp string = time.Now().Format(time.RFC3339)
@@ -53,6 +54,7 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	var workflowResult util.WorkflowResult
 	workflow := &util.Workflow{}
 	workflow.Id =  util.GetWorkflowId()
+	workflow.Type = "backup"
 	workflow.Status = "RUNNING"
 
 	var timestamp string = time.Now().Format(time.RFC3339)
@@ -97,6 +99,7 @@ func StartRestoreWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	var workflowResult util.WorkflowResult
 	workflow := &util.Workflow{}
 	workflow.Id =  util.GetWorkflowId()
+	workflow.Type = "restore"
 	workflow.Status = "RUNNING"
 
 	var timestamp string = time.Now().Format(time.RFC3339)
@@ -138,6 +141,7 @@ func StartRestoreWorkflow(w http.ResponseWriter, r *http.Request) {
 	var workflowResult util.WorkflowResult
 	workflow := &util.Workflow{}
 	workflow.Id =  util.GetWorkflowId()
+	workflow.Type = "restore"
 	workflow.Status = "RUNNING"
 
 	var timestamp string = time.Now().Format(time.RFC3339)

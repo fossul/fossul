@@ -11,6 +11,7 @@ import (
 type Workflow struct {
 	Id int `json:"id"`
 	Status string `json:"status"`
+	Type string `json:"type"`
 	Timestamp string    `json:"timestamp,omitempty"`
 	Steps []Step `json:"steps,omitempty"`
 }

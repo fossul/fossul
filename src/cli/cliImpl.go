@@ -513,9 +513,9 @@ func JobList(auth client.Auth,profileName,configName string) {
 	// print friendly columns
 	tw := new(tabwriter.Writer)
 	tw.Init(os.Stdout, 10, 20, 5, ' ', 0)
-	fmt.Fprintln(tw, "WorkflowId\t Status\t Start Time\t")
+	fmt.Fprintln(tw, "WorkflowId\t Type\t Status\t Start Time\t")
 	for _, job := range jobs.Jobs {
-		fmt.Fprintln(tw, util.IntToString(job.Id) + "\t",job.Status + "\t",job.Timestamp + "\t")
+		fmt.Fprintln(tw, util.IntToString(job.Id) + "\t",job.Type + "\t",job.Status + "\t",job.Timestamp + "\t")
 	}		
 	tw.Flush()
 }
