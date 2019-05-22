@@ -109,6 +109,11 @@ func restore (configMap map[string]string) {
 	restorePath,err := util.GetRestoreSrcPathFromMap(configMap)
 	checkError(err)
 
+	if restorePath == "" {
+		fmt.Println("ERROR Restore data no longer available for workflow id [" + configMap["SelectedWorkflowId"] + "], check retention policy")
+		os.Exit(1)
+	}
+
 	fmt.Println("INFO Restore source path is [" + restorePath + "]")
 
 	restoreDestPath := "/tmp/" + configMap["SelectedWorkflowId"]

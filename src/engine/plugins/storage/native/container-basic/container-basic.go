@@ -117,6 +117,13 @@ func (s storagePlugin) Restore() util.Result {
 		return result
 	}
 
+	if restorePath == "" {
+		msg = util.SetMessage("ERROR", "Restore data no longer available for workflow id [" + util.IntToString(config.SelectedWorkflowId) + "], check retention policy")
+		messages = append(messages,msg)	
+		result = util.SetResult(1, messages)
+		return result
+	}
+
 	msg = util.SetMessage("INFO", "Restore source path is [" + restorePath + "]")
 	messages = append(messages,msg)
 
