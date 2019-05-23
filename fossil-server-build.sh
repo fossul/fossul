@@ -30,7 +30,7 @@ go install fossil/src/engine/server
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying default configs"
-if [ ! -z $GOBIN/metadata/configs/default ]; then
+if [ ! -d $GOBIN/metadata/configs/default ]; then
   mkdir -p $GOBIN/metadata/configs/default
   if [ $? != 0 ]; then exit 1; fi
 fi

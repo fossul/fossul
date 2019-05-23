@@ -29,6 +29,7 @@ RUN /go/src/fossil/fossil-server-build.sh
 #RUN cd /app && go build engine/util && go install engine/workflow
 
 RUN chown -R 1001:0 /app && \
+    chown -R 1001:0 /app/metadata && \
     chmod -R 777 /app && \
     chmod -R 777 /app/metadata
 
