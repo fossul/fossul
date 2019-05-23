@@ -8,7 +8,8 @@ RUN dnf install -y golang
 
 RUN mkdir -p /go/src/fossil
 RUN mkdir /app
-RUN mkdir -p /app/metadata
+RUN mkdir -p /app/metadata/data
+RUN mkdir -p /app/metadata/configs
 
 WORKDIR /go/src/fossil
 
@@ -29,9 +30,7 @@ RUN /go/src/fossil/fossil-server-build.sh
 #RUN cd /app && go build engine/util && go install engine/workflow
 
 RUN chown -R 1001:0 /app && \
-    chown -R 1001:0 /app/metadata && \
-    chmod -R 777 /app && \
-    chmod -R 777 /app/metadata
+    chmod -R 777 /app &&
 
 RUN chmod -R 777 /tmp
 
