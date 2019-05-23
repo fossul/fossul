@@ -245,7 +245,7 @@ objects:
         labels:
           app: "${APPLICATION_NAME}-server"
       spec:
-        containers:                           
+        containers:                                     
         - capabilities: {}
           image: ' '
           imagePullPolicy: IfNotPresent
@@ -255,13 +255,15 @@ objects:
           -containerPort: 8080
           volumeMounts:
           - mountPath: /app/metadata
-            name: "${APPLICATION_NAME}-server-data"
+            name: "${APPLICATION_NAME}-server-data"          
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         volumes:
         - name: "${APPLICATION_NAME}-server-data" 
           persistentVolumeClaim:
-            claimName: "${APPLICATION_NAME}-server-data"          
+            claimName: "${APPLICATION_NAME}-server-data"   
+        securityContext: 
+          fsGroup: 1001                       
     triggers:
     - imageChangeParams:
         automatic: true
@@ -330,7 +332,7 @@ objects:
         labels:
           app: "${APPLICATION_NAME}-storage"
       spec:
-        containers:             
+        containers:                        
         - capabilities: {}
           image: ' '
           imagePullPolicy: IfNotPresent
@@ -340,13 +342,15 @@ objects:
           -containerPort: 8080
           volumeMounts:
           - mountPath: /app/backups
-            name: "${APPLICATION_NAME}-storage-data"
+            name: "${APPLICATION_NAME}-storage-data"                    
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         volumes:
         - name: "${APPLICATION_NAME}-storage-data" 
           persistentVolumeClaim:
             claimName: "${APPLICATION_NAME}-storage-data"
+        securityContext: 
+          fsGroup: 1001                
     triggers:
     - imageChangeParams:
         automatic: true
