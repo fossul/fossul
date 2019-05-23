@@ -254,7 +254,7 @@ objects:
           ports:
           -containerPort: 8080
           volumeMounts:
-          - mountPath: /app
+          - mountPath: /app/metadata
             name: "${APPLICATION_NAME}-server-data"
         dnsPolicy: ClusterFirst
         restartPolicy: Always
@@ -339,7 +339,7 @@ objects:
           ports:
           -containerPort: 8080
           volumeMounts:
-          - mountPath: /app
+          - mountPath: /app/backups
             name: "${APPLICATION_NAME}-storage-data"
         dnsPolicy: ClusterFirst
         restartPolicy: Always

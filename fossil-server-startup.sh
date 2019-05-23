@@ -1,7 +1,7 @@
 #!/bin/bash
 PORT="8000"
-CONFIG_DIR="configs"
-DATA_DIR="data"
+CONFIG_DIR="metadata/configs"
+DATA_DIR="metadata/data"
 USERNAME="admin"
 PASSWORD="redhat123"
 SERVER_HOSTNAME="fossil-server"
