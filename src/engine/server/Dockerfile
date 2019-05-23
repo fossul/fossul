@@ -32,7 +32,7 @@ RUN /go/src/fossil/fossil-server-build.sh
 RUN chown -R 1001:0 /app && \
     chown -R 1001:0 /app/metadata/data && \
     chown -R 1001:0 /app/metadata/configs && \
-    chmod -R 777 /app &&
+    chmod -R 777 /app
 
 RUN chmod -R 777 /tmp
 
