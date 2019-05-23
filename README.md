@@ -127,7 +127,9 @@ A configuration requires a main configuration and a configuration for each plugi
 ### Main config
 Simply copy past to file and update. ProfileName, ConfigName, WorkflowId, SelectedBackupPolicy, SelectedBackupRetention, SelectedWorkflowId are all ignored. These are added dynamically. All you need to do is add plugins app,storage, archive, configure auto discovery (depending on if plugin supports it), configure policy and any pre/post commands that should execute.
  
-```$ fossil --profile mariadb --config mariadb --get-config
+```$ fossil --profile mariadb --config mariadb --get-config```
+
+```
 ProfileName = ""
 ConfigName = ""
 WorkflowId = ""
@@ -170,7 +172,9 @@ Assuming we saved file to /tmp/mariadb.conf
 ### App Plugin Config
 Almost same as previous step, get the plugin default config, copy/paste to file, file it out and add it back to server as new config.
 
-```$ fossil --profile mariadb --config mariadb --get-plugin-config --plugin mariadb-dump.so
+```$ fossil --profile mariadb --config mariadb --get-plugin-config --plugin mariadb-dump.so```
+
+```
 AccessWithinCluster = "true"
 ContainerName = "mariadb"
 MysqlDb = "sampledb"
@@ -191,7 +195,9 @@ Assuming we saved file to /tmp/mariadb-dump.conf
 ### Storage Plugin Configuration
 Identical as previous step just a different plugin. The BackupSrcPaths option can be ignored if you set and your plugin supports auto-discover. The app plugin will automatically figure out what it should backup and set this dynamically.
 
-```$ fossil --profile mariadb --config mariadb --get-plugin-config --plugin container-basic.so
+```$ fossil --profile mariadb --config mariadb --get-plugin-config --plugin container-basic.so```
+
+```
 AccessWithinCluster = "true"
 BackupDestPath = "/app/backups"
 BackupName = "cmds"
