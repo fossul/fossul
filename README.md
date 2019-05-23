@@ -221,7 +221,7 @@ Create a schedule that will run a backup every minute.
 `30 * * * *        postgres         postgres        weekly`
 
 ## List jobs
-`fossil --profile mariadb --config mariadb --action jobList 
+```fossil --profile mariadb --config mariadb --action jobList 
 ########## Welcome to Fossil Framework ##########
 ### List of Jobs for profile [mariadb] config [mariadb] ###
 WorkflowId      Type        Status        Policy      Start Time               
@@ -230,7 +230,7 @@ WorkflowId      Type        Status        Policy      Start Time
 2652            backup      COMPLETE      daily       2019-05-23T23:27:00Z     
 5338            backup      COMPLETE      daily       2019-05-23T23:26:00Z     
 4967            backup      COMPLETE      weekly      2019-05-23T23:25:00Z
-`
+```
 ## Job Status
 `$ fossil --profile mariadb --config mariadb --action jobStatus --workflow-id 6777`
 
