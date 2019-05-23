@@ -14,8 +14,6 @@ import (
 )
 
 type appPlugin string
-
-var config util.Config
 var AppPlugin appPlugin
 
 type key string
@@ -26,14 +24,13 @@ const (
 	databaseKey = key("databaseKey")
 )
 
-func (a appPlugin) SetEnv(c util.Config) util.Result {
-	config = c
+func (a appPlugin) SetEnv(config util.Config) util.Result {
 	var result util.Result
 
 	return result
 }	
 
-func (a appPlugin) Discover() util.DiscoverResult {
+func (a appPlugin) Discover(config util.Config) util.DiscoverResult {
 	var discoverResult util.DiscoverResult
 	var discoverList []util.Discover
 	var discover util.Discover
@@ -93,7 +90,7 @@ func (a appPlugin) Discover() util.DiscoverResult {
 	return discoverResult
 }	
 
-func (a appPlugin) Quiesce() util.Result {	
+func (a appPlugin) Quiesce(config util.Config) util.Result {	
 
 	var result util.Result
 	var messages []util.Message
@@ -140,7 +137,7 @@ func (a appPlugin) Quiesce() util.Result {
 
 }
 
-func (a appPlugin) Unquiesce() util.Result {	
+func (a appPlugin) Unquiesce(config util.Config) util.Result {	
 
 	var result util.Result
 	var messages []util.Message
@@ -187,7 +184,7 @@ func (a appPlugin) Unquiesce() util.Result {
 
 }
 
-func (a appPlugin) PreRestore() util.Result {	
+func (a appPlugin) PreRestore(config util.Config) util.Result {	
 
 	var result util.Result
 	var messages []util.Message
@@ -199,7 +196,7 @@ func (a appPlugin) PreRestore() util.Result {
 	return result
 }	
 
-func (a appPlugin) PostRestore() util.Result {	
+func (a appPlugin) PostRestore(config util.Config) util.Result {	
 
 	var result util.Result
 	var messages []util.Message

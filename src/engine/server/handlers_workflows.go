@@ -190,6 +190,8 @@ func GetWorkflowStatus(w http.ResponseWriter, r *http.Request) {
 	var configName string = params["configName"]
 	var id string = params["id"]
 
+	var workflowStatusResult util.WorkflowStatusResult
+
 	resultsDir := dataDir + "/" + profileName + "/" + configName + "/" + id
 
 	workflow := &util.Workflow{}
@@ -197,11 +199,17 @@ func GetWorkflowStatus(w http.ResponseWriter, r *http.Request) {
 	workflowFile := resultsDir + "/workflow"
 	err := util.ReadGob(workflowFile,&workflow)
 	if err != nil {
-		log.Println(err.Error())
-	}
+		result := util.SetResultMessage(1,"ERROR","Couldn't get status for workflow id [" + id + "] " + err.Error())
+		workflowStatusResult.Result = result
 
-	_ = json.NewDecoder(r.Body).Decode(&workflow)
-	json.NewEncoder(w).Encode(workflow)	
+		_ = json.NewDecoder(r.Body).Decode(&workflowStatusResult)
+		json.NewEncoder(w).Encode(workflowStatusResult)
+	} else {
+		workflowStatusResult.Workflow = *workflow
+
+		_ = json.NewDecoder(r.Body).Decode(&workflowStatusResult)
+		json.NewEncoder(w).Encode(workflowStatusResult)	
+	}
 }
 
 func GetWorkflowStepResults(w http.ResponseWriter, r *http.Request) {

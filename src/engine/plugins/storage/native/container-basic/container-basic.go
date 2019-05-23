@@ -9,12 +9,9 @@ import (
 )
 
 type storagePlugin string
-
-var config util.Config
 var StoragePlugin storagePlugin
 
-func (s storagePlugin) SetEnv(c util.Config) util.Result {
-	config = c
+func (s storagePlugin) SetEnv(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
@@ -24,7 +21,7 @@ func (s storagePlugin) SetEnv(c util.Config) util.Result {
 	return result
 }
 
-func (s storagePlugin) Backup() util.Result {	
+func (s storagePlugin) Backup(config util.Config) util.Result {	
 	var result util.Result
 	var messages []util.Message
 	backupSrcFilePaths := getBackupSrcPaths(config)
@@ -90,7 +87,7 @@ func (s storagePlugin) Backup() util.Result {
 	return result
 }
 
-func (s storagePlugin) Restore() util.Result {
+func (s storagePlugin) Restore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 
@@ -160,7 +157,7 @@ func (s storagePlugin) Restore() util.Result {
 	return result
 }	
 
-func (s storagePlugin) BackupDelete() util.Result {	
+func (s storagePlugin) BackupDelete(config util.Config) util.Result {	
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
@@ -211,7 +208,7 @@ func (s storagePlugin) BackupDelete() util.Result {
 	return result
 }
 
-func (s storagePlugin) BackupList() util.Backups {	
+func (s storagePlugin) BackupList(config util.Config) util.Backups {	
 	var backups util.Backups
 	var result util.Result
 	var messages []util.Message

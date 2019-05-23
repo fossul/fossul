@@ -20,12 +20,12 @@ type Auth struct {
 	Password string `json:"password,omitempty"`
 }
 
-func GetWorkflowStatus(auth Auth,profileName,configName string,id int) (util.Workflow,error) {
-	var workflow util.Workflow
+func GetWorkflowStatus(auth Auth,profileName,configName string,id int) (util.WorkflowStatusResult,error) {
+	var workflowStatusResult util.WorkflowStatusResult
 	idToString := util.IntToString(id)
 	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/getWorkflowStatus/" + profileName + "/" + configName + "/" + idToString, nil)
 	if err != nil {
-		return workflow,err
+		return workflowStatusResult,err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -35,20 +35,20 @@ func GetWorkflowStatus(auth Auth,profileName,configName string,id int) (util.Wor
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return workflow,err
+		return workflowStatusResult,err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		if err := json.NewDecoder(resp.Body).Decode(&workflow); err != nil {
-			return workflow,err
+		if err := json.NewDecoder(resp.Body).Decode(&workflowStatusResult); err != nil {
+			return workflowStatusResult,err
 		}
 	} else {
-		return workflow,errors.New("Http Status Error [" + resp.Status + "]")
+		return workflowStatusResult,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return workflow,nil
+	return workflowStatusResult,nil
 }
 
 func GetWorkflowStepResults(auth Auth,profileName,configName string,workflowId int, step int) ([]util.Result,error) {

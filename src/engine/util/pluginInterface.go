@@ -8,28 +8,28 @@ import (
 
 type AppPlugin interface {
 	SetEnv(Config) (Result)
-	Quiesce() (Result)
-	Unquiesce() (Result)
-	PreRestore() (Result)
-	PostRestore() (Result)
-	Discover() (DiscoverResult)
+	Quiesce(Config) (Result)
+	Unquiesce(Config) (Result)
+	PreRestore(Config) (Result)
+	PostRestore(Config) (Result)
+	Discover(Config) (DiscoverResult)
 	Info() (Plugin)
 }
 
 type StoragePlugin interface {
 	SetEnv(Config) (Result)
-	Backup() (Result)
-	Restore() (Result)
-	BackupDelete() (Result)
-	BackupList() (Backups)
+	Backup(Config) (Result)
+	Restore(Config) (Result)
+	BackupDelete(Config) (Result)
+	BackupList(Config) (Backups)
 	Info() (Plugin)
 }
 
 type ArchivePlugin interface {
 	SetEnv(Config) (Result)
-	Archive() (Result)
-	ArchiveDelete() (Result)
-	ArchiveList() ([]Archive)
+	Archive(Config) (Result)
+	ArchiveDelete(Config) (Result)
+	ArchiveList(Config) ([]Archive)
 	Info() (Plugin)
 }
 

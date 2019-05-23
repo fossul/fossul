@@ -22,6 +22,11 @@ type WorkflowResult struct {
 	Result Result `json:"result,omitempty"`
 }
 
+type WorkflowStatusResult struct {
+	Workflow Workflow `json:"workflow,omitempty"`
+	Result Result `json:"result,omitempty"`
+}
+
 type Step struct {
 	Id int `json:"id"`
 	Status string `json:"status"`

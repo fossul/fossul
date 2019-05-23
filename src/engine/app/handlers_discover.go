@@ -54,7 +54,7 @@ func Discover(w http.ResponseWriter, r *http.Request) {
 				_ = json.NewDecoder(r.Body).Decode(&discoverResult)
 				json.NewEncoder(w).Encode(discoverResult)
 			} else {
-				discoverResult = plugin.Discover()
+				discoverResult = plugin.Discover(config)
 				messages = util.PrependMessages(setEnvResult.Messages,discoverResult.Result.Messages)
 				discoverResult.Result.Messages = messages
 

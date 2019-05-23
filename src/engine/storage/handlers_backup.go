@@ -45,7 +45,7 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 				_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
-				result = plugin.Backup()
+				result = plugin.Backup(config)
 				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
 				result.Messages = messages
 	
@@ -114,7 +114,7 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 				_ = json.NewDecoder(r.Body).Decode(&backups)
 				json.NewEncoder(w).Encode(backups)
 			} else {	
-				backups := plugin.BackupList()
+				backups := plugin.BackupList(config)
 				_ = json.NewDecoder(r.Body).Decode(&backups)
 				json.NewEncoder(w).Encode(backups)	
 			}		
@@ -158,7 +158,7 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 				_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
-				result = plugin.BackupDelete()
+				result = plugin.BackupDelete(config)
 				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
 				result.Messages = messages
 	

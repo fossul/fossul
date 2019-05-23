@@ -82,7 +82,7 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 				_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
-				result = plugin.Quiesce()
+				result = plugin.Quiesce(config)
 				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
 				result.Messages = messages
 

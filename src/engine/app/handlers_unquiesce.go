@@ -81,7 +81,7 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 				_ = json.NewDecoder(r.Body).Decode(&setEnvResult)
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
-				result = plugin.Unquiesce()
+				result = plugin.Unquiesce(config)
 				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
 				result.Messages = messages
 

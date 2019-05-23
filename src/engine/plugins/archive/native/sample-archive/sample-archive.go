@@ -5,12 +5,9 @@ import (
 )
 
 type archivePlugin string
-
-var config util.Config
 var ArchivePlugin archivePlugin
 
-func (r archivePlugin) SetEnv(c util.Config) util.Result {
-	config = c
+func (r archivePlugin) SetEnv(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
@@ -20,7 +17,7 @@ func (r archivePlugin) SetEnv(c util.Config) util.Result {
 	return result
 }
 
-func (r archivePlugin) Archive() util.Result {	
+func (r archivePlugin) Archive(config util.Config) util.Result {	
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
@@ -32,7 +29,7 @@ func (r archivePlugin) Archive() util.Result {
 	return result
 }
 
-func (r archivePlugin) ArchiveDelete() util.Result {	
+func (r archivePlugin) ArchiveDelete(config util.Config) util.Result {	
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
@@ -44,7 +41,7 @@ func (r archivePlugin) ArchiveDelete() util.Result {
 	return result
 }
 
-func (r archivePlugin) ArchiveList() []util.Archive {	
+func (r archivePlugin) ArchiveList(config util.Config) []util.Archive {	
 	var archives []util.Archive
 
 	return archives

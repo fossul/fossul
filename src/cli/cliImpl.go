@@ -319,14 +319,16 @@ func BackupWithLocalConfig(auth client.Auth,profileName,configName,policyName st
 	// loop and wait for all workflow steps to complete
 	for {
 		time.Sleep(1 * time.Second)
-		workflow,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
+		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
 		if err != nil {
 			fmt.Println("ERROR: " + err.Error())
 			os.Exit(1)
 		}
 
+		checkResult(workflowStatusResult.Result)
+
 		// Print results for a step only once
-		for _, step := range workflow.Steps {
+		for _, step := range workflowStatusResult.Workflow.Steps {
 			if step.Status == "COMPLETE" || step.Status == "ERROR" {
 				if !util.IntInSlice(step.Id,completedSteps) {
 					completedSteps = append(completedSteps,step.Id)
@@ -340,7 +342,7 @@ func BackupWithLocalConfig(auth client.Auth,profileName,configName,policyName st
 			}
 		}
 
-		if workflow.Status == "COMPLETE" || workflow.Status == "ERROR"  {
+		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR"  {
 			break
 		}
 		time.Sleep(4 * time.Second)
@@ -366,14 +368,16 @@ func Backup(auth client.Auth,profileName,configName,policyName string) {
 	// loop and wait for all workflow steps to complete
 	for {
 		time.Sleep(1 * time.Second)
-		workflow,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
+		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
 		if err != nil {
 			fmt.Println("ERROR: " + err.Error())
 			os.Exit(1)
 		}
 
+		checkResult(workflowStatusResult.Result)
+
 		// Print results for a step only once
-		for _, step := range workflow.Steps {
+		for _, step := range workflowStatusResult.Workflow.Steps {
 			if step.Status == "COMPLETE" || step.Status == "ERROR" {
 				if !util.IntInSlice(step.Id,completedSteps) {
 					completedSteps = append(completedSteps,step.Id)
@@ -387,7 +391,7 @@ func Backup(auth client.Auth,profileName,configName,policyName string) {
 			}
 		}
 
-		if workflow.Status == "COMPLETE" || workflow.Status == "ERROR"  {
+		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR"  {
 			break
 		}
 		time.Sleep(4 * time.Second)
@@ -413,14 +417,16 @@ func RestoreWithLocalConfig(auth client.Auth,profileName,configName,policyName,s
 	// loop and wait for all workflow steps to complete
 	for {
 		time.Sleep(1 * time.Second)
-		workflow,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
+		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
 		if err != nil {
 			fmt.Println("ERROR: " + err.Error())
 			os.Exit(1)
 		}
 
+		checkResult(workflowStatusResult.Result)
+
 		// Print results for a step only once
-		for _, step := range workflow.Steps {
+		for _, step := range workflowStatusResult.Workflow.Steps {
 			if step.Status == "COMPLETE" || step.Status == "ERROR" {
 				if !util.IntInSlice(step.Id,completedSteps) {
 					completedSteps = append(completedSteps,step.Id)
@@ -434,7 +440,7 @@ func RestoreWithLocalConfig(auth client.Auth,profileName,configName,policyName,s
 			}
 		}
 
-		if workflow.Status == "COMPLETE" || workflow.Status == "ERROR"  {
+		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR"  {
 			break
 		}
 		time.Sleep(4 * time.Second)
@@ -460,14 +466,16 @@ func Restore(auth client.Auth,profileName,configName,policyName,selectedWorkflow
 	// loop and wait for all workflow steps to complete
 	for {
 		time.Sleep(1 * time.Second)
-		workflow,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
+		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
 		if err != nil {
 			fmt.Println("ERROR: " + err.Error())
 			os.Exit(1)
 		}
 
+		checkResult(workflowStatusResult.Result)
+
 		// Print results for a step only once
-		for _, step := range workflow.Steps {
+		for _, step := range workflowStatusResult.Workflow.Steps {
 			if step.Status == "COMPLETE" || step.Status == "ERROR" {
 				if !util.IntInSlice(step.Id,completedSteps) {
 					completedSteps = append(completedSteps,step.Id)
@@ -481,7 +489,7 @@ func Restore(auth client.Auth,profileName,configName,policyName,selectedWorkflow
 			}
 		}
 
-		if workflow.Status == "COMPLETE" || workflow.Status == "ERROR"  {
+		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR"  {
 			break
 		}
 		time.Sleep(4 * time.Second)
@@ -535,14 +543,16 @@ func JobStatus(auth client.Auth,profileName,configName,workflowId string) {
 	// loop and wait for all workflow steps to complete
 	for {
 		time.Sleep(1 * time.Second)
-		workflow,err := client.GetWorkflowStatus(auth,profileName,configName,workflowIdInt)
+		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowIdInt)
 		if err != nil {
 			fmt.Println("ERROR: " + err.Error())
 			os.Exit(1)
 		}
 
+		checkResult(workflowStatusResult.Result)
+
 		// Print results for a step only once
-		for _, step := range workflow.Steps {
+		for _, step := range workflowStatusResult.Workflow.Steps {
 			if step.Status == "COMPLETE" || step.Status == "ERROR" {
 				if !util.IntInSlice(step.Id,completedSteps) {
 					completedSteps = append(completedSteps,step.Id)
@@ -557,7 +567,7 @@ func JobStatus(auth client.Auth,profileName,configName,workflowId string) {
 			}
 		}
 
-		if workflow.Status == "COMPLETE" || workflow.Status == "ERROR"  {
+		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR"  {
 			break
 		}
 		time.Sleep(4 * time.Second)
