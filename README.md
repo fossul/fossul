@@ -115,11 +115,11 @@ First fossil is deployed on OpenShift using the provided template in the yaml fo
 ## Save Credentials
 By default credentials will be stored under user home directory in a file called .fossil-credentials. You can specify `--credential-file` argument and path to save or load credential files from another location.
 
-`$ fossil --set-credentials --user admin --pass redhat123 --server-host fossil-server-fossil.apps.46.4.207.247.xip.io --server-port 80 --app-host fossil-app-fossil.apps.46.4.207.247.xip.io --app-port 80 --storage-host fossil-storage-fossil.apps.46.4.207.247.xip.io --storage-port 80`
+```$ fossil --set-credentials --user admin --pass redhat123 --server-host fossil-server-fossil.apps.46.4.207.247.xip.io --server-port 80 --app-host fossil-app-fossil.apps.46.4.207.247.xip.io --app-port 80 --storage-host fossil-storage-fossil.apps.46.4.207.247.xip.io --storage-port 80```
 
 ## Create a Profile
 A profile is simply a group it can contain one or more configurations. For example you may have an application with several databases. The application is the profile and each database a configuration within the profile. It is only there for organizational purposes.
- `$ fossil --profile mariadb --action addProfile`
+```$ fossil --profile mariadb --action addProfile```
  
 ## Create a COnfiguration
 A configuration requires a main configuration and a configuration for each plugin used. A configuration just contains key/value pairs. The first step is to get the default configurations, change them locally and the upload them. Here we will create configuration to backup and restore mariadb. We will use container-basic and mariadb-dump plugins.
@@ -127,7 +127,7 @@ A configuration requires a main configuration and a configuration for each plugi
 ### Main config
 Simply copy past to file and update. ProfileName, ConfigName, WorkflowId, SelectedBackupPolicy, SelectedBackupRetention, SelectedWorkflowId are all ignored. These are added dynamically. All you need to do is add plugins app,storage, archive, configure auto discovery (depending on if plugin supports it), configure policy and any pre/post commands that should execute.
  
- `$ fossil --profile mariadb --config mariadb --get-config
+```$ fossil --profile mariadb --config mariadb --get-config
 ProfileName = ""
 ConfigName = ""
 WorkflowId = ""
@@ -161,15 +161,16 @@ SendTrapSuccessCmd = "echo,send trap success command"
 
 [[BackupRetentions]]
   Policy = "weekly"
-  RetentionDays = 4`
+  RetentionDays = 4
+```
   
 Assuming we saved file to /tmp/mariadb.conf
-`$ fossil --profile mariadb --config mariadb --action addConfig --config-file /tmp/mariadb.conf`
+```$ fossil --profile mariadb --config mariadb --action addConfig --config-file /tmp/mariadb.conf```
 
 ### App Plugin Config
 Almost same as previous step, get the plugin default config, copy/paste to file, file it out and add it back to server as new config.
 
-`$ fossil --profile mariadb --config mariadb --get-plugin-config --plugin mariadb-dump.so
+```$ fossil --profile mariadb --config mariadb --get-plugin-config --plugin mariadb-dump.so
 AccessWithinCluster = "true"
 ContainerName = "mariadb"
 MysqlDb = "sampledb"
@@ -181,15 +182,16 @@ MysqlProto = "tcp"
 MysqlRestoreCmd = "/opt/rh/rh-mariadb102/root/usr/bin/mysql"
 MysqlUser = "root"
 Namespace = "databases"
-ServiceName = "mariadb"`
+ServiceName = "mariadb"
+```
 
 Assuming we saved file to /tmp/mariadb-dump.conf
-`$ fossil --profile mariadb --config mariadb --action addPluginConfig --plugin mariadb-dump.so --config-file /tmp/mariadb-dump.conf`
+```$ fossil --profile mariadb --config mariadb --action addPluginConfig --plugin mariadb-dump.so --config-file /tmp/mariadb-dump.conf```
 
 ### Storage Plugin Configuration
 Identical as previous step just a different plugin. The BackupSrcPaths option can be ignored if you set and your plugin supports auto-discover. The app plugin will automatically figure out what it should backup and set this dynamically.
 
-`$ fossil --profile mariadb --config mariadb --get-plugin-config --plugin container-basic.so
+```$ fossil --profile mariadb --config mariadb --get-plugin-config --plugin container-basic.so
 AccessWithinCluster = "true"
 BackupDestPath = "/app/backups"
 BackupName = "cmds"
@@ -197,28 +199,30 @@ BackupSrcPaths = "/var/lib/mysql/data/sampledb,/var/lib/mysql/data/test"
 ContainerPlatform = "openshift"
 CopyCmdPath = "/app/oc"
 Namespace = "databases"
-ServiceName = "mariadb"`
+ServiceName = "mariadb"
+```
 
 ## Manual Backup
-`$ fossil --profile mariadb --config mariadb --policy daily --action backup`
+```$ fossil --profile mariadb --config mariadb --policy daily --action backup```
 
 ## List Backups
-`$ fossil --profile mariadb --config mariadb --policy daily --action backupList`
+```$ fossil --profile mariadb --config mariadb --policy daily --action backupList```
 
 ## Add Schedule
 Create a schedule that will run a backup every minute.
-`$ fossil --profile mariadb --config mariadb --policy daily --action addSchedule --cron-schedule "* * * * *"`
+```$ fossil --profile mariadb --config mariadb --policy daily --action addSchedule --cron-schedule "* * * * *"```
 
 ## List Schedules
-`$ fossil --list-schedules`
-`### Job Schedules ###`
-`CronSchedule      ProfileName      ConfigName      Policy`     
-`* * * * *         mariadb          mariadb         daily`      
-`25 * * * *        mariadb          mariadb         weekly`     
-`* * * * *         mongo            mongo           daily`      
-`20 * * * *        mongo            mongo           weekly`     
-`* * * * *         postgres         postgres        daily`      
-`30 * * * *        postgres         postgres        weekly`
+```$ fossil --list-schedules
+### Job Schedules ###`
+CronSchedule      ProfileName      ConfigName      Policy     
+* * * * *         mariadb          mariadb         daily      
+25 * * * *        mariadb          mariadb         weekly     
+* * * * *         mongo            mongo           daily      
+20 * * * *        mongo            mongo           weekly     
+* * * * *         postgres         postgres        daily     
+30 * * * *        postgres         postgres        weekly
+```
 
 ## List jobs
 ```fossil --profile mariadb --config mariadb --action jobList 
@@ -232,7 +236,7 @@ WorkflowId      Type        Status        Policy      Start Time
 4967            backup      COMPLETE      weekly      2019-05-23T23:25:00Z
 ```
 ## Job Status
-`$ fossil --profile mariadb --config mariadb --action jobStatus --workflow-id 6777`
+```$ fossil --profile mariadb --config mariadb --action jobStatus --workflow-id 6777```
 
 ## Restore
-`$ fossil --profile mariadb --config mariadb --action restore --workflow-id 6777`
+```$ fossil --profile mariadb --config mariadb --action restore --workflow-id 6777```
