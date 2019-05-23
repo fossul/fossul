@@ -30,12 +30,12 @@ go install fossil/src/engine/server
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying default configs"
-if [ ! $GOBIN/metadata/configs/default ]; then
+if [ ! -z $GOBIN/metadata/configs/default ]; then
   mkdir -p $GOBIN/metadata/configs/default
   if [ $? != 0 ]; then exit 1; fi
 fi
 
-cp -r $GOPATH/src/fossil/src/cli/configs/default $GOBIN/metadata/configs/default/default
+cp -r $GOPATH/src/fossil/src/cli/configs/default $GOBIN/metadata/configs/default
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying startup script"

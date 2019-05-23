@@ -92,8 +92,8 @@ mv $GOBIN/container-basic $PLUGIN_DIR/storage
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying default configs"
-if [ ! $GOBIN/metadata/configs/default/default ]; then
-  mkdir -p $GOBIN/metadata/configs/default/default
+if [ ! -z $GOBIN/metadata/configs/default ]; then
+  mkdir -p $GOBIN/metadata/configs/default
   if [ $? != 0 ]; then exit 1; fi
 fi
 
