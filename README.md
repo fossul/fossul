@@ -126,8 +126,8 @@ A configuration requires a main configuration and a configuration for each plugi
  
 ### Main config
 Simply copy past to file and update. ProfileName, ConfigName, WorkflowId, SelectedBackupPolicy, SelectedBackupRetention, SelectedWorkflowId are all ignored. These are added dynamically. All you need to do is add plugins app,storage, archive, configure auto discovery (depending on if plugin supports it), configure policy and any pre/post commands that should execute.
- 
-```$ fossil --profile mariadb --config mariadb --get-config```
+
+```$ fossil --get-default-config``` 
 
 ```
 ProfileName = ""
@@ -169,10 +169,13 @@ SendTrapSuccessCmd = "echo,send trap success command"
 Assuming we saved file to /tmp/mariadb.conf
 ```$ fossil --profile mariadb --config mariadb --action addConfig --config-file /tmp/mariadb.conf```
 
+### Get a Config
+```$ fossil --profile mariadb --config mariadb --get-config```
+
 ### App Plugin Config
 Almost same as previous step, get the plugin default config, copy/paste to file, file it out and add it back to server as new config.
 
-```$ fossil --profile mariadb --config mariadb --get-plugin-config --plugin mariadb-dump.so```
+```$ fossil --get-default-plugin-config --plugin mariadb-dump.so```
 
 ```
 AccessWithinCluster = "true"
@@ -192,10 +195,14 @@ ServiceName = "mariadb"
 Assuming we saved file to /tmp/mariadb-dump.conf
 ```$ fossil --profile mariadb --config mariadb --action addPluginConfig --plugin mariadb-dump.so --config-file /tmp/mariadb-dump.conf```
 
+### Get Plugin Config
+
+```$ fossil --profile mariadb --config mariadb --get-plugin-config --plugin mariadb-dump.so```
+
 ### Storage Plugin Configuration
 Identical as previous step just a different plugin. The BackupSrcPaths option can be ignored if you set and your plugin supports auto-discover. The app plugin will automatically figure out what it should backup and set this dynamically.
 
-```$ fossil --profile mariadb --config mariadb --get-plugin-config --plugin container-basic.so```
+```$ fossil --get-default-plugin-config --plugin container-basic.so```
 
 ```
 AccessWithinCluster = "true"
