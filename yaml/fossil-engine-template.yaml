@@ -251,17 +251,20 @@ objects:
             value: ${FOSSIL_SERVER_CONFIG_DIR}
           - name: FOSSIL_SERVER_DATA_DIR
             value: ${FOSSIL_SERVER_DATA_DIR}
-        - name: FOSSIL_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: ${APPLICATION_NAME}-secrets
-              key: admin-user            
-        - name: FOSSIL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: ${APPLICATION_NAME}-secrets
-              key: admin-password
-        - capabilities: {}
+          - name: FOSSIL_SERVER_CLIENT_HOSTNAME
+            value: ${APPLICATION_NAME}-server
+          - name: FOSSIL_SERVER_DEBUG
+            value: ${FOSSIL_SERVER_DEBUG}                         
+          - name: FOSSIL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-secrets
+                key: admin-user
+          - name: FOSSIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-secrets
+                key: admin-password
           image: ' '
           imagePullPolicy: IfNotPresent
           name: "${APPLICATION_NAME}-server"
@@ -312,17 +315,20 @@ objects:
         - env:
           - name: FOSSIL_APP_PLUGIN_DIR
             value: ${FOSSIL_APP_PLUGIN_DIR}
-        - name: FOSSIL_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: ${APPLICATION_NAME}-secrets
-              key: admin-user            
-        - name: FOSSIL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: ${APPLICATION_NAME}-secrets
-              key: admin-password               
-        - capabilities: {}
+          - name: FOSSIL_APP_CLIENT_HOSTNAME
+            value: ${APPLICATION_NAME}-app 
+          - name: FOSSIL_APP_DEBUG
+            value: ${FOSSIL_APP_DEBUG}                         
+          - name: FOSSIL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-secrets
+                key: admin-user
+          - name: FOSSIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-secrets
+                key: admin-password
           image: ' '
           imagePullPolicy: IfNotPresent
           name: "${APPLICATION_NAME}-app"
@@ -363,18 +369,21 @@ objects:
         containers:      
         - env:
           - name: FOSSIL_STORAGE_PLUGIN_DIR
-            value: ${FOSSIL_STORAGE_PLUGIN_DIR}
-        - name: FOSSIL_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: ${APPLICATION_NAME}-secrets
-              key: admin-user            
-        - name: FOSSIL_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: ${APPLICATION_NAME}-secrets
-              key: admin-password                             
-        - capabilities: {}
+            value: ${FOSSIL_STORAGE_PLUGIN_DIR} 
+          - name: FOSSIL_STORAGE_CLIENT_HOSTNAME
+            value: ${APPLICATION_NAME}-storage 
+          - name: FOSSIL_STORAGE_DEBUG
+            value: ${FOSSIL_STORAGE_DEBUG}                           
+          - name: FOSSIL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-secrets
+                key: admin-user
+          - name: FOSSIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-secrets
+                key: admin-password
           image: ' '
           imagePullPolicy: IfNotPresent
           name: "${APPLICATION_NAME}-storage"
@@ -566,22 +575,27 @@ parameters:
     displayName: Password for API Services
     description: Password for API Services
     value: redhat123
-    required: true 
+    required: true     
   - name: FOSSIL_SERVER_CONFIG_DIR
-    displayName: DIrectory for configs
+    displayName: Directory for configs
     description: Directory for configs
-    value: configs
+    value: metadata/configs
     required: true 
   - name: FOSSIL_SERVER_DATA_DIR
     displayName: Directory for data and metadata
     description: Directory for data and metadata
-    value: data
+    value: metadata/data
     required: true                                 
   - name: CONTEXT_DIR_SERVER
     displayName: Context Dir for server
     description: Context Dir for server
     value: src/engine/server
-    required: true  
+    required: true
+  - name: FOSSIL_SERVER_DEBUG
+    displayName: Enable debug true or false
+    description: Enable debug true or false
+    value: "false"
+    required: true         
   - name: FOSSIL_APP_PLUGIN_DIR
     displayName: Directory for app plugins
     description: Directory for app plugins
@@ -591,7 +605,12 @@ parameters:
     displayName: Context Dir for app
     description: Context Dir for app
     value: src/engine/app
-    required: true      
+    required: true 
+  - name: FOSSIL_APP_DEBUG
+    displayName: Enable debug true or false
+    description: Enable debug true or false
+    value: "false"
+    required: true            
   - name: FOSSIL_STORAGE_PLUGIN_DIR
     displayName: Directory for storage plugins
     description: Directory for storage plugins
@@ -601,7 +620,12 @@ parameters:
     displayName: Context Dir for storage
     description: Context Dir for storage
     value: src/engine/storage
-    required: true             
+    required: true 
+  - name: FOSSIL_STORAGE_DEBUG
+    displayName: Enable debug true or false
+    description: Enable debug true or false
+    value: "false"
+    required: true                  
   - name: SOURCE_REPOSITORY_REF_SERVER
     displayName: Source Repository Reference Tag
     description: The Branch tag to use
