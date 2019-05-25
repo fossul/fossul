@@ -61,8 +61,8 @@ if [[ -z "${FOSSIL_SERVER_DEBUG}" ]]; then
 fi
 
 if [ ! -d "${FOSSIL_SERVER_CONFIG_DIR}/default" ]; then
-    mkdir -p ${FOSSIL_SERVER_CONFIG_DIR}/default/default
-    curl -O https://raw.githubusercontent.com/ktenzer/fossil/master/release/default_configs_1.0.0.tar ${FOSSIL_SERVER_CONFIG_DIR}/default/default |tar xz 
+    mkdir -p ${FOSSIL_SERVER_CONFIG_DIR}/default
+    curl https://raw.githubusercontent.com/ktenzer/fossil/master/release/default_configs_1.0.0.tar.gz |tar xz;mv src/cli/configs/default ${FOSSIL_SERVER_CONFIG_DIR}/default
 fi
 
 $GOBIN/server
