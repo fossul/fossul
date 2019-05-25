@@ -6,20 +6,20 @@ import (
 	"net/http"
 	"strings"
 	"os"
-	"log"
 )
 
 func PreRestore(w http.ResponseWriter, r *http.Request) {
 
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
+
 	pluginPath := util.GetPluginPath(config.AppPlugin)
 	var messages []util.Message
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
-			var errMsg string = "\nERROR: App plugin does not exist: " + plugin
-			log.Println(err, errMsg)
+			var errMsg string = "\nApp plugin does not exist: " + plugin
 	
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)
@@ -64,14 +64,15 @@ func PreRestore(w http.ResponseWriter, r *http.Request) {
 func PostRestore(w http.ResponseWriter, r *http.Request) {
 
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
+
 	pluginPath := util.GetPluginPath(config.AppPlugin)
 	var messages []util.Message
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
-			var errMsg string = "\nERROR: App plugin does not exist: " + plugin
-			log.Println(err, errMsg)
+			var errMsg string = "\nApp plugin does not exist: " + plugin
 	
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)
@@ -116,6 +117,7 @@ func PostRestore(w http.ResponseWriter, r *http.Request) {
 func PreAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
 
 	if config.PreAppRestoreCmd != "" {
 		args := strings.Split(config.PreAppRestoreCmd, ",")
@@ -132,6 +134,7 @@ func PreAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 func PostAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
 
 	if config.PostAppRestoreCmd != "" {
 		args := strings.Split(config.PostAppRestoreCmd, ",")

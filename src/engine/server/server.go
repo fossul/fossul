@@ -20,6 +20,7 @@ var appHostname string = os.Getenv("FOSSIL_APP_CLIENT_HOSTNAME")
 var appPort string = os.Getenv("FOSSIL_APP_CLIENT_PORT")
 var storageHostname string = os.Getenv("FOSSIL_STORAGE_CLIENT_HOSTNAME")
 var storagePort string = os.Getenv("FOSSIL_STORAGE_CLIENT_PORT")
+var debug string = os.Getenv("FOSSIL_SERVER_DEBUG")
 
 var runningWorkflowMap map[string]string = make(map[string]string)
  
@@ -45,4 +46,16 @@ func main() {
 
     log.Println("Starting server service on port [" + port + "]")
     log.Fatal(http.ListenAndServe(":" + port, router))
+}
+
+func printConfigDebug(config util.Config) {
+    if debug == "true" {
+		log.Println("[DEBUG]",config)
+	}
+}
+
+func printConfigMapDebug(configMap map[string]string) {
+    if debug == "true" {
+		log.Println("[DEBUG]",configMap)
+	}
 }

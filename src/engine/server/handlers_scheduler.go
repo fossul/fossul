@@ -45,7 +45,9 @@ func AddSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("INFO: Added schedule with id", id)
+	if debug == "true" {
+		log.Println("[DEBUG] Added schedule with id", id)
+	}
 
 	msg := util.SetMessage("INFO","Add schedule completed successfully")
 	messages = append(messages, msg)

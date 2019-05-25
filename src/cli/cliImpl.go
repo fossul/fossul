@@ -24,7 +24,7 @@ func WriteCredentialFile(credentialFile,serverHostname,serverPort,appHostname,ap
 
 	err := util.WriteGob(credentialFile,auth)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	os.Exit(0)
@@ -35,7 +35,7 @@ func ReadCredentialFile(credentialFile string) (client.Auth) {
 
 	err := util.ReadGob(credentialFile,&auth)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 
@@ -45,7 +45,7 @@ func ReadCredentialFile(credentialFile string) (client.Auth) {
 func GetDefaultConfig(auth client.Auth) {
 	config,err := client.GetDefaultConfig(auth)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 
@@ -74,7 +74,7 @@ func ListSchedules(auth client.Auth) {
 	fmt.Println("### Job Schedules ###")
 	jobScheduleResult,err := client.ListSchedules(auth)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	checkResult(jobScheduleResult.Result)
@@ -95,7 +95,7 @@ func GetDefaultPluginConfig(auth client.Auth,pluginName string) {
 
 	configMap,err := client.GetDefaultPluginConfig(auth,pluginName)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 
@@ -109,12 +109,12 @@ func GetDefaultPluginConfig(auth client.Auth,pluginName string) {
 func GetConfig(auth client.Auth,profileName,configName string) {
 	config,err := client.GetConfig(auth,profileName,configName)
 	if err != nil {
-		fmt.Println(err,"\n" + "ERROR: Couldn't get config [" + profileName + "] config [" + configName + "! " + err.Error())
+		fmt.Println(err,"\n" + "[ERROR] Couldn't get config [" + profileName + "] config [" + configName + "! " + err.Error())
 		os.Exit(1)	
 	}
 	buf,err := util.EncodeConfig(config)
 	if err != nil {
-		fmt.Println(err,"\n" + "ERROR: Couldn't encode config [" + profileName + "] config [" + configName + "! " + err.Error())
+		fmt.Println(err,"\n" + "[ERROR] Couldn't encode config [" + profileName + "] config [" + configName + "! " + err.Error())
 		os.Exit(1)	
 	}		
 	fmt.Println(buf.String())
@@ -124,13 +124,13 @@ func GetConfig(auth client.Auth,profileName,configName string) {
 func GetPluginConfig(auth client.Auth,profileName,configName,pluginName string) {
 	pluginConfigMap,err := client.GetPluginConfig(auth,profileName,configName,pluginName)
 	if err != nil {
-		fmt.Println(err,"\n" + "ERROR: Couldn't get config [" + profileName + "] config [" + configName + "! " + err.Error())
+		fmt.Println(err,"\n" + "[ERROR] Couldn't get config [" + profileName + "] config [" + configName + "! " + err.Error())
 		os.Exit(1)	
 	}
 		
 	buf,err := util.EncodePluginConfig(pluginConfigMap)
 	if err != nil {
-		fmt.Println(err,"\n" + "ERROR: Couldn't encode config [" + profileName + "] config [" + configName + "! " + err.Error())
+		fmt.Println(err,"\n" + "[ERROR] Couldn't encode config [" + profileName + "] config [" + configName + "! " + err.Error())
 		os.Exit(1)	
 	}	
 	fmt.Println(buf.String())	
@@ -141,7 +141,7 @@ func ListProfiles(auth client.Auth) {
 	fmt.Println("### Profile List ###")
 	result,err := client.ListProfiles(auth)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	checkResult(result)
@@ -155,7 +155,7 @@ func ListConfigs(auth client.Auth,profileName string) {
 	fmt.Println("### Config List ###")
 	result,err := client.ListConfigs(auth,profileName)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	checkResult(result)
@@ -168,7 +168,7 @@ func ListConfigs(auth client.Auth,profileName string) {
 func AddProfile(auth client.Auth,profileName string) {
 	result,err := client.AddProfile(auth,profileName)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	printResult(result)
@@ -178,7 +178,7 @@ func AddProfile(auth client.Auth,profileName string) {
 func DeleteProfile(auth client.Auth,profileName string) {
 	result,err := client.DeleteProfile(auth,profileName)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	printResult(result)
@@ -190,7 +190,7 @@ func ListPluginConfigs(auth client.Auth,profileName,configName string) {
 	fmt.Println("### Config List ###")
 	result,err := client.ListPluginConfigs(auth,profileName,configName)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	checkResult(result)
@@ -203,12 +203,12 @@ func ListPluginConfigs(auth client.Auth,profileName,configName string) {
 func AddConfig(auth client.Auth,profileName,configName,configFile string) {
 	config,err := util.ReadConfig(configFile)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	result,err := client.AddConfig(auth,profileName,configName,config)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	printResult(result)		
@@ -219,12 +219,12 @@ func AddPluginConfig(auth client.Auth,profileName,configName,pluginName,configFi
 
 	configMap,err := util.ReadConfigToMap(configFile)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	result,err := client.AddPluginConfig(auth,profileName,configName,pluginName,configMap)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	printResult(result)		
@@ -234,7 +234,7 @@ func AddPluginConfig(auth client.Auth,profileName,configName,pluginName,configFi
 func DeleteConfig(auth client.Auth,profileName,configName string) {
 	result,err := client.DeleteConfig(auth,profileName,configName)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	printResult(result)	
@@ -278,21 +278,21 @@ func ImportLocalConfig(profileName,configName,policyName,configDir,configPath st
 func ImportServerConfig(auth client.Auth,profileName,configName string) (util.Config,error) {
 	config,err := client.GetConfig(auth,profileName,configName)
 	if err != nil {
-		return config,errors.New("ERROR: Couldn't get profile [" + profileName + "] config [" + configName + "! " + err.Error())
+		return config,errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + configName + "! " + err.Error())
 	}
 
 	//load dynamic plugin parameters into config struct
 	if config.AppPlugin != "" {
 		appConfigMap,err := client.GetPluginConfig(auth,profileName,configName,config.AppPlugin)
 		if err != nil {
-			return config,errors.New("ERROR: Couldn't get profile [" + profileName + "] config [" + config.AppPlugin + "! " + err.Error())
+			return config,errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + config.AppPlugin + "! " + err.Error())
 		}	
 		config.AppPluginParameters = appConfigMap		
 	}
 	if config.StoragePlugin != "" {
 		storageConfigMap,err := client.GetPluginConfig(auth,profileName,configName,config.StoragePlugin)
 		if err != nil {
-			return config,errors.New("ERROR: Couldn't get profile [" + profileName + "] config [" + config.StoragePlugin + "! " + err.Error())
+			return config,errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + config.StoragePlugin + "! " + err.Error())
 		}	
 		config.StoragePluginParameters = storageConfigMap	
 	}
@@ -305,7 +305,7 @@ func BackupWithLocalConfig(auth client.Auth,profileName,configName,policyName st
 
 	workflowResult,err := client.StartBackupWorkflowLocalConfig(auth,profileName,configName,policyName,config)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 		
@@ -321,7 +321,7 @@ func BackupWithLocalConfig(auth client.Auth,profileName,configName,policyName st
 		time.Sleep(1 * time.Second)
 		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
 		if err != nil {
-			fmt.Println("ERROR: " + err.Error())
+			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
 		}
 
@@ -334,7 +334,7 @@ func BackupWithLocalConfig(auth client.Auth,profileName,configName,policyName st
 					completedSteps = append(completedSteps,step.Id)
 					results,err := client.GetWorkflowStepResults(auth,profileName,configName,workflowId,step.Id)
 					if err != nil {
-						fmt.Println("ERROR: " + err.Error())
+						fmt.Println("[ERROR] " + err.Error())
 						os.Exit(1)
 					}
 					util.LogResults(logger, results)
@@ -354,7 +354,7 @@ func Backup(auth client.Auth,profileName,configName,policyName string) {
 
 	workflowResult,err := client.StartBackupWorkflow(auth,profileName,configName,policyName)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 		
@@ -370,7 +370,7 @@ func Backup(auth client.Auth,profileName,configName,policyName string) {
 		time.Sleep(1 * time.Second)
 		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
 		if err != nil {
-			fmt.Println("ERROR: " + err.Error())
+			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
 		}
 
@@ -383,7 +383,7 @@ func Backup(auth client.Auth,profileName,configName,policyName string) {
 					completedSteps = append(completedSteps,step.Id)
 					results,err := client.GetWorkflowStepResults(auth,profileName,configName,workflowId,step.Id)
 					if err != nil {
-						fmt.Println("ERROR: " + err.Error())
+						fmt.Println("[ERROR] " + err.Error())
 						os.Exit(1)
 					}
 					util.LogResults(logger, results)
@@ -403,7 +403,7 @@ func RestoreWithLocalConfig(auth client.Auth,profileName,configName,policyName,s
 
 	workflowResult,err := client.StartRestoreWorkflowLocalConfig(auth,profileName,configName,policyName,selectedWorkflowId,config)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 		
@@ -419,7 +419,7 @@ func RestoreWithLocalConfig(auth client.Auth,profileName,configName,policyName,s
 		time.Sleep(1 * time.Second)
 		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
 		if err != nil {
-			fmt.Println("ERROR: " + err.Error())
+			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
 		}
 
@@ -432,7 +432,7 @@ func RestoreWithLocalConfig(auth client.Auth,profileName,configName,policyName,s
 					completedSteps = append(completedSteps,step.Id)
 					results,err := client.GetWorkflowStepResults(auth,profileName,configName,workflowId,step.Id)
 					if err != nil {
-						fmt.Println("ERROR: " + err.Error())
+						fmt.Println("[ERROR] " + err.Error())
 						os.Exit(1)
 					}
 					util.LogResults(logger, results)
@@ -452,7 +452,7 @@ func Restore(auth client.Auth,profileName,configName,policyName,selectedWorkflow
 
 	workflowResult,err := client.StartRestoreWorkflow(auth,profileName,configName,policyName,selectedWorkflowId)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 		
@@ -468,7 +468,7 @@ func Restore(auth client.Auth,profileName,configName,policyName,selectedWorkflow
 		time.Sleep(1 * time.Second)
 		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
 		if err != nil {
-			fmt.Println("ERROR: " + err.Error())
+			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
 		}
 
@@ -481,7 +481,7 @@ func Restore(auth client.Auth,profileName,configName,policyName,selectedWorkflow
 					completedSteps = append(completedSteps,step.Id)
 					results,err := client.GetWorkflowStepResults(auth,profileName,configName,workflowId,step.Id)
 					if err != nil {
-						fmt.Println("ERROR: " + err.Error())
+						fmt.Println("[ERROR] " + err.Error())
 						os.Exit(1)
 					}
 					util.LogResults(logger, results)
@@ -502,7 +502,7 @@ func BackupList(auth client.Auth,profileName,configName,policyName string,config
 
 	backups,err := client.BackupList(auth,profileName,configName,policyName,config)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 
@@ -520,7 +520,7 @@ func JobList(auth client.Auth,profileName,configName string) {
 
 	jobs,err := client.GetJobList(auth,profileName,configName)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	checkResult(jobs.Result)
@@ -545,7 +545,7 @@ func JobStatus(auth client.Auth,profileName,configName,workflowId string) {
 		time.Sleep(1 * time.Second)
 		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowIdInt)
 		if err != nil {
-			fmt.Println("ERROR: " + err.Error())
+			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
 		}
 
@@ -558,7 +558,7 @@ func JobStatus(auth client.Auth,profileName,configName,workflowId string) {
 					completedSteps = append(completedSteps,step.Id)
 					results,err := client.GetWorkflowStepResults(auth,profileName,configName,workflowIdInt,step.Id)
 					if err != nil {
-						fmt.Println("ERROR: " + err.Error())
+						fmt.Println("[ERROR] " + err.Error())
 						os.Exit(1)
 					}
 
@@ -580,7 +580,7 @@ func AppPluginList(auth client.Auth) {
 	var plugins []string
 	appPlugins,err := client.AppPluginList(auth,"app")
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 
@@ -598,7 +598,7 @@ func StoragePluginList(auth client.Auth) {
 	var plugins []string
 	storagePlugins,err := client.StoragePluginList(auth,"storage")
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 
@@ -616,7 +616,7 @@ func ArchivePluginList(auth client.Auth) {
 	var plugins []string
 	archivePlugins,err := client.ArchivePluginList(auth,"archive")
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 
@@ -637,23 +637,23 @@ func PluginInfo(auth client.Auth,pluginName,pluginType string) {
 	if pluginType == "app" {
 		pluginInfoResult,err = client.AppPluginInfo(auth,config,pluginName,pluginType)
 		if err != nil {
-			fmt.Println("ERROR: " + err.Error())
+			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
 		}
 	} else if pluginType == "storage" {
 		pluginInfoResult,err = client.StoragePluginInfo(auth,config,pluginName,pluginType)
 		if err != nil {
-			fmt.Println("ERROR: " + err.Error())
+			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
 		}
 	} else if pluginType == "archive" {
 		pluginInfoResult,err = client.ArchivePluginInfo(auth,config,pluginName,pluginType)
 		if err != nil {
-			fmt.Println("ERROR: " + err.Error())
+			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
 		}
 	} else {
-		error := fmt.Sprintf("ERROR: Plugin type must be app|storage|archive")
+		error := fmt.Sprintf("[ERROR] Plugin type must be app|storage|archive")
 		fmt.Println(error)
 	}	
 
@@ -674,21 +674,21 @@ func Status(auth client.Auth) {
 
 	workflowStatus,err := client.GetServerServiceStatus(auth)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	fmt.Println("Server Service:", workflowStatus)
 
 	appStatus,err := client.GetAppServiceStatus(auth)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	fmt.Println("App Service:", appStatus)
 
 	storageStatus,err := client.GetStorageServiceStatus(auth)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	fmt.Println("Storage Service:", storageStatus)
@@ -699,7 +699,7 @@ func Status(auth client.Auth) {
 func AddSchedule(auth client.Auth,profileName,configName,policyName,cronSchedule string) {
 	result,err := client.AddSchedule(auth,profileName,configName,policyName,cronSchedule)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	printResult(result)
@@ -709,7 +709,7 @@ func AddSchedule(auth client.Auth,profileName,configName,policyName,cronSchedule
 func DeleteSchedule(auth client.Auth,profileName,configName,policyName string) {
 	result,err := client.DeleteSchedule(auth,profileName,configName,policyName)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
+		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	printResult(result)

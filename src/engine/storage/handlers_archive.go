@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fossil/src/engine/util"
 	"net/http"
-	"log"
 	"os"
 	"fmt"
 	"strings"
@@ -12,6 +11,8 @@ import (
 
 func Archive(w http.ResponseWriter, r *http.Request) {
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
+
 	pluginPath := util.GetPluginPath(config.ArchivePlugin)
 	var result util.Result
 	var messages []util.Message
@@ -20,8 +21,7 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 		var plugin string = pluginDir + "/archive/" + config.ArchivePlugin
 
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
-			var errMsg string = "ERROR: Archive plugin does not exist"
-			log.Println(err, errMsg)
+			var errMsg string = "Archive plugin does not exist"
 
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)
@@ -63,6 +63,8 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 
 func ArchiveList(w http.ResponseWriter, r *http.Request) {
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
+
 	pluginPath := util.GetPluginPath(config.ArchivePlugin)
 	var result util.ResultSimple
 	var messages []string
@@ -71,8 +73,7 @@ func ArchiveList(w http.ResponseWriter, r *http.Request) {
 		var plugin string = pluginDir + "/archive/" + config.ArchivePlugin
 
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
-			var errMsg string = "ERROR: Archive plugin does not exist"
-			log.Println(err, errMsg)
+			var errMsg string = "Archive plugin does not exist"
 
 			message := fmt.Sprintf("ERROR %s %s",errMsg,err.Error())
 			messages = append(messages, message)
@@ -113,6 +114,8 @@ func ArchiveList(w http.ResponseWriter, r *http.Request) {
 
 func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
+
 	pluginPath := util.GetPluginPath(config.ArchivePlugin)
 	var result util.Result
 	var messages []util.Message
@@ -120,8 +123,7 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/archive/" + config.ArchivePlugin
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
-			var errMsg string = "ERROR: Archive plugin does not exist"
-			log.Println(err, errMsg)
+			var errMsg string = "Archive plugin does not exist"
 
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)
@@ -163,6 +165,7 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 func ArchiveCreateCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
 
 	if config.BackupCreateCmd != "" {
 		args := strings.Split(config.ArchiveCreateCmd, ",")
@@ -179,6 +182,7 @@ func ArchiveCreateCmd(w http.ResponseWriter, r *http.Request) {
 func ArchiveDeleteCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
 
 	if config.BackupDeleteCmd != "" {
 		args := strings.Split(config.ArchiveDeleteCmd, ",")

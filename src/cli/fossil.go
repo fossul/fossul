@@ -64,44 +64,44 @@ func main() {
 
 	if *optSetCredentials {
 		if getopt.IsSet("user") != true {
-			fmt.Println("ERROR: Missing parameter --user")
+			fmt.Println("[ERROR] Missing parameter --user")
 			getopt.Usage()
 			os.Exit(1)
 		}
 
 		if getopt.IsSet("pass") != true {
-			fmt.Println("ERROR: Missing parameter --pass")
+			fmt.Println("[ERROR] Missing parameter --pass")
 			getopt.Usage()
 			os.Exit(1)
 		}
 
 		if getopt.IsSet("server-host") != true {
-			fmt.Println("ERROR: Missing parameter --server-host")
+			fmt.Println("[ERROR] Missing parameter --server-host")
 			getopt.Usage()
 			os.Exit(1)
 		}
 		if getopt.IsSet("server-port") != true {
-			fmt.Println("ERROR: Missing parameter --server-port")
+			fmt.Println("[ERROR] Missing parameter --server-port")
 			getopt.Usage()
 			os.Exit(1)
 		}
 		if getopt.IsSet("app-host") != true {
-			fmt.Println("ERROR: Missing parameter --app-host")
+			fmt.Println("[ERROR] Missing parameter --app-host")
 			getopt.Usage()
 			os.Exit(1)
 		}
 		if getopt.IsSet("app-port") != true {
-			fmt.Println("ERROR: Missing parameter --app-port")
+			fmt.Println("[ERROR] Missing parameter --app-port")
 			getopt.Usage()
 			os.Exit(1)
 		}
 		if getopt.IsSet("storage-host") != true {
-			fmt.Println("ERROR: Missing parameter --storage-host")
+			fmt.Println("[ERROR] Missing parameter --storage-host")
 			getopt.Usage()
 			os.Exit(1)
 		}
 		if getopt.IsSet("storage-port") != true {
-			fmt.Println("ERROR: Missing parameter --storage-port")
+			fmt.Println("[ERROR] Missing parameter --storage-port")
 			getopt.Usage()
 			os.Exit(1)
 		}		
@@ -110,7 +110,7 @@ func main() {
 	}
 
 	if ! util.ExistsPath(credentialFile) {
-		fmt.Println("ERROR: missing credential file! [" + credentialFile + "]")
+		fmt.Println("[ERROR] missing credential file! [" + credentialFile + "]")
 		os.Exit(1)
 	}
 
@@ -122,13 +122,13 @@ func main() {
 
 	if *optGetPluginInfo {
 		if getopt.IsSet("plugin") != true {
-			fmt.Println("ERROR: Missing parameter --plugin")
+			fmt.Println("[ERROR] Missing parameter --plugin")
 			getopt.Usage()
 			os.Exit(1)
 		}
 
 		if getopt.IsSet("plugin-type") != true {
-			fmt.Println("ERROR: Missing parameter --plugin-type")
+			fmt.Println("[ERROR] Missing parameter --plugin-type")
 			getopt.Usage()
 			os.Exit(1)
 		}
@@ -145,7 +145,7 @@ func main() {
 	
 	if *optGetDefaultPluginConfig {
 		if getopt.IsSet("plugin") != true {
-			fmt.Println("ERROR: Missing parameter --plugin")
+			fmt.Println("[ERROR] Missing parameter --plugin")
 			getopt.Usage()
 			os.Exit(1)
 		}
@@ -155,13 +155,13 @@ func main() {
 
 	if *optGetConfig {
 		if getopt.IsSet("profile") != true {
-			fmt.Println("ERROR: missing parameter --profile")
+			fmt.Println("[ERROR] missing parameter --profile")
 			getopt.Usage()
 			os.Exit(1)
 		}	
 
 		if getopt.IsSet("config") != true {
-			fmt.Println("ERROR: missing parameter --config")
+			fmt.Println("[ERROR] missing parameter --config")
 			getopt.Usage()
 			os.Exit(1)
 		}	
@@ -171,19 +171,19 @@ func main() {
 
 	if *optGetPluginConfig {
 		if getopt.IsSet("profile") != true {
-			fmt.Println("ERROR: missing parameter --profile")
+			fmt.Println("[ERROR] missing parameter --profile")
 			getopt.Usage()
 			os.Exit(1)
 		}	
 
 		if getopt.IsSet("config") != true {
-			fmt.Println("ERROR: missing parameter --config")
+			fmt.Println("[ERROR] missing parameter --config")
 			getopt.Usage()
 			os.Exit(1)
 		}	
 		
 		if getopt.IsSet("plugin") != true {
-			fmt.Println("ERROR: Missing parameter --plugin")
+			fmt.Println("[ERROR] Missing parameter --plugin")
 			getopt.Usage()
 			os.Exit(1)
 		}
@@ -204,7 +204,7 @@ func main() {
 	}
 
 	if getopt.IsSet("action") != true {
-		fmt.Println("ERROR: missing parameter --action")
+		fmt.Println("[ERROR] missing parameter --action")
 		getopt.Usage()
 		os.Exit(1)
 	}
@@ -214,7 +214,7 @@ func main() {
 	}	
 
 	if getopt.IsSet("profile") != true {
-		fmt.Println("ERROR: missing parameter --profile")
+		fmt.Println("[ERROR] missing parameter --profile")
 		getopt.Usage()
 		os.Exit(1)
 	}	
@@ -232,7 +232,7 @@ func main() {
 	}
 	
 	if getopt.IsSet("config") != true {
-		fmt.Println("ERROR: missing parameter --config")
+		fmt.Println("[ERROR] missing parameter --config")
 		getopt.Usage()
 		os.Exit(1)
 	}	
@@ -243,7 +243,7 @@ func main() {
 	
 	if *optAction == "addConfig" {
 		if getopt.IsSet("config-file") != true {
-			fmt.Println("ERROR: Missing parameter --config-file")
+			fmt.Println("[ERROR] Missing parameter --config-file")
 			getopt.Usage()
 			os.Exit(1)
 		}
@@ -253,13 +253,13 @@ func main() {
 
 	if *optAction == "addPluginConfig" {
 		if getopt.IsSet("plugin") != true {
-			fmt.Println("ERROR: Missing parameter --plugin")
+			fmt.Println("[ERROR] Missing parameter --plugin")
 			getopt.Usage()
 			os.Exit(1)
 		}	
 
 		if getopt.IsSet("config-file") != true {
-			fmt.Println("ERROR: Missing parameter --config-file")
+			fmt.Println("[ERROR] Missing parameter --config-file")
 			getopt.Usage()
 			os.Exit(1)
 		}
@@ -278,7 +278,7 @@ func main() {
 		var configPath string
 		var configDir string
 		if getopt.IsSet("config-path") != true {
-			fmt.Println("ERROR: missing parameter --config-path")
+			fmt.Println("[ERROR] missing parameter --config-path")
 			getopt.Usage()
 			os.Exit(1)	
 		}
@@ -287,7 +287,7 @@ func main() {
 		configDir = *optConfigPath + "/" + *optProfile + "/" + *optConfig 
 
 		if _, err := os.Stat(configPath); os.IsNotExist(err) {
-			fmt.Println(err,"\n" + "ERROR: Profile of Config don't exist")
+			fmt.Println(err,"\n" + "[ERROR] Profile of Config don't exist")
 			os.Exit(1)
 		}
 
@@ -307,12 +307,12 @@ func main() {
 	// Check retention policy
 	if *optAction == "backup" || *optAction == "backupList" || *optAction == "restore" {
 		if getopt.IsSet("policy") != true {
-			fmt.Println("ERROR: missing parameter --policy")
+			fmt.Println("[ERROR] missing parameter --policy")
 			getopt.Usage()
 			os.Exit(1)	
 		}
 		if util.ExistsBackupRetention(*optPolicy,config.BackupRetentions) != true {
-			fmt.Println("ERROR: policy [" + *optPolicy + "] does not match policy defined in config")
+			fmt.Println("[ERROR] policy [" + *optPolicy + "] does not match policy defined in config")
 			os.Exit(1)
 		}	
 	}
@@ -327,7 +327,7 @@ func main() {
 		}	
 	} else if *optAction == "restore" {	
 		if getopt.IsSet("workflow-id") != true {
-			fmt.Println("ERROR: Missing parameter --workflow-id")
+			fmt.Println("[ERROR] Missing parameter --workflow-id")
 			getopt.Usage()
 			os.Exit(1)
 		}
@@ -343,7 +343,7 @@ func main() {
 		JobList(auth,string(*optProfile),string(*optConfig))
 	} else if *optAction == "jobStatus" {
 		if getopt.IsSet("workflow-id") != true {
-			fmt.Println("ERROR: Missing parameter --workflow-id")
+			fmt.Println("[ERROR] Missing parameter --workflow-id")
 			getopt.Usage()
 			os.Exit(1)
 		}
@@ -366,13 +366,13 @@ func main() {
 		PluginInfo(auth,config,*optPluginName,*optPluginType)*/
 	} else if *optAction == "addSchedule" {
 		if getopt.IsSet("policy") != true {
-			fmt.Println("ERROR: missing parameter --policy")
+			fmt.Println("[ERROR] missing parameter --policy")
 			getopt.Usage()
 			os.Exit(1)	
 		}
 
 		if getopt.IsSet("cron-schedule") != true {
-			fmt.Println("ERROR: Missing parameter --cron-schedule")
+			fmt.Println("[ERROR] Missing parameter --cron-schedule")
 			getopt.Usage()
 			os.Exit(1)
 		}
@@ -381,7 +381,7 @@ func main() {
 	} else if *optAction == "deleteSchedule" {
 		DeleteSchedule(auth,*optProfile,*optConfig,*optPolicy)
 	} else {
-		fmt.Println("ERROR: incorrect parameter", *optAction)
+		fmt.Println("[ERROR] incorrect parameter", *optAction)
 		getopt.Usage()
 		os.Exit(1)
 	}

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fossil/src/engine/util"
 	"net/http"
-	"log"
 	"os"
 	"strings"
 )
@@ -12,6 +11,7 @@ import (
 func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.AppUnquiesceCmd, ",")
@@ -28,6 +28,7 @@ func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.PreAppUnquiesceCmd, ",")
@@ -44,6 +45,8 @@ func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 func Unquiesce(w http.ResponseWriter, r *http.Request) {
 
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
+
 	pluginPath := util.GetPluginPath(config.AppPlugin)
 	var result util.Result
 	var messages []util.Message
@@ -51,8 +54,7 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
-			var errMsg string = "\nERROR: App plugin does not exist: " + plugin
-			log.Println(err, errMsg)
+			var errMsg string = "\nApp plugin does not exist: " + plugin
 	
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)
@@ -95,6 +97,7 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.PostAppUnquiesceCmd, ",")

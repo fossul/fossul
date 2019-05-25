@@ -10,6 +10,7 @@ RUN mkdir -p /go/src/fossil
 RUN mkdir /app
 RUN mkdir -p /app/metadata/data
 RUN mkdir -p /app/metadata/configs
+RUN mkdir -p /app/metadata/configs/default
 
 WORKDIR /go/src/fossil
 

@@ -10,6 +10,8 @@ import (
 
 func Restore(w http.ResponseWriter, r *http.Request) {
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
+
 	pluginPath := util.GetPluginPath(config.StoragePlugin)
 	var result util.Result
 	var messages []util.Message
@@ -59,6 +61,7 @@ func Restore(w http.ResponseWriter, r *http.Request) {
 func RestoreCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
 
 	if config.RestoreCmd != "" {
 		args := strings.Split(config.RestoreCmd, ",")

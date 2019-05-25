@@ -121,12 +121,12 @@ func GetWorkflowSteps(w http.ResponseWriter, r *http.Request) []Step {
 	}
 	defer r.Body.Close()
  
-	res,err := json.Marshal(&steps)
+	_,err := json.Marshal(&steps)
 	if err != nil {
         log.Println(err)
 	}
 
-	log.Println("DEBUG", string(res))
+	//log.Println("DEBUG", string(res))
 
 	return steps
 }

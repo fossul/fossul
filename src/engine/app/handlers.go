@@ -60,6 +60,8 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	var messages []util.Message
 
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
+	
 	pluginPath := util.GetPluginPath(pluginName)
 
 	if pluginPath == "" {

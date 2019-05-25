@@ -4,7 +4,6 @@ import (
 	"gopkg.in/robfig/cron.v3"
 	"fossil/src/engine/client"
 	"fossil/src/engine/util"
-	"fmt"
 	"strings"
 	"os"
 )
@@ -31,13 +30,11 @@ func AddCronSchedule(profileName,configName,policy,cronSchedule string) (cron.En
 	})
 	
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
 		return id,err
 	}
 
 	err = writeJobSchedule(id,cronSchedule,profileName,configName,policy)
 	if err != nil {
-		fmt.Println("ERROR: " + err.Error())
 		return id,err
 	}
 

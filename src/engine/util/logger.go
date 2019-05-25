@@ -6,7 +6,6 @@ import (
 	"time"
 	"io"
 	"net/http"
-	"path/filepath"
 	"sync"
 	"fmt"
 )
@@ -39,13 +38,6 @@ func LogMessageToConsole (l *log.Logger, message Message) {
 	//l.SetPrefix(time.Now().Format("2006-01-02 15:04:05") + " [" + message.Level + "] ")
 	l.SetPrefix(time.Now().Format(time.RFC3339) + " [" + message.Level + "] ")
     l.Print(message.Message)
-}
-
-func LogMessagesToConsole (l *log.Logger, messages []Message) {
-	for _, message := range messages {
-		l.SetPrefix(time.Now().Format(time.RFC3339) + " [" + message.Level + "] ")
-		l.Print(message.Message)
-	}	
 }
 
 func LogInfoMessage (l *log.Logger, message string) {
@@ -146,25 +138,6 @@ func LogResult (l *log.Logger, result Result) {
 	}	
 }
 
-func LogMessages (l *log.Logger, messages []Message) {
-	logDir := getLogDir()
-	file, err := os.OpenFile(logDir, os.O_CREATE|os.O_APPEND, 0644)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    defer file.Close()
-
-	mw := io.MultiWriter(os.Stdout, file)
-	l.SetOutput(mw)
-
-	for _, message := range messages {
-		//l.SetPrefix(time.Now().Format("2006-01-02 15:04:05") + " [" + message.Level + "] ")
-		l.SetPrefix(time.Now().Format(time.RFC3339) + " [" + message.Level + "] ")
-		l.Print(message.Message)
-	}	
-}
-
 func LogApi(inner http.Handler, name string) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         start := time.Now()
@@ -179,15 +152,4 @@ func LogApi(inner http.Handler, name string) http.Handler {
             time.Since(start),
         )
     })
-}
-
-func getLogDir() string {
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-    if err != nil {
-            log.Fatal(err)
-	}
-
-	logDir := dir + "/logs"
-	
-	return logDir
 }

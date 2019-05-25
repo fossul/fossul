@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fossil/src/engine/util"
 	"net/http"
-	"log"
 	"os"
 	"strings"
 )
@@ -12,6 +11,8 @@ import (
 func Discover(w http.ResponseWriter, r *http.Request) {
 
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
+
 	pluginPath := util.GetPluginPath(config.AppPlugin)
 	var discoverResult util.DiscoverResult
 	var messages []util.Message
@@ -19,8 +20,7 @@ func Discover(w http.ResponseWriter, r *http.Request) {
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
-			var errMsg string = "\nERROR: App plugin does not exist: " + plugin
-			log.Println(err, errMsg)
+			var errMsg string = "\nApp plugin does not exist: " + plugin
 	
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)

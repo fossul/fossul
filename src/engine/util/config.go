@@ -2,7 +2,6 @@ package util
 
 import (
 	"io/ioutil"
-	"log"
 	"github.com/BurntSushi/toml"
 	"os"
 	"bufio"
@@ -182,18 +181,14 @@ func GetConfig(w http.ResponseWriter, r *http.Request) (Config,error) {
 
 	var config Config
 	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
-		log.Println(err)
 		return config,err
 	}
 	defer r.Body.Close()
  
-	res,err := json.Marshal(&config)
+	_,err := json.Marshal(&config)
 	if err != nil {
-		log.Println(err)
 		return config,err
 	}
-
-	log.Println("DEBUG", string(res))
 
 	return config,nil
 }
@@ -202,18 +197,14 @@ func GetPluginConfig(w http.ResponseWriter, r *http.Request) (map[string]string,
 
 	var configMap map[string]string
 	if err := json.NewDecoder(r.Body).Decode(&configMap); err != nil {
-		log.Println(err)
 		return configMap,err
 	}
 	defer r.Body.Close()
  
-	res,err := json.Marshal(&configMap)
+	_,err := json.Marshal(&configMap)
 	if err != nil {
-		log.Println(err)
 		return configMap,err
 	}
-
-	log.Println("DEBUG", string(res))
 
 	return configMap,nil
 }

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fossil/src/engine/util"
 	"net/http"
-	"log"
 	"time"
 )
 
@@ -22,6 +21,8 @@ func StartBackupWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	workflowResult.Id = workflow.Id
 
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
+
 	config.WorkflowId = util.IntToString(workflow.Id)
 	workflow.Policy = config.SelectedBackupPolicy
 
@@ -65,6 +66,8 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	workflowResult.Id = workflow.Id
 
 	config,err := GetConsolidatedConfig(profileName,configName,policyName)
+	printConfigDebug(config)
+
 	if err != nil {
 		result := util.SetResultMessage(1,"ERROR","Workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Couldn't read config using profile [" + profileName + "] config [" + configName + "] " + err.Error())
 		workflowResult.Result = result
@@ -110,6 +113,8 @@ func StartRestoreWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	workflowResult.Id = workflow.Id
 
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
+
 	config.WorkflowId = util.IntToString(workflow.Id)
 	config.SelectedWorkflowId = util.StringToInt(selectedWorkflowId)
 	workflow.Policy = config.SelectedBackupPolicy
@@ -154,6 +159,8 @@ func StartRestoreWorkflow(w http.ResponseWriter, r *http.Request) {
 	workflowResult.Id = workflow.Id
 
 	config,err := GetConsolidatedConfig(profileName,configName,policyName)
+	printConfigDebug(config)
+	
 	if err != nil {
 		result := util.SetResultMessage(1,"ERROR","Workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Couldn't read config using profile [" + profileName + "] config [" + configName + "]")
 		workflowResult.Result = result
@@ -226,8 +233,6 @@ func GetWorkflowStepResults(w http.ResponseWriter, r *http.Request) {
 	err := util.ReadGob(resultsFile,&result)
 	results = append(results, result)
 	if err != nil {
-		log.Println(err.Error())
-
 		var results []util.Result
 		errorResult := util.SetResultMessage(1,"ERROR",err.Error())
 		results = append(results, errorResult)
@@ -251,7 +256,6 @@ func DeleteWorkflowResults(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	err := util.RecursiveDirDelete(resultsDir)
 	if err != nil {
-		log.Println(err.Error())
 		result = util.SetResultMessage(1,"ERROR",err.Error())
 	} else {
 		result = util.SetResultMessage(0,"INFO","Workflow results " + resultsDir + " deleted")

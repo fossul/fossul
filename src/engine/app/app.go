@@ -13,6 +13,7 @@ var port string = os.Getenv("FOSSIL_APP_SERVICE_PORT")
 var pluginDir string = os.Getenv("FOSSIL_APP_PLUGIN_DIR")
 var myUser string = os.Getenv("FOSSIL_USERNAME")
 var myPass string = os.Getenv("FOSSIL_PASSWORD")
+var debug string = os.Getenv("FOSSIL_APP_DEBUG")
  
 func main() {
     log.Println("Plugin directory [" + pluginDir + "]")
@@ -28,4 +29,10 @@ func main() {
  
     log.Println("Starting app service on port [" + port + "]")
     log.Fatal(http.ListenAndServe(":" + port, router))
+}
+
+func printConfigDebug(config util.Config) {
+    if debug == "true" {
+		log.Println("[DEBUG]",config)
+	}
 }

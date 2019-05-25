@@ -9,6 +9,7 @@ APP_HOSTNAME="fossil-app"
 APP_PORT="8001"
 STORAGE_HOSTNAME="fossil-storage"
 STORAGE_PORT="8002"
+DEBUG="false"
 
 if [[ -z "${FOSSIL_APP_SERVICE_PORT}" ]]; then
     export FOSSIL_APP_SERVICE_PORT=$PORT
@@ -49,6 +50,10 @@ fi
 if [[ -z "${FOSSIL_STORAGE_CLIENT_PORT}" ]]; then
     export FOSSIL_STORAGE_CLIENT_PORT=$STORAGE_PORT
 fi  
+
+if [[ -z "${FOSSIL_APP_DEBUG}" ]]; then
+    export FOSSIL_APP_DEBUG=$DEBUG
+fi    
 
 $GOBIN/app
 

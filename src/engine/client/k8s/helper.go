@@ -21,11 +21,11 @@ func getKubeConfig(accessWithinCluster string) (error,*rest.Config) {
 		if home := homeDir(); home != "" {
 			kubeconfigFile = home + "/.kube" + "/config"
 			if _, err := os.Stat(kubeconfigFile); os.IsNotExist(err) {
-				log.Println(err,"\n" + "ERROR: Kube config not found under " + kubeconfigFile)
+				log.Println(err,"\n" + "[ERROR] Kube config not found under " + kubeconfigFile)
 				return err,nil
 			}
 		} else {
-			log.Println("ERROR: Could not find homedir, check environment!")
+			log.Println("[ERROR] Could not find homedir, check environment!")
 			return err,nil
 		}
 
@@ -36,7 +36,7 @@ func getKubeConfig(accessWithinCluster string) (error,*rest.Config) {
 			return err,nil
 		}		
 	} else {
-		log.Println("ERROR: Parameter AccessWithinCluster not set to true or false")
+		log.Println("[ERROR]: Parameter AccessWithinCluster not set to true or false")
 		err := errors.New("Parameter AccessWithinCluster not set to true or false")
 		return err,nil
 	}

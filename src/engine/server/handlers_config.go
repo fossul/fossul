@@ -15,8 +15,12 @@ func GetConfig(w http.ResponseWriter, r *http.Request) {
 	var configName string = params["configName"]
 
 	conf := configDir + "/" + profileName + "/" + configName + "/" + configName + ".conf"
-	log.Println("DEBUG", "Config path is " + conf)
+
+	if debug == "true" {
+		log.Println("[DEBUG]", "Config path is " + conf)
+	}
 	config,_ := util.ReadConfig(conf)
+	printConfigDebug(config)
 
 	_ = json.NewDecoder(r.Body).Decode(&config)
 	json.NewEncoder(w).Encode(config)
@@ -29,8 +33,13 @@ func GetPluginConfig(w http.ResponseWriter, r *http.Request) {
 	var pluginName string = params["pluginName"]
 
 	conf := configDir + "/" + profileName + "/" + configName + "/" + pluginName + ".conf"
-	log.Println("DEBUG", "Plugin config path is " + conf)
+
+	if debug == "true" {
+		log.Println("[DEBUG]", "Plugin config path is " + conf)
+	}
+
 	configMap,_ := util.ReadConfigToMap(conf)
+	printConfigMapDebug(configMap)
 
 	_ = json.NewDecoder(r.Body).Decode(&configMap)
 	json.NewEncoder(w).Encode(configMap)
@@ -39,8 +48,13 @@ func GetPluginConfig(w http.ResponseWriter, r *http.Request) {
 func GetDefaultConfig(w http.ResponseWriter, r *http.Request) {
 
 	conf := configDir + "/" + "default" + "/" + "default" + "/" + "default.conf"
-	log.Println("DEBUG", "Default config path is " + conf)
+
+	if debug == "true" {
+		log.Println("[DEBUG]", "Default config path is " + conf)
+	}	
+
 	config,_ := util.ReadConfig(conf)
+	printConfigDebug(config)
 
 	_ = json.NewDecoder(r.Body).Decode(&config)
 	json.NewEncoder(w).Encode(config)
@@ -51,8 +65,13 @@ func GetDefaultPluginConfig(w http.ResponseWriter, r *http.Request) {
 	var pluginName string = params["pluginName"]
 
 	conf := configDir + "/" + "default" + "/" + "default" + "/" + pluginName + ".conf"
-	log.Println("DEBUG", "Config path is " + conf)
+
+	if debug == "true" {
+		log.Println("[DEBUG]", "Config path is " + conf)
+	}
+
 	configMap,_ := util.ReadConfigToMap(conf)
+	printConfigMapDebug(configMap)
 
 	_ = json.NewDecoder(r.Body).Decode(&configMap)
 	json.NewEncoder(w).Encode(configMap)
@@ -67,6 +86,8 @@ func AddConfig(w http.ResponseWriter, r *http.Request) {
 	var messages []util.Message
 
 	config,err := util.GetConfig(w,r)
+	printConfigDebug(config)
+
 	if err != nil {
 		msg := util.SetMessage("ERROR","Couldn't get configuration. " + err.Error()) 
 		messages = append(messages, msg)
@@ -137,6 +158,8 @@ func AddPluginConfig(w http.ResponseWriter, r *http.Request) {
 	var messages []util.Message
 
 	configMap,err := util.GetPluginConfig(w,r)
+	printConfigMapDebug(configMap)
+
 	if err != nil {
 		msg := util.SetMessage("ERROR","Couldn't get configuration. " + err.Error()) 
 		messages = append(messages, msg)

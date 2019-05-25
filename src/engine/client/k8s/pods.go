@@ -25,12 +25,12 @@ func GetPod(namespace, serviceName, accessWithinCluster string) (string,error) {
     	return "",err
     }
 
-	fmt.Println("DEBUG: Pods in namespace", namespace)
+	fmt.Println("[INFO]: Pods in namespace", namespace)
 	var ourPod string
     for _, pod := range pods.Items {
-		fmt.Println("DEBUG Pod", pod.Name, pod.Status.Phase) 
+		fmt.Println("[INFO] Pod", pod.Name, pod.Status.Phase) 
 		if strings.Contains(pod.Name,serviceName) && pod.Status.Phase == "Running" {
-			fmt.Println("INFO Running Pod Found:", pod.Name)
+			fmt.Println("[INFO] Running Pod Found:", pod.Name)
 			ourPod = pod.Name
 		}
 	}

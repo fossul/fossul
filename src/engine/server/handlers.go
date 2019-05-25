@@ -6,7 +6,6 @@ import (
 	"fossil/src/engine/util"
 	"net/http"
 	"strings"
-	"log"
 )
 
 func GetStatus(w http.ResponseWriter, r *http.Request) {
@@ -20,6 +19,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
 
 	if config.SendTrapSuccessCmd != "" {
 		args := strings.Split(config.SendTrapSuccessCmd, ",")
@@ -36,6 +36,7 @@ func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
+	printConfigDebug(config)
 
 	if config.SendTrapSuccessCmd != "" {
 		args := strings.Split(config.SendTrapErrorCmd, ",")
@@ -55,7 +56,6 @@ func GetJobs(w http.ResponseWriter, r *http.Request) {
 	var configName string = params["configName"]
 
 	jobsDir := dataDir + "/" + profileName + "/" + configName
-	log.Println("DEBUG", "Jobs directory is " + jobsDir)
 	
 	var result util.Result
 	var messages []util.Message
