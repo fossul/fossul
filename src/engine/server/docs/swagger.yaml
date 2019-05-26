@@ -1,0 +1,317 @@
+basePath: '{{.BasePath}}'
+definitions:
+  util.Config:
+    properties:
+      appPlugin:
+        type: string
+      appPluginParameters:
+        type: object
+      appQuiesceCmd:
+        type: string
+      appUnquiesceCmd:
+        type: string
+      archiveCreateCmd:
+        type: string
+      archiveDeleteCmd:
+        type: string
+      archivePlugin:
+        type: string
+      autoDiscovery:
+        type: boolean
+      backupCreateCmd:
+        type: string
+      backupDeleteCmd:
+        type: string
+      backupPolicy:
+        type: string
+      backupRetention:
+        type: integer
+      backupRetentions:
+        items:
+          type: BackupRetention
+        type: array
+      configName:
+        type: string
+      jobRetention:
+        type: integer
+      postAppQuiesceCmd:
+        type: string
+      postAppRestoreCmd:
+        type: string
+      postAppUnquiesceCmd:
+        type: string
+      preAppQuiesceCmd:
+        type: string
+      preAppRestoreCmd:
+        type: string
+      preAppUnquiesceCmd:
+        type: string
+      profileName:
+        type: string
+      restoreCmd:
+        type: string
+      selectedWorkflowId:
+        type: integer
+      sendTrapErrorCmd:
+        type: string
+      sendTrapSuccessCmd:
+        type: string
+      storagePlugin:
+        type: string
+      storagePluginParameters:
+        type: object
+      workflowId:
+        type: string
+    type: object
+  util.Result:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          type: string
+        type: array
+      messages:
+        items:
+          type: Message
+        type: array
+    type: object
+  util.WorkflowResult:
+    properties:
+      id:
+        type: integer
+      result:
+        $ref: '#/definitions/util.Result'
+        type: object
+    type: object
+  util.WorkflowStatusResult:
+    properties:
+      result:
+        $ref: '#/definitions/util.Result'
+        type: object
+      workflow:
+        type: Workflow
+    type: object
+host: '{{.Host}}'
+info:
+  contact:
+    email: keith.tenzer@gmail.com
+    name: Keith Tenzer
+    url: http://www.keithtenzer.com
+  description: |-
+    APIs for managing Fossil workflows, jobs, profile, and configs
+    JSON API definition can be retrieved at <a href="/api/v1/swagger/doc.json">/api/v1/swagger/doc.json</a>
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Fossil Framework Server API
+  version: "1.0"
+paths:
+  /getWorkflowStatus/{profileName}/{configName}/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get workflow status
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      - description: workflow id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.WorkflowStatusResult'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /getWorkflowStepResults/{profileName}/{configName}/{workflowId}/{stepId}:
+    get:
+      consumes:
+      - application/json
+      description: Get workflow step results
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      - description: workflow id
+        in: path
+        name: workflowId
+        required: true
+        type: string
+      - description: step id
+        in: path
+        name: stepId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            items:
+              $ref: '#/definitions/util.Result'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /startBackupWorkflow/{profileName}/{configName}/{policy}:
+    post:
+      consumes:
+      - application/json
+      description: Start backup workflow using local config
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      - description: name of backup policy
+        in: path
+        name: policy
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.WorkflowResult'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /startBackupWorkflowLocalConfig:
+    post:
+      consumes:
+      - application/json
+      description: Start backup workflow using local config
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.WorkflowResult'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /status:
+    get:
+      consumes:
+      - application/json
+      description: Status and version information for the service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+swagger: "2.0"

@@ -11,6 +11,16 @@ import (
 	"os"
 )
 
+// GetStatus godoc
+// @Description Status and version information for the service
+// @Accept  json
+// @Produce  json
+// @Success 200 {string} string 
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /status [get]
 func GetStatus(w http.ResponseWriter, r *http.Request) {
 	var status util.Status
 	status.Msg = "OK"

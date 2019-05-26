@@ -1,0 +1,45 @@
+basePath: '{{.BasePath}}'
+host: '{{.Host}}'
+info:
+  contact:
+    name: Keith Tenzer
+    url: http://www.keithtenzer.com
+  description: |-
+    APIs for managing Fossil storage plugins
+    JSON API definition can be retrieved at <a href="/api/v1/swagger/doc.json">/api/v1/swagger/doc.json</a>
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Fossil Framework Storage API
+  version: "1.0"
+paths:
+  /status:
+    get:
+      consumes:
+      - application/json
+      description: Status and version information for the service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+swagger: "2.0"

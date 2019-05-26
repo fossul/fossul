@@ -24,7 +24,7 @@ func main() {
 	optCredentialFile := getopt.StringLong("credential-file",'h',"","Path to credential file")
 	optConfigFile := getopt.StringLong("config-file",'f',"","Path to config file")
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
-	optAction := getopt.StringLong("action",'a',"","backup|restore|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|addSchedule|deleteSchedule|jobList|jobStatus|pluginInfo")
+	optAction := getopt.StringLong("action",'a',"","backup|restore|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|addSchedule|deleteSchedule|jobList|jobStatus")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
 	optPluginType := getopt.StringLong("plugin-type",'t',"","Plugin type app|storage|archive")
 	optWorkflowId := getopt.StringLong("workflow-id",'w',"","Workflow Id")

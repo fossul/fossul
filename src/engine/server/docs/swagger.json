@@ -1,0 +1,472 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "APIs for managing Fossil workflows, jobs, profile, and configs\nJSON API definition can be retrieved at \u003ca href=\"/api/v1/swagger/doc.json\"\u003e/api/v1/swagger/doc.json\u003c/a\u003e",
+        "title": "Fossil Framework Server API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Keith Tenzer",
+            "url": "http://www.keithtenzer.com",
+            "email": "keith.tenzer@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "{{.Host}}",
+    "basePath": "{{.BasePath}}",
+    "paths": {
+        "/getWorkflowStatus/{profileName}/{configName}/{id}": {
+            "get": {
+                "description": "Get workflow status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name of profile",
+                        "name": "profileName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name of config",
+                        "name": "configName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "workflow id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/util.WorkflowStatusResult"
+                        },
+                        "headers": {
+                            "string": {
+                                "type": "string",
+                                "description": "OK"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/getWorkflowStepResults/{profileName}/{configName}/{workflowId}/{stepId}": {
+            "get": {
+                "description": "Get workflow step results",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name of profile",
+                        "name": "profileName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name of config",
+                        "name": "configName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "workflow id",
+                        "name": "workflowId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "step id",
+                        "name": "stepId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/util.Result"
+                            }
+                        },
+                        "headers": {
+                            "string": {
+                                "type": "string",
+                                "description": "OK"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/startBackupWorkflow/{profileName}/{configName}/{policy}": {
+            "post": {
+                "description": "Start backup workflow using local config",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name of profile",
+                        "name": "profileName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name of config",
+                        "name": "configName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "name of backup policy",
+                        "name": "policy",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/util.WorkflowResult"
+                        },
+                        "headers": {
+                            "string": {
+                                "type": "string",
+                                "description": "OK"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/startBackupWorkflowLocalConfig": {
+            "post": {
+                "description": "Start backup workflow using local config",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "config struct",
+                        "name": "config",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/util.Config"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/util.WorkflowResult"
+                        },
+                        "headers": {
+                            "string": {
+                                "type": "string",
+                                "description": "OK"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/status": {
+            "get": {
+                "description": "Status and version information for the service",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "headers": {
+                            "string": {
+                                "type": "string",
+                                "description": "OK"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "util.Config": {
+            "type": "object",
+            "properties": {
+                "appPlugin": {
+                    "type": "string"
+                },
+                "appPluginParameters": {
+                    "type": "object"
+                },
+                "appQuiesceCmd": {
+                    "type": "string"
+                },
+                "appUnquiesceCmd": {
+                    "type": "string"
+                },
+                "archiveCreateCmd": {
+                    "type": "string"
+                },
+                "archiveDeleteCmd": {
+                    "type": "string"
+                },
+                "archivePlugin": {
+                    "type": "string"
+                },
+                "autoDiscovery": {
+                    "type": "boolean"
+                },
+                "backupCreateCmd": {
+                    "type": "string"
+                },
+                "backupDeleteCmd": {
+                    "type": "string"
+                },
+                "backupPolicy": {
+                    "type": "string"
+                },
+                "backupRetention": {
+                    "type": "integer"
+                },
+                "backupRetentions": {
+                    "type": "array",
+                    "items": {
+                        "type": "BackupRetention"
+                    }
+                },
+                "configName": {
+                    "type": "string"
+                },
+                "jobRetention": {
+                    "type": "integer"
+                },
+                "postAppQuiesceCmd": {
+                    "type": "string"
+                },
+                "postAppRestoreCmd": {
+                    "type": "string"
+                },
+                "postAppUnquiesceCmd": {
+                    "type": "string"
+                },
+                "preAppQuiesceCmd": {
+                    "type": "string"
+                },
+                "preAppRestoreCmd": {
+                    "type": "string"
+                },
+                "preAppUnquiesceCmd": {
+                    "type": "string"
+                },
+                "profileName": {
+                    "type": "string"
+                },
+                "restoreCmd": {
+                    "type": "string"
+                },
+                "selectedWorkflowId": {
+                    "type": "integer"
+                },
+                "sendTrapErrorCmd": {
+                    "type": "string"
+                },
+                "sendTrapSuccessCmd": {
+                    "type": "string"
+                },
+                "storagePlugin": {
+                    "type": "string"
+                },
+                "storagePluginParameters": {
+                    "type": "object"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            }
+        },
+        "util.Result": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "type": "Message"
+                    }
+                }
+            }
+        },
+        "util.WorkflowResult": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "result": {
+                    "type": "object",
+                    "$ref": "#/definitions/util.Result"
+                }
+            }
+        },
+        "util.WorkflowStatusResult": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "type": "object",
+                    "$ref": "#/definitions/util.Result"
+                },
+                "workflow": {
+                    "type": "Workflow"
+                }
+            }
+        }
+    }
+}

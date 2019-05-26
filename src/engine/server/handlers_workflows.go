@@ -8,6 +8,17 @@ import (
 	"time"
 )
 
+// StartBackupWorkflowLocalConfig godoc
+// @Description Start backup workflow using local config
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.WorkflowResult
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /startBackupWorkflowLocalConfig [post]
 func StartBackupWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	var workflowResult util.WorkflowResult
 	workflow := &util.Workflow{}
@@ -46,7 +57,19 @@ func StartBackupWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
+// StartBackupWorkflow godoc
+// @Description Start backup workflow using local config
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param policy path string true "name of backup policy"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.WorkflowResult
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /startBackupWorkflow/{profileName}/{configName}/{policy} [post]
 func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]
@@ -191,6 +214,19 @@ func StartRestoreWorkflow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetWorkflowStatus godoc
+// @Description Get workflow status
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param id path string true "workflow id"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.WorkflowStatusResult
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /getWorkflowStatus/{profileName}/{configName}/{id} [get]
 func GetWorkflowStatus(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]
@@ -219,6 +255,20 @@ func GetWorkflowStatus(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetWorkflowStepResults godoc
+// @Description Get workflow step results
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param workflowId path string true "workflow id"
+// @Param stepId path string true "step id"
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /getWorkflowStepResults/{profileName}/{configName}/{workflowId}/{stepId} [get]
 func GetWorkflowStepResults(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]

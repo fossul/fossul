@@ -201,16 +201,10 @@ func setPlugin() (plugin util.Plugin) {
 	var unquiesceCap util.Capability
 	unquiesceCap.Name = "unquiesce"
 
-	var preRestoreCap util.Capability
-	preRestoreCap.Name = "preRestore"
-
-	var postRestoreCap util.Capability
-	postRestoreCap.Name = "postRestore"
-
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,discoverCap,quiesceCap,unquiesceCap,preRestoreCap,postRestoreCap,infoCap)
+	capabilities = append(capabilities,discoverCap,quiesceCap,unquiesceCap,infoCap)
 
 	plugin.Capabilities = capabilities
 	
