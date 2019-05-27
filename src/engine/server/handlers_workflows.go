@@ -120,6 +120,17 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// StartRestoreWorkflowLocalConfig godoc
+// @Description Start restore workflow using local config
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.WorkflowResult
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /startRestoreWorkflowLocalConfig [post]
 func StartRestoreWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var selectedWorkflowId string = params["workflowId"]
@@ -162,6 +173,20 @@ func StartRestoreWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// StartRestoreWorkflow godoc
+// @Description Start restore workflow using local config
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param policy path string true "name of backup policy"
+// @Param workflowId path string true "workflow id"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.WorkflowResult
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /startRestoreWorkflow/{profileName}/{configName}/{policy}/{workflowId} [post]
 func StartRestoreWorkflow(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]
@@ -295,6 +320,20 @@ func GetWorkflowStepResults(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(results)	
 }
 
+
+// DeleteWorkflowResults godoc
+// @Description Delete workflow results for profile/config
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param id path string true "workflow id"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /deleteWorkflowResults/{profileName}/{configName}/{id} [get]
 func DeleteWorkflowResults(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]

@@ -26,6 +26,17 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(status)
 }
 
+// SendTrapSuccessCmd godoc
+// @Description Execute command after successfull workflow execution
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result 
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /sendTrapSuccessCmd [post]
 func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
@@ -43,6 +54,17 @@ func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// SendTrapErrorCmd godoc
+// @Description Execute command after failed workflow execution
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result 
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /sendTrapErrorCmd [post]
 func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
@@ -60,6 +82,18 @@ func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetJobs godoc
+// @Description Get jobs (workflows) that have executed for a profile/config
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Jobs
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /getJobs/{profileName}/{configName} [get]
 func GetJobs(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]

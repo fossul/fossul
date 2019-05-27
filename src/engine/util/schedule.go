@@ -3,7 +3,7 @@ package util
 import (
 	"encoding/json"
 	"net/http"
-	"gopkg.in/robfig/cron.v3"
+	"gopkg.in/robfig/cron.v3"	
 )
 
 type JobScheduleResult struct {
@@ -19,9 +19,13 @@ type JobSchedule struct {
 	BackupPolicy string `json:"backupPolicy"`
 }
 
-func GetCronSchedule(w http.ResponseWriter, r *http.Request) (string,error) {
+type CronSchedule struct {
+	Value string `json:"value,omitempty"`
+}
 
-	var cronSchedule string
+func GetCronSchedule(w http.ResponseWriter, r *http.Request) (CronSchedule,error) {
+
+	var cronSchedule CronSchedule
 	if err := json.NewDecoder(r.Body).Decode(&cronSchedule); err != nil {
 		return cronSchedule,err
 	}

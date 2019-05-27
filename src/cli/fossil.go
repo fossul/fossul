@@ -24,7 +24,9 @@ func main() {
 	optCredentialFile := getopt.StringLong("credential-file",'h',"","Path to credential file")
 	optConfigFile := getopt.StringLong("config-file",'f',"","Path to config file")
 	optPolicy := getopt.StringLong("policy",'i',"","Backup policy as defined in config")
-	optAction := getopt.StringLong("action",'a',"","backup|restore|backupList|listProfiles|listConfigs|listPluginConfigs|addConfig|addPluginConfig|deleteConfig|addProfile|addSchedule|deleteSchedule|jobList|jobStatus")
+	optAction := getopt.StringLong("action",'a',"","backup|restore|backupList|listProfiles|listConfigs|listPluginConfigs|" +
+									"addProfile|addConfig|addPluginConfig|deleteProfile|deleteConfig|deleteConfigDir|" +
+									"deletePluginConfig|jobList|" + "addSchedule|deleteSchedule|jobStatus")
 	optPluginName := getopt.StringLong("plugin",'l',"","Name of plugin")
 	optPluginType := getopt.StringLong("plugin-type",'t',"","Plugin type app|storage|archive")
 	optWorkflowId := getopt.StringLong("workflow-id",'w',"","Workflow Id")
@@ -269,6 +271,20 @@ func main() {
 
 	if *optAction == "deleteConfig" {
 		DeleteConfig(auth,string(*optProfile),string(*optConfig))
+	}
+
+	if *optAction == "deleteConfigDir" {
+		DeleteConfigDir(auth,string(*optProfile),string(*optConfig))
+	}
+
+	if *optAction == "deletePluginConfig" {
+		if getopt.IsSet("plugin") != true {
+			fmt.Println("[ERROR] Missing parameter --plugin")
+			getopt.Usage()
+			os.Exit(1)
+		}	
+
+		DeletePluginConfig(auth,string(*optProfile),string(*optConfig),string(*optPluginName))
 	}
 
 	// Get config

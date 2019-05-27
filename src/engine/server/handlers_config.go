@@ -9,6 +9,18 @@ import (
 	"os"
 )
 
+// GetConfig godoc
+// @Description Get Configuration
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Config
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /getConfig/{profileName}/{configName} [get]
 func GetConfig(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]
@@ -26,6 +38,19 @@ func GetConfig(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(config)
 }
 
+// GetPluginConfig godoc
+// @Description Get Plugin Configuration
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param pluginName path string true "name of plugin"
+// @Accept  json
+// @Produce  json
+// @Success 200 {map} string
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /getPluginConfig/{profileName}/{configName}/{pluginName} [get]
 func GetPluginConfig(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var profileName string = params["profileName"]
@@ -45,6 +70,16 @@ func GetPluginConfig(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(configMap)
 }
 
+// GetDefaultConfig godoc
+// @Description Get Default Configuration
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Config
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /getDefaultConfig [get]
 func GetDefaultConfig(w http.ResponseWriter, r *http.Request) {
 
 	conf := configDir + "/" + "default" + "/" + "default" + "/" + "default.conf"
@@ -60,6 +95,17 @@ func GetDefaultConfig(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(config)
 }
 
+// GetDefaultPluginConfig godoc
+// @Description Get Default Plugin Configuration
+// @Param pluginName path string true "name of plugin"
+// @Accept  json
+// @Produce  json
+// @Success 200 {map} string
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /getDefaultPluginConfig/{pluginName} [get]
 func GetDefaultPluginConfig(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var pluginName string = params["pluginName"]
@@ -77,6 +123,19 @@ func GetDefaultPluginConfig(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(configMap)
 }
 
+// AddConfig godoc
+// @Description Add Configuration
+// @Param config body util.Config true "config struct"
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /addConfig/{profileName}/{configName} [post]
 func AddConfig(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]
@@ -148,6 +207,20 @@ func AddConfig(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// AddPluginConfig godoc
+// @Description Add Plugin Configuration
+// @Param config body util.PluginConfigMap true "config map"
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param pluginName path string true "name of plugin"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /addPluginConfig/{profileName}/{configName}/{pluginName} [post]
 func AddPluginConfig(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]
@@ -221,6 +294,70 @@ func AddPluginConfig(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeletePluginConfig godoc
+// @Description Add Plugin Configuration
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param pluginName path string true "name of plugin"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /deletePluginConfig/{profileName}/{configName}/{pluginName} [get]
+func DeletePluginConfig(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)	
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+	var pluginName string = params["pluginName"]
+
+	var result util.Result
+	var messages []util.Message
+
+	if profileName == "default" {
+		msg := util.SetMessage("ERROR","Deleting default config not permitted!")
+		messages = append(messages, msg)
+
+		result.Code = 1	
+		result.Messages = messages
+		
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	} else {
+		configPath := configDir + "/" + profileName + "/" + configName + "/" + pluginName + ".conf"
+		err := os.Remove(configPath)
+
+		if err != nil {
+			msg := util.SetMessage("ERROR","Delete plugin config [" + configPath + "] failed!" + err.Error())
+			messages = append(messages, msg)
+
+			result.Code = 1
+		} else {
+			msg := util.SetMessage("INFO","Delete plugin config [" + configPath + "] completed successfully")
+			messages = append(messages, msg)
+
+			result.Code = 0
+		}
+		result.Messages = messages
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}	
+}
+
+// AddProfile godoc
+// @Description Add Profile
+// @Param profileName path string true "name of profile"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /addProfile/{profileName} [get]
 func AddProfile(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]
@@ -259,6 +396,17 @@ func AddProfile(w http.ResponseWriter, r *http.Request) {
 	}	
 }
 
+// DeleteProfile godoc
+// @Description Delete Profile Including Configurations (destructive)
+// @Param profileName path string true "name of profile"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /deleteProfile/{profileName} [get]
 func DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]
@@ -298,6 +446,70 @@ func DeleteProfile(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// DeleteConfigDir godoc
+// @Description Delete Entire Configuration (destructive)
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /deleteConfigDir/{profileName}/{configName} [get]
+func DeleteConfigDir(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)	
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+
+	var result util.Result
+	var messages []util.Message
+
+	dir := configDir + "/" + profileName + "/" + configName
+
+	if profileName == "default" {
+		msg := util.SetMessage("ERROR","Deleting default config not permitted!")
+		messages = append(messages, msg)
+
+		result.Code = 1	
+		result.Messages = messages
+		
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	} else {
+		err := util.RecursiveDirDelete(dir)
+
+		if err != nil {
+			msg := util.SetMessage("ERROR","Delete config dir [" + dir + "] failed!" + err.Error())
+			messages = append(messages, msg)
+	
+			result.Code = 1
+		} else {
+			msg := util.SetMessage("INFO","Delete config dir [" + dir + "] completed successfully")
+			messages = append(messages, msg)
+	
+			result.Code = 0
+		}
+		result.Messages = messages
+	
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
+}
+
+// DeleteConfig godoc
+// @Description Delete Configuration
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /deleteConfig/{profileName}/{configName} [get]
 func DeleteConfig(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var profileName string = params["profileName"]
@@ -337,6 +549,16 @@ func DeleteConfig(w http.ResponseWriter, r *http.Request) {
 	}	
 }
 
+// ListProfiles godoc
+// @Description List Profiles
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /listProfiles [get]
 func ListProfiles(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
@@ -360,6 +582,17 @@ func ListProfiles(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ListConfigs godoc
+// @Description List Configurations
+// @Param profileName path string true "name of profile"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /listConfigs/{profileName} [get]
 func ListConfigs(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var profileName string = params["profileName"]
@@ -388,6 +621,18 @@ func ListConfigs(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
+// ListPluginConfigs godoc
+// @Description List Plugin Configuration
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /listPluginConfigs/{profileName}/{configName} [get]
 func ListPluginConfigs(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var profileName string = params["profileName"]

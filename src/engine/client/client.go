@@ -86,7 +86,7 @@ func GetWorkflowStepResults(auth Auth,profileName,configName string,workflowId i
 func DeleteWorkflowResults(auth Auth,profileName,configName string,workflowId string) (util.Result,error) {
 	var result util.Result
 
-	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/deleteWorkflowResults/" + profileName + "/" + configName + "/" + workflowId, nil)
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/deleteWorkflowResults/" + profileName + "/" + configName + "/" + workflowId, nil)
 	if err != nil {
 		return result,err
 	}

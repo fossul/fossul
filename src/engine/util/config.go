@@ -48,6 +48,11 @@ type BackupRetention struct {
 	RetentionDays int `json:"retentionDays"`	
 }
 
+type PluginConfigMap struct {
+	Key1 string `json:"key1,omitempty"`
+	Key2 string `json:"key2,omitempty"`
+}
+
 func ReadConfig(filePath string) (Config,error) {
 	var config Config
 	b, err := ioutil.ReadFile(filePath)

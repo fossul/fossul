@@ -131,7 +131,7 @@ var routes = Routes{
     }, 
     Route{
         "DeleteWorkflowResults",
-        "POST",
+        "GET",
         "/deleteWorkflowResults/{profileName}/{configName}/{id}",
         DeleteWorkflowResults,
     },
@@ -143,13 +143,13 @@ var routes = Routes{
     },
     Route{
         "AddConfig",
-        "GET",
+        "POST",
         "/addConfig/{profileName}/{configName}",
         AddConfig,
     },
     Route{
         "AddPluginConfig",
-        "GET",
+        "POST",
         "/addPluginConfig/{profileName}/{configName}/{pluginName}",
         AddPluginConfig,
     },    
@@ -159,6 +159,18 @@ var routes = Routes{
         "/deleteConfig/{profileName}/{configName}",
         DeleteConfig,
     },
+    Route{
+        "DeleteConfigDir",
+        "GET",
+        "/deleteConfigDir/{profileName}/{configName}",
+        DeleteConfigDir,
+    },    
+    Route{
+        "DeletePluginConfig",
+        "GET",
+        "/deletePluginConfig/{profileName}/{configName}/{pluginName}",
+        DeletePluginConfig,
+    },    
     Route{
         "AddProfile",
         "GET",
@@ -191,7 +203,7 @@ var routes = Routes{
     },
     Route{
         "AddSchedule",
-        "GET",
+        "POST",
         "/addSchedule/{profileName}/{configName}/{policy}",
         AddSchedule,
     },

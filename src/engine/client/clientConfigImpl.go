@@ -138,7 +138,7 @@ func AddConfig(auth Auth,profileName,configName string,config util.Config) (util
 
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/addConfig/" + profileName + "/" + configName, b)
+	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/addConfig/" + profileName + "/" + configName, b)
 	if err != nil {
 		return result,err
 	}
@@ -172,7 +172,38 @@ func AddPluginConfig(auth Auth,profileName,configName,pluginName string,configMa
 
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/addPluginConfig/" + profileName + "/" + configName + "/" + pluginName, b)
+	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/addPluginConfig/" + profileName + "/" + configName + "/" + pluginName, b)
+	if err != nil {
+		return result,err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result,nil
+}
+
+func DeletePluginConfig(auth Auth,profileName,configName,pluginName string) (util.Result,error) {
+	var result util.Result
+
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/deletePluginConfig/" + profileName + "/" + configName + "/" + pluginName, nil)
 	if err != nil {
 		return result,err
 	}
@@ -204,6 +235,37 @@ func DeleteConfig(auth Auth,profileName,configName string) (util.Result,error) {
 	var result util.Result
 
 	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/deleteConfig/" + profileName + "/" + configName, nil)
+	if err != nil {
+		return result,err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result,err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result,err
+		}
+	} else {
+		return result,errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result,nil
+}
+
+func DeleteConfigDir(auth Auth,profileName,configName string) (util.Result,error) {
+	var result util.Result
+
+	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/deleteConfigDir/" + profileName + "/" + configName, nil)
 	if err != nil {
 		return result,err
 	}

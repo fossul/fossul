@@ -8,6 +8,20 @@ import (
 	"log"
 )
 
+// AddSchedule godoc
+// @Description Add job schedule
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param policy path string true "policy name"
+// @Param cronSchedule body util.CronSchedule true "value: min,hour,dayOfMonth,month,dayOfWeek"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /addSchedule/{profileName}/{configName}/{policy} [post]
 func AddSchedule(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var profileName string = params["profileName"]
@@ -31,7 +45,7 @@ func AddSchedule(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id,err := AddCronSchedule(profileName,configName,policy,cronSchedule)
+	id,err := AddCronSchedule(profileName,configName,policy,cronSchedule.Value)
 	if err != nil {
 		msg := util.SetMessage("ERROR","Add schedule failed! " + err.Error())
 		messages = append(messages, msg)
@@ -59,6 +73,19 @@ func AddSchedule(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
+// DeleteSchedule godoc
+// @Description Delete job schedule
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param policy path string true "policy name"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /deleteSchedule/{profileName}/{configName}/{policy} [get]
 func DeleteSchedule(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var profileName string = params["profileName"]
@@ -92,6 +119,16 @@ func DeleteSchedule(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
+// ListSchedules godoc
+// @Description List job schedules
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.JobScheduleResult
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /listSchedules [get]
 func ListSchedules(w http.ResponseWriter, r *http.Request) {
 	var jobScheduleResult util.JobScheduleResult
 	var jobSchedules []util.JobSchedule

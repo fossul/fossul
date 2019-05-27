@@ -9,13 +9,16 @@ import (
 )
 
 
-func AddSchedule(auth Auth,profileName,configName,policy,cronSchedule string) (util.Result,error) {
+func AddSchedule(auth Auth,profileName,configName,policy,cronScheduleInput string) (util.Result,error) {
+	var cronSchedule util.CronSchedule
+	cronSchedule.Value = cronScheduleInput
+
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(cronSchedule)
 
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/addSchedule/" + profileName + "/" + configName + "/" + policy, b)
+	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/addSchedule/" + profileName + "/" + configName + "/" + policy, b)
 	if err != nil {
 		return result,err
 	}

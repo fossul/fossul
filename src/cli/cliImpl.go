@@ -241,6 +241,26 @@ func DeleteConfig(auth client.Auth,profileName,configName string) {
 	os.Exit(0)
 }
 
+func DeleteConfigDir(auth client.Auth,profileName,configName string) {
+	result,err := client.DeleteConfigDir(auth,profileName,configName)
+	if err != nil {
+		fmt.Println("[ERROR] " + err.Error())
+		os.Exit(1)
+	}
+	printResult(result)	
+	os.Exit(0)
+}
+
+func DeletePluginConfig(auth client.Auth,profileName,configName,pluginName string) {
+	result,err := client.DeletePluginConfig(auth,profileName,configName,pluginName)
+	if err != nil {
+		fmt.Println("[ERROR] " + err.Error())
+		os.Exit(1)
+	}
+	printResult(result)	
+	os.Exit(0)
+}
+
 func ImportLocalConfig(profileName,configName,policyName,configDir,configPath string) (util.Config,error) {
 	config,err := util.ReadConfig(configPath)
 	if err != nil {

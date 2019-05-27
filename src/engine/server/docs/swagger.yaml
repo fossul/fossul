@@ -63,6 +63,38 @@ definitions:
       workflowId:
         type: string
     type: object
+  util.CronSchedule:
+    properties:
+      value:
+        type: string
+    type: object
+  util.JobScheduleResult:
+    properties:
+      jobSchedules:
+        items:
+          type: JobSchedule
+        type: array
+      result:
+        $ref: '#/definitions/util.Result'
+        type: object
+    type: object
+  util.Jobs:
+    properties:
+      backup:
+        items:
+          type: Job
+        type: array
+      result:
+        $ref: '#/definitions/util.Result'
+        type: object
+    type: object
+  util.PluginConfigMap:
+    properties:
+      key1:
+        type: string
+      key2:
+        type: string
+    type: object
   util.Result:
     properties:
       code:
@@ -108,6 +140,629 @@ info:
   title: Fossil Framework Server API
   version: "1.0"
 paths:
+  /addConfig/{profileName}/{configName}:
+    post:
+      consumes:
+      - application/json
+      description: Add Configuration
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /addPluginConfig/{profileName}/{configName}/{pluginName}:
+    post:
+      consumes:
+      - application/json
+      description: Add Plugin Configuration
+      parameters:
+      - description: config map
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.PluginConfigMap'
+          type: object
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      - description: name of plugin
+        in: path
+        name: pluginName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /addProfile/{profileName}:
+    get:
+      consumes:
+      - application/json
+      description: Add Profile
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /addSchedule/{profileName}/{configName}/{policy}:
+    post:
+      consumes:
+      - application/json
+      description: Add job schedule
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      - description: policy name
+        in: path
+        name: policy
+        required: true
+        type: string
+      - description: 'value: min,hour,dayOfMonth,month,dayOfWeek'
+        in: body
+        name: cronSchedule
+        required: true
+        schema:
+          $ref: '#/definitions/util.CronSchedule'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /deleteConfig/{profileName}/{configName}:
+    get:
+      consumes:
+      - application/json
+      description: Delete Configuration
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /deleteConfigDir/{profileName}/{configName}:
+    get:
+      consumes:
+      - application/json
+      description: Delete Entire Configuration (destructive)
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /deletePluginConfig/{profileName}/{configName}/{pluginName}:
+    get:
+      consumes:
+      - application/json
+      description: Add Plugin Configuration
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      - description: name of plugin
+        in: path
+        name: pluginName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /deleteProfile/{profileName}:
+    get:
+      consumes:
+      - application/json
+      description: Delete Profile Including Configurations (destructive)
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /deleteSchedule/{profileName}/{configName}/{policy}:
+    get:
+      consumes:
+      - application/json
+      description: Delete job schedule
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      - description: policy name
+        in: path
+        name: policy
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /deleteWorkflowResults/{profileName}/{configName}/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Delete workflow results for profile/config
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      - description: workflow id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /getConfig/{profileName}/{configName}:
+    get:
+      consumes:
+      - application/json
+      description: Get Configuration
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Config'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /getDefaultConfig:
+    get:
+      consumes:
+      - application/json
+      description: Get Default Configuration
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Config'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /getDefaultPluginConfig/{pluginName}:
+    get:
+      consumes:
+      - application/json
+      description: Get Default Plugin Configuration
+      parameters:
+      - description: name of plugin
+        in: path
+        name: pluginName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            type: map
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /getJobs/{profileName}/{configName}:
+    get:
+      consumes:
+      - application/json
+      description: Get jobs (workflows) that have executed for a profile/config
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Jobs'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /getPluginConfig/{profileName}/{configName}/{pluginName}:
+    get:
+      consumes:
+      - application/json
+      description: Get Plugin Configuration
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      - description: name of plugin
+        in: path
+        name: pluginName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            type: map
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
   /getWorkflowStatus/{profileName}/{configName}/{id}:
     get:
       consumes:
@@ -204,6 +859,213 @@ paths:
           description: Internal Server Error
           schema:
             type: string
+  /listConfigs/{profileName}:
+    get:
+      consumes:
+      - application/json
+      description: List Configurations
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /listPluginConfigs/{profileName}/{configName}:
+    get:
+      consumes:
+      - application/json
+      description: List Plugin Configuration
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /listProfiles:
+    get:
+      consumes:
+      - application/json
+      description: List Profiles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /listSchedules:
+    get:
+      consumes:
+      - application/json
+      description: List job schedules
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.JobScheduleResult'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /sendTrapErrorCmd:
+    post:
+      consumes:
+      - application/json
+      description: Execute command after failed workflow execution
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /sendTrapSuccessCmd:
+    post:
+      consumes:
+      - application/json
+      description: Execute command after successfull workflow execution
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
   /startBackupWorkflow/{profileName}/{configName}/{policy}:
     post:
       consumes:
@@ -254,6 +1116,93 @@ paths:
       consumes:
       - application/json
       description: Start backup workflow using local config
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.WorkflowResult'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /startRestoreWorkflow/{profileName}/{configName}/{policy}/{workflowId}:
+    post:
+      consumes:
+      - application/json
+      description: Start restore workflow using local config
+      parameters:
+      - description: name of profile
+        in: path
+        name: profileName
+        required: true
+        type: string
+      - description: name of config
+        in: path
+        name: configName
+        required: true
+        type: string
+      - description: name of backup policy
+        in: path
+        name: policy
+        required: true
+        type: string
+      - description: workflow id
+        in: path
+        name: workflowId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.WorkflowResult'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /startRestoreWorkflowLocalConfig:
+    post:
+      consumes:
+      - application/json
+      description: Start restore workflow using local config
       parameters:
       - description: config struct
         in: body
