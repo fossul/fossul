@@ -1,7 +1,7 @@
 # General
-Fossil is a container-native backup and recovery framework. It aims to provide an application consistent backup restore and recorvery for container-native applications and databases. It's goal is to provide enterprise backup and recovery capabilities enjoyed in traditional world, container-native, in order to increase adoption and make the migration from traditial to container that much easier. The challenge of backup, especially in the container-driven world is signifigant. Each application or database has it's own tools, methods and procedures. Applications are much more fluid, moving around and greater abstractions exist. In addition there is an enormous variation of application,storage vendors capabilities (for example snapshots that impact backup / restore). 
+Fossil is a container-native backup and recovery framework. It aims to provide an application consistent backup restore and recorvery for container-native applications and databases. It's goal is to provide enterprise backup and recovery capabilities enjoyed in traditional world, container-native, in order to increase adoption and make the migration from traditial to container that much easier. The challenge of backup, especially in the container-driven world is signifigant. Each application or database has it's own tools, methods and procedures. Applications are much more fluid, dynamic and provide greater abstractions. In addition there is an enormous variation of application and storage vendors capabilities (for example snapshots that impact backup / restore). 
 
-Fossil addresses the challanges by building a module plugin based framework. Backup and recovery is always the same process, the only thing that changes is the specific tools and proceadures. The fossil belief is that the backup/recovery process can be standardized or democratized using a dynamic plugin-driven workflow and framework. Welcome to Fossil where can not only imortalize your applications but their data as well!
+Fossil addresses the challanges by building a modular plugin based framework. Backup and recovery is always the same process, the only thing that changes is the specific tools and proceadures. The fossil belief is that the backup/recovery process can be standardized or democratized using a dynamic plugin-driven workflow and framework. Welcome to Fossil where you can not only imortalize your applications but their data as well!
 
 In fossil there are three types of plugins storage, application and archive. 
 
@@ -109,22 +109,44 @@ A sample plugin basic and native to provide example for building other plugins.
 # CLI
 The fossil CLI consumes APIs provided by the various services using client libraries that implement and marshall the various rest calls. The CLI can be used remotely and requires a credentials file, usually stored in user home directory to access the various services. 
 
-# Getting Started using CLI
+# Getting Started
+
+## Deploying Fossil
+
+### OpenShift
+An OpenShift template is provided under the yaml folder to deploy the fossil framework on OpenShift.
+
+#### Clone Github repository
+```$ git clone https://github.com/ktenzer/fossil.git```
+
+#### Create Project
+```$ oc create project fossil```
+
+#### Add cluster permissions to fossil project
+```$ oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:fossil:default```
+
+#### Deploy using template
+```$ oc create -f fossil/yaml/fossil-engine-template.yaml -n fossil```
+
+## Getting Started using CLI
 First fossil is deployed on OpenShift using the provided template in the yaml folder or K8s using Dockerfiles. You will end up with three pods, one for each service: server, storage and app.
 
-## Save Credentials
+### Download CLI
+```curl https://raw.githubusercontent.com/ktenzer/fossil/master/release/fossil-cli_1.0.0.tar.gz |tar xz```
+
+### Save Credentials
 By default credentials will be stored under user home directory in a file called .fossil-credentials. You can specify `--credential-file` argument and path to save or load credential files from another location.
 
 ```$ fossil --set-credentials --user admin --pass redhat123 --server-host fossil-server-fossil.apps.46.4.207.247.xip.io --server-port 80 --app-host fossil-app-fossil.apps.46.4.207.247.xip.io --app-port 80 --storage-host fossil-storage-fossil.apps.46.4.207.247.xip.io --storage-port 80```
 
-## Create a Profile
+### Create a Profile
 A profile is simply a group it can contain one or more configurations. For example you may have an application with several databases. The application is the profile and each database a configuration within the profile. It is only there for organizational purposes.
 ```$ fossil --profile mariadb --action addProfile```
  
-## Create a COnfiguration
+### Create a COnfiguration
 A configuration requires a main configuration and a configuration for each plugin used. A configuration just contains key/value pairs. The first step is to get the default configurations, change them locally and the upload them. Here we will create configuration to backup and restore mariadb. We will use container-basic and mariadb-dump plugins.
  
-### Main config
+#### Main config
 Simply copy past to file and update. ProfileName, ConfigName, WorkflowId, SelectedBackupPolicy, SelectedBackupRetention, SelectedWorkflowId are all ignored. These are added dynamically. All you need to do is add plugins app,storage, archive, configure auto discovery (depending on if plugin supports it), configure policy and any pre/post commands that should execute.
 
 ```$ fossil --get-default-config``` 
@@ -169,10 +191,10 @@ SendTrapSuccessCmd = "echo,send trap success command"
 Assuming we saved file to /tmp/mariadb.conf
 ```$ fossil --profile mariadb --config mariadb --action addConfig --config-file /tmp/mariadb.conf```
 
-### Get a Config
+#### Get a Config
 ```$ fossil --profile mariadb --config mariadb --get-config```
 
-### App Plugin Config
+#### App Plugin Config
 Almost same as previous step, get the plugin default config, copy/paste to file, file it out and add it back to server as new config.
 
 ```$ fossil --get-default-plugin-config --plugin mariadb-dump.so```
@@ -195,11 +217,11 @@ ServiceName = "mariadb"
 Assuming we saved file to /tmp/mariadb-dump.conf
 ```$ fossil --profile mariadb --config mariadb --action addPluginConfig --plugin mariadb-dump.so --config-file /tmp/mariadb-dump.conf```
 
-### Get Plugin Config
+#### Get Plugin Config
 
 ```$ fossil --profile mariadb --config mariadb --get-plugin-config --plugin mariadb-dump.so```
 
-### Storage Plugin Configuration
+#### Storage Plugin Configuration
 Identical as previous step just a different plugin. The BackupSrcPaths option can be ignored if you set and your plugin supports auto-discover. The app plugin will automatically figure out what it should backup and set this dynamically.
 
 ```$ fossil --get-default-plugin-config --plugin container-basic.so```
@@ -215,17 +237,17 @@ Namespace = "databases"
 ServiceName = "mariadb"
 ```
 
-## Manual Backup
+### Manual Backup
 ```$ fossil --profile mariadb --config mariadb --policy daily --action backup```
 
-## List Backups
+### List Backups
 ```$ fossil --profile mariadb --config mariadb --policy daily --action backupList```
 
-## Add Schedule
+### Add Schedule
 Create a schedule that will run a backup every minute.
 ```$ fossil --profile mariadb --config mariadb --policy daily --action addSchedule --cron-schedule "* * * * *"```
 
-## List Schedules
+### List Schedules
 ```$ fossil --list-schedules
 ### Job Schedules ###`
 CronSchedule      ProfileName      ConfigName      Policy     
@@ -237,7 +259,7 @@ CronSchedule      ProfileName      ConfigName      Policy
 30 * * * *        postgres         postgres        weekly
 ```
 
-## List jobs
+### List jobs
 ```fossil --profile mariadb --config mariadb --action jobList 
 ########## Welcome to Fossil Framework ##########
 ### List of Jobs for profile [mariadb] config [mariadb] ###
@@ -248,8 +270,8 @@ WorkflowId      Type        Status        Policy      Start Time
 5338            backup      COMPLETE      daily       2019-05-23T23:26:00Z     
 4967            backup      COMPLETE      weekly      2019-05-23T23:25:00Z
 ```
-## Job Status
+### Job Status
 ```$ fossil --profile mariadb --config mariadb --action jobStatus --workflow-id 6777```
 
-## Restore
+### Restore
 ```$ fossil --profile mariadb --config mariadb --action restore --workflow-id 6777```
