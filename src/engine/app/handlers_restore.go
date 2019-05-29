@@ -8,6 +8,17 @@ import (
 	"os"
 )
 
+// PreRestore godoc
+// @Description Application pre restore
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /preRestore [post]
 func PreRestore(w http.ResponseWriter, r *http.Request) {
 
 	config,_ := util.GetConfig(w,r)
@@ -61,6 +72,17 @@ func PreRestore(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PostRestpore godoc
+// @Description Application post restore
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /postRestore [post]
 func PostRestore(w http.ResponseWriter, r *http.Request) {
 
 	config,_ := util.GetConfig(w,r)
@@ -114,6 +136,17 @@ func PostRestore(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PreAppRestoreCmd godoc
+// @Description Application pre restore command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /preAppRestoreCmd [post]
 func PreAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
@@ -131,6 +164,17 @@ func PreAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PostAppRestoreCmd godoc
+// @Description Application post restore command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /postAppRestoreCmd [post]
 func PostAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)

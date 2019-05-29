@@ -8,6 +8,17 @@ import (
 	"strings"
 )
 
+// Restore godoc
+// @Description Restore data
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /restore [post]
 func Restore(w http.ResponseWriter, r *http.Request) {
 	config,_ := util.GetConfig(w,r)
 	printConfigDebug(config)
@@ -58,6 +69,17 @@ func Restore(w http.ResponseWriter, r *http.Request) {
 	}	
 }
 
+// RestoreCmd godoc
+// @Description Restore Command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /restoreCmd [post]
 func RestoreCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)

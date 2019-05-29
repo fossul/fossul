@@ -11,7 +11,7 @@ import (
 func StoragePluginList(auth Auth,pluginType string) ([]string,error) {
 	var plugins []string
 
-	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/pluginList/" + pluginType, nil)
+	req, err := http.NewRequest("GET", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/pluginList/" + pluginType, nil)
 	if err != nil {
 		return plugins,err
 	}

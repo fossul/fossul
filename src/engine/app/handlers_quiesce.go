@@ -8,6 +8,17 @@ import (
 	"strings"
 )
 
+// PreQuiesceCmd godoc
+// @Description Application pre quiesce command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /preQuiesceCmd [post]
 func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
@@ -25,6 +36,17 @@ func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// QuiesceCmd godoc
+// @Description Application quiesce command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /puiesceCmd [post]
 func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
@@ -42,6 +64,17 @@ func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Quiesce godoc
+// @Description Application quiesce
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /quiesce [post]
 func Quiesce(w http.ResponseWriter, r *http.Request) {
 
 	config,_ := util.GetConfig(w,r)
@@ -95,6 +128,17 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PostQuiesceCmd godoc
+// @Description Application post quiesce command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /postQuiesceCmd [post]
 func PostQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)

@@ -1,4 +1,89 @@
 basePath: '{{.BasePath}}'
+definitions:
+  util.Config:
+    properties:
+      appPlugin:
+        type: string
+      appPluginParameters:
+        type: object
+      appQuiesceCmd:
+        type: string
+      appUnquiesceCmd:
+        type: string
+      archiveCreateCmd:
+        type: string
+      archiveDeleteCmd:
+        type: string
+      archivePlugin:
+        type: string
+      autoDiscovery:
+        type: boolean
+      backupCreateCmd:
+        type: string
+      backupDeleteCmd:
+        type: string
+      backupPolicy:
+        type: string
+      backupRetention:
+        type: integer
+      backupRetentions:
+        items:
+          type: BackupRetention
+        type: array
+      configName:
+        type: string
+      jobRetention:
+        type: integer
+      postAppQuiesceCmd:
+        type: string
+      postAppRestoreCmd:
+        type: string
+      postAppUnquiesceCmd:
+        type: string
+      preAppQuiesceCmd:
+        type: string
+      preAppRestoreCmd:
+        type: string
+      preAppUnquiesceCmd:
+        type: string
+      profileName:
+        type: string
+      restoreCmd:
+        type: string
+      selectedWorkflowId:
+        type: integer
+      sendTrapErrorCmd:
+        type: string
+      sendTrapSuccessCmd:
+        type: string
+      storagePlugin:
+        type: string
+      storagePluginParameters:
+        type: object
+      workflowId:
+        type: string
+    type: object
+  util.PluginInfoResult:
+    properties:
+      plugin:
+        type: Plugin
+      result:
+        $ref: '#/definitions/util.Result'
+        type: object
+    type: object
+  util.Result:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          type: string
+        type: array
+      messages:
+        items:
+          type: Message
+        type: array
+    type: object
 host: '{{.Host}}'
 info:
   contact:
@@ -14,6 +99,533 @@ info:
   title: Fossil Framework Storage API
   version: "1.0"
 paths:
+  /archive:
+    post:
+      consumes:
+      - application/json
+      description: Archive backup
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /archiveCreateCmd:
+    post:
+      consumes:
+      - application/json
+      description: Create archive command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /archiveDelete:
+    post:
+      consumes:
+      - application/json
+      description: Delete archive backups according to retention
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /archiveDeleteCmd:
+    post:
+      consumes:
+      - application/json
+      description: Delete archive command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /archiveList:
+    post:
+      consumes:
+      - application/json
+      description: List archive backups
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /backup:
+    post:
+      consumes:
+      - application/json
+      description: Backup data
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /backupCreateCmd:
+    post:
+      consumes:
+      - application/json
+      description: Create backup command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /backupDelete:
+    post:
+      consumes:
+      - application/json
+      description: Delete backups according to retention
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /backupDeleteCmd:
+    post:
+      consumes:
+      - application/json
+      description: Delete backup command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /backupList:
+    post:
+      consumes:
+      - application/json
+      description: List backups
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /pluginInfo/{pluginName}/{pluginType}:
+    post:
+      consumes:
+      - application/json
+      description: Plugin information and version
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      - description: name of plugin
+        in: path
+        name: pluginName
+        required: true
+        type: string
+      - description: plugin type (storage|archive)
+        in: path
+        name: pluginType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.PluginInfoResult'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /pluginList/{pluginType}:
+    get:
+      consumes:
+      - application/json
+      description: List storage or archive plugins
+      parameters:
+      - description: plugin type (storage|archive)
+        in: path
+        name: pluginType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /restore:
+    post:
+      consumes:
+      - application/json
+      description: Restore data
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /restoreCmd:
+    post:
+      consumes:
+      - application/json
+      description: Restore Command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
   /status:
     get:
       consumes:

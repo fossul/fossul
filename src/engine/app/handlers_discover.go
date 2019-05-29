@@ -8,6 +8,17 @@ import (
 	"strings"
 )
 
+// Discover godoc
+// @Description Application discover
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /discover [post]
 func Discover(w http.ResponseWriter, r *http.Request) {
 
 	config,_ := util.GetConfig(w,r)

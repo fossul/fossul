@@ -9,6 +9,17 @@ import (
 	"strings"
 )
 
+// Archive godoc
+// @Description Archive backup
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /archive [post]
 func Archive(w http.ResponseWriter, r *http.Request) {
 	config,_ := util.GetConfig(w,r)
 	printConfigDebug(config)
@@ -61,6 +72,17 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 	}	
 }
 
+// ArchiveList godoc
+// @Description List archive backups
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /archiveList [post]
 func ArchiveList(w http.ResponseWriter, r *http.Request) {
 	config,_ := util.GetConfig(w,r)
 	printConfigDebug(config)
@@ -112,6 +134,17 @@ func ArchiveList(w http.ResponseWriter, r *http.Request) {
 	}	
 }
 
+// ArchiveDelete godoc
+// @Description Delete archive backups according to retention
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /archiveDelete [post]
 func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 	config,_ := util.GetConfig(w,r)
 	printConfigDebug(config)
@@ -162,6 +195,17 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 	}	
 }
 
+// ArchiveCreateCmd godoc
+// @Description Create archive command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /archiveCreateCmd [post]
 func ArchiveCreateCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
@@ -179,6 +223,17 @@ func ArchiveCreateCmd(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ArchiveDeleteCmd godoc
+// @Description Delete archive command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /archiveDeleteCmd [post]
 func ArchiveDeleteCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)

@@ -1,4 +1,89 @@
 basePath: '{{.BasePath}}'
+definitions:
+  util.Config:
+    properties:
+      appPlugin:
+        type: string
+      appPluginParameters:
+        type: object
+      appQuiesceCmd:
+        type: string
+      appUnquiesceCmd:
+        type: string
+      archiveCreateCmd:
+        type: string
+      archiveDeleteCmd:
+        type: string
+      archivePlugin:
+        type: string
+      autoDiscovery:
+        type: boolean
+      backupCreateCmd:
+        type: string
+      backupDeleteCmd:
+        type: string
+      backupPolicy:
+        type: string
+      backupRetention:
+        type: integer
+      backupRetentions:
+        items:
+          type: BackupRetention
+        type: array
+      configName:
+        type: string
+      jobRetention:
+        type: integer
+      postAppQuiesceCmd:
+        type: string
+      postAppRestoreCmd:
+        type: string
+      postAppUnquiesceCmd:
+        type: string
+      preAppQuiesceCmd:
+        type: string
+      preAppRestoreCmd:
+        type: string
+      preAppUnquiesceCmd:
+        type: string
+      profileName:
+        type: string
+      restoreCmd:
+        type: string
+      selectedWorkflowId:
+        type: integer
+      sendTrapErrorCmd:
+        type: string
+      sendTrapSuccessCmd:
+        type: string
+      storagePlugin:
+        type: string
+      storagePluginParameters:
+        type: object
+      workflowId:
+        type: string
+    type: object
+  util.PluginInfoResult:
+    properties:
+      plugin:
+        type: Plugin
+      result:
+        $ref: '#/definitions/util.Result'
+        type: object
+    type: object
+  util.Result:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          type: string
+        type: array
+      messages:
+        items:
+          type: Message
+        type: array
+    type: object
 host: '{{.Host}}'
 info:
   contact:
@@ -14,6 +99,496 @@ info:
   title: Fossil Framework Application API
   version: "1.0"
 paths:
+  /discover:
+    post:
+      consumes:
+      - application/json
+      description: Application discover
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /pluginInfo/{pluginName}/{pluginType}:
+    post:
+      consumes:
+      - application/json
+      description: Plugin information and version
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      - description: name of plugin
+        in: path
+        name: pluginName
+        required: true
+        type: string
+      - description: plugin type (app)
+        in: path
+        name: pluginType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.PluginInfoResult'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /pluginList/{pluginType}:
+    get:
+      consumes:
+      - application/json
+      description: List application plugins
+      parameters:
+      - description: plugin type (app)
+        in: path
+        name: pluginType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /postAppRestoreCmd:
+    post:
+      consumes:
+      - application/json
+      description: Application post restore command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /postQuiesceCmd:
+    post:
+      consumes:
+      - application/json
+      description: Application post quiesce command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /postRestore:
+    post:
+      consumes:
+      - application/json
+      description: Application post restore
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /postUnquiesceCmd:
+    post:
+      consumes:
+      - application/json
+      description: Application post unquiesce command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /preAppRestoreCmd:
+    post:
+      consumes:
+      - application/json
+      description: Application pre restore command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /preQuiesceCmd:
+    post:
+      consumes:
+      - application/json
+      description: Application pre quiesce command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /preRestore:
+    post:
+      consumes:
+      - application/json
+      description: Application pre restore
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /preUnquiesceCmd:
+    post:
+      consumes:
+      - application/json
+      description: Application pre unquiesce command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /puiesceCmd:
+    post:
+      consumes:
+      - application/json
+      description: Application quiesce command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /quiesce:
+    post:
+      consumes:
+      - application/json
+      description: Application quiesce
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
   /status:
     get:
       consumes:
@@ -30,6 +605,80 @@ paths:
               type: string
           schema:
             type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /unquiesce:
+    post:
+      consumes:
+      - application/json
+      description: Application unquiesce
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+  /unquiesceCmd:
+    post:
+      consumes:
+      - application/json
+      description: Application unquiesce command
+      parameters:
+      - description: config struct
+        in: body
+        name: config
+        required: true
+        schema:
+          $ref: '#/definitions/util.Config'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            string:
+              description: OK
+              type: string
+          schema:
+            $ref: '#/definitions/util.Result'
+            type: object
         "400":
           description: Bad Request
           schema:

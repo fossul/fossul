@@ -29,6 +29,17 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(status)
 }
 
+// PluginList godoc
+// @Description List storage or archive plugins
+// @Param pluginType path string true "plugin type (storage|archive)"
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} string
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /pluginList/{pluginType} [get]
 func PluginList(w http.ResponseWriter, r *http.Request) {
 	var plugins []string
 
@@ -60,6 +71,19 @@ func PluginList(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(plugins)
 }
 
+// PluginInfo godoc
+// @Description Plugin information and version
+// @Param config body util.Config true "config struct"
+// @Param pluginName path string true "name of plugin"
+// @Param pluginType path string true "plugin type (storage|archive)"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.PluginInfoResult
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /pluginInfo/{pluginName}/{pluginType} [post]
 func PluginInfo(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)	
 	var pluginName string = params["pluginName"]

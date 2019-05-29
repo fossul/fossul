@@ -8,6 +8,17 @@ import (
 	"strings"
 )
 
+// UnquiesceCmd godoc
+// @Description Application unquiesce command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /unquiesceCmd [post]
 func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
@@ -25,6 +36,17 @@ func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PreUnquiesceCmd godoc
+// @Description Application pre unquiesce command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /preUnquiesceCmd [post]
 func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
@@ -42,6 +64,17 @@ func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Unquiesce godoc
+// @Description Application unquiesce
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /unquiesce [post]
 func Unquiesce(w http.ResponseWriter, r *http.Request) {
 
 	config,_ := util.GetConfig(w,r)
@@ -94,6 +127,17 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PostUnquiesceCmd godoc
+// @Description Application post unquiesce command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /postUnquiesceCmd [post]
 func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)

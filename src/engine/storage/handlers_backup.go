@@ -8,6 +8,17 @@ import (
 	"strings"
 )
 
+// Backup godoc
+// @Description Backup data
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /backup [post]
 func Backup(w http.ResponseWriter, r *http.Request) {
 	config,_ := util.GetConfig(w,r)
 	printConfigDebug(config)
@@ -58,6 +69,17 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 	}	
 }
 
+// BackupList godoc
+// @Description List backups
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /backupList [post]
 func BackupList(w http.ResponseWriter, r *http.Request) {
 	config,_ := util.GetConfig(w,r)
 	printConfigDebug(config)
@@ -126,6 +148,17 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 	}	
 }
 
+// BackupDelete godoc
+// @Description Delete backups according to retention
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /backupDelete [post]
 func BackupDelete(w http.ResponseWriter, r *http.Request) {
 	config,_ := util.GetConfig(w,r)
 	printConfigDebug(config)
@@ -175,6 +208,17 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 	}	
 }
 
+// BackupDeleteCmd godoc
+// @Description Delete backup command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /backupDeleteCmd [post]
 func BackupCreateCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
@@ -192,6 +236,17 @@ func BackupCreateCmd(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// BackupCreateCmd godoc
+// @Description Create backup command
+// @Param config body util.Config true "config struct"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /backupCreateCmd [post]
 func BackupDeleteCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	config,_ := util.GetConfig(w,r)
