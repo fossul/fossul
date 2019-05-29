@@ -34,7 +34,6 @@ var runningWorkflowMap map[string]string = make(map[string]string)
 
 // @contact.name Keith Tenzer
 // @contact.url http://www.keithtenzer.com
-// @contact.email keith.tenzer@gmail.com
 
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
