@@ -90,11 +90,25 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 
 	var pluginInfoResult util.PluginInfoResult
 	var pluginInfo util.Plugin
+
 	var result util.Result
 	var messages []util.Message
-
-	config,_ := util.GetConfig(w,r)
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+		pluginInfoResult.Result = result
+
+		_ = json.NewDecoder(r.Body).Decode(&pluginInfoResult)
+		json.NewEncoder(w).Encode(pluginInfoResult)	
+
+		return
+	}
 	
 	pluginPath := util.GetPluginPath(pluginName)
 

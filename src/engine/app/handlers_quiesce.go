@@ -21,8 +21,22 @@ import (
 // @Router /preQuiesceCmd [post]
 func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.PreAppQuiesceCmd, ",")
@@ -49,8 +63,22 @@ func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 // @Router /puiesceCmd [post]
 func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.AppQuiesceCmd, ",")
@@ -76,12 +104,25 @@ func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string
 // @Router /quiesce [post]
 func Quiesce(w http.ResponseWriter, r *http.Request) {
-
-	config,_ := util.GetConfig(w,r)
+	var result util.Result
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
 
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
+
 	pluginPath := util.GetPluginPath(config.AppPlugin)
-	var messages []util.Message
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin
@@ -91,24 +132,22 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)
 	
-			var result = util.SetResult(1, messages)
+			result = util.SetResult(1, messages)
 	
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)
 		}
 	
-		var result util.Result
 		result = util.ExecutePlugin(config, "app", plugin, "--action", "quiesce")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {	
-		var result util.Result
 		plugin,err := util.GetAppInterface(pluginPath)
 		if err != nil {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			var result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)			
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)		
 		} else {
@@ -141,8 +180,22 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 // @Router /postQuiesceCmd [post]
 func PostQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.PostAppQuiesceCmd, ",")

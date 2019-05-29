@@ -15,7 +15,7 @@ import (
 // @Param configName path string true "name of config"
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} util.Config
+// @Success 200 {object} util.ConfigResult
 // @Header 200 {string} string
 // @Failure 400 {string} string
 // @Failure 404 {string} string
@@ -26,16 +26,37 @@ func GetConfig(w http.ResponseWriter, r *http.Request) {
 	var profileName string = params["profileName"]
 	var configName string = params["configName"]
 
+	var result util.Result
+	var messages []util.Message
+	var configResult util.ConfigResult
+
 	conf := configDir + "/" + profileName + "/" + configName + "/" + configName + ".conf"
 
 	if debug == "true" {
 		log.Println("[DEBUG]", "Config path is " + conf)
 	}
-	config,_ := util.ReadConfig(conf)
+	config,err := util.ReadConfig(conf)
 	printConfigDebug(config)
 
-	_ = json.NewDecoder(r.Body).Decode(&config)
-	json.NewEncoder(w).Encode(config)
+	if err != nil {
+		msg := util.SetMessage("ERROR","Couldn't get config! " + err.Error())
+		messages = append(messages, msg)
+
+		result.Code = 1
+		result.Messages = messages
+		
+		configResult.Result = result
+		
+		_ = json.NewDecoder(r.Body).Decode(&configResult)
+		json.NewEncoder(w).Encode(configResult)
+	} else {
+		result.Code = 0
+		configResult.Result = result			
+		configResult.Config = config
+
+		_ = json.NewDecoder(r.Body).Decode(&configResult)
+		json.NewEncoder(w).Encode(configResult)
+	}
 }
 
 // GetPluginConfig godoc
@@ -57,17 +78,38 @@ func GetPluginConfig(w http.ResponseWriter, r *http.Request) {
 	var configName string = params["configName"]	
 	var pluginName string = params["pluginName"]
 
+	var result util.Result
+	var messages []util.Message
+	var configMapResult util.ConfigMapResult
+
 	conf := configDir + "/" + profileName + "/" + configName + "/" + pluginName + ".conf"
 
 	if debug == "true" {
 		log.Println("[DEBUG]", "Plugin config path is " + conf)
 	}
 
-	configMap,_ := util.ReadConfigToMap(conf)
+	configMap,err := util.ReadConfigToMap(conf)
 	printConfigMapDebug(configMap)
 
-	_ = json.NewDecoder(r.Body).Decode(&configMap)
-	json.NewEncoder(w).Encode(configMap)
+	if err != nil {
+		msg := util.SetMessage("ERROR","Couldn't get config! " + err.Error())
+		messages = append(messages, msg)
+
+		result.Code = 1
+		result.Messages = messages
+		
+		configMapResult.Result = result
+		
+		_ = json.NewDecoder(r.Body).Decode(&configMapResult)
+		json.NewEncoder(w).Encode(configMapResult)
+	} else {
+		result.Code = 0
+		configMapResult.Result = result		
+		configMapResult.ConfigMap = configMap
+
+		_ = json.NewDecoder(r.Body).Decode(&configMapResult)
+		json.NewEncoder(w).Encode(configMapResult)
+	}
 }
 
 // GetDefaultConfig godoc
@@ -82,17 +124,38 @@ func GetPluginConfig(w http.ResponseWriter, r *http.Request) {
 // @Router /getDefaultConfig [get]
 func GetDefaultConfig(w http.ResponseWriter, r *http.Request) {
 
+	var result util.Result
+	var messages []util.Message
+	var configResult util.ConfigResult
+
 	conf := configDir + "/" + "default" + "/" + "default" + "/" + "default.conf"
 
 	if debug == "true" {
 		log.Println("[DEBUG]", "Default config path is " + conf)
 	}	
 
-	config,_ := util.ReadConfig(conf)
+	config,err := util.ReadConfig(conf)
 	printConfigDebug(config)
 
-	_ = json.NewDecoder(r.Body).Decode(&config)
-	json.NewEncoder(w).Encode(config)
+	if err != nil {
+		msg := util.SetMessage("ERROR","Couldn't get config! " + err.Error())
+		messages = append(messages, msg)
+
+		result.Code = 1
+		result.Messages = messages		
+		configResult.Result = result
+		
+		_ = json.NewDecoder(r.Body).Decode(&configResult)
+		json.NewEncoder(w).Encode(configResult)
+	} else {
+		result.Code = 0
+		configResult.Result = result
+		
+		configResult.Config = config
+
+		_ = json.NewDecoder(r.Body).Decode(&configResult)
+		json.NewEncoder(w).Encode(configResult)
+	}
 }
 
 // GetDefaultPluginConfig godoc
@@ -112,15 +175,36 @@ func GetDefaultPluginConfig(w http.ResponseWriter, r *http.Request) {
 
 	conf := configDir + "/" + "default" + "/" + "default" + "/" + pluginName + ".conf"
 
+	var result util.Result
+	var messages []util.Message
+	var configMapResult util.ConfigMapResult
+
 	if debug == "true" {
 		log.Println("[DEBUG]", "Config path is " + conf)
 	}
 
-	configMap,_ := util.ReadConfigToMap(conf)
+	configMap,err := util.ReadConfigToMap(conf)
 	printConfigMapDebug(configMap)
 
-	_ = json.NewDecoder(r.Body).Decode(&configMap)
-	json.NewEncoder(w).Encode(configMap)
+	if err != nil {
+		msg := util.SetMessage("ERROR","Couldn't get config! " + err.Error())
+		messages = append(messages, msg)
+
+		result.Code = 1
+		result.Messages = messages
+		
+		configMapResult.Result = result
+		
+		_ = json.NewDecoder(r.Body).Decode(&configMapResult)
+		json.NewEncoder(w).Encode(configMapResult)
+	} else {
+		result.Code = 0
+		configMapResult.Result = result			
+		configMapResult.ConfigMap = configMap
+
+		_ = json.NewDecoder(r.Body).Decode(&configMapResult)
+		json.NewEncoder(w).Encode(configMapResult)
+	}
 }
 
 // AddConfig godoc

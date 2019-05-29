@@ -43,6 +43,16 @@ type Config struct {
 	StoragePluginParameters map[string]string `json:"storagePluginParameters,omitempty"`
 }
 
+type ConfigResult struct {
+	Config Config `json:"config,omitmepty"`
+	Result Result `json:"result,omitmepty"`
+}
+
+type ConfigMapResult struct {
+	ConfigMap map[string]string `json:"configMap,omitmepty"`
+	Result Result `json:"result,omitmepty"`
+}
+
 type BackupRetention struct {
 	Policy string `json:"policy"`
 	RetentionDays int `json:"retentionDays"`	

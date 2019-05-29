@@ -31,15 +31,31 @@ func StartBackupWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 
 	workflowResult.Id = workflow.Id
 
-	config,_ := util.GetConfig(w,r)
+	var result util.Result
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+		workflowResult.Result = result
+
+		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
+		json.NewEncoder(w).Encode(workflowResult)	
+
+		return
+	}
 
 	config.WorkflowId = util.IntToString(workflow.Id)
 	workflow.Policy = config.SelectedBackupPolicy
 
 	_,ok := runningWorkflowMap[config.ProfileName + "-" + config.ConfigName]
 	if ok {	
-		result := util.SetResultMessage(1,"ERROR","Workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Another workflow is running under profile [" + config.ProfileName + "] config [" + config.ConfigName + "]")
+		result = util.SetResultMessage(1,"ERROR","Workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Another workflow is running under profile [" + config.ProfileName + "] config [" + config.ConfigName + "]")
 		workflowResult.Result = result
 		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
 		json.NewEncoder(w).Encode(workflowResult)		
@@ -50,7 +66,7 @@ func StartBackupWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 			startBackupWorkflowImpl(dataDir,config,workflow)
 		}()
 	
-		result := util.SetResultMessage(0,"INFO","Workflow id [" + util.IntToString(workflow.Id) + "] started successfully")
+		result = util.SetResultMessage(0,"INFO","Workflow id [" + util.IntToString(workflow.Id) + "] started successfully")
 		workflowResult.Result = result
 		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
 		json.NewEncoder(w).Encode(workflowResult)
@@ -146,8 +162,24 @@ func StartRestoreWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 
 	workflowResult.Id = workflow.Id
 
-	config,_ := util.GetConfig(w,r)
+	var result util.Result
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+		workflowResult.Result = result
+
+		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
+		json.NewEncoder(w).Encode(workflowResult)	
+
+		return
+	}
 
 	config.WorkflowId = util.IntToString(workflow.Id)
 	config.SelectedWorkflowId = util.StringToInt(selectedWorkflowId)
@@ -155,7 +187,7 @@ func StartRestoreWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 
 	_,ok := runningWorkflowMap[config.ProfileName + "-" + config.ConfigName]
 	if ok {	
-		result := util.SetResultMessage(1,"ERROR","Workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Another workflow is running under profile [" + config.ProfileName + "] config [" + config.ConfigName + "]")
+		result = util.SetResultMessage(1,"ERROR","Workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Another workflow is running under profile [" + config.ProfileName + "] config [" + config.ConfigName + "]")
 		workflowResult.Result = result
 		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
 		json.NewEncoder(w).Encode(workflowResult)		
@@ -166,7 +198,7 @@ func StartRestoreWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 			startRestoreWorkflowImpl(dataDir,config,workflow)
 		}()
 	
-		result := util.SetResultMessage(0,"INFO","Workflow id [" + util.IntToString(workflow.Id) + "] started successfully")
+		result = util.SetResultMessage(0,"INFO","Workflow id [" + util.IntToString(workflow.Id) + "] started successfully")
 		workflowResult.Result = result
 		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
 		json.NewEncoder(w).Encode(workflowResult)

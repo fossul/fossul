@@ -97,7 +97,7 @@ if [ ! -z $GOBIN/metadata/configs/default ]; then
   if [ $? != 0 ]; then exit 1; fi
 fi
 
-cp -r $GOPATH/src/fossil/src/cli/configs/default $GOBIN/metadata/configs/default/default
+cp -r $GOPATH/src/fossil/src/cli/configs/default $GOBIN/metadata/configs/default
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying startup scripts"

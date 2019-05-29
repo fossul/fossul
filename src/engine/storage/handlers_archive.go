@@ -21,12 +21,25 @@ import (
 // @Failure 500 {string} string
 // @Router /archive [post]
 func Archive(w http.ResponseWriter, r *http.Request) {
-	config,_ := util.GetConfig(w,r)
-	printConfigDebug(config)
-
-	pluginPath := util.GetPluginPath(config.ArchivePlugin)
 	var result util.Result
 	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
+	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
+
+	pluginPath := util.GetPluginPath(config.ArchivePlugin)
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/archive/" + config.ArchivePlugin
@@ -37,7 +50,7 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)
 
-			var result = util.SetResult(1, messages)
+			result = util.SetResult(1, messages)
 
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)
@@ -52,7 +65,7 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			var result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)			
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)		
 		} else {
@@ -146,12 +159,25 @@ func ArchiveList(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string
 // @Router /archiveDelete [post]
 func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
-	config,_ := util.GetConfig(w,r)
-	printConfigDebug(config)
-
-	pluginPath := util.GetPluginPath(config.ArchivePlugin)
 	var result util.Result
 	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
+	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
+
+	pluginPath := util.GetPluginPath(config.ArchivePlugin)
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/archive/" + config.ArchivePlugin
@@ -175,7 +201,7 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			var result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)			
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)		
 		} else {
@@ -208,8 +234,22 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 // @Router /archiveCreateCmd [post]
 func ArchiveCreateCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.BackupCreateCmd != "" {
 		args := strings.Split(config.ArchiveCreateCmd, ",")
@@ -236,8 +276,22 @@ func ArchiveCreateCmd(w http.ResponseWriter, r *http.Request) {
 // @Router /archiveDeleteCmd [post]
 func ArchiveDeleteCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.BackupDeleteCmd != "" {
 		args := strings.Split(config.ArchiveDeleteCmd, ",")

@@ -20,12 +20,25 @@ import (
 // @Failure 500 {string} string
 // @Router /preRestore [post]
 func PreRestore(w http.ResponseWriter, r *http.Request) {
-
-	config,_ := util.GetConfig(w,r)
+	var result util.Result
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
 
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
+
 	pluginPath := util.GetPluginPath(config.AppPlugin)
-	var messages []util.Message
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin
@@ -40,13 +53,11 @@ func PreRestore(w http.ResponseWriter, r *http.Request) {
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)
 		}
-	
-		var result util.Result
+
 		result = util.ExecutePlugin(config, "app", plugin, "--action", "preRestore")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {	
-		var result util.Result
 		plugin,err := util.GetAppInterface(pluginPath)
 		if err != nil {
 			message := util.SetMessage("ERROR", err.Error())
@@ -84,12 +95,25 @@ func PreRestore(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string
 // @Router /postRestore [post]
 func PostRestore(w http.ResponseWriter, r *http.Request) {
-
-	config,_ := util.GetConfig(w,r)
+	var result util.Result
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
 
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
+
 	pluginPath := util.GetPluginPath(config.AppPlugin)
-	var messages []util.Message
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin
@@ -99,24 +123,22 @@ func PostRestore(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)
 	
-			var result = util.SetResult(1, messages)
+			result = util.SetResult(1, messages)
 	
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)
 		}
 	
-		var result util.Result
 		result = util.ExecutePlugin(config, "app", plugin, "--action", "postRestore")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {	
-		var result util.Result
 		plugin,err := util.GetAppInterface(pluginPath)
 		if err != nil {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			var result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)			
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)		
 		} else {
@@ -149,8 +171,22 @@ func PostRestore(w http.ResponseWriter, r *http.Request) {
 // @Router /preAppRestoreCmd [post]
 func PreAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.PreAppRestoreCmd != "" {
 		args := strings.Split(config.PreAppRestoreCmd, ",")
@@ -177,8 +213,22 @@ func PreAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 // @Router /postAppRestoreCmd [post]
 func PostAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.PostAppRestoreCmd != "" {
 		args := strings.Split(config.PostAppRestoreCmd, ",")

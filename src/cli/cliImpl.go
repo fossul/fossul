@@ -5,7 +5,6 @@ import (
 	"fossil/src/engine/util"
 	"fossil/src/engine/client"
 	"fmt"
-	"strconv"
 	"time"
 	"text/tabwriter"
 	"errors"
@@ -43,30 +42,19 @@ func ReadCredentialFile(credentialFile string) (client.Auth) {
 }
 
 func GetDefaultConfig(auth client.Auth) {
-	config,err := client.GetDefaultConfig(auth)
+	configResult,err := client.GetDefaultConfig(auth)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
+	checkResult(configResult.Result)
 
-	fmt.Println("### Default Config ###")
-	fmt.Println("AppPlugin = " + "\"" + config.AppPlugin + "\"")
-	fmt.Println("PreAppQuiesceCmd = " + "\"" + config.PreAppQuiesceCmd + "\"")
-	fmt.Println("PostAppQuiesceCmd = " + "\"" + config.PostAppQuiesceCmd + "\"")
-	fmt.Println("BackupCreateCmd = " + "\"" + config.BackupCreateCmd + "\"")
-	fmt.Println("BackupDeleteCmd = " + "\"" + config.BackupDeleteCmd + "\"")
-	fmt.Println("PreAppUnquiesceCmd = " + "\"" + config.PreAppUnquiesceCmd + "\"")
-	fmt.Println("AppUnquiesceCmd = " + "\"" + config.AppUnquiesceCmd + "\"")
-	fmt.Println("AppUnquiesceCmd = " + "\"" + config.AppUnquiesceCmd + "\"")
-	fmt.Println("PostAppUnquiesceCmd = " + "\"" + config.PostAppUnquiesceCmd + "\"")
-	fmt.Println("SendTrapErrorCmd = " + "\"" +config.SendTrapErrorCmd + "\"")
-	fmt.Println("SendTrapSuccessCmd = " + "\"" + config.SendTrapSuccessCmd + "\"" + "\n")
-
-	for _, retention := range config.BackupRetentions {
-		fmt.Println("[[BackupRetentions]]")
-		fmt.Println("Policy = " + "\"" + retention.Policy + "\"")
-		fmt.Println("RetentionDays = " + strconv.Itoa(retention.RetentionDays) + "\n")
-	}
+	buf,err := util.EncodeConfig(configResult.Config)
+	if err != nil {
+		fmt.Println(err,"\n" + "[ERROR] Couldn't encode default config! " + err.Error())
+		os.Exit(1)	
+	}		
+	fmt.Println(buf.String())
 	os.Exit(0)
 }
 
@@ -93,26 +81,29 @@ func ListSchedules(auth client.Auth) {
 
 func GetDefaultPluginConfig(auth client.Auth,pluginName string) {
 
-	configMap,err := client.GetDefaultPluginConfig(auth,pluginName)
+	configMapResult,err := client.GetDefaultPluginConfig(auth,pluginName)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
+	checkResult(configMapResult.Result)
 
 	fmt.Println("### Default Plugin Config ###")
-	for k,v := range configMap {
+	for k,v := range configMapResult.ConfigMap {
 		fmt.Println(k + " = " + "\""+ v + "\"")
 	}		
 	os.Exit(0)
 }
 
 func GetConfig(auth client.Auth,profileName,configName string) {
-	config,err := client.GetConfig(auth,profileName,configName)
+	configResult,err := client.GetConfig(auth,profileName,configName)
 	if err != nil {
 		fmt.Println(err,"\n" + "[ERROR] Couldn't get config [" + profileName + "] config [" + configName + "! " + err.Error())
 		os.Exit(1)	
 	}
-	buf,err := util.EncodeConfig(config)
+	checkResult(configResult.Result)
+
+	buf,err := util.EncodeConfig(configResult.Config)
 	if err != nil {
 		fmt.Println(err,"\n" + "[ERROR] Couldn't encode config [" + profileName + "] config [" + configName + "! " + err.Error())
 		os.Exit(1)	
@@ -122,13 +113,14 @@ func GetConfig(auth client.Auth,profileName,configName string) {
 }	
 
 func GetPluginConfig(auth client.Auth,profileName,configName,pluginName string) {
-	pluginConfigMap,err := client.GetPluginConfig(auth,profileName,configName,pluginName)
+	pluginConfigMapResult,err := client.GetPluginConfig(auth,profileName,configName,pluginName)
 	if err != nil {
 		fmt.Println(err,"\n" + "[ERROR] Couldn't get config [" + profileName + "] config [" + configName + "! " + err.Error())
 		os.Exit(1)	
 	}
+	checkResult(pluginConfigMapResult.Result)	
 		
-	buf,err := util.EncodePluginConfig(pluginConfigMap)
+	buf,err := util.EncodePluginConfig(pluginConfigMapResult.ConfigMap)
 	if err != nil {
 		fmt.Println(err,"\n" + "[ERROR] Couldn't encode config [" + profileName + "] config [" + configName + "! " + err.Error())
 		os.Exit(1)	
@@ -296,25 +288,30 @@ func ImportLocalConfig(profileName,configName,policyName,configDir,configPath st
 }
 
 func ImportServerConfig(auth client.Auth,profileName,configName string) (util.Config,error) {
-	config,err := client.GetConfig(auth,profileName,configName)
+	configResult,err := client.GetConfig(auth,profileName,configName)
 	if err != nil {
-		return config,errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + configName + "! " + err.Error())
+		return configResult.Config,errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + configName + "! " + err.Error())
 	}
+
+	checkResult(configResult.Result)
+	config := configResult.Config
 
 	//load dynamic plugin parameters into config struct
 	if config.AppPlugin != "" {
-		appConfigMap,err := client.GetPluginConfig(auth,profileName,configName,config.AppPlugin)
+		appConfigMapResult,err := client.GetPluginConfig(auth,profileName,configName,config.AppPlugin)
 		if err != nil {
 			return config,errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + config.AppPlugin + "! " + err.Error())
-		}	
-		config.AppPluginParameters = appConfigMap		
+		}
+		checkResult(appConfigMapResult.Result)		
+		config.AppPluginParameters = appConfigMapResult.ConfigMap		
 	}
 	if config.StoragePlugin != "" {
-		storageConfigMap,err := client.GetPluginConfig(auth,profileName,configName,config.StoragePlugin)
+		storageConfigMapResult,err := client.GetPluginConfig(auth,profileName,configName,config.StoragePlugin)
 		if err != nil {
 			return config,errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + config.StoragePlugin + "! " + err.Error())
 		}	
-		config.StoragePluginParameters = storageConfigMap	
+		checkResult(storageConfigMapResult.Result)	
+		config.StoragePluginParameters = storageConfigMapResult.ConfigMap	
 	}
 	
 	return config,nil
@@ -675,6 +672,7 @@ func PluginInfo(auth client.Auth,pluginName,pluginType string) {
 	} else {
 		error := fmt.Sprintf("[ERROR] Plugin type must be app|storage|archive")
 		fmt.Println(error)
+		os.Exit(1)
 	}	
 
 	checkResult(pluginInfoResult.Result)

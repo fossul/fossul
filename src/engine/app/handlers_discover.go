@@ -20,13 +20,28 @@ import (
 // @Failure 500 {string} string
 // @Router /discover [post]
 func Discover(w http.ResponseWriter, r *http.Request) {
+	var discoverResult util.DiscoverResult
+	var result util.Result
+	var messages []util.Message
 
-	config,_ := util.GetConfig(w,r)
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
 
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		discoverResult.Result = result
+
+		_ = json.NewDecoder(r.Body).Decode(&discoverResult)
+		json.NewEncoder(w).Encode(discoverResult)	
+
+		return
+	}
+
 	pluginPath := util.GetPluginPath(config.AppPlugin)
-	var discoverResult util.DiscoverResult
-	var messages []util.Message
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin
@@ -36,7 +51,7 @@ func Discover(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)
 	
-			result := util.SetResult(1, messages)
+			result = util.SetResult(1, messages)
 	
 			discoverResult.Result = result
 			_ = json.NewDecoder(r.Body).Decode(&discoverResult)
@@ -54,7 +69,7 @@ func Discover(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			var result = util.SetResult(1, messages)
+			result = util.SetResult(1, messages)
 			discoverResult.Result = result			
 			_ = json.NewDecoder(r.Body).Decode(&discoverResult)
 			json.NewEncoder(w).Encode(discoverResult)		

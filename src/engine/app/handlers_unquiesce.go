@@ -21,8 +21,22 @@ import (
 // @Router /unquiesceCmd [post]
 func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.AppUnquiesceCmd, ",")
@@ -49,8 +63,22 @@ func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 // @Router /preUnquiesceCmd [post]
 func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.PreAppUnquiesceCmd, ",")
@@ -76,13 +104,25 @@ func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string
 // @Router /unquiesce [post]
 func Unquiesce(w http.ResponseWriter, r *http.Request) {
-
-	config,_ := util.GetConfig(w,r)
-	printConfigDebug(config)
-
-	pluginPath := util.GetPluginPath(config.AppPlugin)
 	var result util.Result
 	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
+	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
+
+	pluginPath := util.GetPluginPath(config.AppPlugin)
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin
@@ -92,10 +132,12 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
 			messages = append(messages, message)
 	
-			var result = util.SetResult(1, messages)
+			result = util.SetResult(1, messages)
 	
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)
+
+			return
 		}
 	
 		result = util.ExecutePlugin(config, "app", plugin, "--action", "unquiesce")
@@ -107,7 +149,7 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			var result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)			
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)		
 		} else {
@@ -140,8 +182,22 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 // @Router /postUnquiesceCmd [post]
 func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.PostAppUnquiesceCmd, ",")

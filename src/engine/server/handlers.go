@@ -39,8 +39,22 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 // @Router /sendTrapSuccessCmd [post]
 func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.SendTrapSuccessCmd != "" {
 		args := strings.Split(config.SendTrapSuccessCmd, ",")
@@ -67,8 +81,22 @@ func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 // @Router /sendTrapErrorCmd [post]
 func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.SendTrapSuccessCmd != "" {
 		args := strings.Split(config.SendTrapErrorCmd, ",")

@@ -8,12 +8,12 @@ import (
 	"errors"
 )
 
-func GetConfig(auth Auth,profileName,configName string) (util.Config,error) {
-	var config util.Config
+func GetConfig(auth Auth,profileName,configName string) (util.ConfigResult,error) {
+	var configResult util.ConfigResult
 
 	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/getConfig/" + profileName + "/" + configName, nil)
 	if err != nil {
-		return config,err
+		return configResult,err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -23,28 +23,28 @@ func GetConfig(auth Auth,profileName,configName string) (util.Config,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return config,err
+		return configResult,err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		if err := json.NewDecoder(resp.Body).Decode(&config); err != nil {
-			return config,err
+		if err := json.NewDecoder(resp.Body).Decode(&configResult); err != nil {
+			return configResult,err
 		}
 	} else {
-		return config,errors.New("Http Status Error [" + resp.Status + "]")
+		return configResult,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return config,nil
+	return configResult,nil
 }
 
-func GetPluginConfig(auth Auth,profileName,configName,pluginName string) (map[string]string,error) {
-	var configMap map[string]string
+func GetPluginConfig(auth Auth,profileName,configName,pluginName string) (util.ConfigMapResult,error) {
+	var configMapResult util.ConfigMapResult
 
 	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/getPluginConfig/" + profileName + "/" + configName + "/" + pluginName, nil)
 	if err != nil {
-		return configMap,err
+		return configMapResult,err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -54,28 +54,28 @@ func GetPluginConfig(auth Auth,profileName,configName,pluginName string) (map[st
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return configMap,err
+		return configMapResult,err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		if err := json.NewDecoder(resp.Body).Decode(&configMap); err != nil {
-			return configMap,err
+		if err := json.NewDecoder(resp.Body).Decode(&configMapResult); err != nil {
+			return configMapResult,err
 		}
 	} else {
-		return configMap,errors.New("Http Status Error [" + resp.Status + "]")
+		return configMapResult,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return configMap,nil
+	return configMapResult,nil
 }
 
-func GetDefaultConfig(auth Auth) (util.Config,error) {
-	var config util.Config
+func GetDefaultConfig(auth Auth) (util.ConfigResult,error) {
+	var configResult util.ConfigResult
 
 	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/getDefaultConfig", nil)
 	if err != nil {
-		return config,err
+		return configResult,err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -85,28 +85,28 @@ func GetDefaultConfig(auth Auth) (util.Config,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return config,err
+		return configResult,err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		if err := json.NewDecoder(resp.Body).Decode(&config); err != nil {
-			return config,err
+		if err := json.NewDecoder(resp.Body).Decode(&configResult); err != nil {
+			return configResult,err
 		}
 	} else {
-		return config,errors.New("Http Status Error [" + resp.Status + "]")
+		return configResult,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return config,nil
+	return configResult,nil
 }
 
-func GetDefaultPluginConfig(auth Auth,pluginName string) (map[string]string,error) {
-	var configMap map[string]string
+func GetDefaultPluginConfig(auth Auth,pluginName string) (util.ConfigMapResult,error) {
+	var configMapResult util.ConfigMapResult
 
 	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/getDefaultPluginConfig/" + pluginName, nil)
 	if err != nil {
-		return configMap,err
+		return configMapResult,err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -116,20 +116,20 @@ func GetDefaultPluginConfig(auth Auth,pluginName string) (map[string]string,erro
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return configMap,err
+		return configMapResult,err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		if err := json.NewDecoder(resp.Body).Decode(&configMap); err != nil {
-			return configMap,err
+		if err := json.NewDecoder(resp.Body).Decode(&configMapResult); err != nil {
+			return configMapResult,err
 		}
 	} else {
-		return configMap,errors.New("Http Status Error [" + resp.Status + "]")
+		return configMapResult,errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return configMap,nil
+	return configMapResult,nil
 }
 
 func AddConfig(auth Auth,profileName,configName string,config util.Config) (util.Result,error) {

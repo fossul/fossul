@@ -20,12 +20,25 @@ import (
 // @Failure 500 {string} string
 // @Router /backup [post]
 func Backup(w http.ResponseWriter, r *http.Request) {
-	config,_ := util.GetConfig(w,r)
-	printConfigDebug(config)
-
-	pluginPath := util.GetPluginPath(config.StoragePlugin)
 	var result util.Result
 	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
+	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
+
+	pluginPath := util.GetPluginPath(config.StoragePlugin)
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/storage/" + config.StoragePlugin
@@ -49,7 +62,7 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			var result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)			
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)		
 		} else {
@@ -81,14 +94,29 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string
 // @Router /backupList [post]
 func BackupList(w http.ResponseWriter, r *http.Request) {
-	config,_ := util.GetConfig(w,r)
+	var backups util.Backups
+	var backupList []util.Backup
+	var result util.Result
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1,messages)
+		backups.Result = result
+
+		_ = json.NewDecoder(r.Body).Decode(&backups)
+		json.NewEncoder(w).Encode(backups)	
+
+		return
+	}
 
 	pluginPath := util.GetPluginPath(config.StoragePlugin)
 
-	var backups util.Backups
-	var result util.Result
-	var messages []util.Message
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/storage/" + config.StoragePlugin
 
@@ -102,8 +130,7 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 			_ = json.NewDecoder(r.Body).Decode(&backups)
 			json.NewEncoder(w).Encode(backups)
 		}
-		var backups util.Backups
-		var backupList []util.Backup
+
 		resultSimple := util.ExecutePluginSimple(config, "storage", plugin, "--action", "backupList")
 		if resultSimple.Code != 0 {
 			msg := util.SetMessage("ERROR","BackupList failed")
@@ -160,12 +187,25 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string
 // @Router /backupDelete [post]
 func BackupDelete(w http.ResponseWriter, r *http.Request) {
-	config,_ := util.GetConfig(w,r)
-	printConfigDebug(config)
-
-	pluginPath := util.GetPluginPath(config.StoragePlugin)
 	var result util.Result
 	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
+	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1,messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
+
+	pluginPath := util.GetPluginPath(config.StoragePlugin)
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/storage/" + config.StoragePlugin
@@ -188,7 +228,7 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			var result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)			
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)		
 		} else {
@@ -221,8 +261,22 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 // @Router /backupDeleteCmd [post]
 func BackupCreateCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.BackupCreateCmd != "" {
 		args := strings.Split(config.BackupCreateCmd, ",")
@@ -249,8 +303,22 @@ func BackupCreateCmd(w http.ResponseWriter, r *http.Request) {
 // @Router /backupCreateCmd [post]
 func BackupDeleteCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
-	config,_ := util.GetConfig(w,r)
+	var messages []util.Message
+	
+	config,err := util.GetConfig(w,r)
 	printConfigDebug(config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)	
+
+		return
+	}
 
 	if config.BackupDeleteCmd != "" {
 		args := strings.Split(config.BackupDeleteCmd, ",")
