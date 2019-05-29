@@ -122,9 +122,9 @@ The fossil CLI consumes APIs provided by the various services using client libra
 
 # API
 API documentation is done using swagger for Go (swaggo). Each services provides API documentation for the APIs that are published by the service.
-* http://server:8000/api/v1/index.html
-* http://app:8001/api/v1/index.html
-* http://storage:8002/api/v1/index.html
+* [http://fossil-server-fossil.apps.46.4.207.247.xip.io/api/v1/index.html](http://fossil-server-fossil.apps.46.4.207.247.xip.io/api/v1/index.html)
+* [http://fossil-app-fossil.apps.46.4.207.247.xip.io/api/v1/index.html](http://fossil-app-fossil.apps.46.4.207.247.xip.io/api/v1/index.html)
+* [http://fossil-storage-fossil.apps.46.4.207.247.xip.io/api/v1/index.html](http://fossil-storage-fossil.apps.46.4.207.247.xip.io/api/v1/index.html)
 
 # Getting Started
 
