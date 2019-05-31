@@ -128,6 +128,37 @@ API documentation is done using swagger for Go (swaggo). Each services provides 
 
 # Getting Started
 
+## Development Environment
+The instructions are for a Fedora 28 development environment but any Linux or MacOS should work.
+
+### Install the Go programming language. 
+```$ sudo dnf install -y go```
+
+To build source code and setup a development ensure the following environment parameters are exported to the shell and set in user profile (.bashrc):
+
+* export GOPATH=/home/fedora/go
+* export GOBIN=/home/fedora
+
+### Download dep binary. Dep is used for dependency and package management. Build scripts will call dep to download correct dependencies.
+```$ curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh```
+
+This will download and install dep into $GOBIN
+
+### Clone the Fossil Github repository from '$GOPATH/src' in this case '/home/fedora/go/src'.
+```$ git clone https://github.com/ktenzer/fossil.git```
+
+### Change directory to the Fossil Github repository
+```$ cd /home/fedora/go/src/fossil```
+
+### Update Plugin Dir parameter in fossil build script
+```
+vi fossil-build.sh
+PLUGIN_DIR="/home/fedora/plugins"
+```
+
+### Run the fossil build script
+```$ /home/fedora/go/src/fossil/fossil-build.sh```
+
 ## Deploying Fossil
 
 ### OpenShift
