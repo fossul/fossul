@@ -6,8 +6,7 @@
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "Keith Tenzer",
-            "url": "http://www.keithtenzer.com",
-            "email": "keith.tenzer@gmail.com"
+            "url": "http://www.keithtenzer.com"
         },
         "license": {
             "name": "Apache 2.0",
@@ -699,7 +698,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/util.Config"
+                            "$ref": "#/definitions/util.ConfigResult"
                         },
                         "headers": {
                             "string": {
@@ -1797,6 +1796,19 @@
                 },
                 "workflowId": {
                     "type": "string"
+                }
+            }
+        },
+        "util.ConfigResult": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "type": "object",
+                    "$ref": "#/definitions/util.Config"
+                },
+                "result": {
+                    "type": "object",
+                    "$ref": "#/definitions/util.Result"
                 }
             }
         },

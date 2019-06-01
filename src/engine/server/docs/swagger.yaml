@@ -63,6 +63,15 @@ definitions:
       workflowId:
         type: string
     type: object
+  util.ConfigResult:
+    properties:
+      config:
+        $ref: '#/definitions/util.Config'
+        type: object
+      result:
+        $ref: '#/definitions/util.Result'
+        type: object
+    type: object
   util.CronSchedule:
     properties:
       value:
@@ -127,7 +136,6 @@ definitions:
 host: '{{.Host}}'
 info:
   contact:
-    email: keith.tenzer@gmail.com
     name: Keith Tenzer
     url: http://www.keithtenzer.com
   description: |-
@@ -602,7 +610,7 @@ paths:
               description: OK
               type: string
           schema:
-            $ref: '#/definitions/util.Config'
+            $ref: '#/definitions/util.ConfigResult'
             type: object
         "400":
           description: Bad Request
