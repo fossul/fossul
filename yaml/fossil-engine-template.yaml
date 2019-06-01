@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Template
 metadata:
   annotations:
-    description: "Fossul Engine - A Container Native Backup Fraemwork"
+    description: "A Container Native Backup Fraemwork"
   creationTimestamp: null
   name: fossul-framework
 objects:

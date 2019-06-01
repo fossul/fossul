@@ -1,3 +1,5 @@
+![](images/fossul_logo.png)
+
 # General
 Fossil is a container-native backup and recovery framework. It aims to provide an application consistent backup, restore as well as recorvery for container-native applications and databases. It's goal is to provide enterprise backup and recovery capabilities enjoyed in traditional world, container-native, in order to increase adoption and make the migration from traditial to container that much easier. The challenge of backup, especially in the container-driven world is signifigant. Each application or database has it's own tools, methods and even procedures. Applications are much more fluid, dynamic and provide greater abstractions. In addition there is an enormous variation of application and storage vendors capabilities (for example snapshots that impact backup / restore). 
 
