@@ -9,7 +9,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/remotecommand"
-	"fossil/src/engine/util"
+	"fossul/src/engine/util"
 )
 
 func ExecuteCommand(podName, containerName, namespace, accessWithinCluster string, args ...string) util.Result {

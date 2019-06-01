@@ -90,13 +90,13 @@ info:
     name: Keith Tenzer
     url: http://www.keithtenzer.com
   description: |-
-    APIs for managing Fossil applications
+    APIs for managing Fossul applications
     JSON API definition can be retrieved at <a href="/api/v1/swagger/doc.json">/api/v1/swagger/doc.json</a>
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Fossil Framework Application API
+  title: Fossul Framework Application API
   version: "1.0"
 paths:
   /discover:

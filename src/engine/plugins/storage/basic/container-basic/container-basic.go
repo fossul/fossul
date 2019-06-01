@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 	"github.com/pborman/getopt/v2"
-	"fossil/src/engine/util"
-	"fossil/src/engine/client/k8s"
-	"fossil/src/engine/plugins/pluginUtil"
+	"fossul/src/engine/util"
+	"fossul/src/engine/client/k8s"
+	"fossul/src/engine/plugins/pluginUtil"
 	"encoding/json"
 	"fmt"
 	"strings"

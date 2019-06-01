@@ -14,8 +14,8 @@ import (
 var doc = `{
     "swagger": "2.0",
     "info": {
-        "description": "APIs for managing Fossil workflows, jobs, profile, and configs\nJSON API definition can be retrieved at \u003ca href=\"/api/v1/swagger/doc.json\"\u003e/api/v1/swagger/doc.json\u003c/a\u003e",
-        "title": "Fossil Framework Server API",
+        "description": "APIs for managing Fossul workflows, jobs, profile, and configs\nJSON API definition can be retrieved at \u003ca href=\"/api/v1/swagger/doc.json\"\u003e/api/v1/swagger/doc.json\u003c/a\u003e",
+        "title": "Fossul Framework Server API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "Keith Tenzer",

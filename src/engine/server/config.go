@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fossil/src/engine/util"
+	"fossul/src/engine/util"
 )
 
 func GetConsolidatedConfig(profileName,configName,policyName string) (util.Config,error) {

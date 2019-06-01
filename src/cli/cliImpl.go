@@ -2,8 +2,8 @@ package main
 
 import (
 	"os"
-	"fossil/src/engine/util"
-	"fossil/src/engine/client"
+	"fossul/src/engine/util"
+	"fossul/src/engine/client"
 	"fmt"
 	"time"
 	"text/tabwriter"

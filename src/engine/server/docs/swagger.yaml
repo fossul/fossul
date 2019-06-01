@@ -131,13 +131,13 @@ info:
     name: Keith Tenzer
     url: http://www.keithtenzer.com
   description: |-
-    APIs for managing Fossil workflows, jobs, profile, and configs
+    APIs for managing Fossul workflows, jobs, profile, and configs
     JSON API definition can be retrieved at <a href="/api/v1/swagger/doc.json">/api/v1/swagger/doc.json</a>
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Fossil Framework Server API
+  title: Fossul Framework Server API
   version: "1.0"
 paths:
   /addConfig/{profileName}/{configName}:

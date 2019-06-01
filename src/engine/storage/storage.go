@@ -4,22 +4,22 @@ import (
     "log"
     "net/http"
     "os"
-    "fossil/src/engine/util"
+    "fossul/src/engine/util"
     "github.com/swaggo/http-swagger"
-    _ "fossil/src/engine/storage/docs"
+    _ "fossul/src/engine/storage/docs"
 )
 
 const version = "1.0.0"
 
-var port string = os.Getenv("FOSSIL_STORAGE_SERVICE_PORT")
-var pluginDir string = os.Getenv("FOSSIL_STORAGE_PLUGIN_DIR")
-var myUser string = os.Getenv("FOSSIL_USERNAME")
-var myPass string = os.Getenv("FOSSIL_PASSWORD")
-var debug string = os.Getenv("FOSSIL_STORAGE_DEBUG")
+var port string = os.Getenv("FOSSUL_STORAGE_SERVICE_PORT")
+var pluginDir string = os.Getenv("FOSSUL_STORAGE_PLUGIN_DIR")
+var myUser string = os.Getenv("FOSSUL_USERNAME")
+var myPass string = os.Getenv("FOSSUL_PASSWORD")
+var debug string = os.Getenv("FOSSUL_STORAGE_DEBUG")
  
-// @title Fossil Framework Storage API
+// @title Fossul Framework Storage API
 // @version 1.0
-// @description APIs for managing Fossil storage plugins
+// @description APIs for managing Fossul storage plugins
 // @description JSON API definition can be retrieved at <a href="/api/v1/swagger/doc.json">/api/v1/swagger/doc.json</a>
 // @termsOfService http://swagger.io/terms/
 

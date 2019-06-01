@@ -33,7 +33,7 @@ func createMultiLogger() *log.Logger {
 	}
 
 	t := time.Now().Unix()
-	logfile := fmt.Sprintf("%s/logs/fossil_%d.conf", os.Getenv("GOBIN"), t)
+	logfile := fmt.Sprintf("%s/logs/fossul_%d.conf", os.Getenv("GOBIN"), t)
 	file, err := os.OpenFile(logfile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		log.Fatal(err)

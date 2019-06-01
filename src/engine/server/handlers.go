@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"fossil/src/engine/util"
+	"fossul/src/engine/util"
 	"net/http"
 	"strings"
 )

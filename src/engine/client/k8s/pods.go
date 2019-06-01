@@ -36,7 +36,7 @@ func GetPod(namespace, serviceName, accessWithinCluster string) (string,error) {
 	}
 
 	/*            
-	pod := "fossil-app-2-zpdgr"
+	pod := "fossul-app-2-zpdgr"
 	_, err = clientset.CoreV1().Pods(namespace).Get(pod, metav1.GetOptions{})
 	if errors.IsNotFound(err) {
 		fmt.Printf("Pod %s in namespace %s not found\n", pod, namespace)

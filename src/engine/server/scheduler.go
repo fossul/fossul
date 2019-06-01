@@ -2,8 +2,8 @@ package main
 
 import (
 	"gopkg.in/robfig/cron.v3"
-	"fossil/src/engine/client"
-	"fossil/src/engine/util"
+	"fossul/src/engine/client"
+	"fossul/src/engine/util"
 	"strings"
 	"os"
 )

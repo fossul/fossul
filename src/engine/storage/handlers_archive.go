@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fossil/src/engine/util"
+	"fossul/src/engine/util"
 	"net/http"
 	"os"
 	"fmt"

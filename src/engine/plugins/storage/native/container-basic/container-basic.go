@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fossil/src/engine/util"
-	"fossil/src/engine/client/k8s"
-	"fossil/src/engine/plugins/pluginUtil"
+	"fossul/src/engine/util"
+	"fossul/src/engine/client/k8s"
+	"fossul/src/engine/plugins/pluginUtil"
 	"fmt"
 	"strings"
 )

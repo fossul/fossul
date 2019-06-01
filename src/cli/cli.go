@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/pborman/getopt/v2"
 	"os"
-	"fossil/src/engine/util"
+	"fossul/src/engine/util"
 	"fmt"
 )
 
@@ -59,7 +59,7 @@ func main() {
 
 	var credentialFile string
 	if getopt.IsSet("credential-file") != true {
-		credentialFile = os.Getenv("HOME") + "/.fossil-credentials"
+		credentialFile = os.Getenv("HOME") + "/.fossul-credentials"
 	} else {
 		credentialFile = *optCredentialFile
 	}
@@ -333,7 +333,7 @@ func main() {
 		}	
 	}
 
-	fmt.Println("########## Welcome to Fossil Framework ##########")
+	fmt.Println("########## Welcome to Fossul Framework ##########")
 
 	if *optAction == "backup" {
 		if *optLocalConfig {

@@ -2,7 +2,7 @@ package client
 
 import (
 	"encoding/json"
-	"fossil/src/engine/util"
+	"fossul/src/engine/util"
 	"log"
 	"net/http"
 	"bytes"

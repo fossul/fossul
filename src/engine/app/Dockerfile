@@ -1,17 +1,17 @@
 FROM fedora:latest
 
 
-LABEL ios.k8s.display-name="fossil-app" \
+LABEL ios.k8s.display-name="fossul-app" \
     maintainer="Keith Tenzer <ktenzer@redhat.com>"
 
 RUN dnf install -y golang
 
-RUN mkdir -p /go/src/fossil
+RUN mkdir -p /go/src/fossul
 RUN mkdir /app
 
-WORKDIR /go/src/fossil
+WORKDIR /go/src/fossul
 
-ENV FOSSIL_BUILD_PLUGIN_DIR=/app/plugins
+ENV FOSSUL_BUILD_PLUGIN_DIR=/app/plugins
 ENV GOPATH=/go
 ENV GOBIN=/app
 
@@ -21,10 +21,10 @@ RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
 
 #RUN go get -u github.com/gorilla/mux
 
-COPY . /go/src/fossil
+COPY . /go/src/fossul
 
 #RUN cd /app && go build engine/util && go install engine/app
-RUN /go/src/fossil/fossil-app-build.sh
+RUN /go/src/fossul/fossul-app-build.sh
 
 RUN chown -R 1001:0 /app && \
     chmod -R 775 /app
@@ -40,4 +40,4 @@ USER 1001
 
 WORKDIR /app
 
-CMD /app/fossil-app-startup.sh
+CMD /app/fossul-app-startup.sh

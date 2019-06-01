@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"github.com/pborman/getopt/v2"
-	"fossil/src/engine/util"
+	"fossul/src/engine/util"
 	"encoding/json"
 	"fmt"
 	"strings"

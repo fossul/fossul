@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fossil/src/engine/util"
-	"fossil/src/engine/client"
+	"fossul/src/engine/util"
+	"fossul/src/engine/client"
 )
 
 func startRestoreWorkflowImpl (dataDir string, config util.Config, workflow *util.Workflow) int {

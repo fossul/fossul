@@ -2,22 +2,22 @@ apiVersion: v1
 kind: Template
 metadata:
   annotations:
-    description: "Fossil Engine - A Container Native Backup Fraemwork"
+    description: "Fossul Engine - A Container Native Backup Fraemwork"
   creationTimestamp: null
-  name: fossil-engine
+  name: fossul-framework
 objects:
 - apiVersion: v1
   kind: Secret
   metadata:
     name: ${APPLICATION_NAME}-secrets
   stringData:
-    admin-user: ${FOSSIL_USERNAME}
-    admin-password: ${FOSSIL_PASSWORD}  
+    admin-user: ${FOSSUL_USERNAME}
+    admin-password: ${FOSSUL_PASSWORD}  
 - apiVersion: v1
   kind: Service
   metadata:
     annotations:
-      description: Fossil server port
+      description: Fossul server port
     labels:
       app: ${APPLICATION_NAME}-server
     name: ${APPLICATION_NAME}-server
@@ -31,7 +31,7 @@ objects:
   kind: Service
   metadata:
     annotations:
-      description: Fossile app port
+      description: Fossule app port
     labels:
       app: ${APPLICATION_NAME}-app
     name: ${APPLICATION_NAME}-app
@@ -45,7 +45,7 @@ objects:
   kind: Service
   metadata:
     annotations:
-      description: Fossile storage port
+      description: Fossule storage port
     labels:
       app: ${APPLICATION_NAME}-storage
     name: ${APPLICATION_NAME}-storage
@@ -247,20 +247,20 @@ objects:
       spec:
         containers:
         - env:
-          - name: FOSSIL_SERVER_CONFIG_DIR
-            value: ${FOSSIL_SERVER_CONFIG_DIR}
-          - name: FOSSIL_SERVER_DATA_DIR
-            value: ${FOSSIL_SERVER_DATA_DIR}
-          - name: FOSSIL_SERVER_CLIENT_HOSTNAME
+          - name: FOSSUL_SERVER_CONFIG_DIR
+            value: ${FOSSUL_SERVER_CONFIG_DIR}
+          - name: FOSSUL_SERVER_DATA_DIR
+            value: ${FOSSUL_SERVER_DATA_DIR}
+          - name: FOSSUL_SERVER_CLIENT_HOSTNAME
             value: ${APPLICATION_NAME}-server
-          - name: FOSSIL_SERVER_DEBUG
-            value: ${FOSSIL_SERVER_DEBUG}                         
-          - name: FOSSIL_USERNAME
+          - name: FOSSUL_SERVER_DEBUG
+            value: ${FOSSUL_SERVER_DEBUG}                         
+          - name: FOSSUL_USERNAME
             valueFrom:
               secretKeyRef:
                 name: ${APPLICATION_NAME}-secrets
                 key: admin-user
-          - name: FOSSIL_PASSWORD
+          - name: FOSSUL_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: ${APPLICATION_NAME}-secrets
@@ -313,18 +313,18 @@ objects:
       spec:
         containers:
         - env:
-          - name: FOSSIL_APP_PLUGIN_DIR
-            value: ${FOSSIL_APP_PLUGIN_DIR}
-          - name: FOSSIL_APP_CLIENT_HOSTNAME
+          - name: FOSSUL_APP_PLUGIN_DIR
+            value: ${FOSSUL_APP_PLUGIN_DIR}
+          - name: FOSSUL_APP_CLIENT_HOSTNAME
             value: ${APPLICATION_NAME}-app 
-          - name: FOSSIL_APP_DEBUG
-            value: ${FOSSIL_APP_DEBUG}                         
-          - name: FOSSIL_USERNAME
+          - name: FOSSUL_APP_DEBUG
+            value: ${FOSSUL_APP_DEBUG}                         
+          - name: FOSSUL_USERNAME
             valueFrom:
               secretKeyRef:
                 name: ${APPLICATION_NAME}-secrets
                 key: admin-user
-          - name: FOSSIL_PASSWORD
+          - name: FOSSUL_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: ${APPLICATION_NAME}-secrets
@@ -368,18 +368,18 @@ objects:
       spec:
         containers:      
         - env:
-          - name: FOSSIL_STORAGE_PLUGIN_DIR
-            value: ${FOSSIL_STORAGE_PLUGIN_DIR} 
-          - name: FOSSIL_STORAGE_CLIENT_HOSTNAME
+          - name: FOSSUL_STORAGE_PLUGIN_DIR
+            value: ${FOSSUL_STORAGE_PLUGIN_DIR} 
+          - name: FOSSUL_STORAGE_CLIENT_HOSTNAME
             value: ${APPLICATION_NAME}-storage 
-          - name: FOSSIL_STORAGE_DEBUG
-            value: ${FOSSIL_STORAGE_DEBUG}                           
-          - name: FOSSIL_USERNAME
+          - name: FOSSUL_STORAGE_DEBUG
+            value: ${FOSSUL_STORAGE_DEBUG}                           
+          - name: FOSSUL_USERNAME
             valueFrom:
               secretKeyRef:
                 name: ${APPLICATION_NAME}-secrets
                 key: admin-user
-          - name: FOSSIL_PASSWORD
+          - name: FOSSUL_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: ${APPLICATION_NAME}-secrets
@@ -546,7 +546,7 @@ parameters:
   - name: APPLICATION_NAME
     displayName: Application Name
     description: the name and label for all components
-    value: fossil
+    value: fossul
     required: true
   - name: APPLICATION_DOMAIN
     displayName: Application Domain
@@ -554,34 +554,34 @@ parameters:
   - name: SOURCE_REPOSITORY_URL_SERVER
     displayName: Source Repository URL
     description: The URL of the repository with your application source code
-    value: https://github.com/ktenzer/fossil.git
+    value: https://github.com/ktenzer/fossul.git
     required: true
   - name: SOURCE_REPOSITORY_URL_APP
     displayName: Source Repository URL
     description: The URL of the repository with your application source code
-    value: https://github.com/ktenzer/fossil.git
+    value: https://github.com/ktenzer/fossul.git
     required: true  
   - name: SOURCE_REPOSITORY_URL_STORAGE
     displayName: Source Repository URL
     description: The URL of the repository with your application source code
-    value: https://github.com/ktenzer/fossil.git
+    value: https://github.com/ktenzer/fossul.git
     required: true
-  - name: FOSSIL_USERNAME
+  - name: FOSSUL_USERNAME
     displayName: Username for API Services
     description: Username for API Services
     value: admin
     required: true
-  - name: FOSSIL_PASSWORD
+  - name: FOSSUL_PASSWORD
     displayName: Password for API Services
     description: Password for API Services
     value: redhat123
     required: true     
-  - name: FOSSIL_SERVER_CONFIG_DIR
+  - name: FOSSUL_SERVER_CONFIG_DIR
     displayName: Directory for configs
     description: Directory for configs
     value: metadata/configs
     required: true 
-  - name: FOSSIL_SERVER_DATA_DIR
+  - name: FOSSUL_SERVER_DATA_DIR
     displayName: Directory for data and metadata
     description: Directory for data and metadata
     value: metadata/data
@@ -591,12 +591,12 @@ parameters:
     description: Context Dir for server
     value: src/engine/server
     required: true
-  - name: FOSSIL_SERVER_DEBUG
+  - name: FOSSUL_SERVER_DEBUG
     displayName: Enable debug true or false
     description: Enable debug true or false
     value: "false"
     required: true         
-  - name: FOSSIL_APP_PLUGIN_DIR
+  - name: FOSSUL_APP_PLUGIN_DIR
     displayName: Directory for app plugins
     description: Directory for app plugins
     value: plugins
@@ -606,12 +606,12 @@ parameters:
     description: Context Dir for app
     value: src/engine/app
     required: true 
-  - name: FOSSIL_APP_DEBUG
+  - name: FOSSUL_APP_DEBUG
     displayName: Enable debug true or false
     description: Enable debug true or false
     value: "false"
     required: true            
-  - name: FOSSIL_STORAGE_PLUGIN_DIR
+  - name: FOSSUL_STORAGE_PLUGIN_DIR
     displayName: Directory for storage plugins
     description: Directory for storage plugins
     value: plugins
@@ -621,7 +621,7 @@ parameters:
     description: Context Dir for storage
     value: src/engine/storage
     required: true 
-  - name: FOSSIL_STORAGE_DEBUG
+  - name: FOSSUL_STORAGE_DEBUG
     displayName: Enable debug true or false
     description: Enable debug true or false
     value: "false"
