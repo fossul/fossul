@@ -281,8 +281,7 @@ objects:
           persistentVolumeClaim:
             claimName: "${APPLICATION_NAME}-server-data"   
         securityContext:
-          runAsNonRoot: true
-          runAsUser: 1001690000                                
+          fsGroup: 1001                                 
     triggers:
     - imageChangeParams:
         automatic: true
@@ -401,8 +400,7 @@ objects:
           persistentVolumeClaim:
             claimName: "${APPLICATION_NAME}-storage-data"
         securityContext:
-          runAsNonRoot: true
-          runAsUser: 1001690000             
+          fsGroup: 1001           
     triggers:
     - imageChangeParams:
         automatic: true
