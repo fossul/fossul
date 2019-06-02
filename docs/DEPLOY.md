@@ -13,9 +13,11 @@ The deployment will first perform a build and then deploy. Grabbing a release br
 
 ### Add Security Context and CLuster Reader Permissions to Project
 Fossul needs cluster-reader permissions and a security context that allows any user ID instead of the default range.
+
 ```$ oc process -f yaml/fossul-framework-cluster-permissions.yaml -p APPLICATION_NAME=fossul -p APPLICATION_NAMESPACE=fossul |oc create -f -```
 
 Optionally you can also give the fossil project default service account cluster-admin permissions. This is not recommended but it saves you from adding access above and projects later.
+
 ```$ oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:fossul:default```
 
 ### Run Fossul Template
@@ -24,17 +26,22 @@ Optionally you can also give the fossil project default service account cluster-
 ### Add admin access to projects Fossul should manage
 In order to run commands inside pods and containers, Fossul requires admin permissions to the project. In this example we have a project called databases and will add admin access from Fossul
 default service account in order to manage pods running under the databases project.
+
 ```$ oc process -f yaml/fossul-framework-add-admin-access-to-project.yaml -p APPLICATION_NAME=fossul -p APPLICATION_NAMESPACE=fossul -p PROJECT_NAMESPACE=databases |oc create -f -```
 
 ### Remove Fossul OpenShift Deployment
 To remove fossul completely first delete the project.
+
 ```$ oc delete project fossul```
 
 Next remove role bindings and security context. First delete role binding in projects allowing admin access from Fossul project. In this case project called databases.
+
 ```$ oc delete rolebinding fossul-admin -n databases```
 
 Remove the cluster rolebinding for reader access
+
 ```$ oc delete clusterrolebinding fossul-fossul-cluster-reader```
 
 Remove security context allowing pods to run under project with any UID instead of range.
+
 ```$ oc delete scc fossul-scc```
