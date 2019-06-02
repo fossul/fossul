@@ -547,12 +547,7 @@ parameters:
     displayName: Application Name
     description: the name and label for all components
     value: fossul
-    required: true
-  - name: APPLICATION_NAMESPACE
-    displayName: Application Namespace or Project
-    description: the namespace or project where application will deploy
-    value: fossul
-    required: true    
+    required: true 
   - name: APPLICATION_DOMAIN
     displayName: Application Domain
     description: Application domain name used in route to service
