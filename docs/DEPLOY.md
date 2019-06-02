@@ -28,13 +28,13 @@ default service account in order to manage pods running under the databases proj
 
 ### Remove Fossul OpenShift Deployment
 To remove fossul completely first delete the project.
-```$ oc delete project fossul``
+```$ oc delete project fossul```
 
 Next remove role bindings and security context. First delete role binding in projects allowing admin access from Fossul project. In this case project called databases.
-```$ oc delete rolebinding fossul-admin -n databases``
+```$ oc delete rolebinding fossul-admin -n databases```
 
 Remove the cluster rolebinding for reader access
-```$ oc delete clusterrolebinding fossul-fossul-cluster-reader``
+```$ oc delete clusterrolebinding fossul-fossul-cluster-reader```
 
 Remove security context allowing pods to run under project with any UID instead of range.
 ```$ oc delete scc fossul-scc```
