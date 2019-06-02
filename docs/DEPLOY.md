@@ -1,4 +1,4 @@
-![](images/fossul_logo.png)
+![](../images/fossul_logo.png)
 # Deploy
 Provides information on the various ways Fossul Framework can be deployed.
 

@@ -1,4 +1,4 @@
-![](images/fossul_logo.png)
+![](../images/fossul_logo.png)
 # Plugins
 Purpose is to provide more details on plugins. Fossul is all about plugins. There are three types of plugins: application, storage and archive.
 

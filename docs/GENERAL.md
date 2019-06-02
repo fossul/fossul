@@ -1,4 +1,4 @@
-![](images/fossul_logo.png)
+![](../images/fossul_logo.png)
 # General
 Provides general information about the Fossul Framework and it's components.
 
