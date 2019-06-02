@@ -5,7 +5,8 @@ The purpose is to provide guidelines for developers setting up dev environment. 
 ```$ sudo dnf install -y go```
 
 To build source code and setup a development ensure the following environment parameters are exported to the shell and set in user profile (.bashrc):
-```$ vi /home/ktenzer.bashrc
+```
+$ vi /home/ktenzer.bashrc
 export GOPATH=/home/fedora/go
 export GOBIN=/home/fedora
 PATH=$PATH:$GOBIN

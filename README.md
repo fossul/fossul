@@ -30,7 +30,7 @@ If you want to be a contributor the first step is getting a development environm
 
 ## Using Fossul
 Follow the deployment guide to get Fossul up and running.
-* [Deploy Fossul and Get It Running!](docs/PLUGINS.md)
+* [Deploy Fossul and Get It Running!](docs/DEPLOY.md)
 
 Once Fossul is operational start using it by following some of the examples in the getting started guide.
 * [Getting Started](docs/GETTING_STARTED.md)
