@@ -6,6 +6,19 @@ metadata:
   creationTimestamp: null
   name: fossul-framework
 objects:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: ${APPLICATION_NAME}-cluster-reader
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: cluster-reader
+  subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: default
+    namespace: ${APPLICATION_NAMESPACE}
 - apiVersion: v1
   kind: Secret
   metadata:
@@ -207,27 +220,7 @@ objects:
     - imageChange: {}
       type: ImageChange
   status:
-    lastVersion: 0
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: "${APPLICATION_NAME}-server-data" 
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: "${SERVER_CAPACITY}"        
-- apiVersion: v1
-  kind: PersistentVolumeClaim
-  metadata:
-    name: "${APPLICATION_NAME}-storage-data" 
-  spec:
-    accessModes:
-    - ReadWriteOnce
-    resources:
-      requests:
-        storage: "${STORAGE_CAPACITY}"
+    lastVersion: 0 
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -270,18 +263,9 @@ objects:
           name: "${APPLICATION_NAME}-server"
           terminationMessagePath: /dev/termination-log
           ports:
-          -containerPort: 8080
-          volumeMounts:
-          - mountPath: /app/metadata
-            name: "${APPLICATION_NAME}-server-data"          
+          -containerPort: 8080       
         dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        volumes:
-        - name: "${APPLICATION_NAME}-server-data" 
-          persistentVolumeClaim:
-            claimName: "${APPLICATION_NAME}-server-data"   
-        securityContext: 
-          fsGroup: 1001                       
+        restartPolicy: Always                     
     triggers:
     - imageChangeParams:
         automatic: true
@@ -389,18 +373,9 @@ objects:
           name: "${APPLICATION_NAME}-storage"
           terminationMessagePath: /dev/termination-log
           ports:
-          -containerPort: 8080
-          volumeMounts:
-          - mountPath: /app/backups
-            name: "${APPLICATION_NAME}-storage-data"                    
+          -containerPort: 8080                
         dnsPolicy: ClusterFirst
-        restartPolicy: Always
-        volumes:
-        - name: "${APPLICATION_NAME}-storage-data" 
-          persistentVolumeClaim:
-            claimName: "${APPLICATION_NAME}-storage-data"
-        securityContext: 
-          fsGroup: 1001                
+        restartPolicy: Always               
     triggers:
     - imageChangeParams:
         automatic: true
@@ -638,9 +613,3 @@ parameters:
     displayName: Source Repository Reference Tag
     description: The Branch tag to use
     value: master
-  - name: SERVER_CAPACITY
-    description: Storage for Server Service
-    value: 10Gi      
-  - name: STORAGE_CAPACITY
-    description: Storage for Storage Service
-    value: 25Gi

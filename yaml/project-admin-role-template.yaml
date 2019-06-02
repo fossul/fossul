@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Template
+metadata:
+  annotations:
+    description: "Allows admin access from Fossul Framework to Project"
+  creationTimestamp: null
+  name: fossul-framework-project-permissions
+objects:
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRoleBinding
+  metadata:
+    name: ${APPLICATION_NAME}-${APPLICATION_NAMESPACE}-cluster-reader
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: cluster-reader
+  subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: default
+    namespace: ${APPLICATION_NAMESPACE}
+    
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    name: ${APPLICATION_NAME}-admin
+    namespace: ${PROJECT_NAMESPACE}
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: admin
+  subjects:
+  - apiGroup: ""
+    kind: ServiceAccount
+    name: default
+    namespace: ${APPLICATION_NAMESPACE}
+
+parameters:
+  - name: APPLICATION_NAME
+    displayName: Application Name
+    description: the name and label for all components
+    value: fossul
+    required: true
+  - name: APPLICATION_NAMESPACE
+    displayName: Application Namespace or Project
+    description: the namespace or project where application will deploy
+    value: fossul
+    required: true  
+  - name: PROJECT_NAMESPACE
+    displayName: Namespace or Project allowing acceess
+    description: Admin permission is required to project in order to execute commands inside of pods
+    value: myproject
+    required: true          

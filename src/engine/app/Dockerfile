@@ -36,7 +36,7 @@ RUN echo "1.0" > /etc/imageversion
 
 RUN ls -l /app
 
-USER 1001
+USER 1001690000
 
 WORKDIR /app
 
