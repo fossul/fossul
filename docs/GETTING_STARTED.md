@@ -1,3 +1,4 @@
+![](images/fossul_logo.png)
 # Getting Started
 Provides a how-to tutorial focused on Fossul operators.
 

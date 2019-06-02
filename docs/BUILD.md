@@ -1,3 +1,4 @@
+![](images/fossul_logo.png)
 # Build
 The purpose is to provide guidelines for developers setting up dev environment. The instructions are for a Fedora 28 development environment but any Linux or MacOS should work.
 
