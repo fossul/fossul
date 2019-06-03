@@ -118,7 +118,7 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	_,ok := runningWorkflowMap[config.ProfileName + "-" + config.ConfigName]
 	if ok {	
-		result := util.SetResultMessage(1,"ERROR","Workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Another workflow is running under profile [" + config.ProfileName + "] config [" + config.ConfigName + "] " + err.Error())
+		result := util.SetResultMessage(1,"ERROR","Workflow id [" + util.IntToString(workflow.Id) + "] failed to start. Another workflow is running under profile [" + config.ProfileName + "] config [" + config.ConfigName + "]")
 		workflowResult.Result = result
 		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
 		json.NewEncoder(w).Encode(workflowResult)		
