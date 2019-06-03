@@ -7,7 +7,7 @@ The fossul architecture is a plugin based framework. Everything that happens in 
 
 Below is a high-level architecture diagram of the Fossul Framework and how the main components work together.
 
-![](images/fossul_architecture_1.0.0.png)
+![](../images/fossul_architecture_1.0.0.png)
 
 ## Workflow Engine
 Workflows and the ability to democratoize a process like backup or restore is the key to fossul. In fossul a workflow has it's own Id and a series of steps. Each workflow step is an API to a plugin or CMD that executes the step. In fossul you could just use commands and not even any plugins. The plugins or commands which are executed are decided upon within a configuration. A fossul workflow takes as input a configuration. Configurations also define any pre/post commands (simple commands or scripts that can be executed in workflow) and also the backup policy as well as retention. Each plugin also has it's own configuration. These are all loaded and added to the config which is passed into all plugin operations or calls. As mentioned above in case of basic plugin the config object is demarshalled into environment variables. Every workflow has it's own log of what happened during workflow execution. You can decide in configuration how long to keep workflows. Finally a workflow has a state RUNNING, COMPLETE or ERROR.
