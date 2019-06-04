@@ -5,6 +5,7 @@ import (
 )
 
 type storagePlugin string
+
 var StoragePlugin storagePlugin
 
 func (s storagePlugin) SetEnv(config util.Config) util.Result {
@@ -17,43 +18,43 @@ func (s storagePlugin) SetEnv(config util.Config) util.Result {
 	return result
 }
 
-func (s storagePlugin) Backup(config util.Config) util.Result {	
+func (s storagePlugin) Backup(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
 
 	msg := util.SetMessage("INFO", "*** Backup ***")
-	messages = append(messages,msg)
+	messages = append(messages, msg)
 
 	result = util.SetResult(resultCode, messages)
 	return result
 }
 
-func (s storagePlugin) Restore(config util.Config) util.Result {	
+func (s storagePlugin) Restore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
 
 	msg := util.SetMessage("INFO", "*** Restore ***")
-	messages = append(messages,msg)
+	messages = append(messages, msg)
 
 	result = util.SetResult(resultCode, messages)
 	return result
 }
 
-func (s storagePlugin) BackupDelete(config util.Config) util.Result {	
+func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
 
 	msg := util.SetMessage("INFO", "*** Backup Delete ***")
-	messages = append(messages,msg)
+	messages = append(messages, msg)
 
 	result = util.SetResult(resultCode, messages)
 	return result
 }
 
-func (s storagePlugin) BackupList(config util.Config) util.Backups {	
+func (s storagePlugin) BackupList(config util.Config) util.Backups {
 	var backups util.Backups
 
 	return backups
@@ -83,7 +84,7 @@ func setPlugin() (plugin util.Plugin) {
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,backupCap,backupListCap,backupDeleteCap,infoCap)
+	capabilities = append(capabilities, backupCap, backupListCap, backupDeleteCap, infoCap)
 
 	plugin.Capabilities = capabilities
 

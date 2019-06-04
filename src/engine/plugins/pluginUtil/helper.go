@@ -1,13 +1,13 @@
 package pluginUtil
 
 import (
-	"os"
-	"io/ioutil"
-	"regexp"
-	"fossul/src/engine/util"
-	"path/filepath"
-	"sort"
 	"errors"
+	"fossul/src/engine/util"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"regexp"
+	"sort"
 )
 
 func ExistsPath(path string) bool {
@@ -23,24 +23,24 @@ func CreateDir(path string, mode os.FileMode) error {
 	if ExistsPath(path) == false {
 		if err := os.MkdirAll(path, mode); err != nil {
 			return errors.New("creating directory " + path + " failed!" + err.Error())
-		 }	
+		}
 	}
 	return nil
 }
 
-func ListDir(path string) ([]os.FileInfo,error) {
+func ListDir(path string) ([]os.FileInfo, error) {
 	files, err := ioutil.ReadDir(path)
-    if err != nil {
-        return nil,err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-	return files,nil
+	return files, nil
 }
 
 func ListBackups(path string) ([]util.Backup, error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 
 	var backups []util.Backup
@@ -63,12 +63,12 @@ func ListBackups(path string) ([]util.Backup, error) {
 			backup.Timestamp = timestamp
 
 			backups = append(backups, backup)
-		}	
+		}
 	}
 
 	sort.Sort(util.ByEpoch(backups))
 
-	return backups,nil
+	return backups, nil
 }
 
 func GetDirFromPath(path string) string {
@@ -105,7 +105,7 @@ func RecursiveDirDelete(dir string) error {
 		if err != nil {
 			return err
 		}
-	}	
+	}
 
 	return nil
 }
@@ -113,10 +113,10 @@ func RecursiveDirDelete(dir string) error {
 func ReverseBackupList(backups []util.Backup) chan util.Backup {
 	ret := make(chan util.Backup)
 	go func() {
-			for i, _ := range backups {
-					ret <- backups[len(backups)-1-i]
-			}
-			close(ret)
+		for i, _ := range backups {
+			ret <- backups[len(backups)-1-i]
+		}
+		close(ret)
 	}()
 	return ret
 }

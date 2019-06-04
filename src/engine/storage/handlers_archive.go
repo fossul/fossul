@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"fossul/src/engine/util"
 	"net/http"
 	"os"
-	"fmt"
 	"strings"
 )
 
@@ -23,18 +23,18 @@ import (
 func Archive(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
@@ -47,7 +47,7 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "Archive plugin does not exist"
 
-			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+			message := util.SetMessage("ERROR", errMsg+" "+err.Error())
 			messages = append(messages, message)
 
 			result = util.SetResult(1, messages)
@@ -56,18 +56,18 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(result)
 		}
 
-		result = util.ExecutePlugin(config, "archive", plugin, "--action", "archive")	
+		result = util.ExecutePlugin(config, "archive", plugin, "--action", "archive")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		plugin,err := util.GetArchiveInterface(pluginPath)
+		plugin, err := util.GetArchiveInterface(pluginPath)
 		if err != nil {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)
 			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)		
+			json.NewEncoder(w).Encode(result)
 		} else {
 			setEnvResult := plugin.SetEnv(config)
 			if setEnvResult.Code != 0 {
@@ -75,14 +75,14 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
 				result = plugin.Archive(config)
-				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
+				messages = util.PrependMessages(setEnvResult.Messages, result.Messages)
 				result.Messages = messages
-	
+
 				_ = json.NewDecoder(r.Body).Decode(&result)
-				json.NewEncoder(w).Encode(result)			
-			}	
-		}	
-	}	
+				json.NewEncoder(w).Encode(result)
+			}
+		}
+	}
 }
 
 // ArchiveList godoc
@@ -97,7 +97,7 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string
 // @Router /archiveList [post]
 func ArchiveList(w http.ResponseWriter, r *http.Request) {
-	config,_ := util.GetConfig(w,r)
+	config, _ := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	pluginPath := util.GetPluginPath(config.ArchivePlugin)
@@ -110,7 +110,7 @@ func ArchiveList(w http.ResponseWriter, r *http.Request) {
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "Archive plugin does not exist"
 
-			message := fmt.Sprintf("ERROR %s %s",errMsg,err.Error())
+			message := fmt.Sprintf("ERROR %s %s", errMsg, err.Error())
 			messages = append(messages, message)
 
 			var result = util.SetResultSimple(1, messages)
@@ -124,27 +124,27 @@ func ArchiveList(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		plugin,err := util.GetArchiveInterface(pluginPath)
+		plugin, err := util.GetArchiveInterface(pluginPath)
 		//need to implement proper result object for list calls
 		if err != nil {
 
 		} else {
-			_= plugin.SetEnv(config)
+			_ = plugin.SetEnv(config)
 
 			archiveList := plugin.ArchiveList(config)
 			b, err := json.Marshal(archiveList)
 			if err != nil {
 				result.Code = 1
-				result.Messages = append(result.Messages,err.Error())
+				result.Messages = append(result.Messages, err.Error())
 			} else {
 				result.Code = 0
 				outputArray := strings.Split(string(b), "\n")
 				result.Messages = outputArray
 			}
 			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)					
-		}		
-	}	
+			json.NewEncoder(w).Encode(result)
+		}
+	}
 }
 
 // ArchiveDelete godoc
@@ -161,18 +161,18 @@ func ArchiveList(w http.ResponseWriter, r *http.Request) {
 func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
@@ -184,7 +184,7 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "Archive plugin does not exist"
 
-			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+			message := util.SetMessage("ERROR", errMsg+" "+err.Error())
 			messages = append(messages, message)
 
 			result = util.SetResult(1, messages)
@@ -196,14 +196,14 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		plugin,err := util.GetArchiveInterface(pluginPath)
+		plugin, err := util.GetArchiveInterface(pluginPath)
 		if err != nil {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)
 			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)		
+			json.NewEncoder(w).Encode(result)
 		} else {
 			setEnvResult := plugin.SetEnv(config)
 			if setEnvResult.Code != 0 {
@@ -211,14 +211,14 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
 				result = plugin.ArchiveDelete(config)
-				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
+				messages = util.PrependMessages(setEnvResult.Messages, result.Messages)
 				result.Messages = messages
-	
+
 				_ = json.NewDecoder(r.Body).Decode(&result)
-				json.NewEncoder(w).Encode(result)			
-			}			
-		}			
-	}	
+				json.NewEncoder(w).Encode(result)
+			}
+		}
+	}
 }
 
 // ArchiveCreateCmd godoc
@@ -235,28 +235,28 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 func ArchiveCreateCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
 
 	if config.BackupCreateCmd != "" {
 		args := strings.Split(config.ArchiveCreateCmd, ",")
-		message := util.SetMessage("INFO", "Performing archive create command [" + config.ArchiveCreateCmd + "]")
+		message := util.SetMessage("INFO", "Performing archive create command ["+config.ArchiveCreateCmd+"]")
 
 		result = util.ExecuteCommand(args...)
-		result.Messages = util.PrependMessage(message,result.Messages)
+		result.Messages = util.PrependMessage(message, result.Messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
@@ -277,28 +277,28 @@ func ArchiveCreateCmd(w http.ResponseWriter, r *http.Request) {
 func ArchiveDeleteCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
 
 	if config.BackupDeleteCmd != "" {
 		args := strings.Split(config.ArchiveDeleteCmd, ",")
-		message := util.SetMessage("INFO", "Performing archive delete command [" +  config.ArchiveDeleteCmd + "]")
+		message := util.SetMessage("INFO", "Performing archive delete command ["+config.ArchiveDeleteCmd+"]")
 
 		result = util.ExecuteCommand(args...)
-		result.Messages = util.PrependMessage(message,result.Messages)
+		result.Messages = util.PrependMessage(message, result.Messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)

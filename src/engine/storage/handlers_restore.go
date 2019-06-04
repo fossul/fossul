@@ -22,18 +22,18 @@ import (
 func Restore(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
@@ -46,25 +46,25 @@ func Restore(w http.ResponseWriter, r *http.Request) {
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "Storage plugin does not exist"
 
-			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+			message := util.SetMessage("ERROR", errMsg+" "+err.Error())
 			messages = append(messages, message)
 
 			result = util.SetResult(1, messages)
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)
 		}
-		result = util.ExecutePlugin(config, "storage", plugin, "--action", "restore")	
-		_ 	= json.NewDecoder(r.Body).Decode(&result)
+		result = util.ExecutePlugin(config, "storage", plugin, "--action", "restore")
+		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		plugin,err := util.GetStorageInterface(pluginPath)
+		plugin, err := util.GetStorageInterface(pluginPath)
 		if err != nil {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)
 			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)		
+			json.NewEncoder(w).Encode(result)
 		} else {
 			setEnvResult := plugin.SetEnv(config)
 			if setEnvResult.Code != 0 {
@@ -72,14 +72,14 @@ func Restore(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
 				result = plugin.Restore(config)
-				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
+				messages = util.PrependMessages(setEnvResult.Messages, result.Messages)
 				result.Messages = messages
-	
+
 				_ = json.NewDecoder(r.Body).Decode(&result)
-				json.NewEncoder(w).Encode(result)			
-			}	
-		}	
-	}	
+				json.NewEncoder(w).Encode(result)
+			}
+		}
+	}
 }
 
 // RestoreCmd godoc
@@ -96,28 +96,28 @@ func Restore(w http.ResponseWriter, r *http.Request) {
 func RestoreCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
 
 	if config.RestoreCmd != "" {
 		args := strings.Split(config.RestoreCmd, ",")
-		message := util.SetMessage("INFO", "Performing restore command [" + config.RestoreCmd + "]")
+		message := util.SetMessage("INFO", "Performing restore command ["+config.RestoreCmd+"]")
 
 		result = util.ExecuteCommand(args...)
-		result.Messages = util.PrependMessage(message,result.Messages)
+		result.Messages = util.PrependMessage(message, result.Messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)

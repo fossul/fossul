@@ -22,18 +22,18 @@ import (
 func Backup(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
@@ -46,25 +46,25 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "Storage plugin does not exist"
 
-			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+			message := util.SetMessage("ERROR", errMsg+" "+err.Error())
 			messages = append(messages, message)
 
 			result = util.SetResult(1, messages)
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)
 		}
-		result = util.ExecutePlugin(config, "storage", plugin, "--action", "backup")	
-		_ 	= json.NewDecoder(r.Body).Decode(&result)
+		result = util.ExecutePlugin(config, "storage", plugin, "--action", "backup")
+		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		plugin,err := util.GetStorageInterface(pluginPath)
+		plugin, err := util.GetStorageInterface(pluginPath)
 		if err != nil {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)
 			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)		
+			json.NewEncoder(w).Encode(result)
 		} else {
 			setEnvResult := plugin.SetEnv(config)
 			if setEnvResult.Code != 0 {
@@ -72,14 +72,14 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
 				result = plugin.Backup(config)
-				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
+				messages = util.PrependMessages(setEnvResult.Messages, result.Messages)
 				result.Messages = messages
-	
+
 				_ = json.NewDecoder(r.Body).Decode(&result)
-				json.NewEncoder(w).Encode(result)			
-			}	
-		}	
-	}	
+				json.NewEncoder(w).Encode(result)
+			}
+		}
+	}
 }
 
 // BackupList godoc
@@ -98,19 +98,19 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 	var backupList []util.Backup
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
-		result = util.SetResult(1,messages)
+		result = util.SetResult(1, messages)
 		backups.Result = result
 
 		_ = json.NewDecoder(r.Body).Decode(&backups)
-		json.NewEncoder(w).Encode(backups)	
+		json.NewEncoder(w).Encode(backups)
 
 		return
 	}
@@ -121,7 +121,7 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 		var plugin string = pluginDir + "/storage/" + config.StoragePlugin
 
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
-			msg := util.SetMessage("ERROR","Storage plugin not found! " + err.Error())
+			msg := util.SetMessage("ERROR", "Storage plugin not found! "+err.Error())
 			messages = append(messages, msg)
 
 			result = util.SetResult(1, messages)
@@ -133,46 +133,46 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 
 		resultSimple := util.ExecutePluginSimple(config, "storage", plugin, "--action", "backupList")
 		if resultSimple.Code != 0 {
-			msg := util.SetMessage("ERROR","BackupList failed")
-			messages = append(messages, msg)	
+			msg := util.SetMessage("ERROR", "BackupList failed")
+			messages = append(messages, msg)
 			result := util.SetResult(1, messages)
 			backups.Result = result
 
 			_ = json.NewDecoder(r.Body).Decode(&backups)
 			json.NewEncoder(w).Encode(backups)
 		} else {
-			backupListString := strings.Join(resultSimple.Messages," ")
+			backupListString := strings.Join(resultSimple.Messages, " ")
 			json.Unmarshal([]byte(backupListString), &backupList)
-		
+
 			backups.Result.Code = resultSimple.Code
 			backups.Backups = backupList
-	
+
 			_ = json.NewDecoder(r.Body).Decode(&backups)
 			json.NewEncoder(w).Encode(backups)
 		}
 	} else {
-		plugin,err := util.GetStorageInterface(pluginPath)
+		plugin, err := util.GetStorageInterface(pluginPath)
 		if err != nil {
-			msg := util.SetMessage("ERROR",err.Error())
-			messages = append(messages,msg)
-			result = util.SetResult(1,messages)
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+			result = util.SetResult(1, messages)
 			backups.Result = result
 
 			_ = json.NewDecoder(r.Body).Decode(&backups)
-			json.NewEncoder(w).Encode(backups)	
+			json.NewEncoder(w).Encode(backups)
 		} else {
 			setEnvResult := plugin.SetEnv(config)
 			if setEnvResult.Code != 0 {
 				backups.Result = setEnvResult
 				_ = json.NewDecoder(r.Body).Decode(&backups)
 				json.NewEncoder(w).Encode(backups)
-			} else {	
+			} else {
 				backups := plugin.BackupList(config)
 				_ = json.NewDecoder(r.Body).Decode(&backups)
-				json.NewEncoder(w).Encode(backups)	
-			}		
-		}				
-	}	
+				json.NewEncoder(w).Encode(backups)
+			}
+		}
+	}
 }
 
 // BackupDelete godoc
@@ -189,18 +189,18 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 func BackupDelete(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
-		result = util.SetResult(1,messages)
+		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
@@ -212,7 +212,7 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "Storage plugin does not exist"
 
-			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+			message := util.SetMessage("ERROR", errMsg+" "+err.Error())
 			messages = append(messages, message)
 
 			result = util.SetResult(1, messages)
@@ -223,14 +223,14 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		plugin,err := util.GetStorageInterface(pluginPath)
+		plugin, err := util.GetStorageInterface(pluginPath)
 		if err != nil {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)
 			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)		
+			json.NewEncoder(w).Encode(result)
 		} else {
 			setEnvResult := plugin.SetEnv(config)
 			if setEnvResult.Code != 0 {
@@ -238,14 +238,14 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
 				result = plugin.BackupDelete(config)
-				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
+				messages = util.PrependMessages(setEnvResult.Messages, result.Messages)
 				result.Messages = messages
-	
+
 				_ = json.NewDecoder(r.Body).Decode(&result)
-				json.NewEncoder(w).Encode(result)			
-			}	
-		}		
-	}	
+				json.NewEncoder(w).Encode(result)
+			}
+		}
+	}
 }
 
 // BackupDeleteCmd godoc
@@ -262,28 +262,28 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 func BackupCreateCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
 
 	if config.BackupCreateCmd != "" {
 		args := strings.Split(config.BackupCreateCmd, ",")
-		message := util.SetMessage("INFO", "Performing backup create command [" + config.BackupCreateCmd + "]")
+		message := util.SetMessage("INFO", "Performing backup create command ["+config.BackupCreateCmd+"]")
 
 		result = util.ExecuteCommand(args...)
-		result.Messages = util.PrependMessage(message,result.Messages)
+		result.Messages = util.PrependMessage(message, result.Messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
@@ -304,28 +304,28 @@ func BackupCreateCmd(w http.ResponseWriter, r *http.Request) {
 func BackupDeleteCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
 
 	if config.BackupDeleteCmd != "" {
 		args := strings.Split(config.BackupDeleteCmd, ",")
-		message := util.SetMessage("INFO", "Performing backup delete command [" + config.BackupDeleteCmd + "]")
+		message := util.SetMessage("INFO", "Performing backup delete command ["+config.BackupDeleteCmd+"]")
 
 		result = util.ExecuteCommand(args...)
-		result.Messages = util.PrependMessage(message,result.Messages)
+		result.Messages = util.PrependMessage(message, result.Messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)

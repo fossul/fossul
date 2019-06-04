@@ -1,16 +1,16 @@
 package main
 
 import (
-	"os"
-	"github.com/pborman/getopt/v2"
-	"fossul/src/engine/util"
 	"encoding/json"
 	"fmt"
+	"fossul/src/engine/util"
+	"github.com/pborman/getopt/v2"
+	"os"
 	"strings"
 )
 
 func main() {
-	optAction := getopt.StringLong("action",'a',"","discover|quiesce|unquiesce|info")
+	optAction := getopt.StringLong("action", 'a', "", "discover|quiesce|unquiesce|info")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -25,8 +25,8 @@ func main() {
 		os.Exit(1)
 	}
 
-		//load env parameters
-		configMap := getEnvParams()
+	//load env parameters
+	configMap := getEnvParams()
 
 	if *optAction == "quiesce" {
 		printEnv(configMap)
@@ -39,57 +39,57 @@ func main() {
 		preRestore(configMap)
 	} else if *optAction == "postRestore" {
 		printEnv(configMap)
-		postRestore(configMap)					
+		postRestore(configMap)
 	} else if *optAction == "info" {
-		info()		
+		info()
 	} else if *optAction == "discover" {
-		discover()			
+		discover()
 	} else {
 		fmt.Println("ERROR Incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
-}	
+}
 
-func discover () {
+func discover() {
 	var discoverResult util.DiscoverResult = setDiscoverResult()
 
 	//output json
 	b, err := json.Marshal(discoverResult)
-    if err != nil {
-        fmt.Println("ERROR " + err.Error())
+	if err != nil {
+		fmt.Println("ERROR " + err.Error())
 	} else {
 		fmt.Println(string(b))
 	}
-}	
+}
 
-func quiesce (configMap map[string]string) {
+func quiesce(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Application quiesce ***")
 }
 
-func unquiesce (configMap map[string]string) {
+func unquiesce(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Application unquiesce ***")
 }
 
-func preRestore (configMap map[string]string) {
+func preRestore(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Application Pre Restore ***")
 }
 
-func postRestore (configMap map[string]string) {
+func postRestore(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Application Post Restore ***")
 }
 
-func info () {
+func info() {
 	var plugin util.Plugin = setPlugin()
 
 	//output json
 	b, err := json.Marshal(plugin)
-    if err != nil {
-        fmt.Println("ERROR " + err.Error())
+	if err != nil {
+		fmt.Println("ERROR " + err.Error())
 	} else {
 		fmt.Println(string(b))
 	}
@@ -97,12 +97,12 @@ func info () {
 
 func setDiscoverResult() (discoverResult util.DiscoverResult) {
 	var data []string
-	data = append(data,"/path/to/data/file1")
-	data = append(data,"/path/to/data/file2")
+	data = append(data, "/path/to/data/file1")
+	data = append(data, "/path/to/data/file2")
 
 	var logs []string
-	logs = append(logs,"/path/to/logs/file1")
-	logs = append(logs,"/path/to/logs/file2")
+	logs = append(logs, "/path/to/logs/file1")
+	logs = append(logs, "/path/to/logs/file2")
 
 	var discoverInst1 util.Discover
 	discoverInst1.Instance = "inst1"
@@ -119,20 +119,20 @@ func setDiscoverResult() (discoverResult util.DiscoverResult) {
 	discoverList = append(discoverList, discoverInst2)
 
 	var messages []util.Message
-	msg := util.SetMessage("INFO","*** Application Discovery ***")
-	messages = append(messages,msg)
+	msg := util.SetMessage("INFO", "*** Application Discovery ***")
+	messages = append(messages, msg)
 
-	for _,discover := range discoverList {
-		dataFiles := strings.Join(discover.DataFilePaths," ")
-		logFiles := strings.Join(discover.LogFilePaths," ")
-		msg := util.SetMessage("INFO","Instance [" + discover.Instance + "] data files: [" + dataFiles + "] log files: [" + logFiles + "]")
-		messages = append(messages,msg)
+	for _, discover := range discoverList {
+		dataFiles := strings.Join(discover.DataFilePaths, " ")
+		logFiles := strings.Join(discover.LogFilePaths, " ")
+		msg := util.SetMessage("INFO", "Instance ["+discover.Instance+"] data files: ["+dataFiles+"] log files: ["+logFiles+"]")
+		messages = append(messages, msg)
 	}
 
-	result := util.SetResult(0,messages)
+	result := util.SetResult(0, messages)
 	discoverResult.Result = result
 	discoverResult.DiscoverList = discoverList
-	
+
 	return discoverResult
 }
 
@@ -145,7 +145,7 @@ func setPlugin() (plugin util.Plugin) {
 	var capabilities []util.Capability
 	var discoverCap util.Capability
 	discoverCap.Name = "discover"
-	
+
 	var quiesceCap util.Capability
 	quiesceCap.Name = "quiesce"
 
@@ -161,7 +161,7 @@ func setPlugin() (plugin util.Plugin) {
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,discoverCap,quiesceCap,unquiesceCap,preRestoreCap,postRestoreCap,infoCap)
+	capabilities = append(capabilities, discoverCap, quiesceCap, unquiesceCap, preRestoreCap, postRestoreCap, infoCap)
 
 	plugin.Capabilities = capabilities
 
@@ -169,7 +169,7 @@ func setPlugin() (plugin util.Plugin) {
 }
 
 func printEnv(configMap map[string]string) {
-	config,err := util.ConfigMapToJson(configMap)
+	config, err := util.ConfigMapToJson(configMap)
 	if err != nil {
 		fmt.Println("ERROR " + err.Error())
 	}

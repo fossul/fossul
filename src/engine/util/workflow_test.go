@@ -1,28 +1,27 @@
 package util
 
 import (
-	"testing"
-	"regexp"
 	"log"
+	"regexp"
+	"testing"
 )
 
 func TestWorkflow(t *testing.T) {
 	workflow := &Workflow{}
-	workflow.Id =  GetWorkflowId()
+	workflow.Id = GetWorkflowId()
 	SetWorkflowStatusStart(workflow)
 
 	step1 := CreateStep(workflow)
-	SetWorkflowStep(workflow,step1)
+	SetWorkflowStep(workflow, step1)
 
 	step2 := CreateStep(workflow)
-	SetWorkflowStep(workflow,step2)
+	SetWorkflowStep(workflow, step2)
 
 	step3 := CreateStep(workflow)
-	SetWorkflowStep(workflow,step3)
+	SetWorkflowStep(workflow, step3)
 
-
-	SetStepComplete(workflow,step2)
-	SetStepError(workflow,step3)
+	SetStepComplete(workflow, step2)
+	SetStepError(workflow, step3)
 
 	log.Println(workflow)
 

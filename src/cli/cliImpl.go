@@ -1,16 +1,16 @@
 package main
 
 import (
-	"os"
-	"fossul/src/engine/util"
-	"fossul/src/engine/client"
-	"fmt"
-	"time"
-	"text/tabwriter"
 	"errors"
+	"fmt"
+	"fossul/src/engine/client"
+	"fossul/src/engine/util"
+	"os"
+	"text/tabwriter"
+	"time"
 )
 
-func WriteCredentialFile(credentialFile,serverHostname,serverPort,appHostname,appPort,storageHostname,storagePort,username,password string) {
+func WriteCredentialFile(credentialFile, serverHostname, serverPort, appHostname, appPort, storageHostname, storagePort, username, password string) {
 	var auth client.Auth
 	auth.ServerHostname = serverHostname
 	auth.ServerPort = serverPort
@@ -21,7 +21,7 @@ func WriteCredentialFile(credentialFile,serverHostname,serverPort,appHostname,ap
 	auth.Username = username
 	auth.Password = password
 
-	err := util.WriteGob(credentialFile,auth)
+	err := util.WriteGob(credentialFile, auth)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
@@ -29,10 +29,10 @@ func WriteCredentialFile(credentialFile,serverHostname,serverPort,appHostname,ap
 	os.Exit(0)
 }
 
-func ReadCredentialFile(credentialFile string) (client.Auth) {
+func ReadCredentialFile(credentialFile string) client.Auth {
 	auth := &client.Auth{}
 
-	err := util.ReadGob(credentialFile,&auth)
+	err := util.ReadGob(credentialFile, &auth)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
@@ -42,25 +42,25 @@ func ReadCredentialFile(credentialFile string) (client.Auth) {
 }
 
 func GetDefaultConfig(auth client.Auth) {
-	configResult,err := client.GetDefaultConfig(auth)
+	configResult, err := client.GetDefaultConfig(auth)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	checkResult(configResult.Result)
 
-	buf,err := util.EncodeConfig(configResult.Config)
+	buf, err := util.EncodeConfig(configResult.Config)
 	if err != nil {
-		fmt.Println(err,"\n" + "[ERROR] Couldn't encode default config! " + err.Error())
-		os.Exit(1)	
-	}		
+		fmt.Println(err, "\n"+"[ERROR] Couldn't encode default config! "+err.Error())
+		os.Exit(1)
+	}
 	fmt.Println(buf.String())
 	os.Exit(0)
 }
 
 func ListSchedules(auth client.Auth) {
 	fmt.Println("### Job Schedules ###")
-	jobScheduleResult,err := client.ListSchedules(auth)
+	jobScheduleResult, err := client.ListSchedules(auth)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
@@ -71,17 +71,17 @@ func ListSchedules(auth client.Auth) {
 	tw := new(tabwriter.Writer)
 	tw.Init(os.Stdout, 10, 20, 5, ' ', 0)
 	fmt.Fprintln(tw, "CronSchedule\t ProfileName\t ConfigName\t Policy\t")
-	for _,schedule := range jobScheduleResult.JobSchedules {	
-		fmt.Fprintln(tw, schedule.CronSchedule + "\t",schedule.ProfileName + "\t",schedule.ConfigName + "\t",schedule.BackupPolicy + "\t")
-	}		
+	for _, schedule := range jobScheduleResult.JobSchedules {
+		fmt.Fprintln(tw, schedule.CronSchedule+"\t", schedule.ProfileName+"\t", schedule.ConfigName+"\t", schedule.BackupPolicy+"\t")
+	}
 	tw.Flush()
-	
+
 	os.Exit(0)
-}	
+}
 
-func GetDefaultPluginConfig(auth client.Auth,pluginName string) {
+func GetDefaultPluginConfig(auth client.Auth, pluginName string) {
 
-	configMapResult,err := client.GetDefaultPluginConfig(auth,pluginName)
+	configMapResult, err := client.GetDefaultPluginConfig(auth, pluginName)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
@@ -89,86 +89,76 @@ func GetDefaultPluginConfig(auth client.Auth,pluginName string) {
 	checkResult(configMapResult.Result)
 
 	fmt.Println("### Default Plugin Config ###")
-	for k,v := range configMapResult.ConfigMap {
-		fmt.Println(k + " = " + "\""+ v + "\"")
-	}		
+	for k, v := range configMapResult.ConfigMap {
+		fmt.Println(k + " = " + "\"" + v + "\"")
+	}
 	os.Exit(0)
 }
 
-func GetConfig(auth client.Auth,profileName,configName string) {
-	configResult,err := client.GetConfig(auth,profileName,configName)
+func GetConfig(auth client.Auth, profileName, configName string) {
+	configResult, err := client.GetConfig(auth, profileName, configName)
 	if err != nil {
-		fmt.Println(err,"\n" + "[ERROR] Couldn't get config [" + profileName + "] config [" + configName + "! " + err.Error())
-		os.Exit(1)	
+		fmt.Println(err, "\n"+"[ERROR] Couldn't get config ["+profileName+"] config ["+configName+"! "+err.Error())
+		os.Exit(1)
 	}
 	checkResult(configResult.Result)
 
-	buf,err := util.EncodeConfig(configResult.Config)
+	buf, err := util.EncodeConfig(configResult.Config)
 	if err != nil {
-		fmt.Println(err,"\n" + "[ERROR] Couldn't encode config [" + profileName + "] config [" + configName + "! " + err.Error())
-		os.Exit(1)	
-	}		
-	fmt.Println(buf.String())
-	os.Exit(0)		
-}	
-
-func GetPluginConfig(auth client.Auth,profileName,configName,pluginName string) {
-	pluginConfigMapResult,err := client.GetPluginConfig(auth,profileName,configName,pluginName)
-	if err != nil {
-		fmt.Println(err,"\n" + "[ERROR] Couldn't get config [" + profileName + "] config [" + configName + "! " + err.Error())
-		os.Exit(1)	
+		fmt.Println(err, "\n"+"[ERROR] Couldn't encode config ["+profileName+"] config ["+configName+"! "+err.Error())
+		os.Exit(1)
 	}
-	checkResult(pluginConfigMapResult.Result)	
-		
-	buf,err := util.EncodePluginConfig(pluginConfigMapResult.ConfigMap)
-	if err != nil {
-		fmt.Println(err,"\n" + "[ERROR] Couldn't encode config [" + profileName + "] config [" + configName + "! " + err.Error())
-		os.Exit(1)	
-	}	
-	fmt.Println(buf.String())	
+	fmt.Println(buf.String())
 	os.Exit(0)
-}	
+}
+
+func GetPluginConfig(auth client.Auth, profileName, configName, pluginName string) {
+	pluginConfigMapResult, err := client.GetPluginConfig(auth, profileName, configName, pluginName)
+	if err != nil {
+		fmt.Println(err, "\n"+"[ERROR] Couldn't get config ["+profileName+"] config ["+configName+"! "+err.Error())
+		os.Exit(1)
+	}
+	checkResult(pluginConfigMapResult.Result)
+
+	buf, err := util.EncodePluginConfig(pluginConfigMapResult.ConfigMap)
+	if err != nil {
+		fmt.Println(err, "\n"+"[ERROR] Couldn't encode config ["+profileName+"] config ["+configName+"! "+err.Error())
+		os.Exit(1)
+	}
+	fmt.Println(buf.String())
+	os.Exit(0)
+}
 
 func ListProfiles(auth client.Auth) {
 	fmt.Println("### Profile List ###")
-	result,err := client.ListProfiles(auth)
+	result, err := client.ListProfiles(auth)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	checkResult(result)
-	for _,profile := range result.Data {
+	for _, profile := range result.Data {
 		fmt.Println(profile)
 	}
 	os.Exit(0)
-}	
+}
 
-func ListConfigs(auth client.Auth,profileName string) {
+func ListConfigs(auth client.Auth, profileName string) {
 	fmt.Println("### Config List ###")
-	result,err := client.ListConfigs(auth,profileName)
+	result, err := client.ListConfigs(auth, profileName)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	checkResult(result)
-	for _,config := range result.Data {
+	for _, config := range result.Data {
 		fmt.Println(config)
 	}
 	os.Exit(0)
-}	
+}
 
-func AddProfile(auth client.Auth,profileName string) {
-	result,err := client.AddProfile(auth,profileName)
-	if err != nil {
-		fmt.Println("[ERROR] " + err.Error())
-		os.Exit(1)
-	}
-	printResult(result)
-	os.Exit(0)
-}	
-
-func DeleteProfile(auth client.Auth,profileName string) {
-	result,err := client.DeleteProfile(auth,profileName)
+func AddProfile(auth client.Auth, profileName string) {
+	result, err := client.AddProfile(auth, profileName)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
@@ -176,93 +166,102 @@ func DeleteProfile(auth client.Auth,profileName string) {
 	printResult(result)
 	os.Exit(0)
 }
-	
 
-func ListPluginConfigs(auth client.Auth,profileName,configName string) {
+func DeleteProfile(auth client.Auth, profileName string) {
+	result, err := client.DeleteProfile(auth, profileName)
+	if err != nil {
+		fmt.Println("[ERROR] " + err.Error())
+		os.Exit(1)
+	}
+	printResult(result)
+	os.Exit(0)
+}
+
+func ListPluginConfigs(auth client.Auth, profileName, configName string) {
 	fmt.Println("### Config List ###")
-	result,err := client.ListPluginConfigs(auth,profileName,configName)
+	result, err := client.ListPluginConfigs(auth, profileName, configName)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	checkResult(result)
-	for _,plugin := range result.Data {
+	for _, plugin := range result.Data {
 		fmt.Println(plugin)
 	}
 	os.Exit(0)
 }
 
-func AddConfig(auth client.Auth,profileName,configName,configFile string) {
-	config,err := util.ReadConfig(configFile)
+func AddConfig(auth client.Auth, profileName, configName, configFile string) {
+	config, err := util.ReadConfig(configFile)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
-	result,err := client.AddConfig(auth,profileName,configName,config)
+	result, err := client.AddConfig(auth, profileName, configName, config)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
-	printResult(result)		
+	printResult(result)
 	os.Exit(0)
 }
 
-func AddPluginConfig(auth client.Auth,profileName,configName,pluginName,configFile string) {
+func AddPluginConfig(auth client.Auth, profileName, configName, pluginName, configFile string) {
 
-	configMap,err := util.ReadConfigToMap(configFile)
+	configMap, err := util.ReadConfigToMap(configFile)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
-	result,err := client.AddPluginConfig(auth,profileName,configName,pluginName,configMap)
+	result, err := client.AddPluginConfig(auth, profileName, configName, pluginName, configMap)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
-	printResult(result)		
+	printResult(result)
 	os.Exit(0)
 }
 
-func DeleteConfig(auth client.Auth,profileName,configName string) {
-	result,err := client.DeleteConfig(auth,profileName,configName)
+func DeleteConfig(auth client.Auth, profileName, configName string) {
+	result, err := client.DeleteConfig(auth, profileName, configName)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
-	printResult(result)	
+	printResult(result)
 	os.Exit(0)
 }
 
-func DeleteConfigDir(auth client.Auth,profileName,configName string) {
-	result,err := client.DeleteConfigDir(auth,profileName,configName)
+func DeleteConfigDir(auth client.Auth, profileName, configName string) {
+	result, err := client.DeleteConfigDir(auth, profileName, configName)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
-	printResult(result)	
+	printResult(result)
 	os.Exit(0)
 }
 
-func DeletePluginConfig(auth client.Auth,profileName,configName,pluginName string) {
-	result,err := client.DeletePluginConfig(auth,profileName,configName,pluginName)
+func DeletePluginConfig(auth client.Auth, profileName, configName, pluginName string) {
+	result, err := client.DeletePluginConfig(auth, profileName, configName, pluginName)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
-	printResult(result)	
+	printResult(result)
 	os.Exit(0)
 }
 
-func ImportLocalConfig(profileName,configName,policyName,configDir,configPath string) (util.Config,error) {
-	config,err := util.ReadConfig(configPath)
+func ImportLocalConfig(profileName, configName, policyName, configDir, configPath string) (util.Config, error) {
+	config, err := util.ReadConfig(configPath)
 	if err != nil {
-		return config,err
+		return config, err
 	}
 
 	config.ProfileName = profileName
 	config.ConfigName = configName
 
-	backupRetention := util.GetBackupRetention(policyName,config.BackupRetentions)
+	backupRetention := util.GetBackupRetention(policyName, config.BackupRetentions)
 	config.SelectedBackupRetention = backupRetention
 	config.SelectedBackupPolicy = policyName
 
@@ -270,27 +269,27 @@ func ImportLocalConfig(profileName,configName,policyName,configDir,configPath st
 	if config.AppPlugin != "" {
 		var err error
 		appConfigPath := configDir + "/" + config.AppPlugin + ".conf"
-		config,err = util.SetAppPluginParameters(appConfigPath, config)
+		config, err = util.SetAppPluginParameters(appConfigPath, config)
 		if err != nil {
-			return config,err
+			return config, err
 		}
 	}
 	if config.StoragePlugin != "" {
 		var err error
 		storageConfigPath := configDir + "/" + config.StoragePlugin + ".conf"
-		config,err = util.SetStoragePluginParameters(storageConfigPath, config)
+		config, err = util.SetStoragePluginParameters(storageConfigPath, config)
 		if err != nil {
-			return config,err
+			return config, err
 		}
 	}
 
-	return config,nil
+	return config, nil
 }
 
-func ImportServerConfig(auth client.Auth,profileName,configName string) (util.Config,error) {
-	configResult,err := client.GetConfig(auth,profileName,configName)
+func ImportServerConfig(auth client.Auth, profileName, configName string) (util.Config, error) {
+	configResult, err := client.GetConfig(auth, profileName, configName)
 	if err != nil {
-		return configResult.Config,errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + configName + "! " + err.Error())
+		return configResult.Config, errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + configName + "! " + err.Error())
 	}
 
 	checkResult(configResult.Result)
@@ -298,34 +297,34 @@ func ImportServerConfig(auth client.Auth,profileName,configName string) (util.Co
 
 	//load dynamic plugin parameters into config struct
 	if config.AppPlugin != "" {
-		appConfigMapResult,err := client.GetPluginConfig(auth,profileName,configName,config.AppPlugin)
+		appConfigMapResult, err := client.GetPluginConfig(auth, profileName, configName, config.AppPlugin)
 		if err != nil {
-			return config,errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + config.AppPlugin + "! " + err.Error())
+			return config, errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + config.AppPlugin + "! " + err.Error())
 		}
-		checkResult(appConfigMapResult.Result)		
-		config.AppPluginParameters = appConfigMapResult.ConfigMap		
+		checkResult(appConfigMapResult.Result)
+		config.AppPluginParameters = appConfigMapResult.ConfigMap
 	}
 	if config.StoragePlugin != "" {
-		storageConfigMapResult,err := client.GetPluginConfig(auth,profileName,configName,config.StoragePlugin)
+		storageConfigMapResult, err := client.GetPluginConfig(auth, profileName, configName, config.StoragePlugin)
 		if err != nil {
-			return config,errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + config.StoragePlugin + "! " + err.Error())
-		}	
-		checkResult(storageConfigMapResult.Result)	
-		config.StoragePluginParameters = storageConfigMapResult.ConfigMap	
+			return config, errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + config.StoragePlugin + "! " + err.Error())
+		}
+		checkResult(storageConfigMapResult.Result)
+		config.StoragePluginParameters = storageConfigMapResult.ConfigMap
 	}
-	
-	return config,nil
-}	
 
-func BackupWithLocalConfig(auth client.Auth,profileName,configName,policyName string,config util.Config) {
+	return config, nil
+}
+
+func BackupWithLocalConfig(auth client.Auth, profileName, configName, policyName string, config util.Config) {
 	logger := util.GetLoggerInstance()
 
-	workflowResult,err := client.StartBackupWorkflowLocalConfig(auth,profileName,configName,policyName,config)
+	workflowResult, err := client.StartBackupWorkflowLocalConfig(auth, profileName, configName, policyName, config)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
-		
+
 	util.LogResult(logger, workflowResult.Result)
 	if workflowResult.Result.Code != 0 {
 		os.Exit(1)
@@ -336,7 +335,7 @@ func BackupWithLocalConfig(auth client.Auth,profileName,configName,policyName st
 	// loop and wait for all workflow steps to complete
 	for {
 		time.Sleep(1 * time.Second)
-		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
+		workflowStatusResult, err := client.GetWorkflowStatus(auth, profileName, configName, workflowId)
 		if err != nil {
 			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
@@ -347,9 +346,9 @@ func BackupWithLocalConfig(auth client.Auth,profileName,configName,policyName st
 		// Print results for a step only once
 		for _, step := range workflowStatusResult.Workflow.Steps {
 			if step.Status == "COMPLETE" || step.Status == "ERROR" {
-				if !util.IntInSlice(step.Id,completedSteps) {
-					completedSteps = append(completedSteps,step.Id)
-					results,err := client.GetWorkflowStepResults(auth,profileName,configName,workflowId,step.Id)
+				if !util.IntInSlice(step.Id, completedSteps) {
+					completedSteps = append(completedSteps, step.Id)
+					results, err := client.GetWorkflowStepResults(auth, profileName, configName, workflowId, step.Id)
 					if err != nil {
 						fmt.Println("[ERROR] " + err.Error())
 						os.Exit(1)
@@ -359,22 +358,22 @@ func BackupWithLocalConfig(auth client.Auth,profileName,configName,policyName st
 			}
 		}
 
-		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR"  {
+		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR" {
 			break
 		}
 		time.Sleep(4 * time.Second)
 	}
 }
 
-func Backup(auth client.Auth,profileName,configName,policyName string) {
+func Backup(auth client.Auth, profileName, configName, policyName string) {
 	logger := util.GetLoggerInstance()
 
-	workflowResult,err := client.StartBackupWorkflow(auth,profileName,configName,policyName)
+	workflowResult, err := client.StartBackupWorkflow(auth, profileName, configName, policyName)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
-		
+
 	util.LogResult(logger, workflowResult.Result)
 	if workflowResult.Result.Code != 0 {
 		os.Exit(1)
@@ -385,7 +384,7 @@ func Backup(auth client.Auth,profileName,configName,policyName string) {
 	// loop and wait for all workflow steps to complete
 	for {
 		time.Sleep(1 * time.Second)
-		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
+		workflowStatusResult, err := client.GetWorkflowStatus(auth, profileName, configName, workflowId)
 		if err != nil {
 			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
@@ -396,9 +395,9 @@ func Backup(auth client.Auth,profileName,configName,policyName string) {
 		// Print results for a step only once
 		for _, step := range workflowStatusResult.Workflow.Steps {
 			if step.Status == "COMPLETE" || step.Status == "ERROR" {
-				if !util.IntInSlice(step.Id,completedSteps) {
-					completedSteps = append(completedSteps,step.Id)
-					results,err := client.GetWorkflowStepResults(auth,profileName,configName,workflowId,step.Id)
+				if !util.IntInSlice(step.Id, completedSteps) {
+					completedSteps = append(completedSteps, step.Id)
+					results, err := client.GetWorkflowStepResults(auth, profileName, configName, workflowId, step.Id)
 					if err != nil {
 						fmt.Println("[ERROR] " + err.Error())
 						os.Exit(1)
@@ -408,22 +407,22 @@ func Backup(auth client.Auth,profileName,configName,policyName string) {
 			}
 		}
 
-		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR"  {
+		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR" {
 			break
 		}
 		time.Sleep(4 * time.Second)
 	}
 }
 
-func RestoreWithLocalConfig(auth client.Auth,profileName,configName,policyName,selectedWorkflowId string,config util.Config) {
+func RestoreWithLocalConfig(auth client.Auth, profileName, configName, policyName, selectedWorkflowId string, config util.Config) {
 	logger := util.GetLoggerInstance()
 
-	workflowResult,err := client.StartRestoreWorkflowLocalConfig(auth,profileName,configName,policyName,selectedWorkflowId,config)
+	workflowResult, err := client.StartRestoreWorkflowLocalConfig(auth, profileName, configName, policyName, selectedWorkflowId, config)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
-		
+
 	util.LogResult(logger, workflowResult.Result)
 	if workflowResult.Result.Code != 0 {
 		os.Exit(1)
@@ -434,7 +433,7 @@ func RestoreWithLocalConfig(auth client.Auth,profileName,configName,policyName,s
 	// loop and wait for all workflow steps to complete
 	for {
 		time.Sleep(1 * time.Second)
-		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
+		workflowStatusResult, err := client.GetWorkflowStatus(auth, profileName, configName, workflowId)
 		if err != nil {
 			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
@@ -445,9 +444,9 @@ func RestoreWithLocalConfig(auth client.Auth,profileName,configName,policyName,s
 		// Print results for a step only once
 		for _, step := range workflowStatusResult.Workflow.Steps {
 			if step.Status == "COMPLETE" || step.Status == "ERROR" {
-				if !util.IntInSlice(step.Id,completedSteps) {
-					completedSteps = append(completedSteps,step.Id)
-					results,err := client.GetWorkflowStepResults(auth,profileName,configName,workflowId,step.Id)
+				if !util.IntInSlice(step.Id, completedSteps) {
+					completedSteps = append(completedSteps, step.Id)
+					results, err := client.GetWorkflowStepResults(auth, profileName, configName, workflowId, step.Id)
 					if err != nil {
 						fmt.Println("[ERROR] " + err.Error())
 						os.Exit(1)
@@ -457,22 +456,22 @@ func RestoreWithLocalConfig(auth client.Auth,profileName,configName,policyName,s
 			}
 		}
 
-		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR"  {
+		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR" {
 			break
 		}
 		time.Sleep(4 * time.Second)
 	}
 }
 
-func Restore(auth client.Auth,profileName,configName,policyName,selectedWorkflowId string) {
+func Restore(auth client.Auth, profileName, configName, policyName, selectedWorkflowId string) {
 	logger := util.GetLoggerInstance()
 
-	workflowResult,err := client.StartRestoreWorkflow(auth,profileName,configName,policyName,selectedWorkflowId)
+	workflowResult, err := client.StartRestoreWorkflow(auth, profileName, configName, policyName, selectedWorkflowId)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
-		
+
 	util.LogResult(logger, workflowResult.Result)
 	if workflowResult.Result.Code != 0 {
 		os.Exit(1)
@@ -483,7 +482,7 @@ func Restore(auth client.Auth,profileName,configName,policyName,selectedWorkflow
 	// loop and wait for all workflow steps to complete
 	for {
 		time.Sleep(1 * time.Second)
-		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowId)
+		workflowStatusResult, err := client.GetWorkflowStatus(auth, profileName, configName, workflowId)
 		if err != nil {
 			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
@@ -494,9 +493,9 @@ func Restore(auth client.Auth,profileName,configName,policyName,selectedWorkflow
 		// Print results for a step only once
 		for _, step := range workflowStatusResult.Workflow.Steps {
 			if step.Status == "COMPLETE" || step.Status == "ERROR" {
-				if !util.IntInSlice(step.Id,completedSteps) {
-					completedSteps = append(completedSteps,step.Id)
-					results,err := client.GetWorkflowStepResults(auth,profileName,configName,workflowId,step.Id)
+				if !util.IntInSlice(step.Id, completedSteps) {
+					completedSteps = append(completedSteps, step.Id)
+					results, err := client.GetWorkflowStepResults(auth, profileName, configName, workflowId, step.Id)
 					if err != nil {
 						fmt.Println("[ERROR] " + err.Error())
 						os.Exit(1)
@@ -506,36 +505,36 @@ func Restore(auth client.Auth,profileName,configName,policyName,selectedWorkflow
 			}
 		}
 
-		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR"  {
+		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR" {
 			break
 		}
 		time.Sleep(4 * time.Second)
 	}
 }
 
-func BackupList(auth client.Auth,profileName,configName,policyName string,config util.Config) {
-	msg := fmt.Sprintf("### List of Backups for policy [%s] ###",policyName)
+func BackupList(auth client.Auth, profileName, configName, policyName string, config util.Config) {
+	msg := fmt.Sprintf("### List of Backups for policy [%s] ###", policyName)
 	fmt.Println(msg)
 
-	backups,err := client.BackupList(auth,profileName,configName,policyName,config)
+	backups, err := client.BackupList(auth, profileName, configName, policyName, config)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 
-	backupsByPolicy := util.GetBackupsByPolicy(policyName,backups.Backups)
+	backupsByPolicy := util.GetBackupsByPolicy(policyName, backups.Backups)
 	checkResult(backups.Result)
 
 	for _, backup := range backupsByPolicy {
 		fmt.Println(backup.Name, backup.Policy, backup.WorkflowId, backup.Timestamp)
 	}
-}	
+}
 
-func JobList(auth client.Auth,profileName,configName string) {
-	msg := fmt.Sprintf("### List of Jobs for profile [%s] config [%s] ###",profileName,configName)
+func JobList(auth client.Auth, profileName, configName string) {
+	msg := fmt.Sprintf("### List of Jobs for profile [%s] config [%s] ###", profileName, configName)
 	fmt.Println(msg)
 
-	jobs,err := client.GetJobList(auth,profileName,configName)
+	jobs, err := client.GetJobList(auth, profileName, configName)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
@@ -547,12 +546,12 @@ func JobList(auth client.Auth,profileName,configName string) {
 	tw.Init(os.Stdout, 10, 20, 5, ' ', 0)
 	fmt.Fprintln(tw, "WorkflowId\t Type\t Status\t Policy\t Start Time\t")
 	for _, job := range jobs.Jobs {
-		fmt.Fprintln(tw, util.IntToString(job.Id) + "\t",job.Type + "\t",job.Status + "\t",job.Policy + "\t",job.Timestamp + "\t")
-	}		
+		fmt.Fprintln(tw, util.IntToString(job.Id)+"\t", job.Type+"\t", job.Status+"\t", job.Policy+"\t", job.Timestamp+"\t")
+	}
 	tw.Flush()
 }
 
-func JobStatus(auth client.Auth,profileName,configName,workflowId string) {
+func JobStatus(auth client.Auth, profileName, configName, workflowId string) {
 	logger := util.GetLoggerInstance()
 
 	workflowIdInt := util.StringToInt(workflowId)
@@ -560,7 +559,7 @@ func JobStatus(auth client.Auth,profileName,configName,workflowId string) {
 	// loop and wait for all workflow steps to complete
 	for {
 		time.Sleep(1 * time.Second)
-		workflowStatusResult,err := client.GetWorkflowStatus(auth,profileName,configName,workflowIdInt)
+		workflowStatusResult, err := client.GetWorkflowStatus(auth, profileName, configName, workflowIdInt)
 		if err != nil {
 			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
@@ -571,9 +570,9 @@ func JobStatus(auth client.Auth,profileName,configName,workflowId string) {
 		// Print results for a step only once
 		for _, step := range workflowStatusResult.Workflow.Steps {
 			if step.Status == "COMPLETE" || step.Status == "ERROR" {
-				if !util.IntInSlice(step.Id,completedSteps) {
-					completedSteps = append(completedSteps,step.Id)
-					results,err := client.GetWorkflowStepResults(auth,profileName,configName,workflowIdInt,step.Id)
+				if !util.IntInSlice(step.Id, completedSteps) {
+					completedSteps = append(completedSteps, step.Id)
+					results, err := client.GetWorkflowStepResults(auth, profileName, configName, workflowIdInt, step.Id)
 					if err != nil {
 						fmt.Println("[ERROR] " + err.Error())
 						os.Exit(1)
@@ -584,7 +583,7 @@ func JobStatus(auth client.Auth,profileName,configName,workflowId string) {
 			}
 		}
 
-		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR"  {
+		if workflowStatusResult.Workflow.Status == "COMPLETE" || workflowStatusResult.Workflow.Status == "ERROR" {
 			break
 		}
 		time.Sleep(4 * time.Second)
@@ -595,13 +594,13 @@ func AppPluginList(auth client.Auth) {
 	fmt.Println("### List of Application Plugins ###")
 
 	var plugins []string
-	appPlugins,err := client.AppPluginList(auth,"app")
+	appPlugins, err := client.AppPluginList(auth, "app")
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 
-	plugins = util.JoinArray(appPlugins,plugins)
+	plugins = util.JoinArray(appPlugins, plugins)
 
 	for _, plugin := range plugins {
 		fmt.Println(plugin)
@@ -611,16 +610,16 @@ func AppPluginList(auth client.Auth) {
 
 func StoragePluginList(auth client.Auth) {
 	fmt.Println("### List of Storage Plugins ###")
-	
+
 	var plugins []string
-	storagePlugins,err := client.StoragePluginList(auth,"storage")
+	storagePlugins, err := client.StoragePluginList(auth, "storage")
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 
-	plugins = util.JoinArray(storagePlugins,plugins)
-	
+	plugins = util.JoinArray(storagePlugins, plugins)
+
 	for _, plugin := range plugins {
 		fmt.Println(plugin)
 	}
@@ -629,16 +628,16 @@ func StoragePluginList(auth client.Auth) {
 
 func ArchivePluginList(auth client.Auth) {
 	fmt.Println("### List of Archive Plugins ###")
-		
+
 	var plugins []string
-	archivePlugins,err := client.ArchivePluginList(auth,"archive")
+	archivePlugins, err := client.ArchivePluginList(auth, "archive")
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 
-	plugins = util.JoinArray(archivePlugins,plugins)
-		
+	plugins = util.JoinArray(archivePlugins, plugins)
+
 	for _, plugin := range plugins {
 		fmt.Println(plugin)
 	}
@@ -646,25 +645,25 @@ func ArchivePluginList(auth client.Auth) {
 }
 
 //func PluginInfo(auth client.Auth,config util.Config,pluginName,pluginType string) {
-func PluginInfo(auth client.Auth,pluginName,pluginType string) {	
+func PluginInfo(auth client.Auth, pluginName, pluginType string) {
 	var config util.Config
 	var pluginInfoResult util.PluginInfoResult
 	var err error
 
 	if pluginType == "app" {
-		pluginInfoResult,err = client.AppPluginInfo(auth,config,pluginName,pluginType)
+		pluginInfoResult, err = client.AppPluginInfo(auth, config, pluginName, pluginType)
 		if err != nil {
 			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
 		}
 	} else if pluginType == "storage" {
-		pluginInfoResult,err = client.StoragePluginInfo(auth,config,pluginName,pluginType)
+		pluginInfoResult, err = client.StoragePluginInfo(auth, config, pluginName, pluginType)
 		if err != nil {
 			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
 		}
 	} else if pluginType == "archive" {
-		pluginInfoResult,err = client.ArchivePluginInfo(auth,config,pluginName,pluginType)
+		pluginInfoResult, err = client.ArchivePluginInfo(auth, config, pluginName, pluginType)
 		if err != nil {
 			fmt.Println("[ERROR] " + err.Error())
 			os.Exit(1)
@@ -673,7 +672,7 @@ func PluginInfo(auth client.Auth,pluginName,pluginType string) {
 		error := fmt.Sprintf("[ERROR] Plugin type must be app|storage|archive")
 		fmt.Println(error)
 		os.Exit(1)
-	}	
+	}
 
 	checkResult(pluginInfoResult.Result)
 
@@ -690,21 +689,21 @@ func PluginInfo(auth client.Auth,pluginName,pluginType string) {
 func Status(auth client.Auth) {
 	fmt.Println("### Status of Services ###")
 
-	workflowStatus,err := client.GetServerServiceStatus(auth)
+	workflowStatus, err := client.GetServerServiceStatus(auth)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	fmt.Println("Server Service:", workflowStatus)
 
-	appStatus,err := client.GetAppServiceStatus(auth)
+	appStatus, err := client.GetAppServiceStatus(auth)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
 	}
 	fmt.Println("App Service:", appStatus)
 
-	storageStatus,err := client.GetStorageServiceStatus(auth)
+	storageStatus, err := client.GetStorageServiceStatus(auth)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
@@ -714,8 +713,8 @@ func Status(auth client.Auth) {
 	os.Exit(0)
 }
 
-func AddSchedule(auth client.Auth,profileName,configName,policyName,cronSchedule string) {
-	result,err := client.AddSchedule(auth,profileName,configName,policyName,cronSchedule)
+func AddSchedule(auth client.Auth, profileName, configName, policyName, cronSchedule string) {
+	result, err := client.AddSchedule(auth, profileName, configName, policyName, cronSchedule)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
@@ -724,8 +723,8 @@ func AddSchedule(auth client.Auth,profileName,configName,policyName,cronSchedule
 	os.Exit(0)
 }
 
-func DeleteSchedule(auth client.Auth,profileName,configName,policyName string) {
-	result,err := client.DeleteSchedule(auth,profileName,configName,policyName)
+func DeleteSchedule(auth client.Auth, profileName, configName, policyName string) {
+	result, err := client.DeleteSchedule(auth, profileName, configName, policyName)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)

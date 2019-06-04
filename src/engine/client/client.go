@@ -1,31 +1,31 @@
 package client
 
 import (
-	"encoding/json"
-	"log"
-	"fossul/src/engine/util"
-	"net/http"
 	"bytes"
+	"encoding/json"
 	"errors"
+	"fossul/src/engine/util"
+	"log"
+	"net/http"
 )
 
 type Auth struct {
-	ServerHostname string `json:"serverHostname,omitempty"`
-	ServerPort string `json:"serverPort,omitempty"`
-	AppHostname string `json:"appHostname,omitempty"`
-	AppPort string `json:"appPort,omitempty"`
+	ServerHostname  string `json:"serverHostname,omitempty"`
+	ServerPort      string `json:"serverPort,omitempty"`
+	AppHostname     string `json:"appHostname,omitempty"`
+	AppPort         string `json:"appPort,omitempty"`
 	StorageHostname string `json:"storageHostname,omitempty"`
-	StoragePort string `json:"storagePort,omitempty"`
-	Username string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
+	StoragePort     string `json:"storagePort,omitempty"`
+	Username        string `json:"username,omitempty"`
+	Password        string `json:"password,omitempty"`
 }
 
-func GetWorkflowStatus(auth Auth,profileName,configName string,id int) (util.WorkflowStatusResult,error) {
+func GetWorkflowStatus(auth Auth, profileName, configName string, id int) (util.WorkflowStatusResult, error) {
 	var workflowStatusResult util.WorkflowStatusResult
 	idToString := util.IntToString(id)
-	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/getWorkflowStatus/" + profileName + "/" + configName + "/" + idToString, nil)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/getWorkflowStatus/"+profileName+"/"+configName+"/"+idToString, nil)
 	if err != nil {
-		return workflowStatusResult,err
+		return workflowStatusResult, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -35,29 +35,29 @@ func GetWorkflowStatus(auth Auth,profileName,configName string,id int) (util.Wor
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return workflowStatusResult,err
+		return workflowStatusResult, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&workflowStatusResult); err != nil {
-			return workflowStatusResult,err
+			return workflowStatusResult, err
 		}
 	} else {
-		return workflowStatusResult,errors.New("Http Status Error [" + resp.Status + "]")
+		return workflowStatusResult, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return workflowStatusResult,nil
+	return workflowStatusResult, nil
 }
 
-func GetWorkflowStepResults(auth Auth,profileName,configName string,workflowId int, step int) ([]util.Result,error) {
+func GetWorkflowStepResults(auth Auth, profileName, configName string, workflowId int, step int) ([]util.Result, error) {
 	var results []util.Result
 	w := util.IntToString(workflowId)
 	s := util.IntToString(step)
-	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/getWorkflowStepResults/" + profileName + "/" + configName + "/" + w + "/" + s, nil)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/getWorkflowStepResults/"+profileName+"/"+configName+"/"+w+"/"+s, nil)
 	if err != nil {
-		return results,err
+		return results, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -67,28 +67,28 @@ func GetWorkflowStepResults(auth Auth,profileName,configName string,workflowId i
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return results,err
+		return results, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&results); err != nil {
-			return results,err
+			return results, err
 		}
 	} else {
-		return results,errors.New("Http Status Error [" + resp.Status + "]")
+		return results, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return results,nil
+	return results, nil
 }
 
-func DeleteWorkflowResults(auth Auth,profileName,configName string,workflowId string) (util.Result,error) {
+func DeleteWorkflowResults(auth Auth, profileName, configName string, workflowId string) (util.Result, error) {
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/deleteWorkflowResults/" + profileName + "/" + configName + "/" + workflowId, nil)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/deleteWorkflowResults/"+profileName+"/"+configName+"/"+workflowId, nil)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -98,26 +98,26 @@ func DeleteWorkflowResults(auth Auth,profileName,configName string,workflowId st
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func GetServerServiceStatus(auth Auth) (util.Status,error) {
+func GetServerServiceStatus(auth Auth) (util.Status, error) {
 	var status util.Status
 
-	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/status", nil)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/status", nil)
 	if err != nil {
 		log.Println("NewRequest: ", err)
 	}
@@ -128,28 +128,28 @@ func GetServerServiceStatus(auth Auth) (util.Status,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return status,err
+		return status, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
-			return status,err
+			return status, err
 		}
 	} else {
-		return status,errors.New("Http Status Error [" + resp.Status + "]")
+		return status, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return status,nil
+	return status, nil
 }
 
-func GetAppServiceStatus(auth Auth) (util.Status,error) {
+func GetAppServiceStatus(auth Auth) (util.Status, error) {
 	var status util.Status
 
-	req, err := http.NewRequest("GET", "http://" + auth.AppHostname + ":" + auth.AppPort + "/status", nil)
+	req, err := http.NewRequest("GET", "http://"+auth.AppHostname+":"+auth.AppPort+"/status", nil)
 	if err != nil {
-		return status,err
+		return status, err
 	}
 
 	req.SetBasicAuth(auth.Username, auth.Password)
@@ -158,29 +158,29 @@ func GetAppServiceStatus(auth Auth) (util.Status,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return status,err
+		return status, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
-			return status,err
+			return status, err
 		}
 	} else {
-		return status,errors.New("Http Status Error [" + resp.Status + "]")
+		return status, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return status,nil
+	return status, nil
 
 }
 
-func GetStorageServiceStatus(auth Auth) (util.Status,error) {
+func GetStorageServiceStatus(auth Auth) (util.Status, error) {
 	var status util.Status
 
-	req, err := http.NewRequest("GET", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/status", nil)
+	req, err := http.NewRequest("GET", "http://"+auth.StorageHostname+":"+auth.StoragePort+"/status", nil)
 	if err != nil {
-		return status,err
+		return status, err
 	}
 
 	req.SetBasicAuth(auth.Username, auth.Password)
@@ -189,33 +189,33 @@ func GetStorageServiceStatus(auth Auth) (util.Status,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return status,err
+		return status, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&status); err != nil {
-			return status,err
+			return status, err
 		}
 	} else {
-		return status,errors.New("Http Status Error [" + resp.Status + "]")
+		return status, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return status,nil
+	return status, nil
 
 }
 
-func StartBackupWorkflowLocalConfig(auth Auth,profileName,configName,policyName string,config util.Config) (util.WorkflowResult,error) {
+func StartBackupWorkflowLocalConfig(auth Auth, profileName, configName, policyName string, config util.Config) (util.WorkflowResult, error) {
 	var result util.WorkflowResult
-	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
+	config = SetAdditionalConfigParams(profileName, configName, policyName, config)
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/startBackupWorkflowLocalConfig", b)
+	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startBackupWorkflowLocalConfig", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -225,29 +225,29 @@ func StartBackupWorkflowLocalConfig(auth Auth,profileName,configName,policyName 
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 
 }
 
-func StartBackupWorkflow(auth Auth,profileName,configName,policyName string) (util.WorkflowResult,error) {
+func StartBackupWorkflow(auth Auth, profileName, configName, policyName string) (util.WorkflowResult, error) {
 	var result util.WorkflowResult
 
-	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/startBackupWorkflow/"+ profileName + "/" + configName + "/" + policyName, nil)
+	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startBackupWorkflow/"+profileName+"/"+configName+"/"+policyName, nil)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -257,33 +257,33 @@ func StartBackupWorkflow(auth Auth,profileName,configName,policyName string) (ut
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 
 }
 
-func StartRestoreWorkflowLocalConfig(auth Auth,profileName,configName,policyName,selectedWorkflowId string,config util.Config) (util.WorkflowResult,error) {
+func StartRestoreWorkflowLocalConfig(auth Auth, profileName, configName, policyName, selectedWorkflowId string, config util.Config) (util.WorkflowResult, error) {
 	var result util.WorkflowResult
-	config = SetAdditionalConfigParams(profileName,configName,policyName,config)
+	config = SetAdditionalConfigParams(profileName, configName, policyName, config)
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/startRestoreWorkflowLocalConfig/" + selectedWorkflowId, b)
+	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startRestoreWorkflowLocalConfig/"+selectedWorkflowId, b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -293,29 +293,29 @@ func StartRestoreWorkflowLocalConfig(auth Auth,profileName,configName,policyName
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 
 }
 
-func StartRestoreWorkflow(auth Auth,profileName,configName,policyName,selectedWorkflowId string) (util.WorkflowResult,error) {
+func StartRestoreWorkflow(auth Auth, profileName, configName, policyName, selectedWorkflowId string) (util.WorkflowResult, error) {
 	var result util.WorkflowResult
 
-	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/startRestoreWorkflow/"+ profileName + "/" + configName + "/" + policyName + "/" + selectedWorkflowId, nil)
+	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startRestoreWorkflow/"+profileName+"/"+configName+"/"+policyName+"/"+selectedWorkflowId, nil)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -325,20 +325,20 @@ func StartRestoreWorkflow(auth Auth,profileName,configName,policyName,selectedWo
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 
 }
 
@@ -346,20 +346,20 @@ func SetAdditionalConfigParams(profileName, configName, policyName string, confi
 	config.ProfileName = profileName
 	config.ConfigName = configName
 
-	backupRetention := util.GetBackupRetention(policyName,config.BackupRetentions)
+	backupRetention := util.GetBackupRetention(policyName, config.BackupRetentions)
 	config.SelectedBackupRetention = backupRetention
 	config.SelectedBackupPolicy = policyName
 
 	return config
 }
 
-func GetJobList(auth Auth,profileName,configName string) (util.Jobs,error) {
+func GetJobList(auth Auth, profileName, configName string) (util.Jobs, error) {
 
 	var jobs util.Jobs
 
-	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/getJobs/" + profileName + "/" + configName, nil)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/getJobs/"+profileName+"/"+configName, nil)
 	if err != nil {
-		return jobs,err
+		return jobs, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -369,18 +369,18 @@ func GetJobList(auth Auth,profileName,configName string) (util.Jobs,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return jobs,err
+		return jobs, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&jobs); err != nil {
-			return jobs,err
+			return jobs, err
 		}
 	} else {
-		return jobs,errors.New("Http Status Error [" + resp.Status + "]")
+		return jobs, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return jobs,nil
+	return jobs, nil
 }

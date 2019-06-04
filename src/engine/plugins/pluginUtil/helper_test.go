@@ -1,13 +1,13 @@
 package pluginUtil
 
 import (
-    "testing"
+	"testing"
 )
 
-func TestCreateDeleteDir(t *testing.T)  {
+func TestCreateDeleteDir(t *testing.T) {
 	dir := "/tmp/foobar456"
 
-	err := CreateDir(dir,0755)
+	err := CreateDir(dir, 0755)
 	if err != nil {
 		t.Fail()
 	}

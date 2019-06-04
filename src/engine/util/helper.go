@@ -1,17 +1,16 @@
 package util
 
 import (
-	"time"
-	"fmt"
-	"strconv"
 	"encoding/gob"
-	"os"
-	"log"
-	"path/filepath"
+	"fmt"
 	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
+	"strconv"
 	"strings"
+	"time"
 )
-
 
 func GetTimestamp() int64 {
 	time := time.Now().Unix()
@@ -32,14 +31,14 @@ func GetBackupDirFromConfig(config Config) string {
 }
 
 func GetBackupPathFromMap(configMap map[string]string) string {
-	backupName := GetBackupName(configMap["BackupName"],configMap["BackupPolicy"],configMap["WorkflowId"])
+	backupName := GetBackupName(configMap["BackupName"], configMap["BackupPolicy"], configMap["WorkflowId"])
 	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"] + "/" + backupName
 
 	return backupPath
 }
 
 func GetBackupPathFromConfig(config Config) string {
-	backupName := GetBackupName(config.StoragePluginParameters["BackupName"],config.SelectedBackupPolicy,config.WorkflowId)
+	backupName := GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId)
 	backupPath := config.StoragePluginParameters["BackupDestPath"] + "/" + config.ProfileName + "/" + config.ConfigName + "/" + backupName
 
 	return backupPath
@@ -47,64 +46,64 @@ func GetBackupPathFromConfig(config Config) string {
 
 func GetBackupName(name, policy, workflowId string) string {
 	time := GetTimestamp()
-	timeToString := fmt.Sprintf("%d",time)
+	timeToString := fmt.Sprintf("%d", time)
 
 	backupName := fmt.Sprintf(name + "_" + policy + "_" + workflowId + "_" + timeToString)
 
 	return backupName
 }
 
-func GetRestoreSrcPath(config Config) (string,error) {
+func GetRestoreSrcPath(config Config) (string, error) {
 	backupPath := config.StoragePluginParameters["BackupDestPath"] + "/" + config.ProfileName + "/" + config.ConfigName
 	backupNameSubString := config.StoragePluginParameters["BackupName"] + "_" + config.SelectedBackupPolicy + "_" + IntToString(config.SelectedWorkflowId)
-	
+
 	fmt.Println("[DEBUG] restore path [" + backupPath + "] search string [" + backupNameSubString + "]")
 	files, err := ioutil.ReadDir(backupPath)
 	if err != nil {
-		return "",err
+		return "", err
 	}
 	for _, f := range files {
-    	if strings.Contains(f.Name(), backupNameSubString) {
-			return backupPath + "/" + f.Name(),nil
+		if strings.Contains(f.Name(), backupNameSubString) {
+			return backupPath + "/" + f.Name(), nil
 		}
 	}
-	return "",nil
+	return "", nil
 }
 
-func GetRestoreSrcPathFromMap(configMap map[string]string) (string,error) {
+func GetRestoreSrcPathFromMap(configMap map[string]string) (string, error) {
 	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"]
 	backupNameSubString := configMap["BackupName"] + "_" + configMap["BackupPolicy"] + "_" + configMap["SelectedWorkflowId"]
-	
+
 	fmt.Println("[DEBUG] restore path [" + backupPath + "] search string [" + backupNameSubString + "]")
 	files, err := ioutil.ReadDir(backupPath)
 	if err != nil {
-		return "",err
+		return "", err
 	}
 	for _, f := range files {
-    	if strings.Contains(f.Name(), backupNameSubString) {
-			return backupPath + "/" + f.Name(),nil
+		if strings.Contains(f.Name(), backupNameSubString) {
+			return backupPath + "/" + f.Name(), nil
 		}
 	}
-	return "",nil
+	return "", nil
 }
 
 func ConvertEpoch(epoch string) string {
 	i := StringToInt64(epoch)
-	time:= time.Unix(i,0)
+	time := time.Unix(i, 0)
 
 	return time.String()
 }
 
 func ConvertEpochToTime(epoch string) time.Time {
 	i := StringToInt64(epoch)
-	time:= time.Unix(i,0)
+	time := time.Unix(i, 0)
 
 	return time
 }
 
 func JoinArray(array, combinedArray []string) []string {
 	for _, item := range array {
-		combinedArray = append (combinedArray,item)
+		combinedArray = append(combinedArray, item)
 	}
 
 	return combinedArray
@@ -112,29 +111,29 @@ func JoinArray(array, combinedArray []string) []string {
 
 func ExistsInArray(array []string, str string) bool {
 	for _, item := range array {
-	   if item == str {
-		  return true
-	   }
+		if item == str {
+			return true
+		}
 	}
 	return false
- }
+}
 
- func WriteGob(filePath string,object interface{}) error {
+func WriteGob(filePath string, object interface{}) error {
 	file, err := os.Create(filePath)
 	if err == nil {
-		   encoder := gob.NewEncoder(file)
-		   encoder.Encode(object)
+		encoder := gob.NewEncoder(file)
+		encoder.Encode(object)
 	}
 	file.Close()
 	return err
 }
 
-func ReadGob(filePath string,object interface{}) error {
+func ReadGob(filePath string, object interface{}) error {
 
 	file, err := os.Open(filePath)
 	if err == nil {
-		   decoder := gob.NewDecoder(file)
-		   err = decoder.Decode(object)
+		decoder := gob.NewDecoder(file)
+		err = decoder.Decode(object)
 	}
 	file.Close()
 	return err
@@ -153,9 +152,9 @@ func CreateDir(path string, mode os.FileMode) error {
 	if ExistsPath(path) == false {
 		if err := os.MkdirAll(path, mode); err != nil {
 			return err
-		 } else {
+		} else {
 			return nil
-		 }		
+		}
 	}
 	return nil
 }
@@ -185,59 +184,59 @@ func RecursiveDirDelete(dir string) error {
 		if err != nil {
 			return err
 		}
-	}	
+	}
 	return nil
 }
 
-func DirectoryList(path string) ([]string,error) {
+func DirectoryList(path string) ([]string, error) {
 	files, err := ioutil.ReadDir(path)
 	var dirList []string
-    if err != nil {
-        return dirList,err
-    }
-
-    for _, f := range files {
-            if f.IsDir() {
-				dirList = append(dirList,f.Name())
-			}
+	if err != nil {
+		return dirList, err
 	}
-	
-	return dirList,nil
+
+	for _, f := range files {
+		if f.IsDir() {
+			dirList = append(dirList, f.Name())
+		}
+	}
+
+	return dirList, nil
 }
 
-func FileList(path string) ([]string,error) {
+func FileList(path string) ([]string, error) {
 	files, err := ioutil.ReadDir(path)
 	var fileList []string
-    if err != nil {
-        return fileList,err
-    }
-
-    for _, f := range files {
-            if ! f.IsDir() {
-				fileList = append(fileList,f.Name())
-			}
+	if err != nil {
+		return fileList, err
 	}
-	
-	return fileList,nil
+
+	for _, f := range files {
+		if !f.IsDir() {
+			fileList = append(fileList, f.Name())
+		}
+	}
+
+	return fileList, nil
 }
 
-func PluginList(path,configName string) ([]string,error) {
+func PluginList(path, configName string) ([]string, error) {
 	files, err := ioutil.ReadDir(path)
 	var pluginList []string
-    if err != nil {
-        return pluginList,err
+	if err != nil {
+		return pluginList, err
 	}
 
-    for _, f := range files {
-			if configName + ".conf" == f.Name() {
-				continue
-			}
-            if ! f.IsDir() {
-				pluginList = append(pluginList,f.Name())
-			}
+	for _, f := range files {
+		if configName+".conf" == f.Name() {
+			continue
+		}
+		if !f.IsDir() {
+			pluginList = append(pluginList, f.Name())
+		}
 	}
-	
-	return pluginList,nil
+
+	return pluginList, nil
 }
 
 func BoolToString(b bool) string {
@@ -260,15 +259,15 @@ func Int64ToString(i int64) string {
 func StringToInt(s string) int {
 	i, err := strconv.Atoi(s)
 	if err != nil {
-    	log.Println("ERROR " + err.Error())
+		log.Println("ERROR " + err.Error())
 	}
 	return i
 }
 
 func StringToInt64(s string) int64 {
-	i,err := strconv.ParseInt(s,10,64)
+	i, err := strconv.ParseInt(s, 10, 64)
 	if err != nil {
-    	log.Println(err.Error())
+		log.Println(err.Error())
 	}
 
 	return i

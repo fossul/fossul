@@ -1,22 +1,22 @@
 package util
 
 import (
-	"testing"
 	"log"
+	"testing"
 )
 
 func TestResult(t *testing.T) {
-	message1 := SetMessage("INFO","Testing1")
+	message1 := SetMessage("INFO", "Testing1")
 
 	var messages []string
 	message2 := "INFO Testing2"
 
-	messages=append(messages,message2)
+	messages = append(messages, message2)
 
 	messageList := SetMessages(messages)
 	messageList = append(messageList, message1)
 
-	result := SetResult(0,messageList)
+	result := SetResult(0, messageList)
 
 	log.Println(result)
 

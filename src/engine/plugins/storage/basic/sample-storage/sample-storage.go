@@ -1,15 +1,15 @@
 package main
 
 import (
-	"os"
-	"github.com/pborman/getopt/v2"
-	"fossul/src/engine/util"
 	"encoding/json"
 	"fmt"
+	"fossul/src/engine/util"
+	"github.com/pborman/getopt/v2"
+	"os"
 )
 
 func main() {
-	optAction := getopt.StringLong("action",'a',"","backup|backupList|backupDelete|info")
+	optAction := getopt.StringLong("action", 'a', "", "backup|backupList|backupDelete|info")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -24,53 +24,53 @@ func main() {
 		os.Exit(1)
 	}
 
-		//load env parameters
-		configMap := getEnvParams()
+	//load env parameters
+	configMap := getEnvParams()
 
 	if *optAction == "backup" {
 		backup(configMap)
 	} else if *optAction == "restore" {
-		restore(configMap)		
+		restore(configMap)
 	} else if *optAction == "backupList" {
 		backupList(configMap)
 	} else if *optAction == "backupDelete" {
-		backupDelete(configMap)		
+		backupDelete(configMap)
 	} else if *optAction == "info" {
-		info()			
+		info()
 	} else {
 		fmt.Println("ERROR Incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
-}	
+}
 
-func backup (configMap map[string]string) {
+func backup(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Backup ***")
 }
 
-func restore (configMap map[string]string) {
+func restore(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Restore ***")
 }
 
-func backupList (configMap map[string]string) {
+func backupList(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Backup list ***")
 }
 
-func backupDelete (configMap map[string]string) {
+func backupDelete(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Backup delete ***")
 }
 
-func info () {
+func info() {
 	var plugin util.Plugin = setPlugin()
 
 	//output json
 	b, err := json.Marshal(plugin)
-    if err != nil {
-        fmt.Println("ERROR " + err.Error())
+	if err != nil {
+		fmt.Println("ERROR " + err.Error())
 	} else {
 		fmt.Println(string(b))
 	}
@@ -95,7 +95,7 @@ func setPlugin() (plugin util.Plugin) {
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,backupCap,backupListCap,backupDeleteCap,infoCap)
+	capabilities = append(capabilities, backupCap, backupListCap, backupDeleteCap, infoCap)
 
 	plugin.Capabilities = capabilities
 
@@ -103,7 +103,7 @@ func setPlugin() (plugin util.Plugin) {
 }
 
 func printEnv(configMap map[string]string) {
-	config,err := util.ConfigMapToJson(configMap)
+	config, err := util.ConfigMapToJson(configMap)
 	if err != nil {
 		fmt.Println("ERROR " + err.Error())
 	}

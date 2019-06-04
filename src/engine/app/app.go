@@ -1,12 +1,12 @@
 package main
- 
+
 import (
-    "log"
-    "net/http"
-    "os"
-    "fossul/src/engine/util"
-    "github.com/swaggo/http-swagger"
-    _ "fossul/src/engine/app/docs"
+	_ "fossul/src/engine/app/docs"
+	"fossul/src/engine/util"
+	"github.com/swaggo/http-swagger"
+	"log"
+	"net/http"
+	"os"
 )
 
 const version = "1.0.0"
@@ -28,26 +28,26 @@ var debug string = os.Getenv("FOSSUL_APP_DEBUG")
 
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
- 
+
 func main() {
-    log.Println("Plugin directory [" + pluginDir + "]")
-    err := util.CreateDir(pluginDir,0755)
-    if err != nil {
-        log.Fatal(err)
-    }
+	log.Println("Plugin directory [" + pluginDir + "]")
+	err := util.CreateDir(pluginDir, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    os.Setenv("MyUser", myUser)
-    os.Setenv("MyPass", myPass)
+	os.Setenv("MyUser", myUser)
+	os.Setenv("MyPass", myPass)
 
-    router := NewRouter()
-    router.PathPrefix("/api/v1").Handler(httpSwagger.WrapHandler)
- 
-    log.Println("Starting app service on port [" + port + "]")
-    log.Fatal(http.ListenAndServe(":" + port, router))
+	router := NewRouter()
+	router.PathPrefix("/api/v1").Handler(httpSwagger.WrapHandler)
+
+	log.Println("Starting app service on port [" + port + "]")
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
 
 func printConfigDebug(config util.Config) {
-    if debug == "true" {
-		log.Println("[DEBUG]",config)
+	if debug == "true" {
+		log.Println("[DEBUG]", config)
 	}
 }

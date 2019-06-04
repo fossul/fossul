@@ -5,6 +5,7 @@ import (
 )
 
 type archivePlugin string
+
 var ArchivePlugin archivePlugin
 
 func (r archivePlugin) SetEnv(config util.Config) util.Result {
@@ -17,31 +18,31 @@ func (r archivePlugin) SetEnv(config util.Config) util.Result {
 	return result
 }
 
-func (r archivePlugin) Archive(config util.Config) util.Result {	
+func (r archivePlugin) Archive(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
 
 	msg := util.SetMessage("INFO", "*** Archive ***")
-	messages = append(messages,msg)
+	messages = append(messages, msg)
 
 	result = util.SetResult(resultCode, messages)
 	return result
 }
 
-func (r archivePlugin) ArchiveDelete(config util.Config) util.Result {	
+func (r archivePlugin) ArchiveDelete(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
 
 	msg := util.SetMessage("INFO", "*** Archive Delete ***")
-	messages = append(messages,msg)
+	messages = append(messages, msg)
 
 	result = util.SetResult(resultCode, messages)
 	return result
 }
 
-func (r archivePlugin) ArchiveList(config util.Config) []util.Archive {	
+func (r archivePlugin) ArchiveList(config util.Config) []util.Archive {
 	var archives []util.Archive
 
 	return archives
@@ -71,7 +72,7 @@ func setPlugin() (plugin util.Plugin) {
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,archiveCap,archiveListCap,archiveDeleteCap,infoCap)
+	capabilities = append(capabilities, archiveCap, archiveListCap, archiveDeleteCap, infoCap)
 
 	plugin.Capabilities = capabilities
 

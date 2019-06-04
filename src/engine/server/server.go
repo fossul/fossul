@@ -1,12 +1,12 @@
 package main
- 
+
 import (
-    "log"
-    "net/http"
-    "fossul/src/engine/util"
-    "os"
+	_ "fossul/src/engine/server/docs"
+	"fossul/src/engine/util"
 	"github.com/swaggo/http-swagger"
-    _ "fossul/src/engine/server/docs"
+	"log"
+	"net/http"
+	"os"
 )
 
 const version = "1.0.0"
@@ -39,39 +39,39 @@ var runningWorkflowMap map[string]string = make(map[string]string)
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
 func main() {
-    
-    log.Println("Configs directory [" + configDir + "] Data directory [" + dataDir + "]")
-    err := util.CreateDir(configDir,0755)
-    if err != nil {
-        log.Fatal(err)
-    }
 
-    err = util.CreateDir(dataDir,0755)
-    if err != nil {
-        log.Fatal(err)
-    }
+	log.Println("Configs directory [" + configDir + "] Data directory [" + dataDir + "]")
+	err := util.CreateDir(configDir, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    router := NewRouter()
-    router.PathPrefix("/api/v1").Handler(httpSwagger.WrapHandler)
+	err = util.CreateDir(dataDir, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    StartCron()
-    err = LoadCronSchedules()
-    if err != nil {
-        log.Fatal(err)
-    }
+	router := NewRouter()
+	router.PathPrefix("/api/v1").Handler(httpSwagger.WrapHandler)
 
-    log.Println("Starting server service on port [" + port + "]")
-    log.Fatal(http.ListenAndServe(":" + port, router))
+	StartCron()
+	err = LoadCronSchedules()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("Starting server service on port [" + port + "]")
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
 
 func printConfigDebug(config util.Config) {
-    if debug == "true" {
-		log.Println("[DEBUG]",config)
+	if debug == "true" {
+		log.Println("[DEBUG]", config)
 	}
 }
 
 func printConfigMapDebug(configMap map[string]string) {
-    if debug == "true" {
-		log.Println("[DEBUG]",configMap)
+	if debug == "true" {
+		log.Println("[DEBUG]", configMap)
 	}
 }

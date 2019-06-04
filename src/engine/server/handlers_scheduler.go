@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
-	"net/http"
 	"fossul/src/engine/util"
+	"github.com/gorilla/mux"
 	"log"
+	"net/http"
 )
 
 // AddSchedule godoc
@@ -26,36 +26,36 @@ func AddSchedule(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var profileName string = params["profileName"]
 	var configName string = params["configName"]
-	var policy string = params["policy"]	
+	var policy string = params["policy"]
 
 	var result util.Result
 	var messages []util.Message
 
-	cronSchedule,err := util.GetCronSchedule(w,r)
+	cronSchedule, err := util.GetCronSchedule(w, r)
 	if err != nil {
-		msg := util.SetMessage("ERROR","Couldn't get cron schedule! " + err.Error())
+		msg := util.SetMessage("ERROR", "Couldn't get cron schedule! "+err.Error())
 		messages = append(messages, msg)
 
 		result.Code = 1
-		result.Messages = messages	
-		
+		result.Messages = messages
+
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
-		
+
 		return
 	}
 
-	id,err := AddCronSchedule(profileName,configName,policy,cronSchedule.Value)
+	id, err := AddCronSchedule(profileName, configName, policy, cronSchedule.Value)
 	if err != nil {
-		msg := util.SetMessage("ERROR","Add schedule failed! " + err.Error())
+		msg := util.SetMessage("ERROR", "Add schedule failed! "+err.Error())
 		messages = append(messages, msg)
 
 		result.Code = 1
-		result.Messages = messages	
-		
+		result.Messages = messages
+
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
-		
+
 		return
 	}
 
@@ -63,12 +63,12 @@ func AddSchedule(w http.ResponseWriter, r *http.Request) {
 		log.Println("[DEBUG] Added schedule with id", id)
 	}
 
-	msg := util.SetMessage("INFO","Add schedule completed successfully")
+	msg := util.SetMessage("INFO", "Add schedule completed successfully")
 	messages = append(messages, msg)
 
 	result.Code = 0
-	result.Messages = messages	
-	
+	result.Messages = messages
+
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
@@ -95,26 +95,26 @@ func DeleteSchedule(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
 
-	err := DeleteCronSchedule(profileName,configName,policy)
+	err := DeleteCronSchedule(profileName, configName, policy)
 	if err != nil {
-		msg := util.SetMessage("ERROR","Delete schedule failed! " + err.Error())
+		msg := util.SetMessage("ERROR", "Delete schedule failed! "+err.Error())
 		messages = append(messages, msg)
 
 		result.Code = 1
-		result.Messages = messages	
-		
+		result.Messages = messages
+
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
-		
+
 		return
 	}
 
-	msg := util.SetMessage("INFO","Delete schedule completed successfully")
+	msg := util.SetMessage("INFO", "Delete schedule completed successfully")
 	messages = append(messages, msg)
 
 	result.Code = 0
-	result.Messages = messages	
-	
+	result.Messages = messages
+
 	_ = json.NewDecoder(r.Body).Decode(&result)
 	json.NewEncoder(w).Encode(result)
 }
@@ -135,42 +135,42 @@ func ListSchedules(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
 
-	jobScheduleFiles,err := FindJobSchedules()
+	jobScheduleFiles, err := FindJobSchedules()
 	if err != nil {
-		msg := util.SetMessage("ERROR","Couldn't find job schedules! " + err.Error())
+		msg := util.SetMessage("ERROR", "Couldn't find job schedules! "+err.Error())
 		messages = append(messages, msg)
 
 		result.Code = 1
-		result.Messages = messages	
+		result.Messages = messages
 
 		jobScheduleResult.Result = result
-		
+
 		_ = json.NewDecoder(r.Body).Decode(&jobScheduleResult)
 		json.NewEncoder(w).Encode(jobScheduleResult)
-		
+
 		return
 	}
 
-	for _,path := range jobScheduleFiles {
-		schedule,err := ReadJobSchedule(path)
+	for _, path := range jobScheduleFiles {
+		schedule, err := ReadJobSchedule(path)
 		if err != nil {
-			msg := util.SetMessage("ERROR","Couldn't read schedule! " + err.Error())
+			msg := util.SetMessage("ERROR", "Couldn't read schedule! "+err.Error())
 			messages = append(messages, msg)
-	
+
 			result.Code = 1
-			result.Messages = messages	
-	
+			result.Messages = messages
+
 			jobScheduleResult.Result = result
-			
+
 			_ = json.NewDecoder(r.Body).Decode(&jobScheduleResult)
 			json.NewEncoder(w).Encode(jobScheduleResult)
-			
+
 			return
 		}
 
-		jobSchedules = append(jobSchedules,schedule)
+		jobSchedules = append(jobSchedules, schedule)
 
-	}	
+	}
 	result.Code = 0
 	jobScheduleResult.Result = result
 	jobScheduleResult.JobSchedules = jobSchedules

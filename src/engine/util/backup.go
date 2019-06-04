@@ -1,16 +1,16 @@
 package util
 
 type Backups struct {
-	Backups        []Backup `json:"backup,omitempty"`
-	Result         Result `json:"result,omitempty"`
+	Backups []Backup `json:"backup,omitempty"`
+	Result  Result   `json:"result,omitempty"`
 }
 
 type Backup struct {
-	Name          string    `json:"name,omitempty"`
-	Timestamp     string    `json:"timestamp,omitempty"`
-	Epoch         int    	`json:"epoch,omitempty"`
-	Policy        string    `json:"policy,omitempty"`
-	WorkflowId	  string 	`json:"workflowId,omitempty"`
+	Name       string `json:"name,omitempty"`
+	Timestamp  string `json:"timestamp,omitempty"`
+	Epoch      int    `json:"epoch,omitempty"`
+	Policy     string `json:"policy,omitempty"`
+	WorkflowId string `json:"workflowId,omitempty"`
 }
 
 type ByEpoch []Backup
@@ -23,7 +23,7 @@ func GetBackupsByPolicy(policy string, backups []Backup) []Backup {
 	var backupsByPolicy []Backup
 	for _, backup := range backups {
 		if policy == backup.Policy {
-			backupsByPolicy = append(backupsByPolicy,backup)
+			backupsByPolicy = append(backupsByPolicy, backup)
 		}
 	}
 

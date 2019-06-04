@@ -1,15 +1,15 @@
 package main
 
 import (
-	"os"
-	"github.com/pborman/getopt/v2"
-	"fossul/src/engine/util"
 	"encoding/json"
 	"fmt"
+	"fossul/src/engine/util"
+	"github.com/pborman/getopt/v2"
+	"os"
 )
 
 func main() {
-	optAction := getopt.StringLong("action",'a',"","archive|archiveList|archiveDelete")
+	optAction := getopt.StringLong("action", 'a', "", "archive|archiveList|archiveDelete")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -24,46 +24,46 @@ func main() {
 		os.Exit(1)
 	}
 
-		//load env parameters
-		configMap := getEnvParams()
+	//load env parameters
+	configMap := getEnvParams()
 
 	if *optAction == "archive" {
 		archive(configMap)
 	} else if *optAction == "archiveList" {
 		archiveList(configMap)
 	} else if *optAction == "archiveDelete" {
-		archiveDelete(configMap)		
+		archiveDelete(configMap)
 	} else if *optAction == "info" {
-		info()			
+		info()
 	} else {
 		fmt.Println("ERROR Incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
 		os.Exit(1)
 	}
-}	
+}
 
-func archive (configMap map[string]string) {
+func archive(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Archive ***")
 }
 
-func archiveList (configMap map[string]string) {
+func archiveList(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Archive list ***")
 }
 
-func archiveDelete (configMap map[string]string) {
+func archiveDelete(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Archive delete ***")
 }
 
-func info () {
+func info() {
 	var plugin util.Plugin = setPlugin()
 
 	//output json
 	b, err := json.Marshal(plugin)
-    if err != nil {
-        fmt.Println("ERROR " + err.Error())
+	if err != nil {
+		fmt.Println("ERROR " + err.Error())
 	} else {
 		fmt.Println(string(b))
 	}
@@ -88,7 +88,7 @@ func setPlugin() (plugin util.Plugin) {
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,archiveCap,archiveListCap,archiveDeleteCap,infoCap)
+	capabilities = append(capabilities, archiveCap, archiveListCap, archiveDeleteCap, infoCap)
 
 	plugin.Capabilities = capabilities
 
@@ -96,7 +96,7 @@ func setPlugin() (plugin util.Plugin) {
 }
 
 func printEnv(configMap map[string]string) {
-	config,err := util.ConfigMapToJson(configMap)
+	config, err := util.ConfigMapToJson(configMap)
 	if err != nil {
 		fmt.Println("ERROR " + err.Error())
 	}

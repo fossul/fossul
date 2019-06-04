@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"fossul/src/engine/util"
+	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
 )
@@ -12,7 +12,7 @@ import (
 // @Description Status and version information for the service
 // @Accept  json
 // @Produce  json
-// @Success 200 {string} string 
+// @Success 200 {string} string
 // @Header 200 {string} string
 // @Failure 400 {string} string
 // @Failure 404 {string} string
@@ -22,7 +22,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 	var status util.Status
 	status.Msg = "OK"
 	status.Version = version
-	
+
 	json.NewEncoder(w).Encode(status)
 }
 
@@ -31,7 +31,7 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 // @Param config body util.Config true "config struct"
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} util.Result 
+// @Success 200 {object} util.Result
 // @Header 200 {string} string
 // @Failure 400 {string} string
 // @Failure 404 {string} string
@@ -40,28 +40,28 @@ func GetStatus(w http.ResponseWriter, r *http.Request) {
 func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
 
 	if config.SendTrapSuccessCmd != "" {
 		args := strings.Split(config.SendTrapSuccessCmd, ",")
-		message := util.SetMessage("INFO", "Performing send trap success command [" + config.SendTrapSuccessCmd + "]")
+		message := util.SetMessage("INFO", "Performing send trap success command ["+config.SendTrapSuccessCmd+"]")
 
 		result = util.ExecuteCommand(args...)
-		result.Messages = util.PrependMessage(message,result.Messages)
+		result.Messages = util.PrependMessage(message, result.Messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
@@ -73,7 +73,7 @@ func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 // @Param config body util.Config true "config struct"
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} util.Result 
+// @Success 200 {object} util.Result
 // @Header 200 {string} string
 // @Failure 400 {string} string
 // @Failure 404 {string} string
@@ -82,28 +82,28 @@ func SendTrapSuccessCmd(w http.ResponseWriter, r *http.Request) {
 func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
 
 	if config.SendTrapSuccessCmd != "" {
 		args := strings.Split(config.SendTrapErrorCmd, ",")
-		message := util.SetMessage("INFO", "Performing send trap error command [" + config.SendTrapSuccessCmd + "]")
+		message := util.SetMessage("INFO", "Performing send trap error command ["+config.SendTrapSuccessCmd+"]")
 
 		result = util.ExecuteCommand(args...)
-		result.Messages = util.PrependMessage(message,result.Messages)
+		result.Messages = util.PrependMessage(message, result.Messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
@@ -123,21 +123,21 @@ func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string
 // @Router /getJobs/{profileName}/{configName} [get]
 func GetJobs(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)	
+	params := mux.Vars(r)
 	var profileName string = params["profileName"]
 	var configName string = params["configName"]
 
 	jobsDir := dataDir + "/" + profileName + "/" + configName
-	
+
 	var result util.Result
 	var messages []util.Message
 
 	var jobs util.Jobs
 	var jobList []util.Job
-	jobList,err := util.ListJobs(jobsDir)
+	jobList, err := util.ListJobs(jobsDir)
 
 	if err != nil {
-		msg := util.SetMessage("ERROR","Job list failed! " + err.Error())
+		msg := util.SetMessage("ERROR", "Job list failed! "+err.Error())
 		messages = append(messages, msg)
 
 		result = util.SetResult(1, messages)

@@ -6,6 +6,7 @@ import (
 )
 
 type appPlugin string
+
 var AppPlugin appPlugin
 
 func (a appPlugin) SetEnv(config util.Config) util.Result {
@@ -23,53 +24,53 @@ func (a appPlugin) Discover(config util.Config) util.DiscoverResult {
 	return discoverResult
 }
 
-func (a appPlugin) Quiesce(config util.Config) util.Result {	
+func (a appPlugin) Quiesce(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
 
 	msg := util.SetMessage("INFO", "*** Application Quiesce ***")
-	messages = append(messages,msg)
+	messages = append(messages, msg)
 
 	result = util.SetResult(resultCode, messages)
 	return result
 }
 
-func (a appPlugin) Unquiesce(config util.Config) util.Result {	
+func (a appPlugin) Unquiesce(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
 
 	msg := util.SetMessage("INFO", "*** Application Unquiesce ***")
-	messages = append(messages,msg)
+	messages = append(messages, msg)
 
 	result = util.SetResult(resultCode, messages)
 	return result
 }
 
-func (a appPlugin) PreRestore(config util.Config) util.Result {	
+func (a appPlugin) PreRestore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
 
 	msg := util.SetMessage("INFO", "*** Application PreRestore ***")
-	messages = append(messages,msg)
+	messages = append(messages, msg)
 
 	result = util.SetResult(resultCode, messages)
 	return result
-}	
+}
 
-func (a appPlugin) PostRestore(config util.Config) util.Result {	
+func (a appPlugin) PostRestore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
 
 	msg := util.SetMessage("INFO", "*** Application PostRestore ***")
-	messages = append(messages,msg)
+	messages = append(messages, msg)
 
 	result = util.SetResult(resultCode, messages)
 	return result
-}	
+}
 
 func (a appPlugin) Info() util.Plugin {
 	var plugin util.Plugin = setPlugin()
@@ -78,12 +79,12 @@ func (a appPlugin) Info() util.Plugin {
 
 func setDiscoverResult() (discoverResult util.DiscoverResult) {
 	var data []string
-	data = append(data,"/path/to/data/file1")
-	data = append(data,"/path/to/data/file2")
+	data = append(data, "/path/to/data/file1")
+	data = append(data, "/path/to/data/file2")
 
 	var logs []string
-	logs = append(logs,"/path/to/logs/file1")
-	logs = append(logs,"/path/to/logs/file2")
+	logs = append(logs, "/path/to/logs/file1")
+	logs = append(logs, "/path/to/logs/file2")
 
 	var discoverInst1 util.Discover
 	discoverInst1.Instance = "inst1"
@@ -100,20 +101,20 @@ func setDiscoverResult() (discoverResult util.DiscoverResult) {
 	discoverList = append(discoverList, discoverInst2)
 
 	var messages []util.Message
-	msg := util.SetMessage("INFO","*** Application Discovery ***")
-	messages = append(messages,msg)
+	msg := util.SetMessage("INFO", "*** Application Discovery ***")
+	messages = append(messages, msg)
 
-	for _,discover := range discoverList {
-		dataFiles := strings.Join(discover.DataFilePaths," ")
-		logFiles := strings.Join(discover.LogFilePaths," ")
-		msg := util.SetMessage("INFO","Instance [" + discover.Instance + "] data files: [" + dataFiles + "] log files: [" + logFiles + "]")
-		messages = append(messages,msg)
+	for _, discover := range discoverList {
+		dataFiles := strings.Join(discover.DataFilePaths, " ")
+		logFiles := strings.Join(discover.LogFilePaths, " ")
+		msg := util.SetMessage("INFO", "Instance ["+discover.Instance+"] data files: ["+dataFiles+"] log files: ["+logFiles+"]")
+		messages = append(messages, msg)
 	}
 
-	result := util.SetResult(0,messages)
+	result := util.SetResult(0, messages)
 	discoverResult.Result = result
 	discoverResult.DiscoverList = discoverList
-	
+
 	return discoverResult
 }
 
@@ -126,7 +127,7 @@ func setPlugin() (plugin util.Plugin) {
 	var capabilities []util.Capability
 	var discoverCap util.Capability
 	discoverCap.Name = "discover"
-	
+
 	var quiesceCap util.Capability
 	quiesceCap.Name = "quiesce"
 
@@ -142,7 +143,7 @@ func setPlugin() (plugin util.Plugin) {
 	var infoCap util.Capability
 	infoCap.Name = "info"
 
-	capabilities = append(capabilities,discoverCap,quiesceCap,unquiesceCap,preRestoreCap,postRestoreCap,infoCap)
+	capabilities = append(capabilities, discoverCap, quiesceCap, unquiesceCap, preRestoreCap, postRestoreCap, infoCap)
 
 	plugin.Capabilities = capabilities
 

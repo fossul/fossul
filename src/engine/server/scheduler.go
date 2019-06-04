@@ -1,11 +1,11 @@
 package main
 
 import (
-	"gopkg.in/robfig/cron.v3"
 	"fossul/src/engine/client"
 	"fossul/src/engine/util"
-	"strings"
+	"gopkg.in/robfig/cron.v3"
 	"os"
+	"strings"
 )
 
 var c *CronScheduler
@@ -19,31 +19,31 @@ func StartCron() {
 	c.cronScheduler.Start()
 }
 
-func AddCronSchedule(profileName,configName,policy,cronSchedule string) (cron.EntryID,error) {
+func AddCronSchedule(profileName, configName, policy, cronSchedule string) (cron.EntryID, error) {
 	var id cron.EntryID
 	var err error
 
 	auth := SetAuth()
 
-	id,err = c.cronScheduler.AddFunc(cronSchedule, func() {
-		client.StartBackupWorkflow(auth,profileName,configName,policy)
+	id, err = c.cronScheduler.AddFunc(cronSchedule, func() {
+		client.StartBackupWorkflow(auth, profileName, configName, policy)
 	})
-	
+
 	if err != nil {
-		return id,err
+		return id, err
 	}
 
-	err = writeJobSchedule(id,cronSchedule,profileName,configName,policy)
+	err = writeJobSchedule(id, cronSchedule, profileName, configName, policy)
 	if err != nil {
-		return id,err
+		return id, err
 	}
 
-	return id,nil
+	return id, nil
 }
 
-func DeleteCronSchedule(profileName,configName,policy string) error {
+func DeleteCronSchedule(profileName, configName, policy string) error {
 	path := dataDir + "/" + profileName + "/" + configName + "/jobSchedule_" + policy
-	schedule,err := ReadJobSchedule(path)
+	schedule, err := ReadJobSchedule(path)
 	if err != nil {
 		return err
 	}
@@ -63,23 +63,23 @@ func ListCronSchedule() []cron.Entry {
 }
 
 func LoadCronSchedules() error {
-	jobScheduleFiles,err := FindJobSchedules()
+	jobScheduleFiles, err := FindJobSchedules()
 	if err != nil {
 		return err
 	}
 
-	for _,path := range jobScheduleFiles {
-		schedule,err := ReadJobSchedule(path)
+	for _, path := range jobScheduleFiles {
+		schedule, err := ReadJobSchedule(path)
 		if err != nil {
 			return err
 		}
 
-		id,err := AddCronSchedule(schedule.ProfileName,schedule.ConfigName,schedule.BackupPolicy,schedule.CronSchedule)
+		id, err := AddCronSchedule(schedule.ProfileName, schedule.ConfigName, schedule.BackupPolicy, schedule.CronSchedule)
 		if err != nil {
 			return err
 		}
 
-		err = writeJobSchedule(id,schedule.CronSchedule,schedule.ProfileName,schedule.ConfigName,schedule.BackupPolicy)
+		err = writeJobSchedule(id, schedule.CronSchedule, schedule.ProfileName, schedule.ConfigName, schedule.BackupPolicy)
 		if err != nil {
 			return err
 		}
@@ -93,7 +93,7 @@ func getCron() *CronScheduler {
 	return c
 }
 
-func writeJobSchedule(id cron.EntryID,cronSchedule,profileName,configName,policy string) error {
+func writeJobSchedule(id cron.EntryID, cronSchedule, profileName, configName, policy string) error {
 	var jobSchedule util.JobSchedule
 	jobSchedule.CronId = id
 	jobSchedule.CronSchedule = cronSchedule
@@ -103,12 +103,12 @@ func writeJobSchedule(id cron.EntryID,cronSchedule,profileName,configName,policy
 
 	scheduleFileDir := dataDir + "/" + profileName + "/" + configName
 	scheduleFile := dataDir + "/" + profileName + "/" + configName + "/jobSchedule_" + policy
-	err := util.CreateDir(scheduleFileDir,0755)
+	err := util.CreateDir(scheduleFileDir, 0755)
 	if err != nil {
 		return err
 	}
 
-	err = util.WriteGob(scheduleFile,jobSchedule)
+	err = util.WriteGob(scheduleFile, jobSchedule)
 	if err != nil {
 		return err
 	}
@@ -116,44 +116,44 @@ func writeJobSchedule(id cron.EntryID,cronSchedule,profileName,configName,policy
 	return nil
 }
 
-func ReadJobSchedule(scheduleFile string) (util.JobSchedule,error) {
+func ReadJobSchedule(scheduleFile string) (util.JobSchedule, error) {
 	jobSchedule := &util.JobSchedule{}
-	err := util.ReadGob(scheduleFile,&jobSchedule)
+	err := util.ReadGob(scheduleFile, &jobSchedule)
 	if err != nil {
-		return *jobSchedule,err
+		return *jobSchedule, err
 	}
 
-	return *jobSchedule,nil
+	return *jobSchedule, nil
 }
 
-func FindJobSchedules() ([]string,error) {
+func FindJobSchedules() ([]string, error) {
 	var jobScheduleFiles []string
 
-	profiles,err := util.DirectoryList(dataDir)
+	profiles, err := util.DirectoryList(dataDir)
 	if err != nil {
-		return jobScheduleFiles,err
+		return jobScheduleFiles, err
 	}
 
-	for _,profile := range profiles {
-		configs,err := util.DirectoryList(dataDir + "/" + profile)
+	for _, profile := range profiles {
+		configs, err := util.DirectoryList(dataDir + "/" + profile)
 		if err != nil {
-			return jobScheduleFiles,err
+			return jobScheduleFiles, err
 		}
 
-		for _,config := range configs {
-			files,err := util.FileList(dataDir + "/" + profile + "/" + config)
+		for _, config := range configs {
+			files, err := util.FileList(dataDir + "/" + profile + "/" + config)
 			if err != nil {
-				return jobScheduleFiles,err
+				return jobScheduleFiles, err
 			}
 
-			for _,file := range files {
-				if strings.Contains(file,"jobSchedule_") {
+			for _, file := range files {
+				if strings.Contains(file, "jobSchedule_") {
 					path := dataDir + "/" + profile + "/" + config + "/" + file
-					jobScheduleFiles = append(jobScheduleFiles,path)
+					jobScheduleFiles = append(jobScheduleFiles, path)
 				}
 			}
 		}
 	}
 
-	return jobScheduleFiles,nil
+	return jobScheduleFiles, nil
 }

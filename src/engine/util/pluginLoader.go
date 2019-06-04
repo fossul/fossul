@@ -1,11 +1,11 @@
 package util
 
 import (
-//	"log"
+	//	"log"
 	"os"
 	"os/exec"
 	"strings"
-//	"reflect"
+	//	"reflect"
 	"fmt"
 )
 
@@ -15,7 +15,7 @@ func ExecutePlugin(config Config, pluginType string, args ...string) (result Res
 	cmdArgs := args[1:]
 
 	var messages []Message
-	s0 := fmt.Sprintf("Executing plugin [%s %s]",baseCmd, strings.Join(cmdArgs, " "))
+	s0 := fmt.Sprintf("Executing plugin [%s %s]", baseCmd, strings.Join(cmdArgs, " "))
 	message := SetMessage("CMD", s0)
 	messages = append(messages, message)
 
@@ -32,7 +32,7 @@ func ExecutePlugin(config Config, pluginType string, args ...string) (result Res
 	var resultCode int
 	stdoutStderrBytes, err := cmd.CombinedOutput()
 	if err != nil {
-		s1 := fmt.Sprintf("Plugin command [%s %s] failed",baseCmd, strings.Join(cmdArgs, " "))
+		s1 := fmt.Sprintf("Plugin command [%s %s] failed", baseCmd, strings.Join(cmdArgs, " "))
 		message := SetMessage("ERROR", s1)
 		messages = append(messages, message)
 
@@ -42,7 +42,7 @@ func ExecutePlugin(config Config, pluginType string, args ...string) (result Res
 
 		resultCode = 1
 	} else {
-		s1 := fmt.Sprintf("Plugin command [%s %s] completed successfully",baseCmd, strings.Join(cmdArgs, " "))
+		s1 := fmt.Sprintf("Plugin command [%s %s] completed successfully", baseCmd, strings.Join(cmdArgs, " "))
 		message := SetMessage("INFO", s1)
 		messages = append(messages, message)
 
@@ -68,13 +68,13 @@ func ExecutePluginSimple(config Config, pluginType string, args ...string) (resu
 	baseCmd := args[0]
 	cmdArgs := args[1:]
 
-	s := fmt.Sprintf("CMD executing plugin [%s %s]",baseCmd, strings.Join(cmdArgs, " "))
+	s := fmt.Sprintf("CMD executing plugin [%s %s]", baseCmd, strings.Join(cmdArgs, " "))
 	fmt.Println(s)
 
 	cmd := exec.Command(baseCmd, cmdArgs...)
 	if pluginType == "app" {
 		cmd = setBasePluginEnv(config, cmd)
-		cmd = setAppPluginEnv(config, cmd)	
+		cmd = setAppPluginEnv(config, cmd)
 	} else if pluginType == "storage" {
 		cmd = setBasePluginEnv(config, cmd)
 		cmd = setStoragePluginEnv(config, cmd)
@@ -83,17 +83,17 @@ func ExecutePluginSimple(config Config, pluginType string, args ...string) (resu
 	var resultCode int
 	stdoutStderrBytes, err := cmd.CombinedOutput()
 	if err != nil {
-		s := fmt.Sprintf("ERROR plugin command [%s %s] failed",baseCmd, strings.Join(cmdArgs, " "))
+		s := fmt.Sprintf("ERROR plugin command [%s %s] failed", baseCmd, strings.Join(cmdArgs, " "))
 		fmt.Println(s)
 		fmt.Println("ERROR plugin command failed with\n", err)
 		resultCode = 1
 	} else {
 		resultCode = 0
-		s := fmt.Sprintf("INFO plugin command [%s %s] completed successfully",baseCmd, strings.Join(cmdArgs, " "))
+		s := fmt.Sprintf("INFO plugin command [%s %s] completed successfully", baseCmd, strings.Join(cmdArgs, " "))
 		fmt.Println(s)
 
 	}
-	
+
 	output := string(stdoutStderrBytes)
 	outputArray := strings.Split(output, "\n")
 
@@ -104,35 +104,35 @@ func ExecutePluginSimple(config Config, pluginType string, args ...string) (resu
 }
 
 func setAppPluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
-	for k, v := range config.AppPluginParameters { 
-		cmd.Env = append(cmd.Env, k + "=" + v)
+	for k, v := range config.AppPluginParameters {
+		cmd.Env = append(cmd.Env, k+"="+v)
 	}
-	
+
 	return cmd
 }
 
 func setStoragePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
-	for k, v := range config.StoragePluginParameters { 
-		cmd.Env = append(cmd.Env, k + "=" + v)
+	for k, v := range config.StoragePluginParameters {
+		cmd.Env = append(cmd.Env, k+"="+v)
 	}
-	
+
 	return cmd
 }
 
-func setBasePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd  {
+func setBasePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
 	cmd.Env = os.Environ()
-	cmd.Env = append(cmd.Env, "ProfileName=" +  config.ProfileName)
-	cmd.Env = append(cmd.Env, "ConfigName=" + config.ConfigName)
-	cmd.Env = append(cmd.Env, "AutoDiscovery=" + BoolToString(config.AutoDiscovery))
-	cmd.Env = append(cmd.Env, "WorkflowId=" + config.WorkflowId)
-	cmd.Env = append(cmd.Env, "SelectedWorkflowId=" +  IntToString(config.SelectedWorkflowId))
-	cmd.Env = append(cmd.Env, "BackupPolicy=" + config.SelectedBackupPolicy)
+	cmd.Env = append(cmd.Env, "ProfileName="+config.ProfileName)
+	cmd.Env = append(cmd.Env, "ConfigName="+config.ConfigName)
+	cmd.Env = append(cmd.Env, "AutoDiscovery="+BoolToString(config.AutoDiscovery))
+	cmd.Env = append(cmd.Env, "WorkflowId="+config.WorkflowId)
+	cmd.Env = append(cmd.Env, "SelectedWorkflowId="+IntToString(config.SelectedWorkflowId))
+	cmd.Env = append(cmd.Env, "BackupPolicy="+config.SelectedBackupPolicy)
 
 	backupRetentionToString := IntToString(config.SelectedBackupRetention)
-	cmd.Env = append(cmd.Env, "BackupRetention=" + backupRetentionToString)
+	cmd.Env = append(cmd.Env, "BackupRetention="+backupRetentionToString)
 
 	return cmd
-}	
+}
 
 /*
 func setBaseContainerPluginEnvtest(config Config) {

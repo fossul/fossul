@@ -1,8 +1,8 @@
 package util
 
 import (
-	"testing"
 	"strings"
+	"testing"
 )
 
 func TestGetBackupDir(t *testing.T) {
@@ -18,7 +18,7 @@ func TestGetBackupPath(t *testing.T) {
 	configMap := getConfigMap()
 	backupPath := GetBackupPathFromMap(configMap)
 
-	if ! strings.Contains(backupPath,"/backupdest/default/default/mybackup_daily_777") {
+	if !strings.Contains(backupPath, "/backupdest/default/default/mybackup_daily_777") {
 		t.Fail()
 	}
 }
@@ -36,14 +36,14 @@ func getConfigMap() map[string]string {
 	return configMap
 }
 
-func TestCreateDeleteDir(t *testing.T)  {
+func TestCreateDeleteDir(t *testing.T) {
 	dir := "/tmp/foobar123"
 
-	err := CreateDir(dir,0755)
+	err := CreateDir(dir, 0755)
 	if err != nil {
 		t.Fail()
 	}
-	
+
 	exists := ExistsPath(dir)
 
 	if exists == true {

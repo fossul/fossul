@@ -22,28 +22,28 @@ import (
 func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.AppUnquiesceCmd, ",")
-		message := util.SetMessage("INFO", "Performing unquiesce command [" + config.PreAppQuiesceCmd + "]")
+		message := util.SetMessage("INFO", "Performing unquiesce command ["+config.PreAppQuiesceCmd+"]")
 
 		result = util.ExecuteCommand(args...)
-		result.Messages = util.PrependMessage(message,result.Messages)
+		result.Messages = util.PrependMessage(message, result.Messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
@@ -64,28 +64,28 @@ func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.PreAppUnquiesceCmd, ",")
-		message := util.SetMessage("INFO", "Performing pre unquiesce command [" + config.PreAppQuiesceCmd + "]")
+		message := util.SetMessage("INFO", "Performing pre unquiesce command ["+config.PreAppQuiesceCmd+"]")
 
 		result = util.ExecuteCommand(args...)
-		result.Messages = util.PrependMessage(message,result.Messages)
+		result.Messages = util.PrependMessage(message, result.Messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
@@ -106,18 +106,18 @@ func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 func Unquiesce(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
@@ -128,30 +128,30 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
 			var errMsg string = "\nApp plugin does not exist: " + plugin
-	
-			message := util.SetMessage("ERROR", errMsg + " " + err.Error())
+
+			message := util.SetMessage("ERROR", errMsg+" "+err.Error())
 			messages = append(messages, message)
-	
+
 			result = util.SetResult(1, messages)
-	
+
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)
 
 			return
 		}
-	
+
 		result = util.ExecutePlugin(config, "app", plugin, "--action", "unquiesce")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
-		plugin,err := util.GetAppInterface(pluginPath)
+		plugin, err := util.GetAppInterface(pluginPath)
 		if err != nil {
 			message := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, message)
 
-			result = util.SetResult(1, messages)			
+			result = util.SetResult(1, messages)
 			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)		
+			json.NewEncoder(w).Encode(result)
 		} else {
 			setEnvResult := plugin.SetEnv(config)
 			if setEnvResult.Code != 0 {
@@ -159,13 +159,13 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(setEnvResult)
 			} else {
 				result = plugin.Unquiesce(config)
-				messages = util.PrependMessages(setEnvResult.Messages,result.Messages)
+				messages = util.PrependMessages(setEnvResult.Messages, result.Messages)
 				result.Messages = messages
 
 				_ = json.NewDecoder(r.Body).Decode(&result)
-				json.NewEncoder(w).Encode(result)			
+				json.NewEncoder(w).Encode(result)
 			}
-		}			
+		}
 	}
 }
 
@@ -183,28 +183,28 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 	var result util.Result
 	var messages []util.Message
-	
-	config,err := util.GetConfig(w,r)
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
 	if err != nil {
-		message := util.SetMessage("ERROR", "Couldn't read config! " + err.Error())
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
 		messages = append(messages, message)
 
 		result = util.SetResult(1, messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)	
+		json.NewEncoder(w).Encode(result)
 
 		return
 	}
 
 	if config.PreAppQuiesceCmd != "" {
 		args := strings.Split(config.PostAppUnquiesceCmd, ",")
-		message := util.SetMessage("INFO", "Performing post unquiesce command [" + config.PreAppQuiesceCmd + "]")
+		message := util.SetMessage("INFO", "Performing post unquiesce command ["+config.PreAppQuiesceCmd+"]")
 
 		result = util.ExecuteCommand(args...)
-		result.Messages = util.PrependMessage(message,result.Messages)
+		result.Messages = util.PrependMessage(message, result.Messages)
 
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)

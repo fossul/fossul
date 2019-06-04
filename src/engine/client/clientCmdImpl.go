@@ -1,22 +1,22 @@
 package client
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fossul/src/engine/util"
 	"net/http"
-	"bytes"
-	"errors"
 )
 
-func PreQuiesceCmd(auth Auth,config util.Config) (util.Result,error) {
+func PreQuiesceCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/preQuiesceCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.AppHostname+":"+auth.AppPort+"/preQuiesceCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -26,31 +26,31 @@ func PreQuiesceCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func QuiesceCmd(auth Auth,config util.Config) (util.Result,error) {
+func QuiesceCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/quiesceCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.AppHostname+":"+auth.AppPort+"/quiesceCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -60,31 +60,31 @@ func QuiesceCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func PostQuiesceCmd(auth Auth,config util.Config) (util.Result,error) {
+func PostQuiesceCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/postQuiesceCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.AppHostname+":"+auth.AppPort+"/postQuiesceCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -94,31 +94,31 @@ func PostQuiesceCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func PreUnquiesceCmd(auth Auth,config util.Config) (util.Result,error) {
+func PreUnquiesceCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/preUnquiesceCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.AppHostname+":"+auth.AppPort+"/preUnquiesceCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -128,31 +128,31 @@ func PreUnquiesceCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func UnquiesceCmd(auth Auth,config util.Config) (util.Result,error) {
+func UnquiesceCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/unquiesceCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.AppHostname+":"+auth.AppPort+"/unquiesceCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -162,31 +162,31 @@ func UnquiesceCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func BackupCreateCmd(auth Auth,config util.Config) (util.Result,error) {
+func BackupCreateCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/backupCreateCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.StorageHostname+":"+auth.StoragePort+"/backupCreateCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -196,31 +196,31 @@ func BackupCreateCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func BackupDeleteCmd(auth Auth,config util.Config) (util.Result,error) {
+func BackupDeleteCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/backupDeleteCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.StorageHostname+":"+auth.StoragePort+"/backupDeleteCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -230,31 +230,31 @@ func BackupDeleteCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func PostUnquiesceCmd(auth Auth,config util.Config) (util.Result,error) {
+func PostUnquiesceCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/postUnquiesceCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.AppHostname+":"+auth.AppPort+"/postUnquiesceCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -264,32 +264,31 @@ func PostUnquiesceCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-
-func SendTrapSuccessCmd(auth Auth,config util.Config) (util.Result,error) {
+func SendTrapSuccessCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/sendTrapSuccessCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/sendTrapSuccessCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -299,31 +298,31 @@ func SendTrapSuccessCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func SendTrapErrorCmd(auth Auth,config util.Config) (util.Result,error) {
+func SendTrapErrorCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/sendTrapErrorCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/sendTrapErrorCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -333,31 +332,31 @@ func SendTrapErrorCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func ArchiveCreateCmd(auth Auth,config util.Config) (util.Result,error) {
+func ArchiveCreateCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/archiveCreateCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.StorageHostname+":"+auth.StoragePort+"/archiveCreateCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -367,31 +366,31 @@ func ArchiveCreateCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func ArchiveDeleteCmd(auth Auth,config util.Config) (util.Result,error) {
+func ArchiveDeleteCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/archiveDeleteCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.StorageHostname+":"+auth.StoragePort+"/archiveDeleteCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -401,31 +400,31 @@ func ArchiveDeleteCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func PreAppRestoreCmd(auth Auth,config util.Config) (util.Result,error) {
+func PreAppRestoreCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/preAppRestoreCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.AppHostname+":"+auth.AppPort+"/preAppRestoreCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -435,31 +434,31 @@ func PreAppRestoreCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func RestoreCmd(auth Auth,config util.Config) (util.Result,error) {
+func RestoreCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.StorageHostname + ":" + auth.StoragePort + "/restoreCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.StorageHostname+":"+auth.StoragePort+"/restoreCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -469,31 +468,31 @@ func RestoreCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func PostAppRestoreCmd(auth Auth,config util.Config) (util.Result,error) {
+func PostAppRestoreCmd(auth Auth, config util.Config) (util.Result, error) {
 	var result util.Result
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://" + auth.AppHostname + ":" + auth.AppPort + "/postAppRestoreCmd", b)
+	req, err := http.NewRequest("POST", "http://"+auth.AppHostname+":"+auth.AppPort+"/postAppRestoreCmd", b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -503,18 +502,18 @@ func PostAppRestoreCmd(auth Auth,config util.Config) (util.Result,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }

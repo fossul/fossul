@@ -1,9 +1,9 @@
 package util
 
 import (
-	"testing"
-	"strings"
 	"log"
+	"strings"
+	"testing"
 )
 
 func TestExecuteCommand(t *testing.T) {
@@ -13,7 +13,7 @@ func TestExecuteCommand(t *testing.T) {
 	result := ExecuteCommand(args...)
 
 	log.Println(result)
-			
+
 	if result.Code != 0 {
 		t.Fail()
 	}

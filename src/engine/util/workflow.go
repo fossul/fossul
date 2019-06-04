@@ -1,36 +1,36 @@
 package util
 
 import (
+	"encoding/json"
 	"log"
 	"math/rand"
-	"encoding/json"
 	"net/http"
 	"time"
 )
 
 type Workflow struct {
-	Id int `json:"id"`
-	Status string `json:"status"`
-	Type string `json:"type"`
-	Policy string `json:"policy"`
-	Timestamp string    `json:"timestamp,omitempty"`
-	Steps []Step `json:"steps,omitempty"`
+	Id        int    `json:"id"`
+	Status    string `json:"status"`
+	Type      string `json:"type"`
+	Policy    string `json:"policy"`
+	Timestamp string `json:"timestamp,omitempty"`
+	Steps     []Step `json:"steps,omitempty"`
 }
 
 type WorkflowResult struct {
-	Id int `json:"id"`
+	Id     int    `json:"id"`
 	Result Result `json:"result,omitempty"`
 }
 
 type WorkflowStatusResult struct {
 	Workflow Workflow `json:"workflow,omitempty"`
-	Result Result `json:"result,omitempty"`
+	Result   Result   `json:"result,omitempty"`
 }
 
 type Step struct {
-	Id int `json:"id"`
+	Id     int    `json:"id"`
 	Status string `json:"status"`
-	Label string `json:"label,omitempty"`
+	Label  string `json:"label,omitempty"`
 }
 
 func GetWorkflowId() int {
@@ -61,11 +61,11 @@ func CreateCommentStep(workflow *Workflow) Step {
 	return step
 }
 
-func SetStepComplete(workflow *Workflow,step Step) {
+func SetStepComplete(workflow *Workflow, step Step) {
 	workflow.Steps[step.Id].Status = "COMPLETE"
 }
 
-func SetStepError(workflow *Workflow,step Step) {
+func SetStepError(workflow *Workflow, step Step) {
 	workflow.Steps[step.Id].Status = "ERROR"
 }
 
@@ -81,31 +81,30 @@ func SetWorkflowStatusError(workflow *Workflow) {
 	workflow.Status = "ERROR"
 }
 
-func SerializeWorkflow(resultsDir string,workflow *Workflow) {
-	err := CreateDir(resultsDir,0755)
+func SerializeWorkflow(resultsDir string, workflow *Workflow) {
+	err := CreateDir(resultsDir, 0755)
 	if err != nil {
 		log.Println(err.Error())
 	}
 
-	err = WriteGob(resultsDir + "/workflow",workflow)
+	err = WriteGob(resultsDir+"/workflow", workflow)
 	if err != nil {
 		log.Println(err.Error())
 	}
 }
 
-func SerializeWorkflowStepResults(resultsDir string,stepId int, results Result) {
+func SerializeWorkflowStepResults(resultsDir string, stepId int, results Result) {
 	stepIdToString := IntToString(stepId)
-	err := CreateDir(resultsDir,0755)
+	err := CreateDir(resultsDir, 0755)
 	if err != nil {
 		log.Println(err.Error())
 	}
 
-	err = WriteGob(resultsDir + "/" + stepIdToString,results)
+	err = WriteGob(resultsDir+"/"+stepIdToString, results)
 	if err != nil {
 		log.Println(err.Error())
 	}
 }
-
 
 func SetWorkflowStep(workflow *Workflow, step Step) {
 	steps := workflow.Steps
@@ -120,14 +119,13 @@ func GetWorkflowSteps(w http.ResponseWriter, r *http.Request) []Step {
 		log.Println(err)
 	}
 	defer r.Body.Close()
- 
-	_,err := json.Marshal(&steps)
+
+	_, err := json.Marshal(&steps)
 	if err != nil {
-        log.Println(err)
+		log.Println(err)
 	}
 
 	//log.Println("DEBUG", string(res))
 
 	return steps
 }
-

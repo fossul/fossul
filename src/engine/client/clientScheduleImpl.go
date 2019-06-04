@@ -1,15 +1,14 @@
 package client
 
 import (
-	"encoding/json"
-	"net/http"
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fossul/src/engine/util"
+	"net/http"
 )
 
-
-func AddSchedule(auth Auth,profileName,configName,policy,cronScheduleInput string) (util.Result,error) {
+func AddSchedule(auth Auth, profileName, configName, policy, cronScheduleInput string) (util.Result, error) {
 	var cronSchedule util.CronSchedule
 	cronSchedule.Value = cronScheduleInput
 
@@ -18,9 +17,9 @@ func AddSchedule(auth Auth,profileName,configName,policy,cronScheduleInput strin
 
 	var result util.Result
 
-	req, err := http.NewRequest("POST", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/addSchedule/" + profileName + "/" + configName + "/" + policy, b)
+	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/addSchedule/"+profileName+"/"+configName+"/"+policy, b)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -30,28 +29,28 @@ func AddSchedule(auth Auth,profileName,configName,policy,cronScheduleInput strin
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func DeleteSchedule(auth Auth,profileName,configName,policy string) (util.Result,error) {
+func DeleteSchedule(auth Auth, profileName, configName, policy string) (util.Result, error) {
 	var result util.Result
 
-	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/deleteSchedule/" + profileName + "/" + configName + "/" + policy, nil)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/deleteSchedule/"+profileName+"/"+configName+"/"+policy, nil)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -61,28 +60,28 @@ func DeleteSchedule(auth Auth,profileName,configName,policy string) (util.Result
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result,err
+		return result, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result,err
+			return result, err
 		}
 	} else {
-		return result,errors.New("Http Status Error [" + resp.Status + "]")
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return result,nil
+	return result, nil
 }
 
-func ListSchedules(auth Auth) (util.JobScheduleResult,error) {
+func ListSchedules(auth Auth) (util.JobScheduleResult, error) {
 	var jobScheduleResult util.JobScheduleResult
 
-	req, err := http.NewRequest("GET", "http://" + auth.ServerHostname + ":" + auth.ServerPort + "/listSchedules", nil)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/listSchedules", nil)
 	if err != nil {
-		return jobScheduleResult,err
+		return jobScheduleResult, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -92,18 +91,18 @@ func ListSchedules(auth Auth) (util.JobScheduleResult,error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return jobScheduleResult,err
+		return jobScheduleResult, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
 		if err := json.NewDecoder(resp.Body).Decode(&jobScheduleResult); err != nil {
-			return jobScheduleResult,err
+			return jobScheduleResult, err
 		}
 	} else {
-		return jobScheduleResult,errors.New("Http Status Error [" + resp.Status + "]")
+		return jobScheduleResult, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	return jobScheduleResult,nil
+	return jobScheduleResult, nil
 }

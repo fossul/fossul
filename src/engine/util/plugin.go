@@ -1,18 +1,18 @@
 package util
 
 type PluginInfoResult struct {
-	Plugin	   Plugin `json:"plugin,omitempty"`
-	Result         Result `json:"result,omitempty"`
+	Plugin Plugin `json:"plugin,omitempty"`
+	Result Result `json:"result,omitempty"`
 }
 
 type Plugin struct {
-	Name          string    `json:"name,omitempty"`
-	Description   string    `json:"description,omitempty"`
-	Version		  string    `json:"version,omitempty"` 
-	Type          string    `json:"type,omitempty"`
-	Capabilities  []Capability `json:"capabilities"`
+	Name         string       `json:"name,omitempty"`
+	Description  string       `json:"description,omitempty"`
+	Version      string       `json:"version,omitempty"`
+	Type         string       `json:"type,omitempty"`
+	Capabilities []Capability `json:"capabilities"`
 }
 
 type Capability struct {
-	Name string `json:"name"`	
+	Name string `json:"name"`
 }
