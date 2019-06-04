@@ -12,6 +12,14 @@ Below is a high-level architecture diagram of the Fossul Framework and how the m
 ## Workflow Engine
 Workflows and the ability to democratoize a process like backup or restore is the key to fossul. In fossul a workflow has it's own Id and a series of steps. Each workflow step is an API to a plugin or CMD that executes the step. In fossul you could just use commands and not even any plugins. The plugins or commands which are executed are decided upon within a configuration. A fossul workflow takes as input a configuration. Configurations also define any pre/post commands (simple commands or scripts that can be executed in workflow) and also the backup policy as well as retention. Each plugin also has it's own configuration. These are all loaded and added to the config which is passed into all plugin operations or calls. In case of basic plugin the config object is demarshalled into environment variables. Every workflow has it's own log of what happened during workflow execution. You can decide in configuration how long to keep workflows. Finally a workflow has a state RUNNING, COMPLETE or ERROR.
 
+### Backup Workflow
+The diagram below illustrates the data-flow in a backup workflow.
+![](../images/fossul_backup_workflow.png)
+
+### Restore Workflow
+The diagram below illustrates the data-workflow in a restore workflow.
+![](../images/fossul_restore_workflow.png)
+
 ## Profile
 A profile is just an organizational unit or group of configurations.
 
