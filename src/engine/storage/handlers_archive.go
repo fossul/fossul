@@ -251,7 +251,7 @@ func ArchiveCreateCmd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if config.BackupCreateCmd != "" {
+	if config.ArchiveCreateCmd != "" {
 		args := strings.Split(config.ArchiveCreateCmd, ",")
 		message := util.SetMessage("INFO", "Performing archive create command ["+config.ArchiveCreateCmd+"]")
 
@@ -293,7 +293,7 @@ func ArchiveDeleteCmd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if config.BackupDeleteCmd != "" {
+	if config.ArchiveDeleteCmd != "" {
 		args := strings.Split(config.ArchiveDeleteCmd, ",")
 		message := util.SetMessage("INFO", "Performing archive delete command ["+config.ArchiveDeleteCmd+"]")
 

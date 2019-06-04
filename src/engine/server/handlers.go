@@ -98,9 +98,9 @@ func SendTrapErrorCmd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if config.SendTrapSuccessCmd != "" {
+	if config.SendTrapErrorCmd != "" {
 		args := strings.Split(config.SendTrapErrorCmd, ",")
-		message := util.SetMessage("INFO", "Performing send trap error command ["+config.SendTrapSuccessCmd+"]")
+		message := util.SetMessage("INFO", "Performing send trap error command ["+config.SendTrapErrorCmd+"]")
 
 		result = util.ExecuteCommand(args...)
 		result.Messages = util.PrependMessage(message, result.Messages)

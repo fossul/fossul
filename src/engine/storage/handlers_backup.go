@@ -248,7 +248,7 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// BackupDeleteCmd godoc
+// BackupCreateCmd godoc
 // @Description Delete backup command
 // @Param config body util.Config true "config struct"
 // @Accept  json
@@ -290,7 +290,7 @@ func BackupCreateCmd(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// BackupCreateCmd godoc
+// BackupDeleteCmd godoc
 // @Description Create backup command
 // @Param config body util.Config true "config struct"
 // @Accept  json

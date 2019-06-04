@@ -38,9 +38,9 @@ func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if config.PreAppQuiesceCmd != "" {
+	if config.AppUnquiesceCmd != "" {
 		args := strings.Split(config.AppUnquiesceCmd, ",")
-		message := util.SetMessage("INFO", "Performing unquiesce command ["+config.PreAppQuiesceCmd+"]")
+		message := util.SetMessage("INFO", "Performing unquiesce command ["+config.AppUnquiesceCmd+"]")
 
 		result = util.ExecuteCommand(args...)
 		result.Messages = util.PrependMessage(message, result.Messages)
@@ -80,9 +80,9 @@ func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if config.PreAppQuiesceCmd != "" {
+	if config.PreAppUnquiesceCmd != "" {
 		args := strings.Split(config.PreAppUnquiesceCmd, ",")
-		message := util.SetMessage("INFO", "Performing pre unquiesce command ["+config.PreAppQuiesceCmd+"]")
+		message := util.SetMessage("INFO", "Performing pre unquiesce command ["+config.PreAppUnquiesceCmd+"]")
 
 		result = util.ExecuteCommand(args...)
 		result.Messages = util.PrependMessage(message, result.Messages)
@@ -199,9 +199,9 @@ func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if config.PreAppQuiesceCmd != "" {
+	if config.PostAppUnquiesceCmd != "" {
 		args := strings.Split(config.PostAppUnquiesceCmd, ",")
-		message := util.SetMessage("INFO", "Performing post unquiesce command ["+config.PreAppQuiesceCmd+"]")
+		message := util.SetMessage("INFO", "Performing post unquiesce command ["+config.PostAppUnquiesceCmd+"]")
 
 		result = util.ExecuteCommand(args...)
 		result.Messages = util.PrependMessage(message, result.Messages)
