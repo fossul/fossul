@@ -14,11 +14,11 @@ Workflows and the ability to democratoize a process like backup or restore is th
 
 ### Backup Workflow
 The diagram below illustrates the data-flow in a backup workflow.
-![](../images/fossul_backup_workflow.png)
+![](../images/fossul_backup_workflow_1.0.0.png)
 
 ### Restore Workflow
 The diagram below illustrates the data-workflow in a restore workflow.
-![](../images/fossul_restore_workflow.png)
+![](../images/fossul_restore_workflow_1.0.0.png)
 
 ## Profile
 A profile is just an organizational unit or group of configurations.
