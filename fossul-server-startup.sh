@@ -62,7 +62,7 @@ fi
 
 if [ ! -d "${FOSSUL_SERVER_CONFIG_DIR}/default" ]; then
     mkdir -p ${FOSSUL_SERVER_CONFIG_DIR}/default
-    curl https://raw.githubusercontent.com/ktenzer/fossul/master/release/default_configs_1.0.0.tar.gz |tar xz;mv src/cli/configs/default ${FOSSUL_SERVER_CONFIG_DIR}/default
+    curl https://raw.githubusercontent.com/ktenzer/fossul/master/release/default-configs_1.0.0.tar.gz |tar xz;mv src/cli/configs/default ${FOSSUL_SERVER_CONFIG_DIR}/default
 fi
 
 $GOBIN/server
