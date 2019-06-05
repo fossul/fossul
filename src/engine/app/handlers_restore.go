@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fossul/src/engine/client/k8s"
 	"fossul/src/engine/util"
 	"net/http"
 	"os"
@@ -190,13 +191,48 @@ func PreAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 
 	if config.PreAppRestoreCmd != "" {
 		args := strings.Split(config.PreAppRestoreCmd, ",")
-		message := util.SetMessage("INFO", "Performing pre restore app command ["+config.PreAppRestoreCmd+"]")
+		var messages []util.Message
 
-		result = util.ExecuteCommand(args...)
-		result.Messages = util.PrependMessage(message, result.Messages)
+		if k8s.IsRemoteCommand(args[0]) {
+			args[0] = strings.Replace(args[0], ":", "", 1)
+			podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AppPluginParameters["AccessWithinCluster"])
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
 
-		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)
+				result = util.SetResult(1, messages)
+				_ = json.NewDecoder(r.Body).Decode(&result)
+				json.NewEncoder(w).Encode(result)
+			}
+
+			message := util.SetMessage("INFO", "Performing remote pre restore app command ["+config.PreAppRestoreCmd+"] on pod ["+podName+"]")
+			messages = append(messages, message)
+
+			cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AppPluginParameters["AccessWithinCluster"], args...)
+
+			if cmdResult.Code != 0 {
+				messages = util.PrependMessages(messages, cmdResult.Messages)
+				result = util.SetResult(1, messages)
+
+				_ = json.NewDecoder(r.Body).Decode(&result)
+				json.NewEncoder(w).Encode(result)
+			} else {
+				messages = util.PrependMessages(messages, cmdResult.Messages)
+				result = util.SetResult(0, messages)
+
+				_ = json.NewDecoder(r.Body).Decode(&result)
+				json.NewEncoder(w).Encode(result)
+			}
+
+		} else {
+			message := util.SetMessage("INFO", "Performing pre restore app command ["+config.PreAppRestoreCmd+"]")
+
+			result = util.ExecuteCommand(args...)
+			result.Messages = util.PrependMessage(message, result.Messages)
+
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)
+		}		
 	}
 }
 
@@ -232,12 +268,48 @@ func PostAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 
 	if config.PostAppRestoreCmd != "" {
 		args := strings.Split(config.PostAppRestoreCmd, ",")
-		message := util.SetMessage("INFO", "Performing pre restore app command ["+config.PostAppRestoreCmd+"]")
+		var messages []util.Message
 
-		result = util.ExecuteCommand(args...)
-		result.Messages = util.PrependMessage(message, result.Messages)
+		if k8s.IsRemoteCommand(args[0]) {
+			args[0] = strings.Replace(args[0], ":", "", 1)
+			podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AppPluginParameters["AccessWithinCluster"])
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
 
-		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)
+				result = util.SetResult(1, messages)
+				_ = json.NewDecoder(r.Body).Decode(&result)
+				json.NewEncoder(w).Encode(result)
+			}
+
+			message := util.SetMessage("INFO", "Performing remote post restore app command ["+config.PostAppRestoreCmd+"] on pod ["+podName+"]")
+			messages = append(messages, message)
+
+			cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AppPluginParameters["AccessWithinCluster"], args...)
+
+			if cmdResult.Code != 0 {
+				messages = util.PrependMessages(messages, cmdResult.Messages)
+				result = util.SetResult(1, messages)
+
+				_ = json.NewDecoder(r.Body).Decode(&result)
+				json.NewEncoder(w).Encode(result)
+			} else {
+				messages = util.PrependMessages(messages, cmdResult.Messages)
+				result = util.SetResult(0, messages)
+
+				_ = json.NewDecoder(r.Body).Decode(&result)
+				json.NewEncoder(w).Encode(result)
+			}
+
+		} else {
+			message := util.SetMessage("INFO", "Performing post restore app command ["+config.PostAppRestoreCmd+"]")
+
+			result = util.ExecuteCommand(args...)
+			result.Messages = util.PrependMessage(message, result.Messages)
+
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)
+		}		
 	}
+
 }
