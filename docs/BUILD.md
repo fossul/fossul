@@ -19,7 +19,7 @@ PATH=$PATH:$GOBIN
 This will download and install dep into $GOBIN
 
 ## Clone the Fossul Github repository from '$GOPATH/src' in this case '/home/ktenzer/go/src'.
-```$ git clone https://github.com/ktenzer/fossul.git```
+```$ git clone https://github.com/fossul/fossul.git```
 
 ## Change directory to the Fossul Github repository
 ```$ cd /home/ktenzer/go/src/fossul```

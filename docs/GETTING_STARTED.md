@@ -6,7 +6,7 @@ Provides a how-to tutorial focused on Fossul operators.
 First fossul is deployed on OpenShift using the provided template in the yaml folder or K8s using Dockerfiles. You will end up with three pods, one for each service: server, storage and app.
 
 ### Download CLI
-```curl https://raw.githubusercontent.com/ktenzer/fossul/master/release/fossul-cli_1.0.0.tar.gz |tar xz```
+```curl https://raw.githubusercontent.com/fossul/fossul/master/release/fossul-cli_linux_1.0.0.tar.gz |tar xz```
 
 ### Save Credentials
 By default credentials will be stored under user home directory in a file called .fossul-credentials. You can specify `--credential-file` argument and path to save or load credential files from another location.

@@ -529,17 +529,17 @@ parameters:
   - name: SOURCE_REPOSITORY_URL_SERVER
     displayName: Source Repository URL
     description: The URL of the repository with your application source code
-    value: https://github.com/ktenzer/fossul.git
+    value: https://github.com/fossul/fossul.git
     required: true
   - name: SOURCE_REPOSITORY_URL_APP
     displayName: Source Repository URL
     description: The URL of the repository with your application source code
-    value: https://github.com/ktenzer/fossul.git
+    value: https://github.com/fossul/fossul.git
     required: true  
   - name: SOURCE_REPOSITORY_URL_STORAGE
     displayName: Source Repository URL
     description: The URL of the repository with your application source code
-    value: https://github.com/ktenzer/fossul.git
+    value: https://github.com/fossul/fossul.git
     required: true
   - name: FOSSUL_USERNAME
     displayName: Username for API Services

@@ -7,7 +7,7 @@ To make the installation robust and easy, templates are provided that are parame
 The deployment will first perform a build and then deploy. Grabbing a release branch instead of master which may be unstable is a good idea.
 
 ### Clone Github repository
-```$ git clone https://github.com/ktenzer/fossul.git```
+```$ git clone https://github.com/fossul/fossul.git```
 
 ### Create Project
 ```$ oc new-project fossul```
