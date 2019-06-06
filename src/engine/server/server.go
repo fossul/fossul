@@ -13,12 +13,15 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	_ "fossul/src/engine/server/docs"
 	"fossul/src/engine/util"
 	"github.com/swaggo/http-swagger"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 const version = "1.0.0"
@@ -72,8 +75,36 @@ func main() {
 		log.Fatal(err)
 	}
 
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
+	}
+
+	idleConnsClosed := make(chan struct{})
+	go func() {
+		sigint := make(chan os.Signal, 1)
+
+		// Catch Terminal (ctr-c) and SigTerm
+		signal.Notify(sigint, os.Interrupt)
+		signal.Notify(sigint, syscall.SIGTERM)
+
+		<-sigint
+
+		// Signal recieved, shutdown
+		if err := srv.Shutdown(context.Background()); err != nil {
+			log.Println("Storage service shutdown failed! %v", err)
+		}
+
+		log.Println("Stopping server service on port [" + port + "]")
+		close(idleConnsClosed)
+	}()
+
 	log.Println("Starting server service on port [" + port + "]")
-	log.Fatal(http.ListenAndServe(":"+port, router))
+	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+		log.Println("Server service start failed! %v", err)
+	}
+
+	<-idleConnsClosed
 }
 
 func printConfigDebug(config util.Config) {
