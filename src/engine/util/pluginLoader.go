@@ -131,6 +131,14 @@ func setStoragePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
 	return cmd
 }
 
+func setArchivePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
+	for k, v := range config.ArchivePluginParameters {
+		cmd.Env = append(cmd.Env, k+"="+v)
+	}
+
+	return cmd
+}
+
 func setBasePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "ProfileName="+config.ProfileName)
@@ -142,6 +150,8 @@ func setBasePluginEnv(config Config, cmd *exec.Cmd) *exec.Cmd {
 
 	backupRetentionToString := IntToString(config.SelectedBackupRetention)
 	cmd.Env = append(cmd.Env, "BackupRetention="+backupRetentionToString)
+	archiveRetentionToString := IntToString(config.SelectedArchiveRetention)
+	cmd.Env = append(cmd.Env, "ArchiveRetention="+archiveRetentionToString)
 
 	return cmd
 }

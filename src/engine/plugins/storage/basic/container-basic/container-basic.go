@@ -72,7 +72,7 @@ func backup(configMap map[string]string) {
 
 	fmt.Println("INFO Performing backup for pod " + podName)
 
-	backupName := util.GetBackupName(configMap["BackupName"], configMap["BackupPolicy"], configMap["WorkflowId"])
+	backupName := util.GetBackupName(configMap["BackupName"], configMap["BackupPolicy"], configMap["WorkflowId"],configMap["WorkflowTimestamp"])
 	backupPath := util.GetBackupPathFromMap(configMap)
 	fmt.Println("INFO Backup name is " + backupName + ", Backup path is " + backupPath)
 
@@ -260,6 +260,8 @@ func getEnvParams() map[string]string {
 
 	configMap["ProfileName"] = os.Getenv("ProfileName")
 	configMap["ConfigName"] = os.Getenv("ConfigName")
+	configMap["WorkflowId"] = os.Getenv("WorkflowId")
+	configMap["WorkflowTimestamp"] = os.Getenv("WorkflowTimestamp")
 	configMap["SelectedWorkflowId"] = os.Getenv("SelectedWorkflowId")
 	configMap["AutoDiscovery"] = os.Getenv("AutoDiscovery")
 	configMap["DataFilePaths"] = os.Getenv("DataFilePaths")

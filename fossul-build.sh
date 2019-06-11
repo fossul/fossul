@@ -69,6 +69,8 @@ go build -buildmode=plugin -o $PLUGIN_DIR/app/mongo.so fossul/src/engine/plugins
 if [ $? != 0 ]; then exit 1; fi
 go build -buildmode=plugin -o $PLUGIN_DIR/app/mongo-dump.so fossul/src/engine/plugins/app/native/mongo-dump
 if [ $? != 0 ]; then exit 1; fi
+go build -buildmode=plugin -o $PLUGIN_DIR/archive/aws.so fossul/src/engine/plugins/archive/native/aws
+if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Services"
 go install fossul/src/engine/server

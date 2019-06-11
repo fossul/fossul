@@ -25,11 +25,11 @@ type Backup struct {
 	WorkflowId string `json:"workflowId,omitempty"`
 }
 
-type ByEpoch []Backup
+type ByEpochBackup []Backup
 
-func (a ByEpoch) Len() int           { return len(a) }
-func (a ByEpoch) Less(i, j int) bool { return a[i].Epoch < a[j].Epoch }
-func (a ByEpoch) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByEpochBackup) Len() int           { return len(a) }
+func (a ByEpochBackup) Less(i, j int) bool { return a[i].Epoch < a[j].Epoch }
+func (a ByEpochBackup) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 func GetBackupsByPolicy(policy string, backups []Backup) []Backup {
 	var backupsByPolicy []Backup

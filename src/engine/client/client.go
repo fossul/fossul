@@ -360,6 +360,8 @@ func SetAdditionalConfigParams(profileName, configName, policyName string, confi
 
 	backupRetention := util.GetBackupRetention(policyName, config.BackupRetentions)
 	config.SelectedBackupRetention = backupRetention
+	archiveRetention := util.GetArchiveRetention(policyName, config.ArchiveRetentions)
+	config.SelectedArchiveRetention = archiveRetention
 	config.SelectedBackupPolicy = policyName
 
 	return config

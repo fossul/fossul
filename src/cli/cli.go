@@ -24,7 +24,7 @@ func main() {
 	optCredentialFile := getopt.StringLong("credential-file", 'h', "", "Path to credential file")
 	optConfigFile := getopt.StringLong("config-file", 'f', "", "Path to config file")
 	optPolicy := getopt.StringLong("policy", 'i', "", "Backup policy as defined in config")
-	optAction := getopt.StringLong("action", 'a', "", "backup|restore|backupList|listProfiles|listConfigs|listPluginConfigs|"+
+	optAction := getopt.StringLong("action", 'a', "", "backup|restore|backupList|archiveList|listProfiles|listConfigs|listPluginConfigs|"+
 		"addProfile|addConfig|addPluginConfig|deleteProfile|deleteConfig|deleteConfigDir|"+
 		"deletePluginConfig|jobList|"+"addSchedule|deleteSchedule|jobStatus")
 	optPluginName := getopt.StringLong("plugin", 'l', "", "Name of plugin")
@@ -321,7 +321,7 @@ func main() {
 	}
 
 	// Check retention policy
-	if *optAction == "backup" || *optAction == "backupList" || *optAction == "restore" {
+	if *optAction == "backup" || *optAction == "backupList" || *optAction == "restore" || *optAction == "archiveList" {
 		if getopt.IsSet("policy") != true {
 			fmt.Println("[ERROR] missing parameter --policy")
 			getopt.Usage()
@@ -355,6 +355,8 @@ func main() {
 		}
 	} else if *optAction == "backupList" {
 		BackupList(auth, string(*optProfile), string(*optConfig), string(*optPolicy), config)
+	} else if *optAction == "archiveList" {
+		ArchiveList(auth, string(*optProfile), string(*optConfig), string(*optPolicy), config)
 	} else if *optAction == "jobList" {
 		JobList(auth, string(*optProfile), string(*optConfig))
 	} else if *optAction == "jobStatus" {

@@ -19,7 +19,6 @@ import (
 	"fossul/src/engine/util"
 	"log"
 	"net/http"
-	"strings"
 )
 
 func ArchivePluginList(auth Auth, pluginType string) ([]string, error) {
@@ -122,46 +121,39 @@ func Archive(auth Auth, config util.Config) (util.Result, error) {
 	return result, nil
 }
 
-func ArchiveList(auth Auth, profileName, configName, policyName string, config util.Config) (util.ResultSimple, []util.Archive, error) {
-	var result util.ResultSimple
-	var archives []util.Archive
+func ArchiveList(auth Auth, profileName, configName, policyName string, config util.Config) (util.Archives, error) {
+	var archives util.Archives
+
 	config = SetAdditionalConfigParams(profileName, configName, policyName, config)
 
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
 	req, err := http.NewRequest("POST", "http://"+auth.StorageHostname+":"+auth.StoragePort+"/archiveList", b)
-	if err != nil {
-		return result, archives, err
-	}
-
 	req.Header.Add("Content-Type", "application/json")
-	req.SetBasicAuth(auth.Username, auth.Password)
+
+	if err != nil {
+		return archives, err
+	}
 
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return result, archives, err
+		return archives, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-			return result, archives, err
+		if err := json.NewDecoder(resp.Body).Decode(&archives); err != nil {
+			return archives, err
 		}
 	} else {
-		return result, archives, errors.New("Http Status Error [" + resp.Status + "]")
+		return archives, errors.New("Http Status Error [" + resp.Status + "]")
 	}
 
-	//unmarshall json response to plugin struct
-	messages := strings.Join(result.Messages, "\n")
-	backupByteArray := []byte(messages)
-
-	json.Unmarshal(backupByteArray, &archives)
-
-	return result, archives, nil
+	return archives, nil
 }
 
 func ArchiveDelete(auth Auth, config util.Config) (util.Result, error) {

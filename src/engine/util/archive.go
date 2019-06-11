@@ -24,3 +24,20 @@ type Archive struct {
 	Policy     string `json:"policy,omitempty"`
 	WorkflowId string `json:"workflowId,omitempty"`
 }
+
+type ByEpochArchive []Archive
+
+func (a ByEpochArchive) Len() int           { return len(a) }
+func (a ByEpochArchive) Less(i, j int) bool { return a[i].Epoch < a[j].Epoch }
+func (a ByEpochArchive) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+func GetArchivesByPolicy(policy string, archives []Archive) []Archive {
+	var archivesByPolicy []Archive
+	for _, archive := range archives {
+		if policy == archive.Policy {
+			archivesByPolicy = append(archivesByPolicy, archive)
+		}
+	}
+
+	return archivesByPolicy
+}

@@ -63,6 +63,7 @@ func StartBackupWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	config.WorkflowId = util.IntToString(workflow.Id)
+	config.WorkflowTimestamp = util.GetTimestamp()
 	workflow.Policy = config.SelectedBackupPolicy
 
 	_, ok := runningWorkflowMap[config.ProfileName+"-"+config.ConfigName]
@@ -127,6 +128,7 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	config.WorkflowId = util.IntToString(workflow.Id)
+	config.WorkflowTimestamp = util.GetTimestamp()
 
 	_, ok := runningWorkflowMap[config.ProfileName+"-"+config.ConfigName]
 	if ok {
@@ -194,6 +196,7 @@ func StartRestoreWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	config.WorkflowId = util.IntToString(workflow.Id)
+	config.WorkflowTimestamp = util.GetTimestamp()
 	config.SelectedWorkflowId = util.StringToInt(selectedWorkflowId)
 	workflow.Policy = config.SelectedBackupPolicy
 
@@ -261,6 +264,7 @@ func StartRestoreWorkflow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	config.WorkflowId = util.IntToString(workflow.Id)
+	config.WorkflowTimestamp = util.GetTimestamp()
 	config.SelectedWorkflowId = util.StringToInt(selectedWorkflowId)
 
 	_, ok := runningWorkflowMap[config.ProfileName+"-"+config.ConfigName]

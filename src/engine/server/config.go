@@ -29,6 +29,8 @@ func GetConsolidatedConfig(profileName, configName, policyName string) (util.Con
 
 	backupRetention := util.GetBackupRetention(policyName, config.BackupRetentions)
 	config.SelectedBackupRetention = backupRetention
+	archiveRetention := util.GetArchiveRetention(policyName, config.ArchiveRetentions)
+	config.SelectedArchiveRetention = archiveRetention
 	config.SelectedBackupPolicy = policyName
 
 	if config.AppPlugin != "" {
@@ -51,6 +53,17 @@ func GetConsolidatedConfig(profileName, configName, policyName string) (util.Con
 		}
 
 		config.StoragePluginParameters = storageConfigMap
+	}
+
+	if config.ArchivePlugin != "" {
+		archiveConf := configDir + "/" + profileName + "/" + configName + "/" + config.ArchivePlugin + ".conf"
+		archiveConfConfigMap, err := util.ReadConfigToMap(archiveConf)
+
+		if err != nil {
+			return config, err
+		}
+
+		config.ArchivePluginParameters = archiveConfConfigMap
 	}
 
 	return config, nil

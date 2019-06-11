@@ -24,35 +24,39 @@ import (
 )
 
 type Config struct {
-	ProfileName             string            `json:"profileName,omitempty"`
-	ConfigName              string            `json:"configName,omitempty"`
-	WorkflowId              string            `json:"workflowId,omitempty"`
-	AppPlugin               string            `json:"appPlugin"`
-	StoragePlugin           string            `json:"storagePlugin"`
-	ArchivePlugin           string            `json:"archivePlugin"`
-	AutoDiscovery           bool              `json:"autoDiscovery"`
-	JobRetention            int               `json:"jobRetention"`
-	BackupRetentions        []BackupRetention `json:"backupRetentions"`
-	SelectedBackupPolicy    string            `json:"backupPolicy,omitmepty"`
-	SelectedBackupRetention int               `json:"backupRetention,omitmepty"`
-	SelectedWorkflowId      int               `json:"selectedWorkflowId,omitmepty"`
-	PreAppQuiesceCmd        string            `json:"preAppQuiesceCmd,omitempty"`
-	AppQuiesceCmd           string            `json:"appQuiesceCmd,omitempty"`
-	PostAppQuiesceCmd       string            `json:"postAppQuiesceCmd,omitempty"`
-	BackupCreateCmd         string            `json:"backupCreateCmd,omitempty"`
-	BackupDeleteCmd         string            `json:"backupDeleteCmd,omitempty"`
-	ArchiveCreateCmd        string            `json:"archiveCreateCmd,omitempty"`
-	ArchiveDeleteCmd        string            `json:"archiveDeleteCmd,omitempty"`
-	PreAppUnquiesceCmd      string            `json:"preAppUnquiesceCmd,omitempty"`
-	AppUnquiesceCmd         string            `json:"appUnquiesceCmd,omitempty"`
-	PostAppUnquiesceCmd     string            `json:"postAppUnquiesceCmd,omitempty"`
-	PreAppRestoreCmd        string            `json:"preAppRestoreCmd,omitempty"`
-	RestoreCmd              string            `json:"restoreCmd,omitempty"`
-	PostAppRestoreCmd       string            `json:"postAppRestoreCmd,omitempty"`
-	SendTrapErrorCmd        string            `json:"sendTrapErrorCmd,omitempty"`
-	SendTrapSuccessCmd      string            `json:"sendTrapSuccessCmd,omitempty"`
-	AppPluginParameters     map[string]string `json:"appPluginParameters,omitempty"`
-	StoragePluginParameters map[string]string `json:"storagePluginParameters,omitempty"`
+	ProfileName              string             `json:"profileName,omitempty"`
+	ConfigName               string             `json:"configName,omitempty"`
+	WorkflowId               string             `json:"workflowId,omitempty"`
+	WorkflowTimestamp        int64              `json:"workflowTimestamp,omitempty"`
+	AppPlugin                string             `json:"appPlugin"`
+	StoragePlugin            string             `json:"storagePlugin"`
+	ArchivePlugin            string             `json:"archivePlugin"`
+	AutoDiscovery            bool               `json:"autoDiscovery"`
+	JobRetention             int                `json:"jobRetention"`
+	BackupRetentions         []BackupRetention  `json:"backupRetentions"`
+	ArchiveRetentions        []ArchiveRetention `json:"archiveRetentions"`
+	SelectedBackupPolicy     string             `json:"backupPolicy,omitmepty"`
+	SelectedBackupRetention  int                `json:"backupRetention,omitmepty"`
+	SelectedArchiveRetention int                `json:"archiveRetention,omitmepty"`
+	SelectedWorkflowId       int                `json:"selectedWorkflowId,omitmepty"`
+	PreAppQuiesceCmd         string             `json:"preAppQuiesceCmd,omitempty"`
+	AppQuiesceCmd            string             `json:"appQuiesceCmd,omitempty"`
+	PostAppQuiesceCmd        string             `json:"postAppQuiesceCmd,omitempty"`
+	BackupCreateCmd          string             `json:"backupCreateCmd,omitempty"`
+	BackupDeleteCmd          string             `json:"backupDeleteCmd,omitempty"`
+	ArchiveCreateCmd         string             `json:"archiveCreateCmd,omitempty"`
+	ArchiveDeleteCmd         string             `json:"archiveDeleteCmd,omitempty"`
+	PreAppUnquiesceCmd       string             `json:"preAppUnquiesceCmd,omitempty"`
+	AppUnquiesceCmd          string             `json:"appUnquiesceCmd,omitempty"`
+	PostAppUnquiesceCmd      string             `json:"postAppUnquiesceCmd,omitempty"`
+	PreAppRestoreCmd         string             `json:"preAppRestoreCmd,omitempty"`
+	RestoreCmd               string             `json:"restoreCmd,omitempty"`
+	PostAppRestoreCmd        string             `json:"postAppRestoreCmd,omitempty"`
+	SendTrapErrorCmd         string             `json:"sendTrapErrorCmd,omitempty"`
+	SendTrapSuccessCmd       string             `json:"sendTrapSuccessCmd,omitempty"`
+	AppPluginParameters      map[string]string  `json:"appPluginParameters,omitempty"`
+	StoragePluginParameters  map[string]string  `json:"storagePluginParameters,omitempty"`
+	ArchivePluginParameters  map[string]string  `json:"archivePluginParameters,omitempty"`
 }
 
 type ConfigResult struct {
@@ -66,8 +70,13 @@ type ConfigMapResult struct {
 }
 
 type BackupRetention struct {
-	Policy        string `json:"policy"`
-	RetentionDays int    `json:"retentionDays"`
+	Policy          string `json:"policy"`
+	RetentionNumber int    `json:"retentionNumber"`
+}
+
+type ArchiveRetention struct {
+	Policy          string `json:"policy"`
+	RetentionNumber int    `json:"retentionNumber"`
 }
 
 type PluginConfigMap struct {
@@ -204,6 +213,21 @@ func SetStoragePluginParameters(storageConfigPath string, config Config) (Config
 	return config, nil
 }
 
+func SetArchivePluginParameters(archiveConfigPath string, config Config) (Config, error) {
+	var err error
+	configArchiveMap := make(map[string]string)
+
+	if len(config.ArchivePlugin) != 0 {
+		configArchiveMap, err = ReadConfigToMap(archiveConfigPath)
+		if err != nil {
+			return config, err
+		}
+	}
+	config.ArchivePluginParameters = configArchiveMap
+
+	return config, nil
+}
+
 func GetConfig(w http.ResponseWriter, r *http.Request) (Config, error) {
 
 	var config Config
@@ -257,7 +281,16 @@ func ExistsBackupRetention(policy string, retentions []BackupRetention) bool {
 func GetBackupRetention(policy string, retentions []BackupRetention) int {
 	for _, retention := range retentions {
 		if retention.Policy == policy {
-			return retention.RetentionDays
+			return retention.RetentionNumber
+		}
+	}
+	return -1
+}
+
+func GetArchiveRetention(policy string, retentions []ArchiveRetention) int {
+	for _, retention := range retentions {
+		if retention.Policy == policy {
+			return retention.RetentionNumber
 		}
 	}
 	return -1

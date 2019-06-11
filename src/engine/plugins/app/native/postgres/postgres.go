@@ -107,7 +107,8 @@ func (a appPlugin) Quiesce(config util.Config) util.Result {
 		result = util.SetResult(0, messages)
 	}
 
-	backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId)
+	timestampToString := fmt.Sprintf("%d", config.WorkflowTimestamp)
+	backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
 
 	msg := util.SetMessage("INFO", "Entering backup mode using label "+backupName+" for database ["+config.AppPluginParameters["PqDb"]+"]")
 	messages = append(messages, msg)

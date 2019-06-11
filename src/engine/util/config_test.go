@@ -101,6 +101,29 @@ func TestSetStoragePluginParameters(t *testing.T) {
 	}
 }
 
+func TestSetArchivePluginParameters(t *testing.T) {
+	configFile := "../../cli/configs/default/default.conf"
+	archivePluginFile := "../../cli/configs/default/sample-archive.conf"
+
+	config, err := ReadConfig(configFile)
+	if err != nil {
+		t.Fail()
+	}
+
+	config, err = SetArchivePluginParameters(archivePluginFile, config)
+	if err != nil {
+		t.Fail()
+	}
+
+	if config.ArchivePluginParameters["SampleArchiveVar1"] != "foo" {
+		t.Fail()
+	}
+
+	if config.ArchivePluginParameters["SampleArchiveVar2"] != "bar" {
+		t.Fail()
+	}
+}
+
 func TestExistsBackupRetention(t *testing.T) {
 	configFile := "../../cli/configs/default/default.conf"
 	config, err := ReadConfig(configFile)

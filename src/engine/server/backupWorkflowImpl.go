@@ -218,7 +218,7 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		}
 	}
 
-	commentMsg = "Performing Archive Retention"
+	commentMsg = "Performing Archive"
 	setComment(resultsDir, commentMsg, workflow)
 
 	if config.ArchiveCreateCmd != "" {
@@ -244,6 +244,9 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 			return resultCode
 		}
 	}
+
+	commentMsg = "Performing Archive Retention"
+	setComment(resultsDir, commentMsg, workflow)
 
 	if config.ArchiveDeleteCmd != "" {
 		step := stepInit(resultsDir, workflow)

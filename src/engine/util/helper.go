@@ -43,24 +43,22 @@ func GetBackupDirFromConfig(config Config) string {
 }
 
 func GetBackupPathFromMap(configMap map[string]string) string {
-	backupName := GetBackupName(configMap["BackupName"], configMap["BackupPolicy"], configMap["WorkflowId"])
+	backupName := GetBackupName(configMap["BackupName"], configMap["BackupPolicy"], configMap["WorkflowId"], configMap["WorkflowTimestamp"])
 	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"] + "/" + backupName
 
 	return backupPath
 }
 
 func GetBackupPathFromConfig(config Config) string {
-	backupName := GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId)
+	timestampToString := fmt.Sprintf("%d", config.WorkflowTimestamp)
+	backupName := GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
 	backupPath := config.StoragePluginParameters["BackupDestPath"] + "/" + config.ProfileName + "/" + config.ConfigName + "/" + backupName
 
 	return backupPath
 }
 
-func GetBackupName(name, policy, workflowId string) string {
-	time := GetTimestamp()
-	timeToString := fmt.Sprintf("%d", time)
-
-	backupName := fmt.Sprintf(name + "_" + policy + "_" + workflowId + "_" + timeToString)
+func GetBackupName(name, policy, workflowId, timestamp string) string {
+	backupName := fmt.Sprintf(name + "_" + policy + "_" + workflowId + "_" + timestamp)
 
 	return backupName
 }
@@ -151,6 +149,22 @@ func ReadGob(filePath string, object interface{}) error {
 	return err
 }
 
+func IsDirectory(path string) (bool, error) {
+	fileOrDir, err := os.Stat(path)
+
+	if err != nil {
+		return false, err
+	}
+	switch mode := fileOrDir.Mode(); {
+	case mode.IsDir():
+		return true, err
+	case mode.IsRegular():
+		return false, err
+	}
+
+	return false, err
+}
+
 func ExistsPath(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false
@@ -214,6 +228,24 @@ func DirectoryList(path string) ([]string, error) {
 	}
 
 	return dirList, nil
+}
+
+func DirectoryTreeList(dir string) ([]string, error) {
+	var files []string
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		files = append(files, path)
+		return nil
+	})
+
+	if err != nil {
+		return files, err
+	}
+
+	return files, nil
 }
 
 func FileList(path string) ([]string, error) {

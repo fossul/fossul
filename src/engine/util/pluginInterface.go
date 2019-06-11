@@ -41,7 +41,7 @@ type ArchivePlugin interface {
 	SetEnv(Config) Result
 	Archive(Config) Result
 	ArchiveDelete(Config) Result
-	ArchiveList(Config) []Archive
+	ArchiveList(Config) Archives
 	Info() Plugin
 }
 
@@ -68,6 +68,8 @@ func GetPluginPath(pluginName string) string {
 		path = "./plugins/storage/sample-storage.so"
 	case "sample-archive.so":
 		path = "./plugins/archive/sample-archive.so"
+	case "aws.so":
+		path = "./plugins/archive/aws.so"
 	default:
 		fmt.Println("Native plugin [" + pluginName + "] does not exist, executing as basic plugin")
 		path = ""

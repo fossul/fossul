@@ -14,7 +14,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"fossul/src/engine/util"
 	"net/http"
 	"os"
@@ -102,59 +101,90 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 // @Param config body util.Config true "config struct"
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} util.Result
+// @Success 200 {object} util.Archives
 // @Header 200 {string} string
 // @Failure 400 {string} string
 // @Failure 404 {string} string
 // @Failure 500 {string} string
 // @Router /archiveList [post]
 func ArchiveList(w http.ResponseWriter, r *http.Request) {
-	config, _ := util.GetConfig(w, r)
+	var archives util.Archives
+	var archiveList []util.Archive
+	var result util.Result
+	var messages []util.Message
+
+	config, err := util.GetConfig(w, r)
 	printConfigDebug(config)
 
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+		archives.Result = result
+
+		_ = json.NewDecoder(r.Body).Decode(&archives)
+		json.NewEncoder(w).Encode(archives)
+
+		return
+	}
+
 	pluginPath := util.GetPluginPath(config.ArchivePlugin)
-	var result util.ResultSimple
-	var messages []string
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/archive/" + config.ArchivePlugin
 
 		if _, err := os.Stat(plugin); os.IsNotExist(err) {
-			var errMsg string = "Archive plugin does not exist"
+			msg := util.SetMessage("ERROR", "Archive plugin not found! "+err.Error())
+			messages = append(messages, msg)
 
-			message := fmt.Sprintf("ERROR %s %s", errMsg, err.Error())
-			messages = append(messages, message)
+			result = util.SetResult(1, messages)
+			archives.Result = result
 
-			var result = util.SetResultSimple(1, messages)
-
-			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)
+			_ = json.NewDecoder(r.Body).Decode(&archives)
+			json.NewEncoder(w).Encode(archives)
 		}
 
-		result = util.ExecutePluginSimple(config, "archive", plugin, "--action", "archiveList")
+		resultSimple := util.ExecutePluginSimple(config, "archive", plugin, "--action", "archiveList")
+		if resultSimple.Code != 0 {
+			msg := util.SetMessage("ERROR", "ArchiveList failed")
+			messages = append(messages, msg)
+			result := util.SetResult(1, messages)
+			archives.Result = result
 
-		_ = json.NewDecoder(r.Body).Decode(&result)
-		json.NewEncoder(w).Encode(result)
+			_ = json.NewDecoder(r.Body).Decode(&archives)
+			json.NewEncoder(w).Encode(archives)
+		} else {
+			archiveListString := strings.Join(resultSimple.Messages, " ")
+			json.Unmarshal([]byte(archiveListString), &archiveList)
+
+			archives.Result.Code = resultSimple.Code
+			archives.Archives = archiveList
+
+			_ = json.NewDecoder(r.Body).Decode(&archives)
+			json.NewEncoder(w).Encode(archives)
+		}
 	} else {
 		plugin, err := util.GetArchiveInterface(pluginPath)
-		//need to implement proper result object for list calls
 		if err != nil {
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+			result = util.SetResult(1, messages)
+			archives.Result = result
 
+			_ = json.NewDecoder(r.Body).Decode(&archives)
+			json.NewEncoder(w).Encode(archives)
 		} else {
-			_ = plugin.SetEnv(config)
-
-			archiveList := plugin.ArchiveList(config)
-			b, err := json.Marshal(archiveList)
-			if err != nil {
-				result.Code = 1
-				result.Messages = append(result.Messages, err.Error())
+			setEnvResult := plugin.SetEnv(config)
+			if setEnvResult.Code != 0 {
+				archives.Result = setEnvResult
+				_ = json.NewDecoder(r.Body).Decode(&archives)
+				json.NewEncoder(w).Encode(archives)
 			} else {
-				result.Code = 0
-				outputArray := strings.Split(string(b), "\n")
-				result.Messages = outputArray
+				archives := plugin.ArchiveList(config)
+				_ = json.NewDecoder(r.Body).Decode(&archives)
+				json.NewEncoder(w).Encode(archives)
 			}
-			_ = json.NewDecoder(r.Body).Decode(&result)
-			json.NewEncoder(w).Encode(result)
 		}
 	}
 }

@@ -78,9 +78,39 @@ func ListBackups(path string) ([]util.Backup, error) {
 		}
 	}
 
-	sort.Sort(util.ByEpoch(backups))
+	sort.Sort(util.ByEpochBackup(backups))
 
 	return backups, nil
+}
+
+func ListArchives(dirs []string) ([]util.Archive, error) {
+
+	var archives []util.Archive
+	type timeSlice []util.Archive
+
+	re := regexp.MustCompile(`(\S+)_(\S+)_(\S+)_(\S+)`)
+	for _, dir := range dirs {
+		var archive util.Archive
+		match := re.FindStringSubmatch(dir)
+
+		if len(match) != 0 {
+			archive.Name = match[1]
+			archive.Policy = match[2]
+			archive.WorkflowId = match[3]
+
+			epoch := util.StringToInt(match[4])
+			archive.Epoch = epoch
+
+			timestamp := util.ConvertEpoch(match[4])
+			archive.Timestamp = timestamp
+
+			archives = append(archives, archive)
+		}
+	}
+
+	sort.Sort(util.ByEpochArchive(archives))
+
+	return archives, nil
 }
 
 func GetDirFromPath(path string) string {
@@ -127,6 +157,17 @@ func ReverseBackupList(backups []util.Backup) chan util.Backup {
 	go func() {
 		for i, _ := range backups {
 			ret <- backups[len(backups)-1-i]
+		}
+		close(ret)
+	}()
+	return ret
+}
+
+func ReverseArchiveList(archives []util.Archive) chan util.Archive {
+	ret := make(chan util.Archive)
+	go func() {
+		for i, _ := range archives {
+			ret <- archives[len(archives)-1-i]
 		}
 		close(ret)
 	}()

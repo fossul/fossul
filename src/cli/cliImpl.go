@@ -263,6 +263,8 @@ func ImportLocalConfig(profileName, configName, policyName, configDir, configPat
 
 	backupRetention := util.GetBackupRetention(policyName, config.BackupRetentions)
 	config.SelectedBackupRetention = backupRetention
+	archiveRetention := util.GetArchiveRetention(policyName, config.ArchiveRetentions)
+	config.SelectedArchiveRetention = archiveRetention
 	config.SelectedBackupPolicy = policyName
 
 	//load dynamic plugin parameters into config struct
@@ -311,6 +313,15 @@ func ImportServerConfig(auth client.Auth, profileName, configName string) (util.
 		}
 		checkResult(storageConfigMapResult.Result)
 		config.StoragePluginParameters = storageConfigMapResult.ConfigMap
+	}
+
+	if config.ArchivePlugin != "" {
+		archiveConfigMapResult, err := client.GetPluginConfig(auth, profileName, configName, config.ArchivePlugin)
+		if err != nil {
+			return config, errors.New("[ERROR] Couldn't get profile [" + profileName + "] config [" + config.ArchivePlugin + "! " + err.Error())
+		}
+		checkResult(archiveConfigMapResult.Result)
+		config.ArchivePluginParameters = archiveConfigMapResult.ConfigMap
 	}
 
 	return config, nil
@@ -527,6 +538,24 @@ func BackupList(auth client.Auth, profileName, configName, policyName string, co
 
 	for _, backup := range backupsByPolicy {
 		fmt.Println(backup.Name, backup.Policy, backup.WorkflowId, backup.Timestamp)
+	}
+}
+
+func ArchiveList(auth client.Auth, profileName, configName, policyName string, config util.Config) {
+	msg := fmt.Sprintf("### List of Archives for policy [%s] ###", policyName)
+	fmt.Println(msg)
+
+	archives, err := client.ArchiveList(auth, profileName, configName, policyName, config)
+	if err != nil {
+		fmt.Println("[ERROR] " + err.Error())
+		os.Exit(1)
+	}
+
+	archivesByPolicy := util.GetArchivesByPolicy(policyName, archives.Archives)
+	checkResult(archives.Result)
+
+	for _, archive := range archivesByPolicy {
+		fmt.Println(archive.Name, archive.Policy, archive.WorkflowId, archive.Timestamp)
 	}
 }
 

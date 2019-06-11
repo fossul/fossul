@@ -54,7 +54,8 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	msg = util.SetMessage("INFO", "Performing backup for pod "+podName)
 	messages = append(messages, msg)
 
-	backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId)
+	timestampToString := fmt.Sprintf("%d", config.WorkflowTimestamp)
+	backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
 	backupPath := util.GetBackupPathFromConfig(config)
 	msg = util.SetMessage("INFO", "Backup name is "+backupName+", Backup path is "+backupPath)
 	messages = append(messages, msg)

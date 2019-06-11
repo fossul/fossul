@@ -99,7 +99,7 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 // @Param config body util.Config true "config struct"
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} util.Result
+// @Success 200 {object} util.Backups
 // @Header 200 {string} string
 // @Failure 400 {string} string
 // @Failure 404 {string} string
