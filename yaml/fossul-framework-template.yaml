@@ -19,7 +19,7 @@ objects:
     name: ${APPLICATION_NAME}-aws-secrets
   stringData:
     access-key: ${AWS_ACCESS_KEY_ID}
-    secret-key: ${AWS_SECRET_ACCESS_KEY }        
+    secret-key: ${AWS_SECRET_ACCESS_KEY}        
 - apiVersion: v1
   kind: Service
   metadata:

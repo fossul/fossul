@@ -95,26 +95,6 @@ func (r archivePlugin) Archive(config util.Config) util.Result {
 		messages = append(messages, msg)
 	}
 
-	// listing bucket objects
-	/*
-		inputparams := &s3.ListObjectsInput{
-			Bucket:  aws.String("fossul-test"),
-			MaxKeys: aws.Int64(10),
-		}
-		pageNum := 0
-		s3svc.ListObjectsPages(inputparams, func(page *s3.ListObjectsOutput, lastPage bool) bool {
-			fmt.Println("Page", pageNum)
-			pageNum++
-			for _, value := range page.Contents {
-				fmt.Println(*value.Key)
-			}
-			fmt.Println("pageNum", pageNum, "lastPage", lastPage)
-
-			// return if we should continue with the next page
-			return true
-		})
-	*/
-
 	msg = util.SetMessage("INFO", "Archive backup ["+backupPath+"] to AWS bucket ["+config.ArchivePluginParameters["BucketName"]+"] completed successfully")
 	messages = append(messages, msg)
 
