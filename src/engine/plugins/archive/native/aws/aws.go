@@ -51,7 +51,7 @@ func (r archivePlugin) Archive(config util.Config) util.Result {
 	messages = append(messages, msg)
 
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String("eu-central-1"),
+		Region: aws.String(config.ArchivePluginParameters["AwsRegion"]),
 	}))
 
 	s3svc := s3.New(sess)
@@ -128,7 +128,7 @@ func (r archivePlugin) ArchiveDelete(config util.Config) util.Result {
 	var resultCode int = 0
 
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String("eu-central-1"),
+		Region: aws.String(config.ArchivePluginParameters["AwsRegion"]),
 	}))
 
 	s3svc := s3.New(sess)
@@ -198,7 +198,7 @@ func (r archivePlugin) ArchiveList(config util.Config) util.Archives {
 	messages = append(messages, msg)
 
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String("eu-central-1"),
+		Region: aws.String(config.ArchivePluginParameters["AwsRegion"]),
 	}))
 
 	s3svc := s3.New(sess)

@@ -12,7 +12,14 @@ objects:
     name: ${APPLICATION_NAME}-secrets
   stringData:
     admin-user: ${FOSSUL_USERNAME}
-    admin-password: ${FOSSUL_PASSWORD}  
+    admin-password: ${FOSSUL_PASSWORD}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: ${APPLICATION_NAME}-aws-secrets
+  stringData:
+    access-key: ${AWS_ACCESS_KEY_ID}
+    secret-key: ${AWS_SECRET_ACCESS_KEY }        
 - apiVersion: v1
   kind: Service
   metadata:
@@ -373,7 +380,7 @@ objects:
           - name: FOSSUL_STORAGE_CLIENT_HOSTNAME
             value: ${APPLICATION_NAME}-storage 
           - name: FOSSUL_STORAGE_DEBUG
-            value: ${FOSSUL_STORAGE_DEBUG}                           
+            value: ${FOSSUL_STORAGE_DEBUG}                                       
           - name: FOSSUL_USERNAME
             valueFrom:
               secretKeyRef:
@@ -384,6 +391,16 @@ objects:
               secretKeyRef:
                 name: ${APPLICATION_NAME}-secrets
                 key: admin-password
+          - name: AWS_ACCESS_KEY_ID 
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-aws-secrets
+                key: access-key
+          - name: AWS_SECRET_ACCESS_KEY 
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-aws-secrets
+                key: secret-key                                    
           image: ' '
           imagePullPolicy: IfNotPresent
           name: "${APPLICATION_NAME}-storage"
@@ -575,7 +592,17 @@ parameters:
     displayName: Password for API Services
     description: Password for API Services
     value: redhat123
-    required: true     
+    required: true
+  - name: AWS_ACCESS_KEY_ID 
+    displayName: AWS Access Key
+    description: AWS Access Key
+    value: 
+    required: false
+  - name: AWS_SECRET_ACCESS_KEY  
+    displayName: AWS Secret Access Key
+    description: AWS Secret Access Key
+    value: 
+    required: false          
   - name: FOSSUL_SERVER_CONFIG_DIR
     displayName: Directory for configs
     description: Directory for configs

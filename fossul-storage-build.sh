@@ -38,7 +38,7 @@ go install fossul/src/engine/plugins/storage/basic/container-basic
 if [ $? != 0 ]; then exit 1; fi
 go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/container-basic.so fossul/src/engine/plugins/storage/native/container-basic
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $PLUGIN_DIR/archive/aws.so fossul/src/engine/plugins/archive/native/aws
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/archive/aws.so fossul/src/engine/plugins/archive/native/aws
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Storage Service"
