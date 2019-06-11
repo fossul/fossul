@@ -9,6 +9,9 @@ RUN dnf install -y golang
 RUN mkdir -p /go/src/fossul
 RUN mkdir /app
 
+RUN groupadd -r fossul &&\
+    useradd -r -g fossul -d /app -u 1001 -s /sbin/nologin -c "Fossul user" fossul
+
 WORKDIR /go/src/fossul
 
 ENV FOSSUL_BUILD_PLUGIN_DIR=/app/plugins
@@ -27,7 +30,7 @@ COPY . /go/src/fossul
 #RUN cd /app && go build engine/util && go install engine/app
 RUN /go/src/fossul/fossul-app-build.sh
 
-RUN chown -R 1001:0 /app && \
+RUN chown -R fossul:fossul /app && \
     chmod -R 775 /app
  #   chmod -R ug+rwX /app
 
@@ -37,7 +40,7 @@ RUN echo "1.0" > /etc/imageversion
 
 RUN ls -l /app
 
-USER 1001
+USER fossul
 
 WORKDIR /app
 
