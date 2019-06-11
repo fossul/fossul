@@ -244,22 +244,6 @@ func GetConfig(w http.ResponseWriter, r *http.Request) (Config, error) {
 	return config, nil
 }
 
-func GetAwsCredentials(w http.ResponseWriter, r *http.Request) (AwsCredentials, error) {
-
-	var awsCredentials AwsCredentials
-	if err := json.NewDecoder(r.Body).Decode(&awsCredentials); err != nil {
-		return awsCredentials, err
-	}
-	defer r.Body.Close()
-
-	_, err := json.Marshal(&awsCredentials)
-	if err != nil {
-		return awsCredentials, err
-	}
-
-	return awsCredentials, nil
-}
-
 func GetPluginConfig(w http.ResponseWriter, r *http.Request) (map[string]string, error) {
 
 	var configMap map[string]string

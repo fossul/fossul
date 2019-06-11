@@ -762,26 +762,6 @@ func DeleteSchedule(auth client.Auth, profileName, configName, policyName string
 	os.Exit(0)
 }
 
-func AddAwsCredentials(auth client.Auth, awsCredentials util.AwsCredentials) {
-	result, err := client.AddAwsCredentials(auth, awsCredentials)
-	if err != nil {
-		fmt.Println("[ERROR] " + err.Error())
-		os.Exit(1)
-	}
-	printResult(result)
-	os.Exit(0)
-}
-
-func DeleteAwsCredentials(auth client.Auth) {
-	result, err := client.DeleteAwsCredentials(auth)
-	if err != nil {
-		fmt.Println("[ERROR] " + err.Error())
-		os.Exit(1)
-	}
-	printResult(result)
-	os.Exit(0)
-}
-
 func checkResult(result util.Result) {
 	logger := util.GetLoggerInstance()
 	if result.Code != 0 {
