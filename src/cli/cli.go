@@ -30,6 +30,8 @@ func main() {
 	optPluginName := getopt.StringLong("plugin", 'l', "", "Name of plugin")
 	optPluginType := getopt.StringLong("plugin-type", 't', "", "Plugin type app|storage|archive")
 	optWorkflowId := getopt.StringLong("workflow-id", 'w', "", "Workflow Id")
+	optCloudKey := getopt.StringLong("cloud-key", 'b', "", "Cloud Access Key")
+	optCloudSecret := getopt.StringLong("cloud-secret", 'd', "", "Cloud Secret Key")
 	optCronSchedule := getopt.StringLong("cron-schedule", 'r', "", "Cron Schedule Format - (min) (hour) (dayOfMOnth) (month) (dayOfWeek)")
 	optSetCredentials := getopt.BoolLong("set-credentials", 0, "Save credentials to a file")
 	optLocalConfig := getopt.BoolLong("local", 0, "Use a local configuration file")
@@ -43,6 +45,8 @@ func main() {
 	optGetConfig := getopt.BoolLong("get-config", 0, "Get config file")
 	optGetPluginConfig := getopt.BoolLong("get-plugin-config", 0, "Get plugin config file")
 	optGetServiceStatus := getopt.BoolLong("status", 0, "Service status and version information")
+	optAddAwsCredentials := getopt.BoolLong("add-aws-credentials", 0, "Add AWS Credentials")
+	optDeleteAwsCredentials := getopt.BoolLong("delete-aws-credentials", 0, "Delete AWS Credentials")
 	optGetVersion := getopt.BoolLong("version", 0, "CLI version")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
@@ -120,6 +124,30 @@ func main() {
 
 	if *optGetServiceStatus {
 		Status(auth)
+	}
+
+	if *optAddAwsCredentials {
+		if getopt.IsSet("cloud-key") != true {
+			fmt.Println("[ERROR] Missing parameter --cloud-key")
+			getopt.Usage()
+			os.Exit(1)
+		}
+
+		if getopt.IsSet("cloud-secret") != true {
+			fmt.Println("[ERROR] Missing parameter --cloud-secret")
+			getopt.Usage()
+			os.Exit(1)
+		}
+
+		var awsCredentials util.AwsCredentials
+		awsCredentials.AwsKey = *optCloudKey
+		awsCredentials.AwsSecret = *optCloudSecret
+		AddAwsCredentials(auth, awsCredentials)
+
+	}
+
+	if *optDeleteAwsCredentials {
+		DeleteAwsCredentials(auth)
 	}
 
 	if *optGetPluginInfo {

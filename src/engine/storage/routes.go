@@ -137,4 +137,16 @@ var routes = Routes{
 		"/restoreCmd",
 		RestoreCmd,
 	},
+	Route{
+		"AddAwsCredentials",
+		"POST",
+		"/addAwsCredentials",
+		AddAwsCredentials,
+	},
+	Route{
+		"DeleteAwsCredentials",
+		"GET",
+		"/deleteAwsCredentials",
+		DeleteAwsCredentials,
+	},			
 }
