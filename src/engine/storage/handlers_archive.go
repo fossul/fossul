@@ -67,7 +67,7 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(result)
 		}
 
-		result = util.ExecutePlugin(config, "archive", plugin, "--action", "archive")
+		result = util.ExecutePlugin(config, "archive", plugin, "--archive")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
@@ -145,7 +145,7 @@ func ArchiveList(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(archives)
 		}
 
-		resultSimple := util.ExecutePluginSimple(config, "archive", plugin, "--action", "archiveList")
+		resultSimple := util.ExecutePluginSimple(config, "archive", plugin, "--archiveList")
 		if resultSimple.Code != 0 {
 			msg := util.SetMessage("ERROR", "ArchiveList failed")
 			messages = append(messages, msg)
@@ -234,7 +234,7 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(result)
 		}
 
-		result = util.ExecutePlugin(config, "archive", plugin, "--action", "archiveDelete")
+		result = util.ExecutePlugin(config, "archive", plugin, "--archiveDelete")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {

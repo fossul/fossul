@@ -221,7 +221,7 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(result)
 		}
 
-		result = util.ExecutePlugin(config, "app", plugin, "--action", "quiesce")
+		result = util.ExecutePlugin(config, "app", plugin, "--quiesce")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {

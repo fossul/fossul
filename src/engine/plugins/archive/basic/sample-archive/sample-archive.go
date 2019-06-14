@@ -21,7 +21,10 @@ import (
 )
 
 func main() {
-	optAction := getopt.StringLong("action", 'a', "", "archive|archiveList|archiveDelete")
+	optArchive := getopt.BoolLong("archive", 0, "Archive")
+	optArchiveList := getopt.BoolLong("archiveList", 0, "Archive List")
+	optArchiveDelete := getopt.BoolLong("archiveDelete", 0, "Archive Delete")
+	optInfo := getopt.BoolLong("info", 0, "Archive Plugin Information")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -30,27 +33,20 @@ func main() {
 		os.Exit(0)
 	}
 
-	if getopt.IsSet("action") != true {
-		fmt.Println("ERROR Incorrect parameter\n")
-		getopt.Usage()
-		os.Exit(1)
-	}
-
 	//load env parameters
 	configMap := getEnvParams()
 
-	if *optAction == "archive" {
+	if *optArchive {
 		archive(configMap)
-	} else if *optAction == "archiveList" {
+	} else if *optArchiveList {
 		archiveList(configMap)
-	} else if *optAction == "archiveDelete" {
+	} else if *optArchiveDelete {
 		archiveDelete(configMap)
-	} else if *optAction == "info" {
+	} else if *optInfo {
 		info()
 	} else {
-		fmt.Println("ERROR Incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
-		os.Exit(1)
+		os.Exit(0)		
 	}
 }
 

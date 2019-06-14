@@ -67,7 +67,7 @@ func PreRestore(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(result)
 		}
 
-		result = util.ExecutePlugin(config, "app", plugin, "--action", "preRestore")
+		result = util.ExecutePlugin(config, "app", plugin, "--preRestore")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
@@ -142,7 +142,7 @@ func PostRestore(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(result)
 		}
 
-		result = util.ExecutePlugin(config, "app", plugin, "--action", "postRestore")
+		result = util.ExecutePlugin(config, "app", plugin, "--postRestore")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {

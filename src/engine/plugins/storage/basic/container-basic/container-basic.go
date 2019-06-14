@@ -24,7 +24,11 @@ import (
 )
 
 func main() {
-	optAction := getopt.StringLong("action", 'a', "", "backup|restore|backupList|backupDelete|info")
+	optBackup := getopt.BoolLong("backup", 0, "Backup")
+	optRestore := getopt.BoolLong("restore", 0, "Restore")
+	optBackupList := getopt.BoolLong("backupList", 0, "Backup List")
+	optBackupDelete := getopt.BoolLong("backupDelete", 0, "Backup Delete")
+	optInfo := getopt.BoolLong("info", 0, "Storage Plugin Information")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -33,29 +37,22 @@ func main() {
 		os.Exit(0)
 	}
 
-	if getopt.IsSet("action") != true {
-		fmt.Println("ERROR missing parameter --action")
-		getopt.Usage()
-		os.Exit(1)
-	}
-
 	//load env parameters
 	configMap := getEnvParams()
 
-	if *optAction == "backup" {
+	if *optBackup {
 		backup(configMap)
-	} else if *optAction == "restore" {
+	} else if *optRestore {
 		restore(configMap)
-	} else if *optAction == "backupList" {
+	} else if *optBackupList {
 		backupList(configMap)
-	} else if *optAction == "backupDelete" {
+	} else if *optBackupDelete {
 		backupDelete(configMap)
-	} else if *optAction == "info" {
+	} else if *optInfo {
 		info()
 	} else {
-		fmt.Println("ERROR incorrect parameter" + *optAction)
 		getopt.Usage()
-		os.Exit(1)
+		os.Exit(0)
 	}
 }
 
@@ -72,7 +69,7 @@ func backup(configMap map[string]string) {
 
 	fmt.Println("INFO Performing backup for pod " + podName)
 
-	backupName := util.GetBackupName(configMap["BackupName"], configMap["BackupPolicy"], configMap["WorkflowId"],configMap["WorkflowTimestamp"])
+	backupName := util.GetBackupName(configMap["BackupName"], configMap["BackupPolicy"], configMap["WorkflowId"], configMap["WorkflowTimestamp"])
 	backupPath := util.GetBackupPathFromMap(configMap)
 	fmt.Println("INFO Backup name is " + backupName + ", Backup path is " + backupPath)
 

@@ -65,7 +65,7 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)
 		}
-		result = util.ExecutePlugin(config, "storage", plugin, "--action", "backup")
+		result = util.ExecutePlugin(config, "storage", plugin, "--backup")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {
@@ -143,7 +143,7 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(backups)
 		}
 
-		resultSimple := util.ExecutePluginSimple(config, "storage", plugin, "--action", "backupList")
+		resultSimple := util.ExecutePluginSimple(config, "storage", plugin, "--backupList")
 		if resultSimple.Code != 0 {
 			msg := util.SetMessage("ERROR", "BackupList failed")
 			messages = append(messages, msg)
@@ -231,7 +231,7 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)
 		}
-		result = util.ExecutePlugin(config, "storage", plugin, "--action", "backupDelete")
+		result = util.ExecutePlugin(config, "storage", plugin, "--backupDelete")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {

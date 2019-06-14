@@ -22,7 +22,12 @@ import (
 )
 
 func main() {
-	optAction := getopt.StringLong("action", 'a', "", "discover|quiesce|unquiesce|info")
+	optDiscover := getopt.BoolLong("discover", 0, "Application Discover")
+	optQuiesce := getopt.BoolLong("quiesce", 0, "Application Quiesce")
+	optUnquiesce := getopt.BoolLong("unquiesce", 0, "Application Unquiesce")
+	optPreRestore := getopt.BoolLong("preRestore", 0, "Application Pre Restore")
+	optPostRestore := getopt.BoolLong("postRestore", 0, "Application Post Restore")
+	optInfo := getopt.BoolLong("info", 0, "Application Plugin Information")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
 
@@ -31,35 +36,28 @@ func main() {
 		os.Exit(0)
 	}
 
-	if getopt.IsSet("action") != true {
-		fmt.Println("ERROR Incorrect parameter")
-		getopt.Usage()
-		os.Exit(1)
-	}
-
 	//load env parameters
 	configMap := getEnvParams()
 
-	if *optAction == "quiesce" {
+	if *optQuiesce {
 		printEnv(configMap)
 		quiesce(configMap)
-	} else if *optAction == "unquiesce" {
+	} else if *optUnquiesce {
 		printEnv(configMap)
 		unquiesce(configMap)
-	} else if *optAction == "preRestore" {
+	} else if *optPreRestore {
 		printEnv(configMap)
 		preRestore(configMap)
-	} else if *optAction == "postRestore" {
+	} else if *optPostRestore {
 		printEnv(configMap)
 		postRestore(configMap)
-	} else if *optAction == "info" {
+	} else if *optInfo {
 		info()
-	} else if *optAction == "discover" {
+	} else if *optDiscover {
 		discover()
 	} else {
-		fmt.Println("ERROR Incorrect parameter" + *optAction + "\n")
 		getopt.Usage()
-		os.Exit(1)
+		os.Exit(0)
 	}
 }
 

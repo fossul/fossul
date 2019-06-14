@@ -138,7 +138,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var resultSimple util.ResultSimple
-		resultSimple = util.ExecutePluginSimple(config, pluginType, plugin, "--action", "info")
+		resultSimple = util.ExecutePluginSimple(config, pluginType, plugin, "--info")
 		if resultSimple.Code != 0 {
 			msg := util.SetMessage("ERROR", "Plugin Info failed!")
 			messages = append(messages, msg)

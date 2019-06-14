@@ -65,7 +65,7 @@ func Restore(w http.ResponseWriter, r *http.Request) {
 			_ = json.NewDecoder(r.Body).Decode(&result)
 			json.NewEncoder(w).Encode(result)
 		}
-		result = util.ExecutePlugin(config, "storage", plugin, "--action", "restore")
+		result = util.ExecutePlugin(config, "storage", plugin, "--restore")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {

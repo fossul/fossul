@@ -223,7 +223,7 @@ func Unquiesce(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		result = util.ExecutePlugin(config, "app", plugin, "--action", "unquiesce")
+		result = util.ExecutePlugin(config, "app", plugin, "--unquiesce")
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	} else {

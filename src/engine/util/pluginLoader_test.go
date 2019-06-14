@@ -29,7 +29,7 @@ func TestExecutePlugin(t *testing.T) {
 	}
 
 	plugin := pluginDir + "/app/" + config.AppPlugin
-	result := ExecutePlugin(config, "app", plugin, "--action", "quiesce")
+	result := ExecutePlugin(config, "app", plugin, "--quiesce")
 
 	log.Println(result)
 
@@ -46,7 +46,7 @@ func TestExecutePluginSimple(t *testing.T) {
 	}
 
 	plugin := pluginDir + "/storage/" + config.StoragePlugin
-	result := ExecutePluginSimple(config, "storage", plugin, "--action", "backup")
+	result := ExecutePluginSimple(config, "storage", plugin, "--backup")
 
 	log.Println(result)
 

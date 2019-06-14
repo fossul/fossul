@@ -69,7 +69,7 @@ func Discover(w http.ResponseWriter, r *http.Request) {
 			_ = json.NewDecoder(r.Body).Decode(&discoverResult)
 			json.NewEncoder(w).Encode(discoverResult)
 		}
-		resultSimple := util.ExecutePluginSimple(config, "app", plugin, "--action", "discover")
+		resultSimple := util.ExecutePluginSimple(config, "app", plugin, "--discover")
 		discoverResultString := strings.Join(resultSimple.Messages, " ")
 		json.Unmarshal([]byte(discoverResultString), &discoverResult)
 
