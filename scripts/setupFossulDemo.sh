@@ -18,9 +18,15 @@ $CLI --profile mongo --config mongo --action addConfig --config-file $CONFIG_DIR
 $CLI --profile mongo --config mongo --action addPluginConfig --config-file $CONFIG_DIR/mongo/mongo/container-basic.so.conf --plugin container-basic.so --credential-file $CREDENTIAL_FILE 
 $CLI --profile mongo --config mongo --action addPluginConfig --config-file $CONFIG_DIR/mongo/mongo/mongo-dump.so.conf --plugin mongo-dump.so --credential-file $CREDENTIAL_FILE 
 $CLI --profile mongo --config mongo --action addPluginConfig --config-file $CONFIG_DIR/mongo/mongo/aws.so.conf --plugin aws.so --credential-file $CREDENTIAL_FILE 
+$CLI --profile test --config test --action addConfig --config-file $CONFIG_DIR/test/test/test.conf --credential-file $CREDENTIAL_FILE 
+$CLI --profile test --config test --action addPluginConfig --config-file $CONFIG_DIR/test/test/sample-storage.conf --plugin sample-storage --credential-file $CREDENTIAL_FILE 
+$CLI --profile test --config test --action addPluginConfig --config-file $CONFIG_DIR/test/test/sample-app.sh.conf --plugin sample-app.sh --credential-file $CREDENTIAL_FILE 
+$CLI --profile test --config test --action addPluginConfig --config-file $CONFIG_DIR/test/test/sample-archive.conf --plugin sample-archive --credential-file $CREDENTIAL_FILE 
 $CLI --profile mongo --config mongo --action addSchedule --cron-schedule "0,15,30,45 * * * *" --credential-file $CREDENTIAL_FILE --policy daily
 $CLI --profile mongo --config mongo --action addSchedule --cron-schedule "20 * * * *" --credential-file $CREDENTIAL_FILE --policy weekly
 $CLI --profile mariadb --config mariadb --action addSchedule --cron-schedule "0,15,30,45 * * * *" --credential-file $CREDENTIAL_FILE --policy daily
 $CLI --profile mariadb --config mariadb --action addSchedule --cron-schedule "20 * * * *" --credential-file $CREDENTIAL_FILE --policy weekly
 $CLI --profile postgres --config postgres --action addSchedule --cron-schedule "0,15,30,45 * * * *" --credential-file $CREDENTIAL_FILE --policy daily
 $CLI --profile postgres --config postgres --action addSchedule --cron-schedule "20 * * * *" --credential-file $CREDENTIAL_FILE --policy weekly
+$CLI --profile test --config test --action addSchedule --cron-schedule "0,15,30,45 * * * *" --credential-file $CREDENTIAL_FILE --policy daily
+$CLI --profile test --config test --action addSchedule --cron-schedule "20 * * * *" --credential-file $CREDENTIAL_FILE --policy weekly
