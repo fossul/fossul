@@ -28,6 +28,9 @@ steps:
     shopt -s dotglob
     #mv !(gopath) '$(modulePath)'
     echo "$(modulePath) $(GOPATH)/src" 
+    ls $(GOPATH)/src
+    ls $(GOPATH)/src/fossul
+    exit 1
     mv $(modulePath) $(GOPATH)/src
     echo '##vso[task.prependpath]$(GOBIN)'
     echo '##vso[task.prependpath]$(GOROOT)/bin'
