@@ -22,7 +22,7 @@ steps:
     echo "Here $(GOBIN)"
     echo $(GOPATH)
     echo $(modulePath)
-    ls $(GOPATH)/src/github.com/$(build.repository.name)
+    ls $(GOPATH)/src/github.com/fossul
     mkdir -p '$(GOPATH)/pkg'
     mkdir -p '$(modulePath)'
     shopt -s extglob
@@ -31,8 +31,9 @@ steps:
     echo "$(modulePath) $(GOPATH)/src" 
     ls $(GOPATH)/src
     ls $(GOPATH)/src/github.com
-    exit 1
     mv $(modulePath) $(GOPATH)/src
+    ls "new path $(GOPATH)/src"
+    exit 1
     echo '##vso[task.prependpath]$(GOBIN)'
     echo '##vso[task.prependpath]$(GOROOT)/bin'
   displayName: 'Set up the Go workspace'
