@@ -42,5 +42,5 @@ steps:
     fi
     #go build -v .
     $(modulePath)/fossul-build.sh
-  workingDirectory: '$(modulePath)'
+  workingDirectory: '$(GOPATH)/src/fossul'
   displayName: 'Get dependencies, then build'
