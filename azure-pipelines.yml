@@ -22,6 +22,7 @@ steps:
     echo "Here $(GOBIN)"
     echo $(GOPATH)
     echo $(modulePath)
+    ls $(GOPATH)/src/github.com/$(build.repository.name)
     mkdir -p '$(GOPATH)/pkg'
     mkdir -p '$(modulePath)'
     shopt -s extglob
@@ -29,7 +30,7 @@ steps:
     #mv !(gopath) '$(modulePath)'
     echo "$(modulePath) $(GOPATH)/src" 
     ls $(GOPATH)/src
-    ls $(GOPATH)/src/fossul
+    ls $(GOPATH)/src/github.com
     exit 1
     mv $(modulePath) $(GOPATH)/src
     echo '##vso[task.prependpath]$(GOBIN)'
