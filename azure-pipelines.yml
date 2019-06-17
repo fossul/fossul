@@ -41,6 +41,6 @@ steps:
         dep ensure
     fi
     #go build -v .
-    $(GOPATH)/src/fossul-build.sh
+    $(GOPATH)/src/fossul/fossul-build.sh
   workingDirectory: '$(GOPATH)/src/fossul'
   displayName: 'Get dependencies, then build'
