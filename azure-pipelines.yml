@@ -28,8 +28,8 @@ steps:
     mkdir -p '$(GOBIN)'
     mkdir -p '$(GOPATH)/pkg'
     mkdir -p '$(GOPATH)/src/fossul'
-    echo "Moving $(system.defaultWorkingDirectory)/* To $(system.defaultWorkingDirectory)/gopath/src/fossul"
-    mv $(system.defaultWorkingDirectory)/* $(system.defaultWorkingDirectory)/gopath/src/fossul
+    echo "Moving $(system.defaultWorkingDirectory)/* To $(modulePath)"
+    mv $(system.defaultWorkingDirectory)/* $(modulePath)
     shopt -s extglob
     shopt -s dotglob
     echo '##vso[task.prependpath]$(GOBIN)'
