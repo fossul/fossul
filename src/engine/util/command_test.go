@@ -19,7 +19,7 @@ import (
 )
 
 func TestExecuteCommand(t *testing.T) {
-	cmd := "/usr/bin/ls,-a,/tmp"
+	cmd := "/bin/ls,-a,/tmp"
 	args := strings.Split(cmd, ",")
 
 	result := ExecuteCommand(args...)
