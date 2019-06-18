@@ -13,14 +13,22 @@ variables:
   GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
   GOBIN:  '$(GOPATH)/bin' # Go binaries path
   PLUGIN_DIR: '$(GOBIN)'
-  modulePath: '$(GOPATH)/src' # Path to the module's code
+#  GOBIN:  '$(GOPATH)/bin' # Go binaries path
+#  GOROOT: '/usr/local/go1.11' # Go installation path
+#  GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
+  modulePath: '$(GOPATH)/src/fossul' # Path to the module's code
 
 steps:
 - script: |
+    echo "GOBIN $(GOBIN)"
+    echo "GOPATH $(GOPATH)"
+    echo "REPO PATH $(GOPATH)/src/github.com/$(build.repository.name)"
+
     mkdir -p '$(GOPATH)'
     mkdir -p '$(GOBIN)'
     mkdir -p '$(GOPATH)/pkg'
     mkdir -p '$(GOPATH)/src/fossul'
+    echo "Moving $(system.defaultWorkingDirectory)/* To $(system.defaultWorkingDirectory)/gopath/src/fossul"
     mv $(system.defaultWorkingDirectory)/* $(system.defaultWorkingDirectory)/gopath/src/fossul
     shopt -s extglob
     shopt -s dotglob
@@ -30,13 +38,16 @@ steps:
 
 - script: |
     go version
-    go get -v -t -d ./...
     if [ -f Gopkg.toml ]; then
         curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
         dep ensure
+    else
+      echo "ERROR no Gopkg.toml found!"
+      exit 1
     fi
+
     $(GOPATH)/src/fossul/fossul-server-build.sh
     $(GOPATH)/src/fossul/fossul-app-build.sh
     $(GOPATH)/src/fossul/fossul-storage-build.sh
-  workingDirectory: '$(GOPATH)'
+  workingDirectory: '$(GOPATH)/src/fossul'
   displayName: 'Get dependencies, then build'
