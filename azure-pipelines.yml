@@ -10,30 +10,20 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  PLUGIN_DIR: '$(GOBIN)/plugins'
-  GOBIN:  '$(GOPATH)/bin' # Go binaries path
-  GOROOT: '/usr/local/go1.11' # Go installation path
   GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
-  modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
+  GOBIN:  '$(GOPATH)/bin' # Go binaries path
+  PLUGIN_DIR: '$(GOBIN)'
+  modulePath: '$(GOPATH)/src' # Path to the module's code
 
 steps:
 - script: |
+    mkdir -p '$(GOPATH)'
     mkdir -p '$(GOBIN)'
-    echo "Here $(GOBIN)"
-    echo $(GOPATH)
-    echo $(modulePath)
-    ls $(GOPATH)/src/github.com/fossul
     mkdir -p '$(GOPATH)/pkg'
-    mkdir -p '$(modulePath)'
+    mkdir -p '$(GOPATH)/src/fossul'
+    mv $(system.defaultWorkingDirectory)/* $(system.defaultWorkingDirectory)/gopath/src/fossul
     shopt -s extglob
     shopt -s dotglob
-    #mv !(gopath) '$(modulePath)'
-    echo "$(modulePath) $(GOPATH)/src" 
-    ls $(GOPATH)/src
-    ls $(GOPATH)/src/github.com
-    mv $(modulePath) $(GOPATH)/src
-    ls "new path $(GOPATH)/src"
-    exit 1
     echo '##vso[task.prependpath]$(GOBIN)'
     echo '##vso[task.prependpath]$(GOROOT)/bin'
   displayName: 'Set up the Go workspace'
@@ -45,7 +35,8 @@ steps:
         curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
         dep ensure
     fi
-    #go build -v .
-    $(GOPATH)/src/fossul/fossul-build.sh
-  workingDirectory: '$(GOPATH)/src/fossul'
+    $(GOPATH)/src/fossul/fossul-server-build.sh
+    $(GOPATH)/src/fossul/fossul-app-build.sh
+    $(GOPATH)/src/fossul/fossul-storage-build.sh
+  workingDirectory: '$(GOPATH)'
   displayName: 'Get dependencies, then build'
