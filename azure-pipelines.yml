@@ -50,8 +50,8 @@ steps:
       exit 1
     fi
 
-    $(GOPATH)/src/fossul/fossul-server-build.sh
-    $(GOPATH)/src/fossul/fossul-app-build.sh
-    $(GOPATH)/src/fossul/fossul-storage-build.sh
+    $(GOPATH)/src/fossul/scripts/fossul-server-build.sh
+    $(GOPATH)/src/fossul/scripts/fossul-app-build.sh
+    $(GOPATH)/src/fossul/scripts/fossul-storage-build.sh
   workingDirectory: '$(GOPATH)/src/fossul'
   displayName: 'Get dependencies, then build'
