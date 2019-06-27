@@ -23,13 +23,9 @@ RUN curl -L https://github.com/openshift/origin/releases/download/v3.11.0/opensh
 
 RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
 
-#RUN go get -u github.com/gorilla/mux
-
 COPY . /go/src/fossul
 
-RUN /go/src/fossul/fossul-server-build.sh
-
-#RUN cd /app && go build engine/util && go install engine/workflow
+RUN /go/src/fossul/scripts/fossul-server-build.sh
 
 RUN chown -R fossul:fossul /app && \
     chmod -R 775 /app

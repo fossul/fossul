@@ -53,7 +53,7 @@ mv $GOBIN/sample-app $FOSSUL_BUILD_PLUGIN_DIR/app
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying startup script"
-cp $GOPATH/src/fossul/fossul-app-startup.sh $GOBIN
+cp $GOPATH/src/fossul/scripts/fossul-app-startup.sh $GOBIN
 if [ $? != 0 ]; then exit 1; fi
 
 echo "App build completed successfully"

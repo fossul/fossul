@@ -30,7 +30,7 @@ go install fossul/src/engine/server
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying startup script"
-cp $GOPATH/src/fossul/fossul-server-startup.sh $GOBIN
+cp $GOPATH/src/fossul/scripts/fossul-server-startup.sh $GOBIN
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Server build completed successfully"

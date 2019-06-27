@@ -56,7 +56,7 @@ mv $GOBIN/container-basic $FOSSUL_BUILD_PLUGIN_DIR/storage
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying startup script"
-cp $GOPATH/src/fossul/fossul-storage-startup.sh $GOBIN
+cp $GOPATH/src/fossul/scripts/fossul-storage-startup.sh $GOBIN
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Storage build completed successfully"

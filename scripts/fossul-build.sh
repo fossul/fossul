@@ -103,11 +103,11 @@ cp -r $GOPATH/src/fossul/src/cli/configs/default $GOBIN/metadata/configs/default
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying startup scripts"
-cp $GOPATH/src/fossul/fossul-server-startup.sh $GOBIN
+cp $GOPATH/src/fossul/scripts/fossul-server-startup.sh $GOBIN
 if [ $? != 0 ]; then exit 1; fi
-cp $GOPATH/src/fossul/fossul-app-startup.sh $GOBIN
+cp $GOPATH/src/fossul/scripts/fossul-app-startup.sh $GOBIN
 if [ $? != 0 ]; then exit 1; fi
-cp $GOPATH/src/fossul/fossul-storage-startup.sh $GOBIN
+cp $GOPATH/src/fossul/scripts/fossul-storage-startup.sh $GOBIN
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Build completed successfully"

@@ -27,12 +27,10 @@ RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
 
 COPY . /go/src/fossul
 
-#RUN cd /app && go build engine/util && go install engine/app
-RUN /go/src/fossul/fossul-app-build.sh
+RUN /go/src/fossul/scripts/fossul-app-build.sh
 
 RUN chown -R fossul:fossul /app && \
     chmod -R 775 /app
- #   chmod -R ug+rwX /app
 
 RUN chmod -R 777 /tmp
 
