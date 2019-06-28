@@ -15,9 +15,10 @@ package main
 import (
 	"fmt"
 	"fossul/src/engine/client/k8s"
+	"fossul/src/engine/plugins/pluginUtil"
 	"fossul/src/engine/util"
 	"github.com/heketi/heketi/client/api/go-client"
-	//"strings"
+	"strings"
 )
 
 type storagePlugin string
@@ -40,7 +41,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	var resultCode int = 0
 
 	timestampToString := fmt.Sprintf("%d", config.WorkflowTimestamp)
-	backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
+	backupName := util.GetBackupName(config.StoragePluginParameters["PvcName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
 
 	msg := util.SetMessage("INFO", "Performing Gluster snapshot")
 	messages = append(messages, msg)
@@ -150,12 +151,6 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
-	timestampToString := fmt.Sprintf("%d", config.WorkflowTimestamp)
-	backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
-
-	msg := util.SetMessage("INFO", "*** Backup Delete ***")
-	messages = append(messages, msg)
-
 	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.StoragePluginParameters["AccessWithinCluster"])
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
@@ -165,18 +160,67 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 		return result
 	}
 
-	var deleteSnapshot []string
-	deleteSnapshot = append(deleteSnapshot, "/usr/sbin/gluster")
-	deleteSnapshot = append(deleteSnapshot, "--mode=script")
-	deleteSnapshot = append(deleteSnapshot, "snapshot")
-	deleteSnapshot = append(deleteSnapshot, "delete")
-	deleteSnapshot = append(deleteSnapshot, backupName)
+	var listSnapshot []string
+	listSnapshot = append(listSnapshot, "/usr/sbin/gluster")
+	listSnapshot = append(listSnapshot, "--mode=script")
+	listSnapshot = append(listSnapshot, "snapshot")
+	listSnapshot = append(listSnapshot, "list")
 
-	deleteSnapshotResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], deleteSnapshot...)
-	if deleteSnapshotResult.Code != 0 {
-		return deleteSnapshotResult
+	listSnapshotResult, listSnapshotStdout := k8s.ExecuteCommandWithStdout(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], listSnapshot...)
+	if listSnapshotResult.Code != 0 {
+		return listSnapshotResult
 	} else {
-		messages = util.PrependMessages(messages, deleteSnapshotResult.Messages)
+		messages = util.PrependMessages(messages, listSnapshotResult.Messages)
+	}
+
+	snapshotList := strings.Split(listSnapshotStdout, "\n")
+
+	backups, err := pluginUtil.ListSnapshots(snapshotList, config.StoragePluginParameters["PvcName"])
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+
+		return result
+	}
+
+	backupsByPolicy := util.GetBackupsByPolicy(config.SelectedBackupPolicy, backups)
+	backupCount := len(backupsByPolicy)
+
+	if backupCount > config.SelectedBackupRetention {
+		count := 1
+		for backup := range pluginUtil.ReverseBackupList(backupsByPolicy) {
+			if count > config.SelectedBackupRetention {
+				msg := util.SetMessage("INFO", fmt.Sprintf("Number of backups [%d] greater than backup retention [%d]", backupCount, config.SelectedBackupRetention))
+				messages = append(messages, msg)
+				backupCount = backupCount - 1
+
+				backupName := backup.Name + "_" + backup.Policy + "_" + backup.WorkflowId + "_" + util.IntToString(backup.Epoch)
+				msg = util.SetMessage("INFO", "Deleting backup "+backupName)
+				messages = append(messages, msg)
+
+				var deleteSnapshot []string
+				deleteSnapshot = append(deleteSnapshot, "/usr/sbin/gluster")
+				deleteSnapshot = append(deleteSnapshot, "--mode=script")
+				deleteSnapshot = append(deleteSnapshot, "snapshot")
+				deleteSnapshot = append(deleteSnapshot, "delete")
+				deleteSnapshot = append(deleteSnapshot, backupName)
+
+				deleteSnapshotResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], deleteSnapshot...)
+				if deleteSnapshotResult.Code != 0 {
+					return deleteSnapshotResult
+				} else {
+					messages = util.PrependMessages(messages, deleteSnapshotResult.Messages)
+				}
+
+				msg = util.SetMessage("INFO", "Backup "+backupName+" deleted successfully")
+				messages = append(messages, msg)
+			}
+			count = count + 1
+		}
+	} else {
+		msg := util.SetMessage("INFO", fmt.Sprintf("Backup deletion skipped, there are [%d] backups but backup retention is [%d]", backupCount, config.SelectedBackupRetention))
+		messages = append(messages, msg)
 	}
 
 	result = util.SetResult(resultCode, messages)
@@ -185,6 +229,49 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 
 func (s storagePlugin) BackupList(config util.Config) util.Backups {
 	var backups util.Backups
+	var result util.Result
+	var messages []util.Message
+
+	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.StoragePluginParameters["AccessWithinCluster"])
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+
+		result = util.SetResult(1, messages)
+		backups.Result = result
+
+		return backups
+	}
+
+	var listSnapshot []string
+	listSnapshot = append(listSnapshot, "/usr/sbin/gluster")
+	listSnapshot = append(listSnapshot, "--mode=script")
+	listSnapshot = append(listSnapshot, "snapshot")
+	listSnapshot = append(listSnapshot, "list")
+
+	listSnapshotResult, listSnapshotStdout := k8s.ExecuteCommandWithStdout(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], listSnapshot...)
+	if listSnapshotResult.Code != 0 {
+		backups.Result = listSnapshotResult
+		return backups
+	} else {
+		messages = util.PrependMessages(messages, listSnapshotResult.Messages)
+	}
+
+	snapshotList := strings.Split(listSnapshotStdout, "\n")
+
+	backupList, err := pluginUtil.ListSnapshots(snapshotList, config.StoragePluginParameters["PvcName"])
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+		backups.Result = result
+
+		return backups
+	}
+
+	result = util.SetResult(0, messages)
+	backups.Result = result
+	backups.Backups = backupList
 
 	return backups
 }

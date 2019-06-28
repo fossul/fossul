@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strings"
 )
 
 func ExistsPath(path string) bool {
@@ -75,6 +76,38 @@ func ListBackups(path string) ([]util.Backup, error) {
 			backup.Timestamp = timestamp
 
 			backups = append(backups, backup)
+		}
+	}
+
+	sort.Sort(util.ByEpochBackup(backups))
+
+	return backups, nil
+}
+
+func ListSnapshots(snapshots []string, backupName string) ([]util.Backup, error) {
+
+	var backups []util.Backup
+	type timeSlice []util.Backup
+
+	re := regexp.MustCompile(`(\S+)_(\S+)_(\S+)_(\S+)`)
+	for _, snapshot := range snapshots {
+		var backup util.Backup
+		match := re.FindStringSubmatch(snapshot)
+
+		if len(match) != 0 {
+			if strings.Contains(match[1], backupName) {
+				backup.Name = match[1]
+				backup.Policy = match[2]
+				backup.WorkflowId = match[3]
+
+				epoch := util.StringToInt(match[4])
+				backup.Epoch = epoch
+
+				timestamp := util.ConvertEpoch(match[4])
+				backup.Timestamp = timestamp
+
+				backups = append(backups, backup)
+			}
 		}
 	}
 
