@@ -137,4 +137,16 @@ var routes = Routes{
 		"/restoreCmd",
 		RestoreCmd,
 	},
+	Route{
+		"Mount",
+		"POST",
+		"/mount",
+		Mount,
+	},
+	Route{
+		"Unmount",
+		"POST",
+		"/unmount",
+		Unmount,
+	},
 }

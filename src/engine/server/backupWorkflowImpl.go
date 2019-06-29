@@ -218,6 +218,21 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		}
 	}
 
+	commentMsg = "Performing Mount"
+	setComment(resultsDir, commentMsg, workflow)
+
+	if config.StoragePlugin != "" && config.ArchiveCreateCmd != "" {
+		step := stepInit(resultsDir, workflow)
+		result, err := client.Mount(auth, config)
+		if err != nil {
+			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			return 1
+		}
+		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+			return resultCode
+		}
+	}
+
 	commentMsg = "Performing Archive"
 	setComment(resultsDir, commentMsg, workflow)
 
@@ -271,6 +286,24 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 			return resultCode
 		}
 	}
+
+	commentMsg = "Performing Unmount"
+	setComment(resultsDir, commentMsg, workflow)
+
+	if config.StoragePlugin != "" && config.ArchiveCreateCmd != "" {
+		step := stepInit(resultsDir, workflow)
+		result, err := client.Unmount(auth, config)
+		if err != nil {
+			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			return 1
+		}
+		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+			return resultCode
+		}
+	}
+
+	commentMsg = "Job Cleanup"
+	setComment(resultsDir, commentMsg, workflow)
 
 	if config.JobRetention != 0 {
 		step := stepInit(resultsDir, workflow)

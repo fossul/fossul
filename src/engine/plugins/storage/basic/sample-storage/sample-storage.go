@@ -25,6 +25,8 @@ func main() {
 	optRestore := getopt.BoolLong("restore", 0, "Restore")
 	optBackupList := getopt.BoolLong("backupList", 0, "Backup List")
 	optBackupDelete := getopt.BoolLong("backupDelete", 0, "Backup Delete")
+	optMount := getopt.BoolLong("mount", 0, "Mount a backup or snapshot volume")
+	optUnmount := getopt.BoolLong("unmount", 0, "Mount a backup or snapshot volume")
 	optInfo := getopt.BoolLong("info", 0, "Storage Plugin Information")
 	optHelp := getopt.BoolLong("help", 0, "Help")
 	getopt.Parse()
@@ -45,6 +47,10 @@ func main() {
 		backupList(configMap)
 	} else if *optBackupDelete {
 		backupDelete(configMap)
+	} else if *optMount {
+		mount(configMap)
+	} else if *optUnmount {
+		unmount(configMap)
 	} else if *optInfo {
 		info()
 	} else {
@@ -71,6 +77,16 @@ func backupList(configMap map[string]string) {
 func backupDelete(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Backup delete ***")
+}
+
+func mount(configMap map[string]string) {
+	printEnv(configMap)
+	fmt.Println("INFO *** Mount ***")
+}
+
+func unmount(configMap map[string]string) {
+	printEnv(configMap)
+	fmt.Println("INFO *** Unmount ***")
 }
 
 func info() {

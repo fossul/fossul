@@ -72,6 +72,30 @@ func (s storagePlugin) BackupList(config util.Config) util.Backups {
 	return backups
 }
 
+func (s storagePlugin) Mount(config util.Config) util.Result {
+	var result util.Result
+	var messages []util.Message
+	var resultCode int = 0
+
+	msg := util.SetMessage("INFO", "Mount not implemented or required")
+	messages = append(messages, msg)
+
+	result = util.SetResult(resultCode, messages)
+	return result
+}
+
+func (s storagePlugin) Unmount(config util.Config) util.Result {
+	var result util.Result
+	var messages []util.Message
+	var resultCode int = 0
+
+	msg := util.SetMessage("INFO", "Unmount not implemented or required")
+	messages = append(messages, msg)
+
+	result = util.SetResult(resultCode, messages)
+	return result
+}
+
 func (s storagePlugin) Info() util.Plugin {
 	var plugin util.Plugin = setPlugin()
 	return plugin

@@ -17,7 +17,7 @@ import (
 	"fossul/src/engine/client/k8s"
 	"fossul/src/engine/plugins/pluginUtil"
 	"fossul/src/engine/util"
-	"github.com/heketi/heketi/client/api/go-client"
+	//"github.com/heketi/heketi/client/api/go-client"
 	"strings"
 )
 
@@ -46,6 +46,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	msg := util.SetMessage("INFO", "Performing Gluster snapshot")
 	messages = append(messages, msg)
 
+	/* Heketi example, might need heketi so keeping code for now
 	heketi := client.NewClient(config.StoragePluginParameters["HeketiUrl"], config.StoragePluginParameters["HeketiUser"], config.StoragePluginParameters["HeketiToken"])
 
 	list, err := heketi.VolumeList()
@@ -69,6 +70,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 
 		fmt.Println("DEBUG:", volumeInfo.Name, volumeInfo.Mount)
 	}
+	*/
 
 	pvName, err := k8s.GetPersistentVolumeName(config.StoragePluginParameters["DatabaseNamespace"], config.StoragePluginParameters["PvcName"], config.StoragePluginParameters["AccessWithinCluster"])
 	if err != nil {
@@ -376,6 +378,30 @@ func (s storagePlugin) BackupList(config util.Config) util.Backups {
 	backups.Backups = backupList
 
 	return backups
+}
+
+func (s storagePlugin) Mount(config util.Config) util.Result {
+	var result util.Result
+	var messages []util.Message
+	var resultCode int = 0
+
+	msg := util.SetMessage("INFO", "Mount not implemented or required")
+	messages = append(messages, msg)
+
+	result = util.SetResult(resultCode, messages)
+	return result
+}
+
+func (s storagePlugin) Unmount(config util.Config) util.Result {
+	var result util.Result
+	var messages []util.Message
+	var resultCode int = 0
+
+	msg := util.SetMessage("INFO", "Unmount not implemented or required")
+	messages = append(messages, msg)
+
+	result = util.SetResult(resultCode, messages)
+	return result
 }
 
 func (s storagePlugin) Info() util.Plugin {
