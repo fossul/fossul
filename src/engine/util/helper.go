@@ -80,6 +80,19 @@ func GetRestoreSrcPath(config Config) (string, error) {
 	return "", nil
 }
 
+func GetRestoreSnapshot(config Config, snapshots []string) string {
+	snapshotNameSubString := config.StoragePluginParameters["BackupName"] + "_" + config.SelectedBackupPolicy + "_" + IntToString(config.SelectedWorkflowId)
+
+	fmt.Println("[DEBUG] snapshot search string [" + snapshotNameSubString + "]")
+
+	for _, snapshot := range snapshots {
+		if strings.Contains(snapshot, snapshotNameSubString) {
+			return snapshot
+		}
+	}
+	return ""
+}
+
 func GetRestoreSrcPathFromMap(configMap map[string]string) (string, error) {
 	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"]
 	backupNameSubString := configMap["BackupName"] + "_" + configMap["BackupPolicy"] + "_" + configMap["SelectedWorkflowId"]
