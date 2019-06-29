@@ -64,3 +64,73 @@ func GetPod(namespace, serviceName, accessWithinCluster string) (string, error) 
 
 	return ourPod, nil
 }
+
+func GetPodByName(namespace, podName, accessWithinCluster string) (string, error) {
+	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		return "", err
+	}
+
+	// create the clientset
+	clientset, err := kubernetes.NewForConfig(kubeConfig)
+	if err != nil {
+		return "", err
+	}
+
+	pods, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println("[INFO]: Pods in namespace", namespace)
+	var ourPod string
+	for _, pod := range pods.Items {
+		fmt.Println("[INFO] Pod", pod.Name, pod.Status.Phase)
+		if strings.Contains(pod.Name, podName) && pod.Status.Phase == "Running" {
+			fmt.Println("[INFO] Running Pod Found:", pod.Name)
+			ourPod = pod.Name
+		}
+	}
+
+	return ourPod, nil
+}
+
+func GetPersistentVolumeName(namespace, pvcName, accessWithinCluster string) (string, error) {
+	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		return "", err
+	}
+
+	// create the clientset
+	clientset, err := kubernetes.NewForConfig(kubeConfig)
+	if err != nil {
+		return "", err
+	}
+
+	pvc, err := clientset.CoreV1().PersistentVolumeClaims(namespace).Get(pvcName, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	return pvc.Spec.VolumeName, nil
+}
+
+func GetGlusterPersistentVolumePath(pvName, accessWithinCluster string) (string, error) {
+	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		return "", err
+	}
+
+	// create the clientset
+	clientset, err := kubernetes.NewForConfig(kubeConfig)
+	if err != nil {
+		return "", err
+	}
+
+	pv, err := clientset.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	return pv.Spec.Glusterfs.Path, nil
+}
