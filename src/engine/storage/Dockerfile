@@ -29,7 +29,10 @@ COPY . /go/src/fossul
 
 RUN /go/src/fossul/scripts/fossul-storage-build.sh
 
-RUN chown -R fossul:fossul /app && \
+#RUN chown -R fossul:fossul /app && \
+#    chmod -R 775 /app
+
+RUN chown -R root:root /app && \
     chmod -R 775 /app
 
 RUN chmod -R 777 /tmp
