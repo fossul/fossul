@@ -10,9 +10,9 @@ RUN mkdir -p /go/src/fossul
 RUN mkdir /app
 RUN mkdir /app/backups
 
-RUN groupadd -r fossul &&\
-    useradd -r -g fossul -d /app -u 1001 -s /sbin/nologin -c "Fossul user" fossul &&\
-    echo 'fossul ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/fossul
+#RUN groupadd -r fossul &&\
+#    useradd -r -g fossul -d /app -u 1001 -s /sbin/nologin -c "Fossul user" fossul &&\
+#    echo 'fossul ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/fossul
 
 WORKDIR /go/src/fossul
 
@@ -34,11 +34,9 @@ RUN chown -R fossul:fossul /app && \
 
 RUN chmod -R 777 /tmp
 
-RUN ls -l /app
-
 RUN echo "1.0" > /etc/imageversion
 
-USER fossul
+USER 0
 
 WORKDIR /app
 
