@@ -37,14 +37,6 @@
   revision = "a0175ee3bccc567396460bf5acd36800cb10c49c"
 
 [[projects]]
-  digest = "1:320e7ead93de9fd2b0e59b50fd92a4d50c1f8ab455d96bc2eb083267453a9709"
-  name = "github.com/asaskevich/govalidator"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "ccb8e960c48f04d6935e72476ae4a51028f9e22f"
-  version = "v9"
-
-[[projects]]
   digest = "1:b7fabcc244c3f893cba25f5f7ee03ac54dea8c2b2ba6a8455316ad19f1b2a918"
   name = "github.com/aws/aws-sdk-go"
   packages = [
@@ -99,14 +91,6 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
-  name = "github.com/dgrijalva/jwt-go"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
-  version = "v3.2.0"
-
-[[projects]]
   digest = "1:58be7025fd84632dfbb8a398f931b5bdbbecc0390e4385df4ae56775487a0f87"
   name = "github.com/docker/spdystream"
   packages = [
@@ -147,17 +131,6 @@
   pruneopts = "UT"
   revision = "b3e2804c8535ee0d1b89320afd98474d5b8e9e3b"
   version = "v0.19.0"
-
-[[projects]]
-  digest = "1:aa047c900450fea2242fbb449076eb20cea8278f3b15d2db1950a3c8da8e4308"
-  name = "github.com/go-ozzo/ozzo-validation"
-  packages = [
-    ".",
-    "is",
-  ]
-  pruneopts = "UT"
-  revision = "106681dbb37bfa3e7683c4c8129cb7f5925ea3e9"
-  version = "v3.5.0"
 
 [[projects]]
   digest = "1:ec6f9bf5e274c833c911923c9193867f3f18788c461f76f05f62bb1510e0ae65"
@@ -232,18 +205,6 @@
   pruneopts = "UT"
   revision = "c5c6c98bc25355028a63748a498942a6398ccd22"
   version = "v1.7.1"
-
-[[projects]]
-  digest = "1:11de6cf68be27db64002f176231a9efba6cd569a926cd16b8fc2a59510529ef8"
-  name = "github.com/heketi/heketi"
-  packages = [
-    "client/api/go-client",
-    "pkg/glusterfs/api",
-    "pkg/utils",
-  ]
-  pruneopts = "UT"
-  revision = "891a99667d82b04208dfe7d55567f17b05f0cc18"
-  version = "v9.0.0"
 
 [[projects]]
   digest = "1:3e260afa138eab6492b531a3b3d10ab4cb70512d423faa78b8949dec76e66a21"
@@ -752,7 +713,6 @@
     "github.com/aws/aws-sdk-go/service/s3/s3manager",
     "github.com/go-sql-driver/mysql",
     "github.com/gorilla/mux",
-    "github.com/heketi/heketi/client/api/go-client",
     "github.com/lib/pq",
     "github.com/pborman/getopt/v2",
     "github.com/swaggo/http-swagger",
