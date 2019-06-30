@@ -10,9 +10,8 @@ RUN mkdir -p /go/src/fossul
 RUN mkdir /app
 RUN mkdir /app/backups
 
-#RUN groupadd -r fossul &&\
-#    useradd -r -g fossul -d /app -u 1001 -s /sbin/nologin -c "Fossul user" fossul &&\
-#    echo 'fossul ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/fossul
+RUN groupadd -r fossul &&\
+    useradd -r -g fossul -d /app -u 1001 -s /sbin/nologin -c "Fossul user" fossul
 
 WORKDIR /go/src/fossul
 
@@ -29,10 +28,7 @@ COPY . /go/src/fossul
 
 RUN /go/src/fossul/scripts/fossul-storage-build.sh
 
-#RUN chown -R fossul:fossul /app && \
-#    chmod -R 775 /app
-
-RUN chown -R root:root /app && \
+RUN chown -R fossul:fossul /app && \
     chmod -R 775 /app
 
 RUN chmod -R 777 /tmp
