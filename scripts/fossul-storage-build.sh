@@ -40,7 +40,7 @@ go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/container-basic.s
 if [ $? != 0 ]; then exit 1; fi
 go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/archive/aws.so fossul/src/engine/plugins/archive/native/aws
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $PLUGIN_DIR/storage/ocs-gluster.so fossul/src/engine/plugins/storage/native/ocs-gluster
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/ocs-gluster.so fossul/src/engine/plugins/storage/native/ocs-gluster
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Storage Service"
