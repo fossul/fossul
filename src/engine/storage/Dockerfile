@@ -11,7 +11,8 @@ RUN mkdir /app
 RUN mkdir /app/backups
 
 RUN groupadd -r fossul &&\
-    useradd -r -g fossul -d /app -u 1001 -s /sbin/nologin -c "Fossul user" fossul
+    useradd -r -g fossul -d /app -u 1001 -s /sbin/nologin -c "Fossul user" fossul &&\
+    echo 'fossul ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/fossul
 
 WORKDIR /go/src/fossul
 
