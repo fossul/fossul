@@ -26,7 +26,7 @@ func setComment(resultsDir, msg string, workflow *util.Workflow) {
 	util.SerializeWorkflowStepResults(resultsDir, step.Id, commentResult)
 }
 
-func StepErrorHandlerBackup(isQuiesce bool, resultsDir, policy string, step util.Step, workflow *util.Workflow, result util.Result, config util.Config) int {
+func StepErrorHandlerBackup(isQuiesce, isMount bool, resultsDir, policy string, step util.Step, workflow *util.Workflow, result util.Result, config util.Config) int {
 	auth := SetAuth()
 
 	if result.Code != 0 {
@@ -48,6 +48,19 @@ func StepErrorHandlerBackup(isQuiesce bool, resultsDir, policy string, step util
 			if config.AppPlugin != "" {
 				step := stepInit(resultsDir, workflow)
 				result, _ := client.Unquiesce(auth, config)
+
+				util.SetStepError(workflow, step)
+				util.SerializeWorkflowStepResults(resultsDir, step.Id, result)
+			}
+		}
+
+		if isMount {
+			commentMsg := "Performing Unmount"
+			setComment(resultsDir, commentMsg, workflow)
+
+			if config.StoragePlugin != "" && config.ArchivePlugin != "" {
+				step := stepInit(resultsDir, workflow)
+				result, _ := client.Unmount(auth, config)
 
 				util.SetStepError(workflow, step)
 				util.SerializeWorkflowStepResults(resultsDir, step.Id, result)
@@ -94,7 +107,7 @@ func StepErrorHandler(resultsDir, policy string, step util.Step, workflow *util.
 	}
 }
 
-func HttpErrorHandlerBackup(err error, isQuiesce bool, resultsDir, policy string, step util.Step, workflow *util.Workflow, result util.Result, config util.Config) {
+func HttpErrorHandlerBackup(err error, isQuiesce, isMount bool, resultsDir, policy string, step util.Step, workflow *util.Workflow, result util.Result, config util.Config) {
 	auth := SetAuth()
 
 	msg := util.SetMessage("ERROR", err.Error())
@@ -118,6 +131,19 @@ func HttpErrorHandlerBackup(err error, isQuiesce bool, resultsDir, policy string
 		if config.AppPlugin != "" {
 			step := stepInit(resultsDir, workflow)
 			result, _ := client.Unquiesce(auth, config)
+			util.SetStepError(workflow, step)
+			util.SerializeWorkflowStepResults(resultsDir, step.Id, result)
+		}
+	}
+
+	if isMount {
+		commentMsg := "Performing Unmount"
+		setComment(resultsDir, commentMsg, workflow)
+
+		if config.StoragePlugin != "" && config.ArchivePlugin != "" {
+			step := stepInit(resultsDir, workflow)
+			result, _ := client.Unmount(auth, config)
+
 			util.SetStepError(workflow, step)
 			util.SerializeWorkflowStepResults(resultsDir, step.Id, result)
 		}

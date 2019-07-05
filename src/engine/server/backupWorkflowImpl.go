@@ -23,6 +23,7 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	resultsDir := dataDir + "/" + config.ProfileName + "/" + config.ConfigName + "/" + util.IntToString(workflow.Id)
 	policy := config.SelectedBackupPolicy
 	var isQuiesce bool = false
+	var isMount bool = false
 
 	if config.AppPlugin != "" && config.AutoDiscovery == true {
 		commentMsg := "Performing Application Discovery"
@@ -32,10 +33,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 
 		discoverResult, err := client.Discover(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, discoverResult.Result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, discoverResult.Result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, discoverResult.Result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, discoverResult.Result, config); resultCode != 0 {
 			return resultCode
 		}
 
@@ -64,10 +65,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.PreQuiesceCmd(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -76,10 +77,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.QuiesceCmd(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 		isQuiesce = true
@@ -90,10 +91,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Quiesce(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -102,10 +103,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.PostQuiesceCmd(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -117,10 +118,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.BackupCreateCmd(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -129,10 +130,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Backup(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -144,10 +145,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.PreUnquiesceCmd(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -156,10 +157,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.UnquiesceCmd(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 		isQuiesce = false
@@ -169,10 +170,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Unquiesce(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			//unquiesceOnError(resultsDir,policy,isQuiesce,workflow,config)
 			return resultCode
 		}
@@ -183,10 +184,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.PostUnquiesceCmd(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -198,10 +199,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.BackupDeleteCmd(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -210,10 +211,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.BackupDelete(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -221,14 +222,15 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	commentMsg = "Performing Mount"
 	setComment(resultsDir, commentMsg, workflow)
 
-	if config.StoragePlugin != "" && config.ArchiveCreateCmd != "" {
+	if config.StoragePlugin != "" && config.ArchivePlugin != "" {
+		isMount = true
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Mount(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -240,10 +242,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.ArchiveCreateCmd(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -252,10 +254,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Archive(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -267,10 +269,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.ArchiveDeleteCmd(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -279,10 +281,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.ArchiveDelete(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -290,16 +292,17 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	commentMsg = "Performing Unmount"
 	setComment(resultsDir, commentMsg, workflow)
 
-	if config.StoragePlugin != "" && config.ArchiveCreateCmd != "" {
+	if config.StoragePlugin != "" && config.ArchivePlugin != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Unmount(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
+		isMount = false
 	}
 
 	commentMsg = "Job Cleanup"
@@ -309,7 +312,7 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result := util.DeleteJobs(dataDir, config.ProfileName, config.ConfigName, config.JobRetention)
 
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}
@@ -321,10 +324,10 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 		result, err := client.SendTrapSuccessCmd(auth, config)
 		if err != nil {
-			HttpErrorHandlerBackup(err, isQuiesce, resultsDir, policy, step, workflow, result, config)
+			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
 		}
-		if resultCode := StepErrorHandlerBackup(isQuiesce, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
+		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
 	}

@@ -95,6 +95,27 @@ func GetPodByName(namespace, podName, accessWithinCluster string) (string, error
 	return ourPod, nil
 }
 
+func GetPodIp(namespace, podName, accessWithinCluster string) (string, error) {
+	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		return "", err
+	}
+
+	// create the clientset
+	clientset, err := kubernetes.NewForConfig(kubeConfig)
+	if err != nil {
+		return "", err
+	}
+
+	pod, err := clientset.CoreV1().Pods(namespace).Get(podName, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	podIp := pod.Status.PodIP
+	return podIp, nil
+}
+
 func GetPersistentVolumeName(namespace, pvcName, accessWithinCluster string) (string, error) {
 	err, kubeConfig := getKubeConfig(accessWithinCluster)
 	if err != nil {
