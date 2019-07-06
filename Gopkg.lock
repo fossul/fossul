@@ -269,6 +269,25 @@
   version = "v1.0.1"
 
 [[projects]]
+  digest = "1:94b521dc449e4a6758c681e35f3b97a4a5699090dccd9c25eba0fb0bcf60f48b"
+  name = "github.com/openshift/api"
+  packages = ["apps/v1"]
+  pruneopts = "UT"
+  revision = "0d921e363e951d89f583292c60d013c318df64dc"
+  version = "v3.9.0"
+
+[[projects]]
+  branch = "release-3.11"
+  digest = "1:ac03d9bc2fe6da892db6faa8e2c625fdf128b590d6e12a4c0e49de1c8637023d"
+  name = "github.com/openshift/client-go"
+  packages = [
+    "apps/clientset/versioned/scheme",
+    "apps/clientset/versioned/typed/apps/v1",
+  ]
+  pruneopts = "UT"
+  revision = "431ec9a26e5021f35fa41ee9a89842db9bfdb370"
+
+[[projects]]
   branch = "master"
   digest = "1:b62454f56a51554d714d6c2277034d735fb5d9c0b81d2fc08cedb9acaab72dad"
   name = "github.com/pborman/getopt"
@@ -714,6 +733,8 @@
     "github.com/go-sql-driver/mysql",
     "github.com/gorilla/mux",
     "github.com/lib/pq",
+    "github.com/openshift/api/apps/v1",
+    "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1",
     "github.com/pborman/getopt/v2",
     "github.com/swaggo/http-swagger",
     "github.com/swaggo/swag",
@@ -723,10 +744,12 @@
     "go.mongodb.org/mongo-driver/mongo/readpref",
     "go.mongodb.org/mongo-driver/x/bsonx",
     "gopkg.in/robfig/cron.v3",
+    "k8s.io/api/apps/v1",
     "k8s.io/api/core/v1",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/client-go/kubernetes",
     "k8s.io/client-go/kubernetes/scheme",
+    "k8s.io/client-go/kubernetes/typed/apps/v1",
     "k8s.io/client-go/rest",
     "k8s.io/client-go/tools/clientcmd",
     "k8s.io/client-go/tools/remotecommand",

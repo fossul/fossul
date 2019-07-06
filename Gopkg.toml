@@ -80,3 +80,7 @@
 #[[constraint]]
 #  name = "github.com/heketi/heketi"
 #  version = "9.0.0"
+
+[[constraint]]
+  branch = "release-3.11"
+  name = "github.com/openshift/client-go"

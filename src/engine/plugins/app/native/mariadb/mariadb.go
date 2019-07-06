@@ -16,6 +16,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"fossul/src/engine/client/k8s"
 	"fossul/src/engine/util"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -36,25 +37,27 @@ func (a appPlugin) SetEnv(config util.Config) util.Result {
 
 	dsn := getDSN(config)
 
-	//reuse database connection
-	if conn == nil {
-		msg := util.SetMessage("INFO", "Creating connection to database ["+config.AppPluginParameters["MysqlDb"]+"]")
-		messages = append(messages, msg)
-		conn, err = getConn(dsn)
-	} else {
-		msg := util.SetMessage("INFO", "Reusing connection to database ["+config.AppPluginParameters["MysqlDb"]+"]")
-		messages = append(messages, msg)
-	}
+	if config.WorkflowType != "restore" {
+		//reuse database connection
+		if conn == nil {
+			msg := util.SetMessage("INFO", "Creating connection to database ["+config.AppPluginParameters["MysqlDb"]+"]")
+			messages = append(messages, msg)
+			conn, err = getConn(dsn)
+		} else {
+			msg := util.SetMessage("INFO", "Reusing connection to database ["+config.AppPluginParameters["MysqlDb"]+"]")
+			messages = append(messages, msg)
+		}
 
-	if conn == nil || err != nil {
-		msg := util.SetMessage("ERROR", "Couldn't connect to database ["+config.AppPluginParameters["MysqlDb"]+"] "+err.Error())
-		messages = append(messages, msg)
+		if conn == nil || err != nil {
+			msg := util.SetMessage("ERROR", "Couldn't connect to database ["+config.AppPluginParameters["MysqlDb"]+"] "+err.Error())
+			messages = append(messages, msg)
 
-		result = util.SetResult(1, messages)
-	} else {
-		msg := util.SetMessage("INFO", "Connection to database ["+config.AppPluginParameters["MysqlDb"]+"] established")
-		messages = append(messages, msg)
-		result = util.SetResult(0, messages)
+			result = util.SetResult(1, messages)
+		} else {
+			msg := util.SetMessage("INFO", "Connection to database ["+config.AppPluginParameters["MysqlDb"]+"] established")
+			messages = append(messages, msg)
+			result = util.SetResult(0, messages)
+		}
 	}
 
 	return result
@@ -173,8 +176,19 @@ func (a appPlugin) PreRestore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	msg := util.SetMessage("INFO", "PreRestore Not implemented")
-	messages = append(messages, msg)
+	if config.AppPluginParameters["DisableRestoreHooks"] == "false" {
+		msg := util.SetMessage("INFO", "Scaling deployment ["+config.AppPluginParameters["DeploymentConfig"]+"] to 0")
+		messages = append(messages, msg)
+
+		err := k8s.ScaleDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["DeploymentConfig"], config.AppPluginParameters["AccessWithinCluster"], 0)
+		if err != nil {
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+	}
 
 	result = util.SetResult(0, messages)
 	return result
@@ -185,9 +199,19 @@ func (a appPlugin) PostRestore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	msg := util.SetMessage("INFO", "PostRestore Not implemented")
-	messages = append(messages, msg)
+	if config.AppPluginParameters["DisableRestoreHooks"] == "false" {
+		msg := util.SetMessage("INFO", "Scaling deployment ["+config.AppPluginParameters["DeploymentConfig"]+"] to 1")
+		messages = append(messages, msg)
 
+		err := k8s.ScaleDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["DeploymentConfig"], config.AppPluginParameters["AccessWithinCluster"], 1)
+		if err != nil {
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+	}
 	result = util.SetResult(0, messages)
 	return result
 }

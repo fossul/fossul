@@ -95,10 +95,11 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	snapshotRestore = append(snapshotRestore, restoreSnapshot)
 
 	snapshotRestoreResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], snapshotRestore...)
+	var snapshotFailed bool = false
 	if snapshotRestoreResult.Code != 0 {
 		messages = util.PrependMessages(messages, snapshotRestoreResult.Messages)
 		result = util.SetResult(1, messages)
-		return result
+		snapshotFailed = true
 	} else {
 		messages = util.PrependMessages(messages, snapshotRestoreResult.Messages)
 	}
@@ -117,6 +118,11 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		return result
 	} else {
 		messages = util.PrependMessages(messages, startGlusterVolumeResult.Messages)
+	}
+
+	if snapshotFailed {
+		result = util.SetResult(1, messages)
+		return result
 	}
 
 	result = util.SetResult(resultCode, messages)

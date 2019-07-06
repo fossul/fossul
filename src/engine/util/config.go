@@ -27,6 +27,7 @@ type Config struct {
 	ProfileName              string             `json:"profileName,omitempty"`
 	ConfigName               string             `json:"configName,omitempty"`
 	WorkflowId               string             `json:"workflowId,omitempty"`
+	WorkflowType             string             `json:"workflowType,omitempty"`
 	WorkflowTimestamp        int64              `json:"workflowTimestamp,omitempty"`
 	AppPlugin                string             `json:"appPlugin"`
 	StoragePlugin            string             `json:"storagePlugin"`
