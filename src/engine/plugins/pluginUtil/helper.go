@@ -123,6 +123,7 @@ func ListArchives(dirs []string) ([]util.Archive, error) {
 
 	re := regexp.MustCompile(`(\S+)_(\S+)_(\S+)_(\S+)`)
 	for _, dir := range dirs {
+		var isUnique bool = true
 		var archive util.Archive
 		match := re.FindStringSubmatch(dir)
 
@@ -137,7 +138,16 @@ func ListArchives(dirs []string) ([]util.Archive, error) {
 			timestamp := util.ConvertEpoch(match[4])
 			archive.Timestamp = timestamp
 
-			archives = append(archives, archive)
+			//ensure backup is unique
+			for _, a := range archives {
+				if a == archive {
+					isUnique = false
+				}
+			}
+
+			if isUnique {
+				archives = append(archives, archive)
+			}
 		}
 	}
 

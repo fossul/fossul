@@ -15,6 +15,7 @@ package main
 import (
 	"fmt"
 	"fossul/src/engine/client/k8s"
+	"fossul/src/engine/plugins/pluginUtil"
 	"fossul/src/engine/util"
 )
 
@@ -23,13 +24,25 @@ func (s storagePlugin) Unmount(config util.Config) util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
+	backupPath := config.StoragePluginParameters["BackupDestPath"] + "/" + config.ProfileName + "/" + config.ConfigName
 	timestampToString := fmt.Sprintf("%d", config.WorkflowTimestamp)
 	backupName := util.GetBackupName(config.StoragePluginParameters["PvcName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
 
-	msg := util.SetMessage("INFO", "Mounting snapshot ["+backupName+"]")
+	msg := util.SetMessage("INFO", "Removing temporary local archive path ["+backupPath+"/"+backupName+"]")
 	messages = append(messages, msg)
 
-	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.StoragePluginParameters["AccessWithinCluster"])
+	err := pluginUtil.RecursiveDirDelete(backupPath + "/" + backupName)
+	if err != nil {
+		msg = util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+		return result
+	}
+
+	msg = util.SetMessage("INFO", "Unmounting snapshot ["+backupName+"]")
+	messages = append(messages, msg)
+
+	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -42,7 +55,7 @@ func (s storagePlugin) Unmount(config util.Config) util.Result {
 	unmountSnapshot = append(unmountSnapshot, "/usr/bin/umount")
 	unmountSnapshot = append(unmountSnapshot, "/tmp/"+backupName)
 
-	unmountSnapshotResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], unmountSnapshot...)
+	unmountSnapshotResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, unmountSnapshot...)
 	if unmountSnapshotResult.Code != 0 {
 		messages = util.PrependMessages(messages, unmountSnapshotResult.Messages)
 		result = util.SetResult(1, messages)
@@ -55,7 +68,7 @@ func (s storagePlugin) Unmount(config util.Config) util.Result {
 	deleteDir = append(deleteDir, "/usr/bin/rmdir")
 	deleteDir = append(deleteDir, "/tmp/"+backupName)
 
-	deleteDirResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], deleteDir...)
+	deleteDirResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, deleteDir...)
 	if deleteDirResult.Code != 0 {
 		messages = util.PrependMessages(messages, deleteDirResult.Messages)
 		result = util.SetResult(1, messages)

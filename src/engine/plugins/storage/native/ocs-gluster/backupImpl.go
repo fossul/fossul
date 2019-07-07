@@ -55,7 +55,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	}
 	*/
 
-	pvName, err := k8s.GetPersistentVolumeName(config.StoragePluginParameters["DatabaseNamespace"], config.StoragePluginParameters["PvcName"], config.StoragePluginParameters["AccessWithinCluster"])
+	pvName, err := k8s.GetPersistentVolumeName(config.StoragePluginParameters["DatabaseNamespace"], config.StoragePluginParameters["PvcName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -64,7 +64,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 		return result
 	}
 
-	glusterVolume, err := k8s.GetGlusterPersistentVolumePath(pvName, config.StoragePluginParameters["AccessWithinCluster"])
+	glusterVolume, err := k8s.GetGlusterPersistentVolumePath(pvName, config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -73,7 +73,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 		return result
 	}
 
-	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.StoragePluginParameters["AccessWithinCluster"])
+	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -94,7 +94,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	createSnapshot = append(createSnapshot, glusterVolume)
 	createSnapshot = append(createSnapshot, "no-timestamp")
 
-	createSnapshotResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], createSnapshot...)
+	createSnapshotResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, createSnapshot...)
 	if createSnapshotResult.Code != 0 {
 		messages = util.PrependMessages(messages, createSnapshotResult.Messages)
 		result = util.SetResult(1, messages)
@@ -110,7 +110,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	activateSnapshot = append(activateSnapshot, "activate")
 	activateSnapshot = append(activateSnapshot, backupName)
 
-	activateSnapshotResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], activateSnapshot...)
+	activateSnapshotResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, activateSnapshot...)
 	if activateSnapshotResult.Code != 0 {
 		messages = util.PrependMessages(messages, activateSnapshotResult.Messages)
 		result = util.SetResult(1, messages)

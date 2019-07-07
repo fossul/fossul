@@ -29,6 +29,8 @@ type Config struct {
 	WorkflowId               string             `json:"workflowId,omitempty"`
 	WorkflowType             string             `json:"workflowType,omitempty"`
 	WorkflowTimestamp        int64              `json:"workflowTimestamp,omitempty"`
+	ContainerPlatform		 string             `json:"containerPlatform,omitempty"`
+	AccessWithinCluster		 string             `json:"accessWithinCluster,omitempty"`
 	AppPlugin                string             `json:"appPlugin"`
 	StoragePlugin            string             `json:"storagePlugin"`
 	ArchivePlugin            string             `json:"archivePlugin"`

@@ -26,7 +26,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	msg := util.SetMessage("INFO", "Performing Gluster snapshot restore")
 	messages = append(messages, msg)
 
-	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.StoragePluginParameters["AccessWithinCluster"])
+	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -41,7 +41,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	listSnapshot = append(listSnapshot, "snapshot")
 	listSnapshot = append(listSnapshot, "list")
 
-	listSnapshotResult, listSnapshotStdout := k8s.ExecuteCommandWithStdout(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], listSnapshot...)
+	listSnapshotResult, listSnapshotStdout := k8s.ExecuteCommandWithStdout(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, listSnapshot...)
 	if listSnapshotResult.Code != 0 {
 		messages = util.PrependMessages(messages, listSnapshotResult.Messages)
 		result = util.SetResult(1, messages)
@@ -53,7 +53,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	snapshotList := strings.Split(listSnapshotStdout, "\n")
 	restoreSnapshot := util.GetRestoreSnapshot(config, snapshotList)
 
-	pvName, err := k8s.GetPersistentVolumeName(config.StoragePluginParameters["DatabaseNamespace"], config.StoragePluginParameters["PvcName"], config.StoragePluginParameters["AccessWithinCluster"])
+	pvName, err := k8s.GetPersistentVolumeName(config.StoragePluginParameters["DatabaseNamespace"], config.StoragePluginParameters["PvcName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -62,7 +62,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		return result
 	}
 
-	glusterVolume, err := k8s.GetGlusterPersistentVolumePath(pvName, config.StoragePluginParameters["AccessWithinCluster"])
+	glusterVolume, err := k8s.GetGlusterPersistentVolumePath(pvName, config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -78,7 +78,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	stopGlusterVolume = append(stopGlusterVolume, "stop")
 	stopGlusterVolume = append(stopGlusterVolume, glusterVolume)
 
-	stopGlusterVolumeResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], stopGlusterVolume...)
+	stopGlusterVolumeResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, stopGlusterVolume...)
 	if stopGlusterVolumeResult.Code != 0 {
 		messages = util.PrependMessages(messages, stopGlusterVolumeResult.Messages)
 		result = util.SetResult(1, messages)
@@ -94,7 +94,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	snapshotRestore = append(snapshotRestore, "restore")
 	snapshotRestore = append(snapshotRestore, restoreSnapshot)
 
-	snapshotRestoreResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], snapshotRestore...)
+	snapshotRestoreResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, snapshotRestore...)
 	var snapshotFailed bool = false
 	if snapshotRestoreResult.Code != 0 {
 		messages = util.PrependMessages(messages, snapshotRestoreResult.Messages)
@@ -111,7 +111,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	startGlusterVolume = append(startGlusterVolume, "start")
 	startGlusterVolume = append(startGlusterVolume, glusterVolume)
 
-	startGlusterVolumeResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], startGlusterVolume...)
+	startGlusterVolumeResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, startGlusterVolume...)
 	if startGlusterVolumeResult.Code != 0 {
 		messages = util.PrependMessages(messages, startGlusterVolumeResult.Messages)
 		result = util.SetResult(1, messages)

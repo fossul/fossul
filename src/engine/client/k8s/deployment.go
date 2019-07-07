@@ -49,7 +49,7 @@ func GetDeploymentScaleInteger(namespace, deploymentName, accessWithinCluster st
 	return deployment.Spec.Replicas, nil
 }
 
-func ScaleDeployment(namespace, deploymentName, accessWithinCluster string, size *int32) error {
+func ScaleDeployment(namespace, deploymentName, accessWithinCluster string, size int32) error {
 	err, kubeConfig := getKubeConfig(accessWithinCluster)
 	if err != nil {
 		return err
@@ -66,7 +66,7 @@ func ScaleDeployment(namespace, deploymentName, accessWithinCluster string, size
 		return err
 	}
 
-	deployment.Spec.Replicas = size
+	deployment.Spec.Replicas = &size
 
 	_, err = clientset.Deployments(namespace).Update(deployment)
 	if err != nil {

@@ -62,7 +62,7 @@ func (a appPlugin) Quiesce(config util.Config) util.Result {
 	var args []string
 	var mkdirArgs []string
 
-	podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AppPluginParameters["AccessWithinCluster"])
+	podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -78,7 +78,7 @@ func (a appPlugin) Quiesce(config util.Config) util.Result {
 	mkdirArgs = append(mkdirArgs, "-p")
 	mkdirArgs = append(mkdirArgs, dumpPath)
 
-	cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AppPluginParameters["AccessWithinCluster"], mkdirArgs...)
+	cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AccessWithinCluster, mkdirArgs...)
 
 	if cmdResult.Code != 0 {
 		return cmdResult
@@ -107,7 +107,7 @@ func (a appPlugin) Quiesce(config util.Config) util.Result {
 
 	//args = append(args,"--quiet")
 
-	cmdResult = k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AppPluginParameters["AccessWithinCluster"], args...)
+	cmdResult = k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AccessWithinCluster, args...)
 
 	if cmdResult.Code != 0 {
 		return cmdResult
@@ -130,7 +130,7 @@ func (a appPlugin) Unquiesce(config util.Config) util.Result {
 	args = append(args, "-rf")
 	args = append(args, dumpPath)
 
-	podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AppPluginParameters["AccessWithinCluster"])
+	podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -139,7 +139,7 @@ func (a appPlugin) Unquiesce(config util.Config) util.Result {
 		return result
 	}
 
-	cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AppPluginParameters["AccessWithinCluster"], args...)
+	cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AccessWithinCluster, args...)
 
 	if cmdResult.Code != 0 {
 		return cmdResult
@@ -156,7 +156,7 @@ func (a appPlugin) PreRestore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AppPluginParameters["AccessWithinCluster"])
+	podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -172,7 +172,7 @@ func (a appPlugin) PreRestore(config util.Config) util.Result {
 	mkdirArgs = append(mkdirArgs, "-p")
 	mkdirArgs = append(mkdirArgs, restoreDir)
 
-	cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AppPluginParameters["AccessWithinCluster"], mkdirArgs...)
+	cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AccessWithinCluster, mkdirArgs...)
 
 	if cmdResult.Code != 0 {
 		return cmdResult
@@ -189,7 +189,7 @@ func (a appPlugin) PostRestore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AppPluginParameters["AccessWithinCluster"])
+	podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -202,7 +202,7 @@ func (a appPlugin) PostRestore(config util.Config) util.Result {
 	lsDirArgs = append(lsDirArgs, "ls")
 	lsDirArgs = append(lsDirArgs, "/tmp/"+util.IntToString(config.SelectedWorkflowId))
 
-	cmdResult, restoreDir := k8s.ExecuteCommandWithStdout(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AppPluginParameters["AccessWithinCluster"], lsDirArgs...)
+	cmdResult, restoreDir := k8s.ExecuteCommandWithStdout(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AccessWithinCluster, lsDirArgs...)
 
 	if cmdResult.Code != 0 {
 		return cmdResult
@@ -227,7 +227,7 @@ func (a appPlugin) PostRestore(config util.Config) util.Result {
 			config.AppPluginParameters["MongoPassword"]+" "+restorePath)
 	}
 
-	cmdResult = k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AppPluginParameters["AccessWithinCluster"], restoreArgs...)
+	cmdResult = k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AccessWithinCluster, restoreArgs...)
 
 	if cmdResult.Code != 0 {
 		return cmdResult
@@ -241,7 +241,7 @@ func (a appPlugin) PostRestore(config util.Config) util.Result {
 	rmDirArgs = append(rmDirArgs, "-rf")
 	rmDirArgs = append(rmDirArgs, restoreTmpDir)
 
-	cmdResult = k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AppPluginParameters["AccessWithinCluster"], rmDirArgs...)
+	cmdResult = k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AccessWithinCluster, rmDirArgs...)
 
 	if cmdResult.Code != 0 {
 		return cmdResult

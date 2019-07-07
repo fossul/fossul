@@ -26,7 +26,7 @@ func getKubeConfig(accessWithinCluster string) (error, *rest.Config) {
 	if accessWithinCluster == "true" {
 		kubeConfig, err = rest.InClusterConfig()
 		if err != nil {
-			log.Fatal(err.Error())
+			return err, nil
 		}
 	} else if accessWithinCluster == "false" {
 		var kubeconfigFile string

@@ -177,10 +177,16 @@ func (a appPlugin) PreRestore(config util.Config) util.Result {
 	var messages []util.Message
 
 	if config.AppPluginParameters["DisableRestoreHooks"] == "false" {
-		msg := util.SetMessage("INFO", "Scaling deployment ["+config.AppPluginParameters["DeploymentConfig"]+"] to 0")
+		msg := util.SetMessage("INFO", "Scaling deployment ["+config.AppPluginParameters["Deployment"]+"] to 0")
 		messages = append(messages, msg)
 
-		err := k8s.ScaleDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["DeploymentConfig"], config.AppPluginParameters["AccessWithinCluster"], 0)
+		var err error
+		if config.ContainerPlatform == "openshift" {
+			err = k8s.ScaleDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 0)
+		} else {
+			err = k8s.ScaleDeployment(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 0)
+		}
+
 		if err != nil {
 			msg := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, msg)
@@ -200,10 +206,16 @@ func (a appPlugin) PostRestore(config util.Config) util.Result {
 	var messages []util.Message
 
 	if config.AppPluginParameters["DisableRestoreHooks"] == "false" {
-		msg := util.SetMessage("INFO", "Scaling deployment ["+config.AppPluginParameters["DeploymentConfig"]+"] to 1")
+		msg := util.SetMessage("INFO", "Scaling deployment ["+config.AppPluginParameters["Deployment"]+"] to 1")
 		messages = append(messages, msg)
 
-		err := k8s.ScaleDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["DeploymentConfig"], config.AppPluginParameters["AccessWithinCluster"], 1)
+		var err error
+		if config.ContainerPlatform == "openshift" {
+			err = k8s.ScaleDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 1)
+		} else {
+			err = k8s.ScaleDeployment(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 1)
+		}
+
 		if err != nil {
 			msg := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, msg)

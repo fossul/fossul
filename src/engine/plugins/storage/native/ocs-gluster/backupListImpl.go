@@ -24,7 +24,7 @@ func (s storagePlugin) BackupList(config util.Config) util.Backups {
 	var result util.Result
 	var messages []util.Message
 
-	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.StoragePluginParameters["AccessWithinCluster"])
+	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -41,7 +41,7 @@ func (s storagePlugin) BackupList(config util.Config) util.Backups {
 	listSnapshot = append(listSnapshot, "snapshot")
 	listSnapshot = append(listSnapshot, "list")
 
-	listSnapshotResult, listSnapshotStdout := k8s.ExecuteCommandWithStdout(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], listSnapshot...)
+	listSnapshotResult, listSnapshotStdout := k8s.ExecuteCommandWithStdout(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, listSnapshot...)
 	if listSnapshotResult.Code != 0 {
 		backups.Result = listSnapshotResult
 		return backups

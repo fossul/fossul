@@ -57,7 +57,7 @@ func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 
 		if k8s.IsRemoteCommand(args[0]) {
 			args[0] = strings.Replace(args[0], ":", "", 1)
-			podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AppPluginParameters["AccessWithinCluster"])
+			podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)
@@ -70,7 +70,7 @@ func UnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("INFO", "Performing remote unquiesce command ["+config.AppUnquiesceCmd+"] on pod ["+podName+"]")
 			messages = append(messages, message)
 
-			cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AppPluginParameters["AccessWithinCluster"], args...)
+			cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AccessWithinCluster, args...)
 
 			if cmdResult.Code != 0 {
 				messages = util.PrependMessages(messages, cmdResult.Messages)
@@ -134,7 +134,7 @@ func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 
 		if k8s.IsRemoteCommand(args[0]) {
 			args[0] = strings.Replace(args[0], ":", "", 1)
-			podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AppPluginParameters["AccessWithinCluster"])
+			podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)
@@ -147,7 +147,7 @@ func PreUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("INFO", "Performing remote pre unquiesce command ["+config.PreAppRestoreCmd+"] on pod ["+podName+"]")
 			messages = append(messages, message)
 
-			cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AppPluginParameters["AccessWithinCluster"], args...)
+			cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AccessWithinCluster, args...)
 
 			if cmdResult.Code != 0 {
 				messages = util.PrependMessages(messages, cmdResult.Messages)
@@ -288,7 +288,7 @@ func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 
 		if k8s.IsRemoteCommand(args[0]) {
 			args[0] = strings.Replace(args[0], ":", "", 1)
-			podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AppPluginParameters["AccessWithinCluster"])
+			podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)
@@ -301,7 +301,7 @@ func PostUnquiesceCmd(w http.ResponseWriter, r *http.Request) {
 			message := util.SetMessage("INFO", "Performing remote post unquiesce command ["+config.PostAppUnquiesceCmd+"] on pod ["+podName+"]")
 			messages = append(messages, message)
 
-			cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AppPluginParameters["AccessWithinCluster"], args...)
+			cmdResult := k8s.ExecuteCommand(podName, config.AppPluginParameters["ContainerName"], config.AppPluginParameters["Namespace"], config.AccessWithinCluster, args...)
 
 			if cmdResult.Code != 0 {
 				messages = util.PrependMessages(messages, cmdResult.Messages)

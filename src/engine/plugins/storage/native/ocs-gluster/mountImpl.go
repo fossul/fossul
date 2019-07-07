@@ -30,7 +30,7 @@ func (s storagePlugin) Mount(config util.Config) util.Result {
 	msg := util.SetMessage("INFO", "Mounting snapshot ["+backupName+"]")
 	messages = append(messages, msg)
 
-	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.StoragePluginParameters["AccessWithinCluster"])
+	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -39,7 +39,7 @@ func (s storagePlugin) Mount(config util.Config) util.Result {
 		return result
 	}
 
-	podIp, err := k8s.GetPodIp(config.StoragePluginParameters["Namespace"], podName, config.StoragePluginParameters["AccessWithinCluster"])
+	podIp, err := k8s.GetPodIp(config.StoragePluginParameters["Namespace"], podName, config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -48,7 +48,7 @@ func (s storagePlugin) Mount(config util.Config) util.Result {
 		return result
 	}
 
-	pvName, err := k8s.GetPersistentVolumeName(config.StoragePluginParameters["DatabaseNamespace"], config.StoragePluginParameters["PvcName"], config.StoragePluginParameters["AccessWithinCluster"])
+	pvName, err := k8s.GetPersistentVolumeName(config.StoragePluginParameters["DatabaseNamespace"], config.StoragePluginParameters["PvcName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -57,7 +57,7 @@ func (s storagePlugin) Mount(config util.Config) util.Result {
 		return result
 	}
 
-	glusterVolume, err := k8s.GetGlusterPersistentVolumePath(pvName, config.StoragePluginParameters["AccessWithinCluster"])
+	glusterVolume, err := k8s.GetGlusterPersistentVolumePath(pvName, config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -71,7 +71,7 @@ func (s storagePlugin) Mount(config util.Config) util.Result {
 	createDir = append(createDir, "-p")
 	createDir = append(createDir, "/tmp/"+backupName)
 
-	createDirResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], createDir...)
+	createDirResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, createDir...)
 	if createDirResult.Code != 0 {
 		messages = util.PrependMessages(messages, createDirResult.Messages)
 		result = util.SetResult(1, messages)
@@ -87,10 +87,24 @@ func (s storagePlugin) Mount(config util.Config) util.Result {
 	mountSnapshot = append(mountSnapshot, podIp+":/snaps/"+backupName+"/"+glusterVolume)
 	mountSnapshot = append(mountSnapshot, "/tmp/"+backupName)
 
-	mountSnapshotResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], mountSnapshot...)
+	mountSnapshotResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, mountSnapshot...)
 	if mountSnapshotResult.Code != 0 {
 		messages = util.PrependMessages(messages, mountSnapshotResult.Messages)
 		result = util.SetResult(1, messages)
+
+		var deleteDir []string
+		deleteDir = append(deleteDir, "/usr/bin/rmdir")
+		deleteDir = append(deleteDir, "/tmp/"+backupName)
+
+		deleteDirResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, deleteDir...)
+		if deleteDirResult.Code != 0 {
+			messages = util.PrependMessages(messages, deleteDirResult.Messages)
+			result = util.SetResult(1, messages)
+			return result
+		} else {
+			messages = util.PrependMessages(messages, deleteDirResult.Messages)
+		}
+
 		return result
 	} else {
 		messages = util.PrependMessages(messages, mountSnapshotResult.Messages)
@@ -125,16 +139,16 @@ func (s storagePlugin) Mount(config util.Config) util.Result {
 
 	var args []string
 	args = append(args, config.StoragePluginParameters["CopyCmdPath"])
-	if config.StoragePluginParameters["ContainerPlatform"] == "openshift" {
+	if config.ContainerPlatform == "openshift" {
 		args = append(args, "rsync")
 		args = append(args, "-n")
 		args = append(args, config.StoragePluginParameters["Namespace"])
 		args = append(args, podName+":"+backupSrcFilePath)
-	} else if config.StoragePluginParameters["ContainerPlatform"] == "kubernetes" {
+	} else if config.ContainerPlatform == "kubernetes" {
 		args = append(args, "cp")
 		args = append(args, config.StoragePluginParameters["Namespace"]+"/"+podName+":"+config.StoragePluginParameters["BackupSrcPath"])
 	} else {
-		msg = util.SetMessage("ERROR", "Incorrect parameter set for ContainerPlatform ["+config.StoragePluginParameters["ContainerPlatform"]+"]")
+		msg = util.SetMessage("ERROR", "Incorrect parameter set for ContainerPlatform ["+config.ContainerPlatform+"]")
 		messages = append(messages, msg)
 
 		result = util.SetResult(1, messages)

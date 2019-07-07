@@ -25,7 +25,7 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
-	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.StoragePluginParameters["AccessWithinCluster"])
+	podName, err := k8s.GetPodByName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -40,7 +40,7 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 	listSnapshot = append(listSnapshot, "snapshot")
 	listSnapshot = append(listSnapshot, "list")
 
-	listSnapshotResult, listSnapshotStdout := k8s.ExecuteCommandWithStdout(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], listSnapshot...)
+	listSnapshotResult, listSnapshotStdout := k8s.ExecuteCommandWithStdout(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, listSnapshot...)
 	if listSnapshotResult.Code != 0 {
 		messages = util.PrependMessages(messages, listSnapshotResult.Messages)
 		result = util.SetResult(1, messages)
@@ -82,7 +82,7 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 				deleteSnapshot = append(deleteSnapshot, "delete")
 				deleteSnapshot = append(deleteSnapshot, backupName)
 
-				deleteSnapshotResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["AccessWithinCluster"], deleteSnapshot...)
+				deleteSnapshotResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["ContainerName"], config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, deleteSnapshot...)
 				if deleteSnapshotResult.Code != 0 {
 					messages = util.PrependMessages(messages, deleteSnapshotResult.Messages)
 					result = util.SetResult(1, messages)

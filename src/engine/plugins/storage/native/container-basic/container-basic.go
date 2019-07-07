@@ -42,7 +42,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	msg := util.SetMessage("INFO", "Performing container backup")
 	messages = append(messages, msg)
 
-	podName, err := k8s.GetPod(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["ServiceName"], config.StoragePluginParameters["AccessWithinCluster"])
+	podName, err := k8s.GetPod(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["ServiceName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -71,16 +71,16 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	for _, backupSrcFilePath := range backupSrcFilePaths {
 		var args []string
 		args = append(args, config.StoragePluginParameters["CopyCmdPath"])
-		if config.StoragePluginParameters["ContainerPlatform"] == "openshift" {
+		if config.ContainerPlatform == "openshift" {
 			args = append(args, "rsync")
 			args = append(args, "-n")
 			args = append(args, config.StoragePluginParameters["Namespace"])
 			args = append(args, podName+":"+backupSrcFilePath)
-		} else if config.StoragePluginParameters["ContainerPlatform"] == "kubernetes" {
+		} else if config.ContainerPlatform  == "kubernetes" {
 			args = append(args, "cp")
 			args = append(args, config.StoragePluginParameters["Namespace"]+"/"+podName+":"+config.StoragePluginParameters["BackupSrcPath"])
 		} else {
-			msg = util.SetMessage("ERROR", "Incorrect parameter set for ContainerPlatform ["+config.StoragePluginParameters["ContainerPlatform"]+"]")
+			msg = util.SetMessage("ERROR", "Incorrect parameter set for ContainerPlatform ["+config.ContainerPlatform +"]")
 			messages = append(messages, msg)
 
 			result = util.SetResult(1, messages)
@@ -108,7 +108,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	msg := util.SetMessage("INFO", "Performing container restore")
 	messages = append(messages, msg)
 
-	podName, err := k8s.GetPod(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["ServiceName"], config.StoragePluginParameters["AccessWithinCluster"])
+	podName, err := k8s.GetPod(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["ServiceName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -142,18 +142,18 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 
 	var args []string
 	args = append(args, config.StoragePluginParameters["CopyCmdPath"])
-	if config.StoragePluginParameters["ContainerPlatform"] == "openshift" {
+	if config.ContainerPlatform == "openshift" {
 		args = append(args, "rsync")
 		args = append(args, "-n")
 		args = append(args, config.StoragePluginParameters["Namespace"])
 		args = append(args, restorePath)
 		args = append(args, podName+":"+restoreDestPath)
-	} else if config.StoragePluginParameters["ContainerPlatform"] == "kubernetes" {
+	} else if config.ContainerPlatform  == "kubernetes" {
 		args = append(args, "cp")
 		args = append(args, restorePath)
 		args = append(args, config.StoragePluginParameters["Namespace"]+"/"+podName+":"+restoreDestPath)
 	} else {
-		msg = util.SetMessage("ERROR", "Incorrect parameter set for ContainerPlatform ["+config.StoragePluginParameters["ContainerPlatform"]+"]")
+		msg = util.SetMessage("ERROR", "Incorrect parameter set for ContainerPlatform ["+config.ContainerPlatform +"]")
 		messages = append(messages, msg)
 
 		result = util.SetResult(1, messages)

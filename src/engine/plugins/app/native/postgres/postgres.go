@@ -16,6 +16,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"fossul/src/engine/client/k8s"
 	"fossul/src/engine/util"
 	_ "github.com/lib/pq"
 )
@@ -177,8 +178,25 @@ func (a appPlugin) PreRestore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	msg := util.SetMessage("INFO", "PreRestore Not implemented")
-	messages = append(messages, msg)
+	if config.AppPluginParameters["DisableRestoreHooks"] == "false" {
+		msg := util.SetMessage("INFO", "Scaling deployment ["+config.AppPluginParameters["Deployment"]+"] to 0")
+		messages = append(messages, msg)
+
+		var err error
+		if config.ContainerPlatform == "openshift" {
+			err = k8s.ScaleDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 0)
+		} else {
+			err = k8s.ScaleDeployment(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 0)
+		}
+
+		if err != nil {
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+	}
 
 	result = util.SetResult(0, messages)
 	return result
@@ -189,9 +207,25 @@ func (a appPlugin) PostRestore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	msg := util.SetMessage("INFO", "PostRestore Not implemented")
-	messages = append(messages, msg)
+	if config.AppPluginParameters["DisableRestoreHooks"] == "false" {
+		msg := util.SetMessage("INFO", "Scaling deployment ["+config.AppPluginParameters["Deployment"]+"] to 1")
+		messages = append(messages, msg)
 
+		var err error
+		if config.ContainerPlatform == "openshift" {
+			err = k8s.ScaleDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 1)
+		} else {
+			err = k8s.ScaleDeployment(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 1)
+		}
+
+		if err != nil {
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+	}
 	result = util.SetResult(0, messages)
 	return result
 }
