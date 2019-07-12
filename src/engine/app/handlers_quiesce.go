@@ -14,7 +14,7 @@ package main
 
 import (
 	"encoding/json"
-	"fossul/src/engine/client/k8s"
+	"fossul/src/client/k8s"
 	"fossul/src/engine/util"
 	"net/http"
 	"os"

@@ -13,7 +13,7 @@ limitations under the License.
 package main
 
 import (
-	"fossul/src/engine/client"
+	"fossul/src/client"
 	"fossul/src/engine/util"
 )
 
