@@ -12,17 +12,17 @@ $GOBIN/dep ensure
 echo "Running Unit Tests"
 go test fossul/src/engine/util
 if [ $? != 0 ]; then exit 1; fi
-go test fossul/src/engine/plugins/pluginUtil
+go test fossul/src/plugins/pluginUtil
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Shared Libraries"
 go build fossul/src/engine/util
 if [ $? != 0 ]; then exit 1; fi
-go build fossul/src/engine/client
+go build fossul/src/client
 if [ $? != 0 ]; then exit 1; fi
-go build fossul/src/engine/client/k8s
+go build fossul/src/client/k8s
 if [ $? != 0 ]; then exit 1; fi
-go build fossul/src/engine/plugins/pluginUtil
+go build fossul/src/plugins/pluginUtil
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Server Service"

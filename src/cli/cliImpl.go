@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"fossul/src/engine/client"
+	"fossul/src/client"
 	"fossul/src/engine/util"
 	"os"
 	"text/tabwriter"
