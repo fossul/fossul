@@ -3,7 +3,7 @@ FROM fedora:latest
 LABEL ios.k8s.display-name="fossul-app" \
     maintainer="Keith Tenzer <ktenzer@redhat.com>"
 
-#RUN dnf install -y golang
+RUN dnf install -y golang
 
 RUN mkdir -p /go/src/fossul
 RUN mkdir /app
