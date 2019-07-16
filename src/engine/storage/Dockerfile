@@ -35,7 +35,7 @@ RUN chmod -R 777 /tmp
 
 RUN echo "1.0" > /etc/imageversion
 
-USER 0
+USER fossul
 
 WORKDIR /app
 
