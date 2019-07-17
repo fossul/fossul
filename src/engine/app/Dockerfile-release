@@ -14,7 +14,6 @@ ENV GOBIN=/app
 ENV HOME=/app
 
 RUN curl -L https://github.com/fossul/fossul/releases/download/latest/app-service.tar.gz |tar xz -C /app && \
-    ls -l /app && \
     curl -L https://github.com/fossul/fossul/releases/download/latest/plugins-app.tar.gz |tar xz -C /app/plugins    
 
 RUN chown -R fossul:fossul /app && \
@@ -24,5 +23,7 @@ RUN chown -R fossul:fossul /app && \
 RUN echo "1.0" > /etc/imageversion
 
 USER fossul
+
+WORKDIR /app
 
 CMD /app/fossul-app-startup.sh
