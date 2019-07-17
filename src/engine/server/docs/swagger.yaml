@@ -2,6 +2,8 @@ basePath: '{{.BasePath}}'
 definitions:
   util.Config:
     properties:
+      accessWithinCluster:
+        type: string
       appPlugin:
         type: string
       appPluginParameters:
@@ -16,6 +18,14 @@ definitions:
         type: string
       archivePlugin:
         type: string
+      archivePluginParameters:
+        type: object
+      archiveRetention:
+        type: integer
+      archiveRetentions:
+        items:
+          type: ArchiveRetention
+        type: array
       autoDiscovery:
         type: boolean
       backupCreateCmd:
@@ -31,6 +41,8 @@ definitions:
           type: BackupRetention
         type: array
       configName:
+        type: string
+      containerPlatform:
         type: string
       jobRetention:
         type: integer
@@ -61,6 +73,10 @@ definitions:
       storagePluginParameters:
         type: object
       workflowId:
+        type: string
+      workflowTimestamp:
+        type: integer
+      workflowType:
         type: string
     type: object
   util.ConfigResult:

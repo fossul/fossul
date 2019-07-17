@@ -267,7 +267,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/util.Result"
+                            "$ref": "#/definitions/util.Archives"
                         },
                         "headers": {
                             "string": {
@@ -524,6 +524,62 @@
         "/backupList": {
             "post": {
                 "description": "List backups",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "config struct",
+                        "name": "config",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/util.Config"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/util.Backups"
+                        },
+                        "headers": {
+                            "string": {
+                                "type": "string",
+                                "description": "OK"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/mount": {
+            "post": {
+                "description": "Mount a volume, typically a snapshot volume",
                 "consumes": [
                     "application/json"
                 ],
@@ -856,12 +912,101 @@
                     }
                 }
             }
+        },
+        "/unmount": {
+            "post": {
+                "description": "Unmount a volume, typically a snapshot volume",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "description": "config struct",
+                        "name": "config",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/util.Config"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/util.Result"
+                        },
+                        "headers": {
+                            "string": {
+                                "type": "string",
+                                "description": "OK"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "util.Archives": {
+            "type": "object",
+            "properties": {
+                "archive": {
+                    "type": "array",
+                    "items": {
+                        "type": "Archive"
+                    }
+                },
+                "result": {
+                    "type": "object",
+                    "$ref": "#/definitions/util.Result"
+                }
+            }
+        },
+        "util.Backups": {
+            "type": "object",
+            "properties": {
+                "backup": {
+                    "type": "array",
+                    "items": {
+                        "type": "Backup"
+                    }
+                },
+                "result": {
+                    "type": "object",
+                    "$ref": "#/definitions/util.Result"
+                }
+            }
+        },
         "util.Config": {
             "type": "object",
             "properties": {
+                "accessWithinCluster": {
+                    "type": "string"
+                },
                 "appPlugin": {
                     "type": "string"
                 },
@@ -882,6 +1027,18 @@
                 },
                 "archivePlugin": {
                     "type": "string"
+                },
+                "archivePluginParameters": {
+                    "type": "object"
+                },
+                "archiveRetention": {
+                    "type": "integer"
+                },
+                "archiveRetentions": {
+                    "type": "array",
+                    "items": {
+                        "type": "ArchiveRetention"
+                    }
                 },
                 "autoDiscovery": {
                     "type": "boolean"
@@ -905,6 +1062,9 @@
                     }
                 },
                 "configName": {
+                    "type": "string"
+                },
+                "containerPlatform": {
                     "type": "string"
                 },
                 "jobRetention": {
@@ -950,6 +1110,12 @@
                     "type": "object"
                 },
                 "workflowId": {
+                    "type": "string"
+                },
+                "workflowTimestamp": {
+                    "type": "integer"
+                },
+                "workflowType": {
                     "type": "string"
                 }
             }

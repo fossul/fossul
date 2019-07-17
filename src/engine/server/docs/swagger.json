@@ -1707,6 +1707,9 @@
         "util.Config": {
             "type": "object",
             "properties": {
+                "accessWithinCluster": {
+                    "type": "string"
+                },
                 "appPlugin": {
                     "type": "string"
                 },
@@ -1727,6 +1730,18 @@
                 },
                 "archivePlugin": {
                     "type": "string"
+                },
+                "archivePluginParameters": {
+                    "type": "object"
+                },
+                "archiveRetention": {
+                    "type": "integer"
+                },
+                "archiveRetentions": {
+                    "type": "array",
+                    "items": {
+                        "type": "ArchiveRetention"
+                    }
                 },
                 "autoDiscovery": {
                     "type": "boolean"
@@ -1750,6 +1765,9 @@
                     }
                 },
                 "configName": {
+                    "type": "string"
+                },
+                "containerPlatform": {
                     "type": "string"
                 },
                 "jobRetention": {
@@ -1795,6 +1813,12 @@
                     "type": "object"
                 },
                 "workflowId": {
+                    "type": "string"
+                },
+                "workflowTimestamp": {
+                    "type": "integer"
+                },
+                "workflowType": {
                     "type": "string"
                 }
             }
