@@ -1,4 +1,4 @@
-FROM fedora:latest
+FROM registry.redhat.io/ubi8/ubi:latest
 
 
 LABEL ios.k8s.display-name="fossul-server" \

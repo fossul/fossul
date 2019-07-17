@@ -121,7 +121,7 @@ objects:
         dockerfilePath: src/engine/server/Dockerfile-release
         from:
           kind: ImageStreamTag
-          name: fedora:latest
+          name: registry.redhat.io/ubi8/ubi:latest
       type: Docker
     triggers:
     - github:
@@ -161,7 +161,7 @@ objects:
         dockerfilePath: src/engine/app/Dockerfile-release
         from:
           kind: ImageStreamTag
-          name: fedora:latest
+          name: registry.redhat.io/ubi8/ubi:latest
       type: Docker
     triggers:
     - github:
@@ -201,7 +201,7 @@ objects:
         dockerfilePath: src/engine/storage/Dockerfile-release
         from:
           kind: ImageStreamTag
-          name: fedora:latest
+          name: registry.redhat.io/ubi8/ubi:latest
       type: Docker
     triggers:
     - github:
@@ -502,16 +502,16 @@ objects:
     generation: 2
     labels:
       app: "${APPLICATION_NAME}-server"
-    name: fedora
+    name: ubi
   spec:
     lookupPolicy:
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: fedora:latest
+        openshift.io/imported-from: registry.redhat.io/ubi8/ubi:latest
       from:
         kind: DockerImage
-        name: fedora:latest
+        name: registry.redhat.io/ubi8/ubi:latest
       generation: 2
       importPolicy: {}
       name: latest
@@ -524,16 +524,16 @@ objects:
     generation: 2
     labels:
       app: "${APPLICATION_NAME}-app"
-    name: fedora
+    name: ubi
   spec:
     lookupPolicy:
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: fedora:latest
+        openshift.io/imported-from: registry.redhat.io/ubi8/ubi:latest
       from:
         kind: DockerImage
-        name: fedora:latest
+        name: registry.redhat.io/ubi8/ubi:latest
       generation: 2
       importPolicy: {}
       name: latest
@@ -546,16 +546,16 @@ objects:
     generation: 2
     labels:
       app: "${APPLICATION_NAME}-storage"
-    name: fedora
+    name: ubi
   spec:
     lookupPolicy:
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: fedora:latest
+        openshift.io/imported-from: registry.redhat.io/ubi8/ubi:latest
       from:
         kind: DockerImage
-        name: fedora:latest
+        name: registry.redhat.io/ubi8/ubi:latest
       generation: 2
       importPolicy: {}
       name: latest
