@@ -1,0 +1,28 @@
+FROM fedora:latest
+
+
+LABEL ios.k8s.display-name="fossul-server" \
+    maintainer="Keith Tenzer <ktenzer@redhat.com>"
+
+RUN mkdir /app && \
+    mkdir /app/plugins
+
+RUN groupadd -r fossul &&\
+    useradd -r -g fossul -d /app -u 1001 -s /sbin/nologin -c "Fossul user" fossul
+
+ENV HOME=/app
+
+RUN curl -L https://github.com/fossul/fossul/releases/download/latest/app-service.tar.gz |tar xz;mv app /app;mv fossul-app-startup.sh /app && \
+    curl -L https://github.com/fossul/fossul/releases/download/latest/plugins-app.tar.gz |tar xz;mv app/ /app/plugins    
+
+RUN chown -R fossul:fossul /app && \
+    chmod -R 775 /app && \
+    chmod -R 777 /tmp
+
+RUN echo "1.0" > /etc/imageversion
+
+USER fossul
+
+WORKDIR /app
+
+CMD /app/fossul-app-startup.sh

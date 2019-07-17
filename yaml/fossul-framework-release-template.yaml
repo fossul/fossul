@@ -1,0 +1,675 @@
+apiVersion: v1
+kind: Template
+metadata:
+  annotations:
+    description: "A Container Native Backup Fraemwork"
+  creationTimestamp: null
+  name: fossul-framework
+objects:
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: ${APPLICATION_NAME}-secrets
+  stringData:
+    admin-user: ${FOSSUL_USERNAME}
+    admin-password: ${FOSSUL_PASSWORD}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: ${APPLICATION_NAME}-aws-secrets
+  stringData:
+    access-key: ${AWS_ACCESS_KEY_ID}
+    secret-key: ${AWS_SECRET_ACCESS_KEY}        
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: Fossul server port
+    labels:
+      app: ${APPLICATION_NAME}-server
+    name: ${APPLICATION_NAME}-server
+  spec:
+    ports:
+    - port: 8000
+      targetPort: 8000
+    selector:
+      app: ${APPLICATION_NAME}-server
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: Fossule app port
+    labels:
+      app: ${APPLICATION_NAME}-app
+    name: ${APPLICATION_NAME}-app
+  spec:
+    ports:
+    - port: 8001
+      targetPort: 8001
+    selector:
+      app: ${APPLICATION_NAME}-app
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      description: Fossule storage port
+    labels:
+      app: ${APPLICATION_NAME}-storage
+    name: ${APPLICATION_NAME}-storage
+  spec:
+    ports:
+    - port: 8002
+      targetPort: 8002
+    selector:
+      app: ${APPLICATION_NAME}-storage      
+- apiVersion: v1
+  kind: Route
+  metadata:
+    annotations:
+      template.openshift.io/expose-uri: http://{.spec.host}{.spec.path}
+    name: ${APPLICATION_NAME}-server
+  spec:
+    host: ${APPLICATION_DOMAIN}
+    to:
+      kind: Service
+      name: ${APPLICATION_NAME}-server
+- apiVersion: v1
+  kind: Route
+  metadata:
+    annotations:
+      template.openshift.io/expose-uri: http://{.spec.host}{.spec.path}
+    name: ${APPLICATION_NAME}-app
+  spec:
+    host: ${APPLICATION_DOMAIN}
+    to:
+      kind: Service
+      name: ${APPLICATION_NAME}-app
+- apiVersion: v1
+  kind: Route
+  metadata:
+    annotations:
+      template.openshift.io/expose-uri: http://{.spec.host}{.spec.path}
+    name: ${APPLICATION_NAME}-storage
+  spec:
+    host: ${APPLICATION_DOMAIN}
+    to:
+      kind: Service
+      name: ${APPLICATION_NAME}-storage          
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: "${APPLICATION_NAME}-server"
+    name: "${APPLICATION_NAME}-server" 
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${APPLICATION_NAME}-server:latest"
+    runPolicy: Serial
+    source:
+      git:
+        uri: "${SOURCE_REPOSITORY_URL_SERVER}" 
+        ref: "${SOURCE_REPOSITORY_REF_SERVER}"
+        contextDir: "${CONTEXT_DIR_SERVER}"
+        type: Git
+    strategy:
+      dockerStrategy:
+        dockerfilePath: src/engine/server/Dockerfile-release
+        from:
+          kind: ImageStreamTag
+          name: fedora:latest
+      type: Docker
+    triggers:
+    - github:
+        secret: _Rn6FzszP2wVCdy5gn5A
+      type: GitHub
+    - generic:
+        secret: lDMTxQXebRt4VBgwXZ-f
+      type: Generic
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: "${APPLICATION_NAME}-app"
+    name: "${APPLICATION_NAME}-app" 
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${APPLICATION_NAME}-app:latest"
+    runPolicy: Serial
+    source:
+      git:
+        uri: "${SOURCE_REPOSITORY_URL_APP}" 
+        ref: "${SOURCE_REPOSITORY_REF_APP}"
+        contextDir: "${CONTEXT_DIR_APP}"
+        type: Git
+    strategy:
+      dockerStrategy:
+        dockerfilePath: src/engine/app/Dockerfile-release
+        from:
+          kind: ImageStreamTag
+          name: fedora:latest
+      type: Docker
+    triggers:
+    - github:
+        secret: _Rn6FzszP2wVCdy5gn5A
+      type: GitHub
+    - generic:
+        secret: lDMTxQXebRt4VBgwXZ-f
+      type: Generic
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0    
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: "${APPLICATION_NAME}-storage"
+    name: "${APPLICATION_NAME}-storage" 
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${APPLICATION_NAME}-storage:latest"
+    runPolicy: Serial
+    source:
+      git:
+        uri: "${SOURCE_REPOSITORY_URL_STORAGE}" 
+        ref: "${SOURCE_REPOSITORY_REF_STORAGE}"
+        contextDir: "${CONTEXT_DIR_STORAGE}"
+        type: Git
+    strategy:
+      dockerStrategy:
+        dockerfilePath: src/engine/storage/Dockerfile-release
+        from:
+          kind: ImageStreamTag
+          name: fedora:latest
+      type: Docker
+    triggers:
+    - github:
+        secret: _Rn6FzszP2wVCdy5gn5A
+      type: GitHub
+    - generic:
+        secret: lDMTxQXebRt4VBgwXZ-f
+      type: Generic
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: "${APPLICATION_NAME}-server-data" 
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: "${SERVER_CAPACITY}"        
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: "${APPLICATION_NAME}-storage-data" 
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: "${STORAGE_CAPACITY}"
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: "true"
+    name: "${APPLICATION_NAME}-server" 
+  spec:
+    replicas: 1
+    selector:
+      app: "${APPLICATION_NAME}-server"
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: "${APPLICATION_NAME}-server"
+      spec:
+        containers:
+        - env:
+          - name: FOSSUL_SERVER_CONFIG_DIR
+            value: ${FOSSUL_SERVER_CONFIG_DIR}
+          - name: FOSSUL_SERVER_DATA_DIR
+            value: ${FOSSUL_SERVER_DATA_DIR}
+          - name: FOSSUL_SERVER_CLIENT_HOSTNAME
+            value: ${APPLICATION_NAME}-server
+          - name: FOSSUL_SERVER_DEBUG
+            value: ${FOSSUL_SERVER_DEBUG}                         
+          - name: FOSSUL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-secrets
+                key: admin-user
+          - name: FOSSUL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-secrets
+                key: admin-password
+          image: ' '
+          imagePullPolicy: IfNotPresent
+          name: "${APPLICATION_NAME}-server"
+          terminationMessagePath: /dev/termination-log
+          ports:
+          -containerPort: 8080
+          volumeMounts:
+          - mountPath: /app/metadata
+            name: "${APPLICATION_NAME}-server-data"          
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        volumes:
+        - name: "${APPLICATION_NAME}-server-data" 
+          persistentVolumeClaim:
+            claimName: "${APPLICATION_NAME}-server-data"   
+        securityContext:
+          fsGroup: 1001                                 
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - "${APPLICATION_NAME}-server"
+        from:
+          kind: ImageStreamTag
+          name: "${APPLICATION_NAME}-server:latest"
+        lastTriggeredImage: ""
+      type: ImageChange
+    - type: ConfigChange
+  status: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: "true"
+    name: "${APPLICATION_NAME}-app" 
+  spec:
+    replicas: 1
+    selector:
+      app: "${APPLICATION_NAME}-app"
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: "${APPLICATION_NAME}-app"
+      spec:
+        containers:
+        - env:
+          - name: FOSSUL_APP_PLUGIN_DIR
+            value: ${FOSSUL_APP_PLUGIN_DIR}
+          - name: FOSSUL_APP_CLIENT_HOSTNAME
+            value: ${APPLICATION_NAME}-app 
+          - name: FOSSUL_APP_DEBUG
+            value: ${FOSSUL_APP_DEBUG}                         
+          - name: FOSSUL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-secrets
+                key: admin-user
+          - name: FOSSUL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-secrets
+                key: admin-password
+          image: ' '
+          imagePullPolicy: IfNotPresent
+          name: "${APPLICATION_NAME}-app"
+          terminationMessagePath: /dev/termination-log
+          ports:
+          -containerPort: 8080
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext:
+          fsGroup: 1001        
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - "${APPLICATION_NAME}-app"
+        from:
+          kind: ImageStreamTag
+          name: "${APPLICATION_NAME}-app:latest"
+        lastTriggeredImage: ""
+      type: ImageChange
+    - type: ConfigChange
+  status: {}  
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      template.alpha.openshift.io/wait-for-ready: "true"
+    name: "${APPLICATION_NAME}-storage" 
+  spec:
+    replicas: 1
+    selector:
+      app: "${APPLICATION_NAME}-storage"
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: "${APPLICATION_NAME}-storage"
+      spec:
+        containers:      
+        - env:
+          - name: FOSSUL_STORAGE_PLUGIN_DIR
+            value: ${FOSSUL_STORAGE_PLUGIN_DIR} 
+          - name: FOSSUL_STORAGE_CLIENT_HOSTNAME
+            value: ${APPLICATION_NAME}-storage 
+          - name: FOSSUL_STORAGE_DEBUG
+            value: ${FOSSUL_STORAGE_DEBUG}                                       
+          - name: FOSSUL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-secrets
+                key: admin-user
+          - name: FOSSUL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-secrets
+                key: admin-password
+          - name: AWS_ACCESS_KEY_ID 
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-aws-secrets
+                key: access-key
+          - name: AWS_SECRET_ACCESS_KEY 
+            valueFrom:
+              secretKeyRef:
+                name: ${APPLICATION_NAME}-aws-secrets
+                key: secret-key                                    
+          image: ' '
+          imagePullPolicy: IfNotPresent
+          name: "${APPLICATION_NAME}-storage"
+          terminationMessagePath: /dev/termination-log
+          ports:
+          -containerPort: 8080
+          volumeMounts:
+          - mountPath: /app/backups
+            name: "${APPLICATION_NAME}-storage-data"                    
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        volumes:
+        - name: "${APPLICATION_NAME}-storage-data" 
+          persistentVolumeClaim:
+            claimName: "${APPLICATION_NAME}-storage-data"
+        securityContext:
+          fsGroup: 1001           
+    triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - "${APPLICATION_NAME}-storage"
+        from:
+          kind: ImageStreamTag
+          name: "${APPLICATION_NAME}-storage:latest"
+        lastTriggeredImage: ""
+      type: ImageChange
+    - type: ConfigChange
+  status: {}  
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: "${APPLICATION_NAME}-server"
+    name: "${APPLICATION_NAME}-server"
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations: null
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: ""
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: "${APPLICATION_NAME}-app"
+    name: "${APPLICATION_NAME}-app"
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations: null
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: ""
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: "${APPLICATION_NAME}-storage"
+    name: "${APPLICATION_NAME}-storage"
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations: null
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: ""
+  status:
+    dockerImageRepository: ""        
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+    generation: 2
+    labels:
+      app: "${APPLICATION_NAME}-server"
+    name: fedora
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: fedora:latest
+      from:
+        kind: DockerImage
+        name: fedora:latest
+      generation: 2
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: Source
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+    generation: 2
+    labels:
+      app: "${APPLICATION_NAME}-app"
+    name: fedora
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: fedora:latest
+      from:
+        kind: DockerImage
+        name: fedora:latest
+      generation: 2
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: Source
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+    generation: 2
+    labels:
+      app: "${APPLICATION_NAME}-storage"
+    name: fedora
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: fedora:latest
+      from:
+        kind: DockerImage
+        name: fedora:latest
+      generation: 2
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: Source                
+parameters:
+  - name: APPLICATION_NAME
+    displayName: Application Name
+    description: the name and label for all components
+    value: fossul
+    required: true 
+  - name: APPLICATION_DOMAIN
+    displayName: Application Domain
+    description: Application domain name used in route to service
+  - name: SOURCE_REPOSITORY_URL_SERVER
+    displayName: Source Repository URL
+    description: The URL of the repository with your application source code
+    value: https://github.com/fossul/fossul.git
+    required: true
+  - name: SOURCE_REPOSITORY_URL_APP
+    displayName: Source Repository URL
+    description: The URL of the repository with your application source code
+    value: https://github.com/fossul/fossul.git
+    required: true  
+  - name: SOURCE_REPOSITORY_URL_STORAGE
+    displayName: Source Repository URL
+    description: The URL of the repository with your application source code
+    value: https://github.com/fossul/fossul.git
+    required: true
+  - name: FOSSUL_USERNAME
+    displayName: Username for API Services
+    description: Username for API Services
+    value: admin
+    required: true
+  - name: FOSSUL_PASSWORD
+    displayName: Password for API Services
+    description: Password for API Services
+    value: redhat123
+    required: true
+  - name: AWS_ACCESS_KEY_ID 
+    displayName: AWS Access Key
+    description: AWS Access Key
+    value: 
+    required: false
+  - name: AWS_SECRET_ACCESS_KEY  
+    displayName: AWS Secret Access Key
+    description: AWS Secret Access Key
+    value: 
+    required: false          
+  - name: FOSSUL_SERVER_CONFIG_DIR
+    displayName: Directory for configs
+    description: Directory for configs
+    value: metadata/configs
+    required: true 
+  - name: FOSSUL_SERVER_DATA_DIR
+    displayName: Directory for data and metadata
+    description: Directory for data and metadata
+    value: metadata/data
+    required: true                                 
+  - name: CONTEXT_DIR_SERVER
+    displayName: Context Dir for server
+    description: Context Dir for server
+    value: src/engine/server
+    required: true
+  - name: FOSSUL_SERVER_DEBUG
+    displayName: Enable debug true or false
+    description: Enable debug true or false
+    value: "false"
+    required: true         
+  - name: FOSSUL_APP_PLUGIN_DIR
+    displayName: Directory for app plugins
+    description: Directory for app plugins
+    value: plugins
+    required: true           
+  - name: CONTEXT_DIR_APP
+    displayName: Context Dir for app
+    description: Context Dir for app
+    value: src/engine/app
+    required: true 
+  - name: FOSSUL_APP_DEBUG
+    displayName: Enable debug true or false
+    description: Enable debug true or false
+    value: "false"
+    required: true            
+  - name: FOSSUL_STORAGE_PLUGIN_DIR
+    displayName: Directory for storage plugins
+    description: Directory for storage plugins
+    value: plugins
+    required: true      
+  - name: CONTEXT_DIR_STORAGE
+    displayName: Context Dir for storage
+    description: Context Dir for storage
+    value: src/engine/storage
+    required: true 
+  - name: FOSSUL_STORAGE_DEBUG
+    displayName: Enable debug true or false
+    description: Enable debug true or false
+    value: "false"
+    required: true                  
+  - name: SOURCE_REPOSITORY_REF_SERVER
+    displayName: Source Repository Reference Tag
+    description: The Branch tag to use
+    value: master
+  - name: SOURCE_REPOSITORY_REF_APP
+    displayName: Source Repository Reference Tag
+    description: The Branch tag to use
+    value: master    
+  - name: SOURCE_REPOSITORY_REF_STORAGE
+    displayName: Source Repository Reference Tag
+    description: The Branch tag to use
+    value: master
+  - name: SERVER_CAPACITY
+    description: Storage for Server Service
+    value: 10Gi      
+  - name: STORAGE_CAPACITY
+    description: Storage for Storage Service
+    value: 25Gi
