@@ -10,6 +10,7 @@ RUN mkdir /app && \
 RUN groupadd -r fossul &&\
     useradd -r -g fossul -d /app -u 1001 -s /sbin/nologin -c "Fossul user" fossul
 
+ENV GOBIN=/app
 ENV HOME=/app
 
 RUN curl -L https://github.com/fossul/fossul/releases/download/latest/app-service.tar.gz |tar xz -C /app && \
