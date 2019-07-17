@@ -13,8 +13,9 @@ RUN groupadd -r fossul &&\
 WORKDIR /app
 ENV HOME=/app
 
-RUN curl -L https://github.com/fossul/fossul/releases/download/latest/app-service.tar.gz |tar xz && \
-    curl -L https://github.com/fossul/fossul/releases/download/latest/plugins-app.tar.gz |tar xz;mv app/ /app/plugins    
+RUN curl -L https://github.com/fossul/fossul/releases/download/latest/app-service.tar.gz |tar xz -C /app && \
+    ls -l /app && \
+    curl -L https://github.com/fossul/fossul/releases/download/latest/plugins-app.tar.gz |tar xz -C /app/plugins    
 
 RUN chown -R fossul:fossul /app && \
     chmod -R 775 /app && \
