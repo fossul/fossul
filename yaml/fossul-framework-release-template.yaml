@@ -502,7 +502,7 @@ objects:
     generation: 2
     labels:
       app: "${APPLICATION_NAME}-server"
-    name: fedora:latest
+    name: fedora
   spec:
     lookupPolicy:
       local: false
@@ -524,7 +524,7 @@ objects:
     generation: 2
     labels:
       app: "${APPLICATION_NAME}-app"
-    name: fedora:latest
+    name: fedora
   spec:
     lookupPolicy:
       local: false
@@ -546,7 +546,7 @@ objects:
     generation: 2
     labels:
       app: "${APPLICATION_NAME}-storage"
-    name: fedora:latest
+    name: fedora
   spec:
     lookupPolicy:
       local: false
