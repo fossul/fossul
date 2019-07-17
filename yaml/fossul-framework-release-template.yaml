@@ -121,7 +121,7 @@ objects:
         dockerfilePath: src/engine/server/Dockerfile-release
         from:
           kind: ImageStreamTag
-          name: registry.redhat.io/ubi8/ubi
+          name: registry.access.redhat.com/ubi8/ubi
       type: Docker
     triggers:
     - github:
@@ -161,7 +161,7 @@ objects:
         dockerfilePath: src/engine/app/Dockerfile-release
         from:
           kind: ImageStreamTag
-          name: registry.redhat.io/ubi8/ubi
+          name: registry.access.redhat.com/ubi8/ubi
       type: Docker
     triggers:
     - github:
@@ -201,7 +201,7 @@ objects:
         dockerfilePath: src/engine/storage/Dockerfile-release
         from:
           kind: ImageStreamTag
-          name: registry.redhat.io/ubi8/ubi
+          name: registry.access.redhat.com/ubi8/ubi
       type: Docker
     triggers:
     - github:
@@ -508,10 +508,10 @@ objects:
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: registry.redhat.io/ubi8/ubi
+        openshift.io/imported-from: registry.access.redhat.com/ubi8/ubi
       from:
         kind: DockerImage
-        name: registry.redhat.io/ubi8/ubi
+        name: registry.access.redhat.com/ubi8/ubi
       generation: 2
       importPolicy: {}
       name: latest
@@ -530,10 +530,10 @@ objects:
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: registry.redhat.io/ubi8/ubi
+        openshift.io/imported-from: registry.access.redhat.com/ubi8/ubi
       from:
         kind: DockerImage
-        name: registry.redhat.io/ubi8/ubi
+        name: registry.access.redhat.com/ubi8/ubi
       generation: 2
       importPolicy: {}
       name: latest
@@ -552,10 +552,10 @@ objects:
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: registry.redhat.io/ubi8/ubi
+        openshift.io/imported-from: registry.access.redhat.com/ubi8/ubi
       from:
         kind: DockerImage
-        name: registry.redhat.io/ubi8/ubi
+        name: registry.access.redhat.com/ubi8/ubi
       generation: 2
       importPolicy: {}
       name: latest
