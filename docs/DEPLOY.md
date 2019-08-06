@@ -20,7 +20,7 @@ Fossul needs cluster-reader permissions and a security context that allows any u
 Optionally you can also give the fossil project default service account cluster-admin permissions. This is not recommended but it saves you from adding access above and projects later.
 
 ```$ oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:fossul:default```
-
+Hi
 ### Join projects to allow network connectivity (optional) ###
 Certain plugins access databases using the service.  you are using OpenShift SDN you need to allow network connectivity between projects where data workloads are running and fossul. In this case we have databases running in the 'databases' project.
 
@@ -29,10 +29,10 @@ Certain plugins access databases using the service.  you are using OpenShift SDN
 ### Run Fossul Template
 To deploy fossul by building source code use following template:
 
-```$ oc process -f yaml/fossul-framework-template.yaml -p APPLICATION_NAME=fossul -p FOSSUL_USERNAME=admin -p FOSSUL_PASSWORD=r3dH@t31 |oc create -f -```
+```$ oc process -f yaml/fossul-framework-template.yaml -p APPLICATION_NAME=fossul -p FOSSUL_USERNAME=admin -p FOSSUL_PASSWORD=redhat123 |oc create -f -```
 
 To deploy fossul using latest release without building the code:
-```$ oc process -f yaml/fossul-framework-release-template.yaml -p APPLICATION_NAME=fossul -p FOSSUL_USERNAME=admin -p FOSSUL_PASSWORD=r3dH@t31 |oc create -f -```
+```$ oc process -f yaml/fossul-framework-release-template.yaml -p APPLICATION_NAME=fossul -p FOSSUL_USERNAME=admin -p FOSSUL_PASSWORD=redhat123 |oc create -f -```
 
 ### Add admin access to projects Fossul should manage
 In order to run commands inside pods and containers, Fossul requires admin permissions to the project. In this example we have a project called databases and will add admin access from Fossul
