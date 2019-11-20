@@ -229,6 +229,18 @@
   revision = "ab8a2e0c74be"
 
 [[projects]]
+  digest = "1:9029d8351d44136a8ca42d8351d5e3750522ec089883577ec6dcf0dfb7df6fac"
+  name = "github.com/kubernetes-csi/external-snapshotter"
+  packages = [
+    "pkg/apis/volumesnapshot/v1alpha1",
+    "pkg/client/clientset/versioned/scheme",
+    "pkg/client/clientset/versioned/typed/volumesnapshot/v1alpha1",
+  ]
+  pruneopts = "UT"
+  revision = "d5da3c1e527cd356696300222ebd8bf728971ae4"
+  version = "v1.2.2"
+
+[[projects]]
   digest = "1:bc1c0be40c67b6b4aee09d7508d5a2a52c1c116b1fa43806dad2b0d6b4d4003b"
   name = "github.com/lib/pq"
   packages = [
@@ -534,8 +546,7 @@
   version = "v2.2.2"
 
 [[projects]]
-  branch = "master"
-  digest = "1:87189339611e8b38a2bbfb3e02c5f98ff733475a168684088d48a95d85f8fceb"
+  digest = "1:b2e959d92a38ffc25142da8e8bf4fefe0e5e687ecb871fabaac58db0497304df"
   name = "k8s.io/api"
   packages = [
     "admissionregistration/v1beta1",
@@ -576,11 +587,11 @@
     "storage/v1beta1",
   ]
   pruneopts = "UT"
-  revision = "181e1f9c52c1a4e72e64db906923efc79a76a8e3"
+  revision = "fdd30b57c827abbc506646ecfd579f6ccb3b80ab"
+  version = "kubernetes-1.15.2"
 
 [[projects]]
-  branch = "master"
-  digest = "1:d2e6dbb78f7fdb6962778bdf7d15b4eb8014e6d4914394fb3dfdafd83f118ee9"
+  digest = "1:30c1ae5985d5a94abf93bb2ecf69d1f8a01430129bc064e575110797b6e9be18"
   name = "k8s.io/apimachinery"
   packages = [
     "pkg/api/errors",
@@ -588,7 +599,6 @@
     "pkg/api/resource",
     "pkg/apis/meta/v1",
     "pkg/apis/meta/v1/unstructured",
-    "pkg/apis/meta/v1beta1",
     "pkg/conversion",
     "pkg/conversion/queryparams",
     "pkg/fields",
@@ -617,6 +627,7 @@
     "pkg/util/sets",
     "pkg/util/validation",
     "pkg/util/validation/field",
+    "pkg/util/wait",
     "pkg/util/yaml",
     "pkg/version",
     "pkg/watch",
@@ -624,11 +635,11 @@
     "third_party/forked/golang/reflect",
   ]
   pruneopts = "UT"
-  revision = "17f84483f50094cc9bb94364a06f4776c1aa9a3f"
+  revision = "1799e75a07195de9460b8ef7300883499f12127b"
+  version = "kubernetes-1.15.2"
 
 [[projects]]
-  branch = "master"
-  digest = "1:0d684d05678954a615259eeb3f9614ba64215117ff89a160424c3fa9c077e24d"
+  digest = "1:3efb74c57c837b2daa62ce2738f525c4a5fa9d71b049a892d5a7eab70f5bc90e"
   name = "k8s.io/client-go"
   packages = [
     "discovery",
@@ -695,7 +706,8 @@
     "util/keyutil",
   ]
   pruneopts = "UT"
-  revision = "65184652c88974f455258f2e0fbc6ac2c67e1786"
+  revision = "2fe0317bcee0e1ff48861f77cc1e2791cceba458"
+  version = "kubernetes-1.15.2"
 
 [[projects]]
   digest = "1:c696379ad201c1e86591785579e16bf6cf886c362e9a7534e8eb0d1028b20582"
@@ -732,6 +744,8 @@
     "github.com/aws/aws-sdk-go/service/s3/s3manager",
     "github.com/go-sql-driver/mysql",
     "github.com/gorilla/mux",
+    "github.com/kubernetes-csi/external-snapshotter/pkg/apis/volumesnapshot/v1alpha1",
+    "github.com/kubernetes-csi/external-snapshotter/pkg/client/clientset/versioned/typed/volumesnapshot/v1alpha1",
     "github.com/lib/pq",
     "github.com/openshift/api/apps/v1",
     "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1",
@@ -747,6 +761,7 @@
     "k8s.io/api/apps/v1",
     "k8s.io/api/core/v1",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
+    "k8s.io/apimachinery/pkg/util/wait",
     "k8s.io/client-go/kubernetes",
     "k8s.io/client-go/kubernetes/scheme",
     "k8s.io/client-go/kubernetes/typed/apps/v1",
