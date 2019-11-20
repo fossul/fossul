@@ -19,11 +19,12 @@ import (
 	"github.com/kubernetes-csi/external-snapshotter/pkg/apis/volumesnapshot/v1alpha1"
 	snapClient "github.com/kubernetes-csi/external-snapshotter/pkg/client/clientset/versioned/typed/volumesnapshot/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 var poll = 2 * time.Second
 
-func createSnapshot(snap *v1alpha1.VolumeSnapshot, t int, accessWithinCluster string) error {
+func createSnapshot(snapshotName, namespace, snapshotClassName, pvcName string, t int, accessWithinCluster string) error {
 
 	err, kubeConfig := getKubeConfig(accessWithinCluster)
 	if err != nil {
@@ -34,11 +35,14 @@ func createSnapshot(snap *v1alpha1.VolumeSnapshot, t int, accessWithinCluster st
 	if err != nil {
 		return err
 	}
-	
+
+	snap := generateSnapshot(snapshotName, namespace, snapshotClassName, pvcName)
+
 	_, err = sclient.VolumeSnapshots(snap.Namespace).Create(snap)
 	if err != nil {
 		return err
 	}
+	
 	fmt.Printf("snapshot with name %v created in %v namespace", snap.Name, snap.Namespace)
 
 	timeout := time.Duration(t) * time.Minute
@@ -58,4 +62,22 @@ func createSnapshot(snap *v1alpha1.VolumeSnapshot, t int, accessWithinCluster st
 		}
 		return false, nil
 	})
+}
+
+func generateSnapshot(snapshotName, namespace, snapshotClassName, pvcName string) *v1alpha1.VolumeSnapshot {
+    snapshot := v1alpha1.VolumeSnapshot{
+        ObjectMeta: metav1.ObjectMeta{
+            Name:      snapshotName,
+            Namespace: namespace,
+        },
+        Spec: v1alpha1.VolumeSnapshotSpec{
+            VolumeSnapshotClassName: &snapshotClassName,
+            Source: &v1.TypedLocalObjectReference{
+                Name: pvcName,
+                Kind: "PersistentVolumeClaim",
+            },
+        },
+    }
+
+    return &snapshot
 }
