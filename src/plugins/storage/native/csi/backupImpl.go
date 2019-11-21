@@ -24,8 +24,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	var resultCode int = 0
 
 	timestampToString := fmt.Sprintf("%d", config.WorkflowTimestamp)
-	//backupName := util.GetBackupName(config.StoragePluginParameters["PvcName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
-	backupName := fmt.Sprintf(config.StoragePluginParameters["PvcName"] + "-" + config.SelectedBackupPolicy + "-" + config.WorkflowId + "-" + timestampToString)
+	backupName := util.GetBackupName(config.StoragePluginParameters["PvcName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
 	timeout := util.StringToInt(config.StoragePluginParameters["SnapshotTimeoutSeconds"])
 
 	msg := util.SetMessage("INFO", "Creating CSI snapshot ["+backupName+"] of pvc ["+config.StoragePluginParameters["PvcName"]+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+config.StoragePluginParameters["SnapshotClass"]+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")

@@ -30,7 +30,7 @@ func TestGetBackupPath(t *testing.T) {
 	configMap := getConfigMap()
 	backupPath := GetBackupPathFromMap(configMap)
 
-	if !strings.Contains(backupPath, "/backupdest/default/default/mybackup_daily_777") {
+	if !strings.Contains(backupPath, "/backupdest/default/default/mybackup-daily-777") {
 		t.Fail()
 	}
 }

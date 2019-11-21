@@ -26,12 +26,7 @@ var poll = 2 * time.Second
 
 func CreateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessWithinCluster string, t int) error {
 
-	err, kubeConfig := getKubeConfig(accessWithinCluster)
-	if err != nil {
-		return err
-	}
-
-	sclient, err := snapClient.NewForConfig(kubeConfig)
+	sclient, err := getSnapshotClient(accessWithinCluster)
 	if err != nil {
 		return err
 	}
@@ -62,6 +57,53 @@ func CreateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessW
 		}
 		return false, nil
 	})
+}
+
+func ListSnapshots(namespace, accessWithinCluster string) (*v1alpha1.VolumeSnapshotList, error) {
+	var snapshots *v1alpha1.VolumeSnapshotList
+	sclient, err := getSnapshotClient(accessWithinCluster)
+	if err != nil {
+		return snapshots, err
+	}
+
+	snapshots, err = sclient.VolumeSnapshots(namespace).List(metav1.ListOptions{})
+	if err != nil {
+		return snapshots, err
+	}
+
+	//for _,snapshot := range snapshots.Items {
+	//}
+
+	return snapshots, nil
+}
+
+func DeleteSnapshot(name, namespace, accessWithinCluster string) error {
+	sclient, err := getSnapshotClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	err = sclient.VolumeSnapshots(namespace).Delete(name, &metav1.DeleteOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getSnapshotClient(accessWithinCluster string) (*snapClient.SnapshotV1alpha1Client, error) {
+	var sclient *snapClient.SnapshotV1alpha1Client
+	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		return sclient, err
+	}
+
+	sclient, err = snapClient.NewForConfig(kubeConfig)
+	if err != nil {
+		return sclient, err
+	}
+
+	return sclient, nil
 }
 
 func generateSnapshot(snapshotName, namespace, snapshotClassName, pvcName string) *v1alpha1.VolumeSnapshot {
