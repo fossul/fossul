@@ -13,7 +13,9 @@ limitations under the License.
 package main
 
 import (
+	"fossul/src/client/k8s"
 	"fossul/src/engine/util"
+	"fossul/src/plugins/pluginUtil"
 )
 
 func (s storagePlugin) Restore(config util.Config) util.Result {
@@ -21,10 +23,89 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
-	msg := util.SetMessage("INFO", "Not implemented")
+	msg := util.SetMessage("INFO", "Performing CSI snapshot restore")
 	messages = append(messages, msg)
 
-	result = util.SetResult(resultCode, messages)
+	podName, err := k8s.GetPodByName(config.StoragePluginParameters["CephStorageNamespace"], config.StoragePluginParameters["CephToolsPodName"], config.AccessWithinCluster)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
 
+		result = util.SetResult(1, messages)
+		return result
+	}
+
+	snapshots, err := k8s.ListSnapshots(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+
+		return result
+	}
+
+	var snapshotList []string
+	for _, snapshot := range snapshots.Items {
+		snapshotList = append(snapshotList, snapshot.Name)
+	}
+
+	restoreSnapshot := util.GetRestoreSnapshot(config, snapshotList)
+
+	pvName, err := k8s.GetPersistentVolumeName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PvcName"], config.AccessWithinCluster)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+
+		result = util.SetResult(1, messages)
+		return result
+	}
+
+	pv, err := k8s.GetPersistentVolume(pvName, config.AccessWithinCluster)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+
+		result = util.SetResult(1, messages)
+		return result
+	}
+
+	cephVolumeHandle := pv.Spec.CSI.VolumeHandle
+	cephVolumeName := pluginUtil.CephVolumeName(cephVolumeHandle)
+
+	snapshot, err := k8s.GetSnapshot(restoreSnapshot, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+
+		result = util.SetResult(1, messages)
+		return result
+	}
+
+	cephSnapshotHandle, err := k8s.GetSnapshotHandle(snapshot.Spec.SnapshotContentName, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+
+		result = util.SetResult(1, messages)
+		return result
+	}
+
+	cephSnapshotName := pluginUtil.CephSnapshotName(cephSnapshotHandle)
+
+	var snapshotRestore []string
+	snapshotRestore = append(snapshotRestore, "rbd")
+	snapshotRestore = append(snapshotRestore, "snap")
+	snapshotRestore = append(snapshotRestore, "rollback")
+	snapshotRestore = append(snapshotRestore, "ocs-storagecluster-cephblockpool/"+cephVolumeName+"@"+cephSnapshotName)
+
+	snapshotRestoreResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["CephToolsContainerName"], config.StoragePluginParameters["CephStorageNamespace"], config.AccessWithinCluster, snapshotRestore...)
+	if snapshotRestoreResult.Code != 0 {
+		messages = util.PrependMessages(messages, snapshotRestoreResult.Messages)
+		result = util.SetResult(1, messages)
+	} else {
+		messages = util.PrependMessages(messages, snapshotRestoreResult.Messages)
+	}
+
+	result = util.SetResult(resultCode, messages)
 	return result
 }

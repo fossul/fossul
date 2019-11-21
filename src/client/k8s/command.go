@@ -40,7 +40,7 @@ func ExecuteCommand(podName, containerName, namespace, accessWithinCluster strin
 		return result
 	}
 
-	s0 := fmt.Sprintf("Executing command [%s %s] on pod [%s] container [%s]", baseCmd, strings.Join(cmdArgs, " "), podName, containerName)
+	s0 := fmt.Sprintf("Executing command [%s %s] in namespace [%s] on pod [%s] container [%s]", baseCmd, strings.Join(cmdArgs, " "), namespace, podName, containerName)
 	message := util.SetMessage("CMD", s0)
 	messages = append(messages, message)
 
@@ -126,7 +126,7 @@ func ExecuteCommandWithStdout(podName, containerName, namespace, accessWithinClu
 		return result, ""
 	}
 
-	s0 := fmt.Sprintf("Executing command [%s %s] on pod [%s] container [%s]", baseCmd, strings.Join(cmdArgs, " "), podName, containerName)
+	s0 := fmt.Sprintf("Executing command [%s %s] in namespace [%s] on pod [%s] container [%s]", baseCmd, strings.Join(cmdArgs, " "), namespace, podName, containerName)
 	message := util.SetMessage("CMD", s0)
 	messages = append(messages, message)
 

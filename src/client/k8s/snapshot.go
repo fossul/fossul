@@ -88,6 +88,40 @@ func DeleteSnapshot(name, namespace, accessWithinCluster string) error {
 	return nil
 }
 
+func GetSnapshot(name, namespace, accessWithinCluster string) (*v1alpha1.VolumeSnapshot, error) {
+	var snapshot *v1alpha1.VolumeSnapshot
+
+	sclient, err := getSnapshotClient(accessWithinCluster)
+	if err != nil {
+		return snapshot, err
+	}
+
+	snapshot, err = sclient.VolumeSnapshots(namespace).Get(name, metav1.GetOptions{})
+	if err != nil {
+		return snapshot, err
+	}
+
+	return snapshot, nil
+}
+
+func GetSnapshotHandle(contentName, namespace, accessWithinCluster string) (string, error) {
+	var snapshotHandle string
+
+	sclient, err := getSnapshotClient(accessWithinCluster)
+	if err != nil {
+		return snapshotHandle, err
+	}
+
+	snapshotContent, err := sclient.VolumeSnapshotContents().Get(contentName, metav1.GetOptions{})
+	if err != nil {
+		return snapshotHandle, err
+	}
+
+	snapshotHandle = snapshotContent.Spec.CSI.SnapshotHandle
+
+	return snapshotHandle, nil
+}
+
 func getSnapshotClient(accessWithinCluster string) (*snapClient.SnapshotV1alpha1Client, error) {
 	var sclient *snapClient.SnapshotV1alpha1Client
 	err, kubeConfig := getKubeConfig(accessWithinCluster)

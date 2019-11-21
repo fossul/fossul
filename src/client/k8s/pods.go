@@ -15,6 +15,7 @@ package k8s
 import (
 	//	"k8s.io/apimachinery/pkg/api/errors"
 	"fmt"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"strings"
@@ -136,7 +137,7 @@ func GetPersistentVolumeName(namespace, pvcName, accessWithinCluster string) (st
 	return pvc.Spec.VolumeName, nil
 }
 
-func GetGlusterPersistentVolumePath(pvName, accessWithinCluster string) (string, error) {
+func GetGlusterVolumePath(pvName, accessWithinCluster string) (string, error) {
 	err, kubeConfig := getKubeConfig(accessWithinCluster)
 	if err != nil {
 		return "", err
@@ -154,4 +155,26 @@ func GetGlusterPersistentVolumePath(pvName, accessWithinCluster string) (string,
 	}
 
 	return pv.Spec.Glusterfs.Path, nil
+}
+
+func GetPersistentVolume(pvName, accessWithinCluster string) (*v1.PersistentVolume, error) {
+	var pv *v1.PersistentVolume
+
+	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		return pv, err
+	}
+
+	// create the clientset
+	clientset, err := kubernetes.NewForConfig(kubeConfig)
+	if err != nil {
+		return pv, err
+	}
+
+	pv, err = clientset.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
+	if err != nil {
+		return pv, err
+	}
+
+	return pv, nil
 }

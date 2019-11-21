@@ -15,8 +15,8 @@ package main
 import (
 	"fmt"
 	"fossul/src/client/k8s"
-	"fossul/src/plugins/pluginUtil"
 	"fossul/src/engine/util"
+	"fossul/src/plugins/pluginUtil"
 )
 
 func (s storagePlugin) Mount(config util.Config) util.Result {
@@ -57,7 +57,7 @@ func (s storagePlugin) Mount(config util.Config) util.Result {
 		return result
 	}
 
-	glusterVolume, err := k8s.GetGlusterPersistentVolumePath(pvName, config.AccessWithinCluster)
+	glusterVolume, err := k8s.GetGlusterVolumePath(pvName, config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)

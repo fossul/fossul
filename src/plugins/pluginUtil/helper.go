@@ -14,6 +14,7 @@ package pluginUtil
 
 import (
 	"errors"
+	"fmt"
 	"fossul/src/engine/util"
 	"io/ioutil"
 	"os"
@@ -215,4 +216,28 @@ func ReverseArchiveList(archives []util.Archive) chan util.Archive {
 		close(ret)
 	}()
 	return ret
+}
+
+func CephVolumeName(volumeHandle string) string {
+	re := regexp.MustCompile(`\d+-\d+-openshift-storage-\d+-(\S+)$`)
+	match := re.FindStringSubmatch(volumeHandle)
+
+	csiPath := match[1]
+
+	volumeName := "csi-vol-" + csiPath
+	fmt.Println("HERE456 ", volumeName)
+
+	return volumeName
+}
+
+func CephSnapshotName(snapshotHandle string) string {
+	re := regexp.MustCompile(`\d+-\d+-openshift-storage-\d+-(\S+)$`)
+	match := re.FindStringSubmatch(snapshotHandle)
+
+	csiPath := match[1]
+
+	snapshotName := "csi-snap-" + csiPath
+	fmt.Println("HERE789 ", snapshotName)
+
+	return snapshotName
 }
