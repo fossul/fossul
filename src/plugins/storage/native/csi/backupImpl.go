@@ -22,10 +22,28 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0
-	
-	//snap.Namespace = f.UniqueName
-	//snap.Spec.Source.Name = pvc.Name
-	//snap.Spec.Source.Kind = "PersistentVolumeClaim"
 
+	timestampToString := fmt.Sprintf("%d", config.WorkflowTimestamp)
+	//backupName := util.GetBackupName(config.StoragePluginParameters["PvcName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
+	backupName := fmt.Sprintf(config.StoragePluginParameters["PvcName"] + "-" + config.SelectedBackupPolicy + "-" + config.WorkflowId + "-" + timestampToString)
+	timeout := util.StringToInt(config.StoragePluginParameters["SnapshotTimeoutSeconds"])
+
+	msg := util.SetMessage("INFO", "Creating CSI snapshot ["+backupName+"] of pvc ["+config.StoragePluginParameters["PvcName"]+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+config.StoragePluginParameters["SnapshotClass"]+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
+	messages = append(messages, msg)
+
+	err := k8s.CreateSnapshot(backupName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["SnapshotClass"], config.StoragePluginParameters["PvcName"], config.AccessWithinCluster, timeout)
+
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+
+		result = util.SetResult(1, messages)
+		return result
+	}
+
+	msg = util.SetMessage("INFO", "CSI snapshot created successfully")
+	messages = append(messages, msg)
+
+	result = util.SetResult(resultCode, messages)
 	return result
-}	
+}

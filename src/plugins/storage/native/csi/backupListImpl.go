@@ -21,5 +21,12 @@ func (s storagePlugin) BackupList(config util.Config) util.Backups {
 	var result util.Result
 	var messages []util.Message
 
+	msg := util.SetMessage("INFO", "Not implemented")
+	messages = append(messages, msg)
+
+	result = util.SetResult(0, messages)
+
+	backups.Result = result
+
 	return backups
-}	
+}

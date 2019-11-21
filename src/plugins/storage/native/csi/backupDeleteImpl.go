@@ -21,5 +21,10 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
+	msg := util.SetMessage("INFO", "Not implemented")
+	messages = append(messages, msg)
+
+	result = util.SetResult(resultCode, messages)
+
 	return result
-}	
+}

@@ -16,7 +16,7 @@ import (
 	"fossul/src/engine/util"
 )
 
-func (s storagePlugin) Restore(config util.Config) util.Result {
+func (s storagePlugin) Mount(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0

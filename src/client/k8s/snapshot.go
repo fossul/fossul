@@ -14,17 +14,17 @@ package k8s
 
 import (
 	"fmt"
-	"k8s.io/apimachinery/pkg/util/wait"
-	"time"
 	"github.com/kubernetes-csi/external-snapshotter/pkg/apis/volumesnapshot/v1alpha1"
 	snapClient "github.com/kubernetes-csi/external-snapshotter/pkg/client/clientset/versioned/typed/volumesnapshot/v1alpha1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"time"
 )
 
 var poll = 2 * time.Second
 
-func createSnapshot(snapshotName, namespace, snapshotClassName, pvcName string, t int, accessWithinCluster string) error {
+func CreateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessWithinCluster string, t int) error {
 
 	err, kubeConfig := getKubeConfig(accessWithinCluster)
 	if err != nil {
@@ -42,19 +42,19 @@ func createSnapshot(snapshotName, namespace, snapshotClassName, pvcName string, 
 	if err != nil {
 		return err
 	}
-	
-	fmt.Printf("snapshot with name %v created in %v namespace", snap.Name, snap.Namespace)
 
-	timeout := time.Duration(t) * time.Minute
+	fmt.Printf("snapshot with name %v created in %v namespace\n", snap.Name, snap.Namespace)
+
+	timeout := time.Duration(t) * time.Second
 	name := snap.Name
 	start := time.Now()
-	fmt.Printf("Waiting up to %v to be in Ready state", snap)
+	fmt.Printf("Waiting up to %v to be in Ready state\n", snap)
 
 	return wait.PollImmediate(poll, timeout, func() (bool, error) {
-		fmt.Printf("waiting for snapshot %s (%d seconds elapsed)", snap.Name, int(time.Since(start).Seconds()))
+		fmt.Printf("waiting for snapshot %s (%d seconds elapsed)\n", snap.Name, int(time.Since(start).Seconds()))
 		snaps, err := sclient.VolumeSnapshots(snap.Namespace).Get(name, metav1.GetOptions{})
 		if err != nil {
-			fmt.Printf("Error getting snapshot in namespace: '%s': %v", snap.Namespace, err)
+			fmt.Printf("Error getting snapshot in namespace: '%s': %v\n", snap.Namespace, err)
 			return false, err
 		}
 		if snaps.Status.ReadyToUse {
@@ -65,19 +65,19 @@ func createSnapshot(snapshotName, namespace, snapshotClassName, pvcName string, 
 }
 
 func generateSnapshot(snapshotName, namespace, snapshotClassName, pvcName string) *v1alpha1.VolumeSnapshot {
-    snapshot := v1alpha1.VolumeSnapshot{
-        ObjectMeta: metav1.ObjectMeta{
-            Name:      snapshotName,
-            Namespace: namespace,
-        },
-        Spec: v1alpha1.VolumeSnapshotSpec{
-            VolumeSnapshotClassName: &snapshotClassName,
-            Source: &v1.TypedLocalObjectReference{
-                Name: pvcName,
-                Kind: "PersistentVolumeClaim",
-            },
-        },
-    }
+	snapshot := v1alpha1.VolumeSnapshot{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      snapshotName,
+			Namespace: namespace,
+		},
+		Spec: v1alpha1.VolumeSnapshotSpec{
+			VolumeSnapshotClassName: &snapshotClassName,
+			Source: &v1.TypedLocalObjectReference{
+				Name: pvcName,
+				Kind: "PersistentVolumeClaim",
+			},
+		},
+	}
 
-    return &snapshot
+	return &snapshot
 }

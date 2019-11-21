@@ -42,6 +42,8 @@ go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/archive/aws.so fossul/src
 if [ $? != 0 ]; then exit 1; fi
 go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/ocs-gluster.so fossul/src/plugins/storage/native/ocs-gluster
 if [ $? != 0 ]; then exit 1; fi
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/csi.so fossul/src/plugins/storage/native/csi
+if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Storage Service"
 go install fossul/src/engine/storage
