@@ -58,14 +58,14 @@ func GetBackupPathFromConfig(config Config) string {
 }
 
 func GetBackupName(name, policy, workflowId, timestamp string) string {
-	backupName := fmt.Sprintf(name + "_" + policy + "_" + workflowId + "_" + timestamp)
+	backupName := fmt.Sprintf(name + "-" + policy + "-" + workflowId + "-" + timestamp)
 
 	return backupName
 }
 
 func GetRestoreSrcPath(config Config) (string, error) {
 	backupPath := config.StoragePluginParameters["BackupDestPath"] + "/" + config.ProfileName + "/" + config.ConfigName
-	backupNameSubString := config.StoragePluginParameters["BackupName"] + "_" + config.SelectedBackupPolicy + "_" + IntToString(config.SelectedWorkflowId)
+	backupNameSubString := config.StoragePluginParameters["BackupName"] + "-" + config.SelectedBackupPolicy + "-" + IntToString(config.SelectedWorkflowId)
 
 	fmt.Println("[DEBUG] restore path [" + backupPath + "] search string [" + backupNameSubString + "]")
 	files, err := ioutil.ReadDir(backupPath)
@@ -81,7 +81,7 @@ func GetRestoreSrcPath(config Config) (string, error) {
 }
 
 func GetRestoreSnapshot(config Config, snapshots []string) string {
-	snapshotNameSubString := config.StoragePluginParameters["BackupName"] + "_" + config.SelectedBackupPolicy + "_" + IntToString(config.SelectedWorkflowId)
+	snapshotNameSubString := config.StoragePluginParameters["BackupName"] + "-" + config.SelectedBackupPolicy + "-" + IntToString(config.SelectedWorkflowId)
 
 	fmt.Println("[DEBUG] snapshot search string [" + snapshotNameSubString + "]")
 
@@ -95,7 +95,7 @@ func GetRestoreSnapshot(config Config, snapshots []string) string {
 
 func GetRestoreSrcPathFromMap(configMap map[string]string) (string, error) {
 	backupPath := configMap["BackupDestPath"] + "/" + configMap["ProfileName"] + "/" + configMap["ConfigName"]
-	backupNameSubString := configMap["BackupName"] + "_" + configMap["BackupPolicy"] + "_" + configMap["SelectedWorkflowId"]
+	backupNameSubString := configMap["BackupName"] + "-" + configMap["BackupPolicy"] + "-" + configMap["SelectedWorkflowId"]
 
 	fmt.Println("[DEBUG] restore path [" + backupPath + "] search string [" + backupNameSubString + "]")
 	files, err := ioutil.ReadDir(backupPath)

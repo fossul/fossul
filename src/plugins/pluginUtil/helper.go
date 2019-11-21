@@ -59,7 +59,7 @@ func ListBackups(path string) ([]util.Backup, error) {
 	var backups []util.Backup
 	type timeSlice []util.Backup
 
-	re := regexp.MustCompile(`(\S+)_(\S+)_(\S+)_(\S+)`)
+	re := regexp.MustCompile(`(\S+)-(\S+)-(\S+)-(\S+)`)
 	for _, f := range files {
 		var backup util.Backup
 		match := re.FindStringSubmatch(f.Name())
@@ -89,7 +89,7 @@ func ListSnapshots(snapshots []string, backupName string) ([]util.Backup, error)
 	var backups []util.Backup
 	type timeSlice []util.Backup
 
-	re := regexp.MustCompile(`(\S+)_(\S+)_(\S+)_(\S+)`)
+	re := regexp.MustCompile(`(\S+)-(\S+)-(\S+)-(\S+)`)
 	for _, snapshot := range snapshots {
 		var backup util.Backup
 		match := re.FindStringSubmatch(snapshot)
@@ -121,7 +121,7 @@ func ListArchives(dirs []string) ([]util.Archive, error) {
 	var archives []util.Archive
 	type timeSlice []util.Archive
 
-	re := regexp.MustCompile(`(\S+)_(\S+)_(\S+)_(\S+)`)
+	re := regexp.MustCompile(`(\S+)-(\S+)-(\S+)-(\S+)`)
 	for _, dir := range dirs {
 		var isUnique bool = true
 		var archive util.Archive

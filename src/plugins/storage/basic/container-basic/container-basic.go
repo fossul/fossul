@@ -192,7 +192,7 @@ func backupDelete(configMap map[string]string) {
 				fmt.Println(msg)
 				backupCount = backupCount - 1
 
-				backupName := backup.Name + "_" + backup.Policy + "_" + backup.WorkflowId + "_" + util.IntToString(backup.Epoch)
+				backupName := backup.Name + "-" + backup.Policy + "-" + backup.WorkflowId + "-" + util.IntToString(backup.Epoch)
 				fmt.Println("INFO Deleting backup " + backupName)
 				backupPath := backupDir + "/" + backupName
 				err := pluginUtil.RecursiveDirDelete(backupPath)

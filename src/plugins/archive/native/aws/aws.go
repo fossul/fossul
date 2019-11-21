@@ -14,8 +14,8 @@ package main
 
 import (
 	"fmt"
-	"fossul/src/plugins/pluginUtil"
 	"fossul/src/engine/util"
+	"fossul/src/plugins/pluginUtil"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -141,7 +141,7 @@ func (r archivePlugin) ArchiveDelete(config util.Config) util.Result {
 				messages = append(messages, msg)
 				archiveCount = archiveCount - 1
 
-				archiveName := archive.Name + "_" + archive.Policy + "_" + archive.WorkflowId + "_" + util.IntToString(archive.Epoch)
+				archiveName := archive.Name + "-" + archive.Policy + "-" + archive.WorkflowId + "-" + util.IntToString(archive.Epoch)
 				msg = util.SetMessage("INFO", "Deleting archive "+archiveName)
 				messages = append(messages, msg)
 

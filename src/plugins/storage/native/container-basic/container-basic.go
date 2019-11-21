@@ -196,7 +196,7 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 				messages = append(messages, msg)
 				backupCount = backupCount - 1
 
-				backupName := backup.Name + "_" + backup.Policy + "_" + backup.WorkflowId + "_" + util.IntToString(backup.Epoch)
+				backupName := backup.Name + "-" + backup.Policy + "-" + backup.WorkflowId + "-" + util.IntToString(backup.Epoch)
 				msg = util.SetMessage("INFO", "Deleting backup "+backupName)
 				messages = append(messages, msg)
 
