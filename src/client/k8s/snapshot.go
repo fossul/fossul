@@ -71,9 +71,6 @@ func ListSnapshots(namespace, accessWithinCluster string) (*v1alpha1.VolumeSnaps
 		return snapshots, err
 	}
 
-	//for _,snapshot := range snapshots.Items {
-	//}
-
 	return snapshots, nil
 }
 

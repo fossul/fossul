@@ -13,7 +13,9 @@ limitations under the License.
 package main
 
 import (
+	"fossul/src/client/k8s"
 	"fossul/src/engine/util"
+	"fossul/src/plugins/pluginUtil"
 )
 
 func (s storagePlugin) BackupList(config util.Config) util.Backups {
@@ -21,12 +23,34 @@ func (s storagePlugin) BackupList(config util.Config) util.Backups {
 	var result util.Result
 	var messages []util.Message
 
-	msg := util.SetMessage("INFO", "Not implemented")
-	messages = append(messages, msg)
+	snapshots, err := k8s.ListSnapshots(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+		backups.Result = result
+
+		return backups
+	}
+
+	var snapshotList []string
+	for _, snapshot := range snapshots.Items {
+		snapshotList = append(snapshotList, snapshot.Name)
+	}
+
+	backupList, err := pluginUtil.ListSnapshots(snapshotList, config.StoragePluginParameters["PvcName"])
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+		backups.Result = result
+
+		return backups
+	}
 
 	result = util.SetResult(0, messages)
-
 	backups.Result = result
+	backups.Backups = backupList
 
 	return backups
 }

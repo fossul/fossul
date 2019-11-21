@@ -13,7 +13,10 @@ limitations under the License.
 package main
 
 import (
+	"fmt"
+	"fossul/src/client/k8s"
 	"fossul/src/engine/util"
+	"fossul/src/plugins/pluginUtil"
 )
 
 func (s storagePlugin) BackupDelete(config util.Config) util.Result {
@@ -21,10 +24,63 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
-	msg := util.SetMessage("INFO", "Not implemented")
-	messages = append(messages, msg)
+	snapshots, err := k8s.ListSnapshots(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+
+		return result
+	}
+
+	var snapshotList []string
+	for _, snapshot := range snapshots.Items {
+		snapshotList = append(snapshotList, snapshot.Name)
+	}
+
+	backups, err := pluginUtil.ListSnapshots(snapshotList, config.StoragePluginParameters["PvcName"])
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+
+		return result
+	}
+
+	backupsByPolicy := util.GetBackupsByPolicy(config.SelectedBackupPolicy, backups)
+	backupCount := len(backupsByPolicy)
+
+	if backupCount > config.SelectedBackupRetention {
+		count := 1
+		for backup := range pluginUtil.ReverseBackupList(backupsByPolicy) {
+			if count > config.SelectedBackupRetention {
+				msg := util.SetMessage("INFO", fmt.Sprintf("Number of backups [%d] greater than backup retention [%d]", backupCount, config.SelectedBackupRetention))
+				messages = append(messages, msg)
+				backupCount = backupCount - 1
+
+				backupName := backup.Name + "-" + backup.Policy + "-" + backup.WorkflowId + "-" + util.IntToString(backup.Epoch)
+				msg = util.SetMessage("INFO", "Deleting backup "+backupName)
+				messages = append(messages, msg)
+
+				err := k8s.DeleteSnapshot(backupName, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster)
+				if err != nil {
+					msg := util.SetMessage("ERROR", err.Error())
+					messages = append(messages, msg)
+					result = util.SetResult(1, messages)
+
+					return result
+				}
+
+				msg = util.SetMessage("INFO", "Backup "+backupName+" deleted successfully")
+				messages = append(messages, msg)
+			}
+			count = count + 1
+		}
+	} else {
+		msg := util.SetMessage("INFO", fmt.Sprintf("Backup deletion skipped, there are [%d] backups but backup retention is [%d]", backupCount, config.SelectedBackupRetention))
+		messages = append(messages, msg)
+	}
 
 	result = util.SetResult(resultCode, messages)
-
 	return result
 }
