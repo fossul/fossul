@@ -272,6 +272,8 @@ objects:
           volumeMounts:
           - mountPath: /app/metadata
             name: "${APPLICATION_NAME}-server-data"          
+        securityContext:
+          fsGroup: 1001
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         volumes:
@@ -332,6 +334,8 @@ objects:
           ports:
           -containerPort: 8080
         dnsPolicy: ClusterFirst
+        securityContext:
+          fsGroup: 1001
         restartPolicy: Always
     triggers:
     - imageChangeParams:
@@ -399,6 +403,8 @@ objects:
           volumeMounts:
           - mountPath: /app/backups
             name: "${APPLICATION_NAME}-storage-data"                    
+        securityContext:
+          fsGroup: 1001
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         volumes:

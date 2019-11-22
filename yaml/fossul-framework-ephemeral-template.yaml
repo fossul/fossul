@@ -251,6 +251,8 @@ objects:
           -containerPort: 8080        
         dnsPolicy: ClusterFirst
         restartPolicy: Always 
+        securityContext:
+          fsGroup: 1001
     triggers:
     - imageChangeParams:
         automatic: true
@@ -306,6 +308,8 @@ objects:
           -containerPort: 8080
         dnsPolicy: ClusterFirst
         restartPolicy: Always
+        securityContext:
+          fsGroup: 1001
     triggers:
     - imageChangeParams:
         automatic: true
@@ -371,6 +375,8 @@ objects:
           -containerPort: 8080                 
         dnsPolicy: ClusterFirst
         restartPolicy: Always
+        securityContext:
+          fsGroup: 1001
     triggers:
     - imageChangeParams:
         automatic: true
