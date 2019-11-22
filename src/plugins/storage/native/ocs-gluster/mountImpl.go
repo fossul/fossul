@@ -14,9 +14,9 @@ package main
 
 import (
 	"fmt"
-	"fossul/src/client/k8s"
-	"fossul/src/engine/util"
-	"fossul/src/plugins/pluginUtil"
+	"github.com/fossul/fossul/src/client/k8s"
+	"github.com/fossul/fossul/src/engine/util"
+	"github.com/fossul/fossul/src/plugins/pluginUtil"
 )
 
 func (s storagePlugin) Mount(config util.Config) util.Result {

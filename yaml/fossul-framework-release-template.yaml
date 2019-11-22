@@ -119,9 +119,6 @@ objects:
     strategy:
       dockerStrategy:
         dockerfilePath: src/engine/server/Dockerfile-release
-        from:
-          kind: ImageStreamTag
-          name: fedora:latest
       type: Docker
     triggers:
     - github:
@@ -159,9 +156,6 @@ objects:
     strategy:
       dockerStrategy:
         dockerfilePath: src/engine/app/Dockerfile-release
-        from:
-          kind: ImageStreamTag
-          name: fedora:latest
       type: Docker
     triggers:
     - github:
@@ -199,9 +193,6 @@ objects:
     strategy:
       dockerStrategy:
         dockerfilePath: src/engine/storage/Dockerfile-release
-        from:
-          kind: ImageStreamTag
-          name: fedora:latest
       type: Docker
     triggers:
     - github:
@@ -287,8 +278,6 @@ objects:
         - name: "${APPLICATION_NAME}-server-data" 
           persistentVolumeClaim:
             claimName: "${APPLICATION_NAME}-server-data"   
-        securityContext:
-          fsGroup: 1001                                 
     triggers:
     - imageChangeParams:
         automatic: true
@@ -344,8 +333,6 @@ objects:
           -containerPort: 8080
         dnsPolicy: ClusterFirst
         restartPolicy: Always
-        securityContext:
-          fsGroup: 1001        
     triggers:
     - imageChangeParams:
         automatic: true
@@ -418,8 +405,6 @@ objects:
         - name: "${APPLICATION_NAME}-storage-data" 
           persistentVolumeClaim:
             claimName: "${APPLICATION_NAME}-storage-data"
-        securityContext:
-          fsGroup: 1001           
     triggers:
     - imageChangeParams:
         automatic: true
@@ -495,72 +480,6 @@ objects:
         type: ""
   status:
     dockerImageRepository: ""        
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
-    annotations:
-    generation: 2
-    labels:
-      app: "${APPLICATION_NAME}-server"
-    name: fedora
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-    - annotations:
-        openshift.io/imported-from: fedora:latest
-      from:
-        kind: DockerImage
-        name: fedora:latest
-      generation: 2
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: Source
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
-    annotations:
-    generation: 2
-    labels:
-      app: "${APPLICATION_NAME}-app"
-    name: fedora
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-    - annotations:
-        openshift.io/imported-from: fedora:latest
-      from:
-        kind: DockerImage
-        name: fedora:latest
-      generation: 2
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: Source
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
-    annotations:
-    generation: 2
-    labels:
-      app: "${APPLICATION_NAME}-storage"
-    name: fedora
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-    - annotations:
-        openshift.io/imported-from: fedora:latest
-      from:
-        kind: DockerImage
-        name: fedora:latest
-      generation: 2
-      importPolicy: {}
-      name: latest
-      referencePolicy:
-        type: Source                
 parameters:
   - name: APPLICATION_NAME
     displayName: Application Name

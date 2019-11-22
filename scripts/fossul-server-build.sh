@@ -10,27 +10,27 @@ echo "Installing Dependencies"
 $GOBIN/dep ensure
 
 echo "Running Unit Tests"
-go test fossul/src/engine/util
+go test github.com/fossul/fossul/src/engine/util
 if [ $? != 0 ]; then exit 1; fi
-go test fossul/src/plugins/pluginUtil
+go test github.com/fossul/fossul/src/plugins/pluginUtil
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Shared Libraries"
-go build fossul/src/engine/util
+go build github.com/fossul/fossul/src/engine/util
 if [ $? != 0 ]; then exit 1; fi
-go build fossul/src/client
+go build github.com/fossul/fossul/src/client
 if [ $? != 0 ]; then exit 1; fi
-go build fossul/src/client/k8s
+go build github.com/fossul/fossul/src/client/k8s
 if [ $? != 0 ]; then exit 1; fi
-go build fossul/src/plugins/pluginUtil
+go build github.com/fossul/fossul/src/plugins/pluginUtil
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Server Service"
-go install fossul/src/engine/server
+go install github.com/fossul/fossul/src/engine/server
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying startup script"
-cp $GOPATH/src/fossul/scripts/fossul-server-startup.sh $GOBIN
+cp $GOPATH/src/github.com/fossul/fossul/scripts/fossul-server-startup.sh $GOBIN
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Server build completed successfully"

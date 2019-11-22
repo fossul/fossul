@@ -14,8 +14,8 @@ package main
 
 import (
 	"fmt"
-	"fossul/src/engine/util"
-	"fossul/src/plugins/pluginUtil"
+	"github.com/fossul/fossul/src/engine/util"
+	"github.com/fossul/fossul/src/plugins/pluginUtil"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"

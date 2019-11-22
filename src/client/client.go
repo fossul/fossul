@@ -16,7 +16,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fossul/src/engine/util"
+	"github.com/fossul/fossul/src/engine/util"
 	"log"
 	"net/http"
 )

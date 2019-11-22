@@ -15,7 +15,7 @@ package k8s
 import (
 	"bytes"
 	"fmt"
-	"fossul/src/engine/util"
+	"github.com/fossul/fossul/src/engine/util"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"

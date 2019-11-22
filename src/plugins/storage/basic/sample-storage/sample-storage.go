@@ -15,7 +15,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"fossul/src/engine/util"
+	"github.com/fossul/fossul/src/engine/util"
 	"github.com/pborman/getopt/v2"
 	"os"
 )

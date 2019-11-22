@@ -13,7 +13,7 @@ limitations under the License.
 package main
 
 import (
-	"fossul/src/engine/util"
+	"github.com/fossul/fossul/src/engine/util"
 )
 
 func (s storagePlugin) Unmount(config util.Config) util.Result {

@@ -14,8 +14,8 @@ package main
 
 import (
 	"context"
-	_ "fossul/src/engine/server/docs"
-	"fossul/src/engine/util"
+	_ "github.com/fossul/fossul/src/engine/server/docs"
+	"github.com/fossul/fossul/src/engine/util"
 	"github.com/swaggo/http-swagger"
 	"log"
 	"net/http"

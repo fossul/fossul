@@ -10,43 +10,43 @@ echo "Installing Dependencies"
 $GOBIN/dep ensure
 
 echo "Running Unit Tests"
-go test fossul/src/engine/util
+go test github.com/fossul/fossul/src/engine/util
 if [ $? != 0 ]; then exit 1; fi
-go test fossul/src/plugins/pluginUtil
+go test github.com/fossul/fossul/src/plugins/pluginUtil
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Shared Libraries"
-go build fossul/src/engine/util
+go build github.com/fossul/fossul/src/engine/util
 if [ $? != 0 ]; then exit 1; fi
-go build fossul/src/client
+go build github.com/fossul/fossul/src/client
 if [ $? != 0 ]; then exit 1; fi
-go build fossul/src/client/k8s
+go build github.com/fossul/fossul/src/client/k8s
 if [ $? != 0 ]; then exit 1; fi
-go build fossul/src/plugins/pluginUtil
+go build github.com/fossul/fossul/src/plugins/pluginUtil
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Plugins"
-go install fossul/src/plugins/storage/basic/sample-storage
+go install github.com/fossul/fossul/src/plugins/storage/basic/sample-storage
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/sample-storage.so fossul/src/plugins/storage/native/sample-storage
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/sample-storage.so github.com/fossul/fossul/src/plugins/storage/native/sample-storage
 if [ $? != 0 ]; then exit 1; fi
-go install fossul/src/plugins/archive/basic/sample-archive
+go install github.com/fossul/fossul/src/plugins/archive/basic/sample-archive
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/archive/sample-archive.so fossul/src/plugins/archive/native/sample-archive
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/archive/sample-archive.so github.com/fossul/fossul/src/plugins/archive/native/sample-archive
 if [ $? != 0 ]; then exit 1; fi
-go install fossul/src/plugins/storage/basic/container-basic
+go install github.com/fossul/fossul/src/plugins/storage/basic/container-basic
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/container-basic.so fossul/src/plugins/storage/native/container-basic
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/container-basic.so github.com/fossul/fossul/src/plugins/storage/native/container-basic
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/archive/aws.so fossul/src/plugins/archive/native/aws
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/archive/aws.so github.com/fossul/fossul/src/plugins/archive/native/aws
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/ocs-gluster.so fossul/src/plugins/storage/native/ocs-gluster
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/ocs-gluster.so github.com/fossul/fossul/src/plugins/storage/native/ocs-gluster
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/csi-ceph.so fossul/src/plugins/storage/native/csi-ceph
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/storage/csi-ceph.so github.com/fossul/fossul/src/plugins/storage/native/csi-ceph
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Storage Service"
-go install fossul/src/engine/storage
+go install github.com/fossul/fossul/src/engine/storage
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Moving plugins to $FOSSUL_BUILD_PLUGIN_DIR"
@@ -60,7 +60,7 @@ mv $GOBIN/container-basic $FOSSUL_BUILD_PLUGIN_DIR/storage
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying startup script"
-cp $GOPATH/src/fossul/scripts/fossul-storage-startup.sh $GOBIN
+cp $GOPATH/src/github.com/fossul/fossul/scripts/fossul-storage-startup.sh $GOBIN
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Storage build completed successfully"

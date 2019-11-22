@@ -14,7 +14,7 @@ package main
 
 import (
 	"encoding/json"
-	"fossul/src/engine/util"
+	"github.com/fossul/fossul/src/engine/util"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strings"

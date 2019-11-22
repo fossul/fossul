@@ -10,41 +10,41 @@ echo "Installing Dependencies"
 $GOBIN/dep ensure
 
 echo "Running Unit Tests"
-go test fossul/src/engine/util
+go test github.com/fossul/fossul/src/engine/util
 if [ $? != 0 ]; then exit 1; fi
-go test fossul/src/plugins/pluginUtil
+go test github.com/fossul/fossul/src/plugins/pluginUtil
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Shared Libraries"
-go build fossul/src/engine/util
+go build github.com/fossul/fossul/src/engine/util
 if [ $? != 0 ]; then exit 1; fi
-go build fossul/src/client
+go build github.com/fossul/fossul/src/client
 if [ $? != 0 ]; then exit 1; fi
-go build fossul/src/client/k8s
+go build github.com/fossul/fossul/src/client/k8s
 if [ $? != 0 ]; then exit 1; fi
-go build fossul/src/plugins/pluginUtil
+go build github.com/fossul/fossul/src/plugins/pluginUtil
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Plugins"
-go install fossul/src/plugins/app/basic/sample-app
+go install github.com/fossul/fossul/src/plugins/app/basic/sample-app
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/sample-app.so fossul/src/plugins/app/native/sample-app
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/sample-app.so github.com/fossul/fossul/src/plugins/app/native/sample-app
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/mariadb.so fossul/src/plugins/app/native/mariadb
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/mariadb.so github.com/fossul/fossul/src/plugins/app/native/mariadb
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/mariadb-dump.so fossul/src/plugins/app/native/mariadb-dump
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/mariadb-dump.so github.com/fossul/fossul/src/plugins/app/native/mariadb-dump
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/postgres.so fossul/src/plugins/app/native/postgres
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/postgres.so github.com/fossul/fossul/src/plugins/app/native/postgres
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/postgres-dump.so fossul/src/plugins/app/native/postgres-dump
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/postgres-dump.so github.com/fossul/fossul/src/plugins/app/native/postgres-dump
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/mongo.so fossul/src/plugins/app/native/mongo
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/mongo.so github.com/fossul/fossul/src/plugins/app/native/mongo
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/mongo-dump.so fossul/src/plugins/app/native/mongo-dump
+go build -buildmode=plugin -o $FOSSUL_BUILD_PLUGIN_DIR/app/mongo-dump.so github.com/fossul/fossul/src/plugins/app/native/mongo-dump
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building App Service"
-go install fossul/src/engine/app
+go install github.com/fossul/fossul/src/engine/app
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Moving plugins to $FOSSUL_BUILD_PLUGIN_DIR"
@@ -53,7 +53,7 @@ mv $GOBIN/sample-app $FOSSUL_BUILD_PLUGIN_DIR/app
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Copying startup script"
-cp $GOPATH/src/fossul/scripts/fossul-app-startup.sh $GOBIN
+cp $GOPATH/src/github.com/fossul/fossul/scripts/fossul-app-startup.sh $GOBIN
 if [ $? != 0 ]; then exit 1; fi
 
 echo "App build completed successfully"

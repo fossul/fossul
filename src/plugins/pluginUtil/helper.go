@@ -15,7 +15,7 @@ package pluginUtil
 import (
 	"errors"
 	"fmt"
-	"fossul/src/engine/util"
+	"github.com/fossul/fossul/src/engine/util"
 	"io/ioutil"
 	"os"
 	"path/filepath"

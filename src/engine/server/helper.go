@@ -13,8 +13,8 @@ limitations under the License.
 package main
 
 import (
-	"fossul/src/client"
-	"fossul/src/engine/util"
+	"github.com/fossul/fossul/src/client"
+	"github.com/fossul/fossul/src/engine/util"
 )
 
 func setComment(resultsDir, msg string, workflow *util.Workflow) {

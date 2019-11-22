@@ -14,8 +14,8 @@ package main
 
 import (
 	"fmt"
-	"fossul/src/client/k8s"
-	"fossul/src/engine/util"
+	"github.com/fossul/fossul/src/client/k8s"
+	"github.com/fossul/fossul/src/engine/util"
 	"strings"
 )
 

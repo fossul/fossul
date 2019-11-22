@@ -16,8 +16,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"fossul/src/client/k8s"
-	"fossul/src/engine/util"
+	"github.com/fossul/fossul/src/client/k8s"
+	"github.com/fossul/fossul/src/engine/util"
 	_ "github.com/lib/pq"
 )
 

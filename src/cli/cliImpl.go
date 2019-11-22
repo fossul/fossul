@@ -3,8 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	"fossul/src/client"
-	"fossul/src/engine/util"
+	"github.com/fossul/fossul/src/client"
+	"github.com/fossul/fossul/src/engine/util"
 	"os"
 	"text/tabwriter"
 	"time"
