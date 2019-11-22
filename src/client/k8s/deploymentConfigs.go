@@ -14,9 +14,12 @@ limitations under the License.
 package k8s
 
 import (
+	"fmt"
 	apps "github.com/openshift/api/apps/v1"
 	appsclient "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"time"
 )
 
 func GetDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster string) (*apps.DeploymentConfig, error) {
@@ -48,7 +51,7 @@ func GetDeploymentConfigScaleInteger(namespace, deploymentConfigName, accessWith
 	return deploymentConfig.Spec.Replicas, nil
 }
 
-func ScaleDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster string, size int32) error {
+func ScaleDownDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster string, size int32) error {
 	err, kubeConfig := getKubeConfig(accessWithinCluster)
 	if err != nil {
 		return err
@@ -72,5 +75,72 @@ func ScaleDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster 
 		return err
 	}
 
-	return nil
+	var poll = 5 * time.Second
+	timeout := time.Duration(120) * time.Second
+	start := time.Now()
+
+	fmt.Printf("Waiting up to %v for deployment to be scaled to %d\n", timeout, size)
+
+	return wait.PollImmediate(poll, timeout, func() (bool, error) {
+		deploymentConfig, err := GetDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster)
+		if err != nil {
+			return false, nil
+		}
+
+		readyReplicas := deploymentConfig.Status.ReadyReplicas
+		numberReplicas := deploymentConfig.Status.Replicas
+
+		fmt.Printf("waiting for replicas to be scaled down [%d of %d] (%d seconds elapsed)\n", readyReplicas, numberReplicas, int(time.Since(start).Seconds()))
+
+		if readyReplicas == 0 {
+			return true, nil
+		}
+		return false, nil
+	})
+}
+
+func ScaleUpDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster string, size int32) error {
+	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	// create the clientset
+	clientset, err := appsclient.NewForConfig(kubeConfig)
+	if err != nil {
+		return err
+	}
+
+	deploymentConfig, err := GetDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	deploymentConfig.Spec.Replicas = size
+
+	_, err = clientset.DeploymentConfigs(namespace).Update(deploymentConfig)
+	if err != nil {
+		return err
+	}
+
+	var poll = 5 * time.Second
+	timeout := time.Duration(120) * time.Second
+	start := time.Now()
+
+	fmt.Printf("Waiting up to %v for deployment to be scaled to %d\n", timeout, size)
+
+	return wait.PollImmediate(poll, timeout, func() (bool, error) {
+		deploymentConfig, err := GetDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster)
+		if err != nil {
+			return false, nil
+		}
+
+		readyReplicas := deploymentConfig.Status.ReadyReplicas
+		fmt.Printf("waiting for replicas to be scaled up [%d of %d] (%d seconds elapsed)\n", readyReplicas, size, int(time.Since(start).Seconds()))
+
+		if readyReplicas == size {
+			return true, nil
+		}
+		return false, nil
+	})
 }

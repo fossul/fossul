@@ -182,7 +182,7 @@ func (a appPlugin) PreRestore(config util.Config) util.Result {
 
 		var err error
 		if config.ContainerPlatform == "openshift" {
-			err = k8s.ScaleDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 0)
+			err = k8s.ScaleDownDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 0)
 		} else {
 			err = k8s.ScaleDeployment(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 0)
 		}
@@ -211,7 +211,7 @@ func (a appPlugin) PostRestore(config util.Config) util.Result {
 
 		var err error
 		if config.ContainerPlatform == "openshift" {
-			err = k8s.ScaleDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 1)
+			err = k8s.ScaleUpDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 1)
 		} else {
 			err = k8s.ScaleDeployment(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 1)
 		}

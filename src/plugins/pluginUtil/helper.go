@@ -14,7 +14,6 @@ package pluginUtil
 
 import (
 	"errors"
-	"fmt"
 	"github.com/fossul/fossul/src/engine/util"
 	"io/ioutil"
 	"os"
@@ -223,9 +222,7 @@ func CephVolumeName(volumeHandle string) string {
 	match := re.FindStringSubmatch(volumeHandle)
 
 	csiPath := match[1]
-
 	volumeName := "csi-vol-" + csiPath
-	fmt.Println("HERE456 ", volumeName)
 
 	return volumeName
 }
@@ -235,9 +232,7 @@ func CephSnapshotName(snapshotHandle string) string {
 	match := re.FindStringSubmatch(snapshotHandle)
 
 	csiPath := match[1]
-
 	snapshotName := "csi-snap-" + csiPath
-	fmt.Println("HERE789 ", snapshotName)
 
 	return snapshotName
 }

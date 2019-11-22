@@ -22,8 +22,6 @@ import (
 	"time"
 )
 
-var poll = 2 * time.Second
-
 func CreateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessWithinCluster string, t int) error {
 
 	sclient, err := getSnapshotClient(accessWithinCluster)
@@ -40,10 +38,11 @@ func CreateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessW
 
 	fmt.Printf("snapshot with name %v created in %v namespace\n", snap.Name, snap.Namespace)
 
+	var poll = 2 * time.Second
 	timeout := time.Duration(t) * time.Second
 	name := snap.Name
 	start := time.Now()
-	fmt.Printf("Waiting up to %v to be in Ready state\n", snap)
+	fmt.Printf("Waiting up to %v seconds to be in Ready state\n", timeout)
 
 	return wait.PollImmediate(poll, timeout, func() (bool, error) {
 		fmt.Printf("waiting for snapshot %s (%d seconds elapsed)\n", snap.Name, int(time.Since(start).Seconds()))
