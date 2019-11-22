@@ -74,8 +74,8 @@ func GetPluginPath(pluginName string) string {
 		path = "./plugins/archive/aws.so"
 	case "ocs-gluster.so":
 		path = "./plugins/storage/ocs-gluster.so"
-	case "csi.so":
-		path = "./plugins/storage/csi.so"
+	case "csi-ceph.so":
+		path = "./plugins/storage/csi-ceph.so"
 	default:
 		fmt.Println("Native plugin [" + pluginName + "] does not exist, executing as basic plugin")
 		path = ""

@@ -73,7 +73,7 @@ go build -buildmode=plugin -o $PLUGIN_DIR/archive/aws.so fossul/src/plugins/arch
 if [ $? != 0 ]; then exit 1; fi
 go build -buildmode=plugin -o $PLUGIN_DIR/storage/ocs-gluster.so fossul/src/plugins/storage/native/ocs-gluster
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o $PLUGIN_DIR/storage/csi.so fossul/src/plugins/storage/native/csi
+go build -buildmode=plugin -o $PLUGIN_DIR/storage/csi-ceph.so fossul/src/plugins/storage/native/csi-ceph
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Services"

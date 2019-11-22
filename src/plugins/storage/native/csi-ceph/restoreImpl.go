@@ -96,7 +96,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	snapshotRestore = append(snapshotRestore, "rbd")
 	snapshotRestore = append(snapshotRestore, "snap")
 	snapshotRestore = append(snapshotRestore, "rollback")
-	snapshotRestore = append(snapshotRestore, "ocs-storagecluster-cephblockpool/"+cephVolumeName+"@"+cephSnapshotName)
+	snapshotRestore = append(snapshotRestore, config.StoragePluginParameters["CephStoragePool"]+"/"+cephVolumeName+"@"+cephSnapshotName)
 
 	snapshotRestoreResult := k8s.ExecuteCommand(podName, config.StoragePluginParameters["CephToolsContainerName"], config.StoragePluginParameters["CephStorageNamespace"], config.AccessWithinCluster, snapshotRestore...)
 	if snapshotRestoreResult.Code != 0 {
