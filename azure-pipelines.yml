@@ -20,7 +20,7 @@ variables:
 #  GOBIN:  '$(GOPATH)/bin' # Go binaries path
 #  GOROOT: '/usr/local/go1.11' # Go installation path
 #  GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
-  modulePath: '$(GOPATH)/src/fossul' # Path to the module's code
+  modulePath: '$(GOPATH)/src/github.com/fossul/fossul' # Path to the module's code
 
 steps:
 - script: |
@@ -31,7 +31,7 @@ steps:
     mkdir -p '$(GOPATH)'
     mkdir -p '$(GOBIN)'
     mkdir -p '$(GOPATH)/pkg'
-    mkdir -p '$(GOPATH)/src/fossul'
+    mkdir -p '$(GOPATH)/src/github.com/fossul/fossul'
     echo "Moving $(system.defaultWorkingDirectory)/* To $(modulePath)"
     mv $(system.defaultWorkingDirectory)/* $(modulePath)
     shopt -s extglob
@@ -50,8 +50,8 @@ steps:
       exit 1
     fi
 
-    $(GOPATH)/src/fossul/scripts/fossul-server-build.sh
-    $(GOPATH)/src/fossul/scripts/fossul-app-build.sh
-    $(GOPATH)/src/fossul/scripts/fossul-storage-build.sh
-  workingDirectory: '$(GOPATH)/src/fossul'
+    $(GOPATH)/src/github.com/fossul/fossul/scripts/fossul-server-build.sh
+    $(GOPATH)/src/github.com/fossul/fossul/scripts/fossul-app-build.sh
+    $(GOPATH)/src/github.com/fossul/fossul/scripts/fossul-storage-build.sh
+  workingDirectory: '$(GOPATH)/src/github.com/fossul/fossul'
   displayName: 'Get dependencies, then build'
