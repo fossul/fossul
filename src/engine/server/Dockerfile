@@ -6,13 +6,13 @@ LABEL ios.k8s.display-name="fossul-server" \
 
 RUN dnf install -y golang
 
-RUN mkdir -p /go/src/fossul
+RUN mkdir -p /go/src/github.com/fossul/fossul
 RUN mkdir /app
 
 RUN groupadd -r fossul &&\
     useradd -r -g fossul -d /app -u 1001 -s /sbin/nologin -c "Fossul user" fossul
 
-WORKDIR /go/src/fossul
+WORKDIR /go/src/github.com/fossul/fossul
 
 ENV FOSSUL_BUILD_PLUGIN_DIR=/app/plugins
 ENV GOPATH=/go
@@ -23,9 +23,9 @@ RUN curl -L https://github.com/openshift/origin/releases/download/v3.11.0/opensh
 
 RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
 
-COPY . /go/src/fossul
+COPY . /go/src/github.com/fossul/fossul
 
-RUN /go/src/fossul/scripts/fossul-server-build.sh
+RUN /go/src/github.com/fossul/fossul/scripts/fossul-server-build.sh
 
 RUN chown -R fossul:fossul /app && \
     chmod -R 775 /app

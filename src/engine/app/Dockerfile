@@ -5,13 +5,13 @@ LABEL ios.k8s.display-name="fossul-app" \
 
 RUN dnf install -y golang
 
-RUN mkdir -p /go/src/fossul
+RUN mkdir -p /go/src/github.com/fossul/fossul
 RUN mkdir /app
 
 RUN groupadd -r fossul &&\
     useradd -r -g fossul -d /app -u 1001 -s /sbin/nologin -c "Fossul user" fossul
 
-WORKDIR /go/src/fossul
+WORKDIR /go/src/github.com/fossul/fossul
 
 ENV FOSSUL_BUILD_PLUGIN_DIR=/app/plugins
 ENV GOPATH=/go
@@ -24,9 +24,9 @@ RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
 
 #RUN go get -u github.com/gorilla/mux
 
-COPY . /go/src/fossul
+COPY . /go/src/github.com/fossul/fossul
 
-RUN /go/src/fossul/scripts/fossul-app-build.sh
+RUN /go/src/github.com/fossul/fossul/scripts/fossul-app-build.sh
 
 RUN chown -R fossul:fossul /app && \
     chmod -R 775 /app
