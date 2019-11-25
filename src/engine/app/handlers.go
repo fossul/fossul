@@ -122,7 +122,7 @@ func PluginInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pluginPath := util.GetPluginPath(pluginName)
+	pluginPath := util.GetPluginPath(pluginName,pluginType)
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/" + pluginType + "/" + pluginName

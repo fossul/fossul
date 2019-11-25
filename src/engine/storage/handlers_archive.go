@@ -50,7 +50,7 @@ func Archive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pluginPath := util.GetPluginPath(config.ArchivePlugin)
+	pluginPath := util.GetPluginPath(config.ArchivePlugin,"archive")
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/archive/" + config.ArchivePlugin
@@ -129,7 +129,7 @@ func ArchiveList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pluginPath := util.GetPluginPath(config.ArchivePlugin)
+	pluginPath := util.GetPluginPath(config.ArchivePlugin,"archive")
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/archive/" + config.ArchivePlugin
@@ -219,7 +219,7 @@ func ArchiveDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pluginPath := util.GetPluginPath(config.ArchivePlugin)
+	pluginPath := util.GetPluginPath(config.ArchivePlugin,"archive")
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/archive/" + config.ArchivePlugin

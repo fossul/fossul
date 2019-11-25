@@ -50,7 +50,7 @@ func Backup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pluginPath := util.GetPluginPath(config.StoragePlugin)
+	pluginPath := util.GetPluginPath(config.StoragePlugin,"storage")
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/storage/" + config.StoragePlugin
@@ -127,7 +127,7 @@ func BackupList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pluginPath := util.GetPluginPath(config.StoragePlugin)
+	pluginPath := util.GetPluginPath(config.StoragePlugin,"storage")
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/storage/" + config.StoragePlugin
@@ -217,7 +217,7 @@ func BackupDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pluginPath := util.GetPluginPath(config.StoragePlugin)
+	pluginPath := util.GetPluginPath(config.StoragePlugin,"storage")
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/storage/" + config.StoragePlugin

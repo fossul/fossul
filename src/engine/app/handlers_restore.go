@@ -51,7 +51,7 @@ func PreRestore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pluginPath := util.GetPluginPath(config.AppPlugin)
+	pluginPath := util.GetPluginPath(config.AppPlugin,"app")
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin
@@ -126,7 +126,7 @@ func PostRestore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pluginPath := util.GetPluginPath(config.AppPlugin)
+	pluginPath := util.GetPluginPath(config.AppPlugin,"app")
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin

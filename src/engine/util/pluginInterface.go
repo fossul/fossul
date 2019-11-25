@@ -16,6 +16,7 @@ import (
 	"errors"
 	"fmt"
 	"plugin"
+	"regexp"
 )
 
 type AppPlugin interface {
@@ -47,36 +48,15 @@ type ArchivePlugin interface {
 	Info() Plugin
 }
 
-func GetPluginPath(pluginName string) string {
+func GetPluginPath(pluginName, pluginType string) string {
 	var path string
-	switch pluginName {
-	case "mariadb.so":
-		path = "./plugins/app/mariadb.so"
-	case "mariadb-dump.so":
-		path = "./plugins/app/mariadb-dump.so"
-	case "postgres.so":
-		path = "./plugins/app/postgres.so"
-	case "postgres-dump.so":
-		path = "./plugins/app/postgres-dump.so"
-	case "mongo.so":
-		path = "./plugins/app/mongo.so"
-	case "mongo-dump.so":
-		path = "./plugins/app/mongo-dump.so"
-	case "container-basic.so":
-		path = "./plugins/storage/container-basic.so"
-	case "sample-app.so":
-		path = "./plugins/app/sample-app.so"
-	case "sample-storage.so":
-		path = "./plugins/storage/sample-storage.so"
-	case "sample-archive.so":
-		path = "./plugins/archive/sample-archive.so"
-	case "aws.so":
-		path = "./plugins/archive/aws.so"
-	case "ocs-gluster.so":
-		path = "./plugins/storage/ocs-gluster.so"
-	case "csi-ceph.so":
-		path = "./plugins/storage/csi-ceph.so"
-	default:
+
+	re := regexp.MustCompile(`\S+.so`)
+	match := re.FindStringSubmatch(pluginName)
+
+	if match != nil {
+		path = "./plugins/" + pluginType + "/" + pluginName
+	} else {
 		fmt.Println("Native plugin [" + pluginName + "] does not exist, executing as basic plugin")
 		path = ""
 	}
