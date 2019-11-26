@@ -313,6 +313,11 @@ func Int64ToString(i int64) string {
 	return str
 }
 
+func Int32ToString(i int32) string {
+	str := strconv.FormatInt(int64(i), 10)
+	return str
+}
+
 func StringToInt(s string) int {
 	i, err := strconv.Atoi(s)
 	if err != nil {

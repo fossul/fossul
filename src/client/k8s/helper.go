@@ -14,11 +14,59 @@ package k8s
 
 import (
 	"errors"
+	deploymentConfigClient "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
+	"k8s.io/client-go/kubernetes"
+	deploymentClient "k8s.io/client-go/kubernetes/typed/apps/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"log"
 	"os"
 )
+
+func getClient(accessWithinCluster string) (*kubernetes.Clientset, error) {
+	var client *kubernetes.Clientset
+	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		return client, err
+	}
+
+	client, err = kubernetes.NewForConfig(kubeConfig)
+	if err != nil {
+		return client, err
+	}
+
+	return client, nil
+}
+
+func getDeploymentConfigClient(accessWithinCluster string) (*deploymentConfigClient.AppsV1Client, error) {
+	var client *deploymentConfigClient.AppsV1Client
+	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		return client, err
+	}
+
+	client, err = deploymentConfigClient.NewForConfig(kubeConfig)
+	if err != nil {
+		return client, err
+	}
+
+	return client, nil
+}
+
+func getDeploymentClient(accessWithinCluster string) (*deploymentClient.AppsV1Client, error) {
+	var client *deploymentClient.AppsV1Client
+	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		return client, err
+	}
+
+	client, err = deploymentClient.NewForConfig(kubeConfig)
+	if err != nil {
+		return client, err
+	}
+
+	return client, nil
+}
 
 func getKubeConfig(accessWithinCluster string) (error, *rest.Config) {
 	var kubeConfig *rest.Config
@@ -61,4 +109,35 @@ func homeDir() string {
 		return h
 	}
 	return os.Getenv("USERPROFILE") // windows
+}
+
+func GetOwner(namespace, service, accessWithinCluster string) (string, string, error) {
+	podName, err := GetPodName(namespace, service, accessWithinCluster)
+	if err != nil {
+		return "", "", err
+	}
+
+	pod, err := GetPod(podName, namespace, accessWithinCluster)
+	if err != nil {
+		return "", "", err
+	}
+
+	var rcName string
+	for _, owner := range pod.OwnerReferences {
+		rcName = owner.Name
+	}
+
+	rc, err := GetReplicationController(rcName, namespace, accessWithinCluster)
+	if err != nil {
+		return "", "", err
+	}
+
+	var ownerKind string
+	var ownerName string
+	for _, owner := range rc.OwnerReferences {
+		ownerKind = owner.Kind
+		ownerName = owner.Name
+	}
+
+	return ownerKind, ownerName, nil
 }

@@ -57,7 +57,7 @@ func PreQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
 		if k8s.IsRemoteCommand(args[0]) {
 			args[0] = strings.Replace(args[0], ":", "", 1)
-			podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+			podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)
@@ -134,7 +134,7 @@ func QuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
 		if k8s.IsRemoteCommand(args[0]) {
 			args[0] = strings.Replace(args[0], ":", "", 1)
-			podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+			podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)
@@ -205,7 +205,7 @@ func Quiesce(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pluginPath := util.GetPluginPath(config.AppPlugin,"app")
+	pluginPath := util.GetPluginPath(config.AppPlugin, "app")
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/app/" + config.AppPlugin
@@ -286,7 +286,7 @@ func PostQuiesceCmd(w http.ResponseWriter, r *http.Request) {
 
 		if k8s.IsRemoteCommand(args[0]) {
 			args[0] = strings.Replace(args[0], ":", "", 1)
-			podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+			podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)

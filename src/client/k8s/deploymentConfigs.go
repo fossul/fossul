@@ -16,27 +16,22 @@ package k8s
 import (
 	"fmt"
 	apps "github.com/openshift/api/apps/v1"
-	appsclient "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"time"
 )
 
 func GetDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster string) (*apps.DeploymentConfig, error) {
-	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	var deploymentConfig *apps.DeploymentConfig
+
+	client, err := getDeploymentConfigClient(accessWithinCluster)
 	if err != nil {
-		return nil, err
+		return deploymentConfig, err
 	}
 
-	// create the clientset
-	clientset, err := appsclient.NewForConfig(kubeConfig)
+	deploymentConfig, err = client.DeploymentConfigs(namespace).Get(deploymentConfigName, metav1.GetOptions{})
 	if err != nil {
-		return nil, err
-	}
-
-	deploymentConfig, err := clientset.DeploymentConfigs(namespace).Get(deploymentConfigName, metav1.GetOptions{})
-	if err != nil {
-		return nil, err
+		return deploymentConfig, err
 	}
 
 	return deploymentConfig, nil
@@ -51,14 +46,8 @@ func GetDeploymentConfigScaleInteger(namespace, deploymentConfigName, accessWith
 	return deploymentConfig.Spec.Replicas, nil
 }
 
-func ScaleDownDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster string, size int32) error {
-	err, kubeConfig := getKubeConfig(accessWithinCluster)
-	if err != nil {
-		return err
-	}
-
-	// create the clientset
-	clientset, err := appsclient.NewForConfig(kubeConfig)
+func ScaleDownDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster string, size int32, t int) error {
+	client, err := getDeploymentConfigClient(accessWithinCluster)
 	if err != nil {
 		return err
 	}
@@ -70,16 +59,16 @@ func ScaleDownDeploymentConfig(namespace, deploymentConfigName, accessWithinClus
 
 	deploymentConfig.Spec.Replicas = size
 
-	_, err = clientset.DeploymentConfigs(namespace).Update(deploymentConfig)
+	_, err = client.DeploymentConfigs(namespace).Update(deploymentConfig)
 	if err != nil {
 		return err
 	}
 
 	var poll = 5 * time.Second
-	timeout := time.Duration(120) * time.Second
+	timeout := time.Duration(t) * time.Second
 	start := time.Now()
 
-	fmt.Printf("Waiting up to %v for deployment to be scaled to %d\n", timeout, size)
+	fmt.Printf("[DEBUG] Waiting up to %v for deployment to be scaled to %d\n", timeout, size)
 
 	return wait.PollImmediate(poll, timeout, func() (bool, error) {
 		deploymentConfig, err := GetDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster)
@@ -90,7 +79,7 @@ func ScaleDownDeploymentConfig(namespace, deploymentConfigName, accessWithinClus
 		readyReplicas := deploymentConfig.Status.ReadyReplicas
 		numberReplicas := deploymentConfig.Status.Replicas
 
-		fmt.Printf("waiting for replicas to be scaled down [%d of %d] (%d seconds elapsed)\n", readyReplicas, numberReplicas, int(time.Since(start).Seconds()))
+		fmt.Printf("[DEBUG] Waiting for replicas to be scaled down [%d of %d] (%d seconds elapsed)\n", readyReplicas, numberReplicas, int(time.Since(start).Seconds()))
 
 		if readyReplicas == 0 {
 			return true, nil
@@ -99,14 +88,8 @@ func ScaleDownDeploymentConfig(namespace, deploymentConfigName, accessWithinClus
 	})
 }
 
-func ScaleUpDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster string, size int32) error {
-	err, kubeConfig := getKubeConfig(accessWithinCluster)
-	if err != nil {
-		return err
-	}
-
-	// create the clientset
-	clientset, err := appsclient.NewForConfig(kubeConfig)
+func ScaleUpDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster string, size int32, t int) error {
+	client, err := getDeploymentConfigClient(accessWithinCluster)
 	if err != nil {
 		return err
 	}
@@ -118,16 +101,16 @@ func ScaleUpDeploymentConfig(namespace, deploymentConfigName, accessWithinCluste
 
 	deploymentConfig.Spec.Replicas = size
 
-	_, err = clientset.DeploymentConfigs(namespace).Update(deploymentConfig)
+	_, err = client.DeploymentConfigs(namespace).Update(deploymentConfig)
 	if err != nil {
 		return err
 	}
 
 	var poll = 5 * time.Second
-	timeout := time.Duration(120) * time.Second
+	timeout := time.Duration(t) * time.Second
 	start := time.Now()
 
-	fmt.Printf("Waiting up to %v for deployment to be scaled to %d\n", timeout, size)
+	fmt.Printf("[DEBUG] Waiting up to %v for deployment to be scaled to %d\n", timeout, size)
 
 	return wait.PollImmediate(poll, timeout, func() (bool, error) {
 		deploymentConfig, err := GetDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster)
@@ -136,7 +119,7 @@ func ScaleUpDeploymentConfig(namespace, deploymentConfigName, accessWithinCluste
 		}
 
 		readyReplicas := deploymentConfig.Status.ReadyReplicas
-		fmt.Printf("waiting for replicas to be scaled up [%d of %d] (%d seconds elapsed)\n", readyReplicas, size, int(time.Since(start).Seconds()))
+		fmt.Printf("[DEBUG] Waiting for replicas to be scaled up [%d of %d] (%d seconds elapsed)\n", readyReplicas, size, int(time.Since(start).Seconds()))
 
 		if readyReplicas == size {
 			return true, nil

@@ -15,8 +15,8 @@ package main
 import (
 	"fmt"
 	"github.com/fossul/fossul/src/client/k8s"
-	"github.com/fossul/fossul/src/plugins/pluginUtil"
 	"github.com/fossul/fossul/src/engine/util"
+	"github.com/fossul/fossul/src/plugins/pluginUtil"
 	"strings"
 )
 
@@ -42,7 +42,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	msg := util.SetMessage("INFO", "Performing container backup")
 	messages = append(messages, msg)
 
-	podName, err := k8s.GetPod(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["ServiceName"], config.AccessWithinCluster)
+	podName, err := k8s.GetPodName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["ServiceName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -76,11 +76,11 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 			args = append(args, "-n")
 			args = append(args, config.StoragePluginParameters["Namespace"])
 			args = append(args, podName+":"+backupSrcFilePath)
-		} else if config.ContainerPlatform  == "kubernetes" {
+		} else if config.ContainerPlatform == "kubernetes" {
 			args = append(args, "cp")
 			args = append(args, config.StoragePluginParameters["Namespace"]+"/"+podName+":"+config.StoragePluginParameters["BackupSrcPath"])
 		} else {
-			msg = util.SetMessage("ERROR", "Incorrect parameter set for ContainerPlatform ["+config.ContainerPlatform +"]")
+			msg = util.SetMessage("ERROR", "Incorrect parameter set for ContainerPlatform ["+config.ContainerPlatform+"]")
 			messages = append(messages, msg)
 
 			result = util.SetResult(1, messages)
@@ -108,7 +108,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	msg := util.SetMessage("INFO", "Performing container restore")
 	messages = append(messages, msg)
 
-	podName, err := k8s.GetPod(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["ServiceName"], config.AccessWithinCluster)
+	podName, err := k8s.GetPodName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["ServiceName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -148,12 +148,12 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		args = append(args, config.StoragePluginParameters["Namespace"])
 		args = append(args, restorePath)
 		args = append(args, podName+":"+restoreDestPath)
-	} else if config.ContainerPlatform  == "kubernetes" {
+	} else if config.ContainerPlatform == "kubernetes" {
 		args = append(args, "cp")
 		args = append(args, restorePath)
 		args = append(args, config.StoragePluginParameters["Namespace"]+"/"+podName+":"+restoreDestPath)
 	} else {
-		msg = util.SetMessage("ERROR", "Incorrect parameter set for ContainerPlatform ["+config.ContainerPlatform +"]")
+		msg = util.SetMessage("ERROR", "Incorrect parameter set for ContainerPlatform ["+config.ContainerPlatform+"]")
 		messages = append(messages, msg)
 
 		result = util.SetResult(1, messages)

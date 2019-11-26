@@ -62,7 +62,7 @@ func (a appPlugin) Quiesce(config util.Config) util.Result {
 	var args []string
 	var mkdirArgs []string
 
-	podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+	podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -130,7 +130,7 @@ func (a appPlugin) Unquiesce(config util.Config) util.Result {
 	args = append(args, "-rf")
 	args = append(args, dumpPath)
 
-	podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+	podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -156,7 +156,7 @@ func (a appPlugin) PreRestore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+	podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -189,7 +189,7 @@ func (a appPlugin) PostRestore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	podName, err := k8s.GetPod(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+	podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)

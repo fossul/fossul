@@ -16,8 +16,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fossul/fossul/src/client/k8s"
-	"github.com/fossul/fossul/src/plugins/pluginUtil"
 	"github.com/fossul/fossul/src/engine/util"
+	"github.com/fossul/fossul/src/plugins/pluginUtil"
 	"github.com/pborman/getopt/v2"
 	"os"
 	"strings"
@@ -70,7 +70,7 @@ func backup(configMap map[string]string) {
 
 	fmt.Println("INFO Performing container backup")
 
-	podName, err := k8s.GetPod(configMap["Namespace"], configMap["ServiceName"], configMap["AccessWithinCluster"])
+	podName, err := k8s.GetPodName(configMap["Namespace"], configMap["ServiceName"], configMap["AccessWithinCluster"])
 	checkError(err)
 
 	fmt.Println("INFO Performing backup for pod " + podName)
@@ -116,7 +116,7 @@ func restore(configMap map[string]string) {
 
 	fmt.Println("INFO Performing container restore")
 
-	podName, err := k8s.GetPod(configMap["Namespace"], configMap["ServiceName"], configMap["AccessWithinCluster"])
+	podName, err := k8s.GetPodName(configMap["Namespace"], configMap["ServiceName"], configMap["AccessWithinCluster"])
 	checkError(err)
 
 	fmt.Println("INFO Performing restore for pod " + podName)

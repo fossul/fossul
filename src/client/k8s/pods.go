@@ -13,27 +13,34 @@ limitations under the License.
 package k8s
 
 import (
-	//	"k8s.io/apimachinery/pkg/api/errors"
 	"fmt"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	"strings"
 )
 
-func GetPod(namespace, serviceName, accessWithinCluster string) (string, error) {
-	err, kubeConfig := getKubeConfig(accessWithinCluster)
+func GetPod(podName, namespace, accessWithinCluster string) (*v1.Pod, error) {
+	var pod *v1.Pod
+	client, err := getClient(accessWithinCluster)
+	if err != nil {
+		return pod, err
+	}
+
+	pod, err = client.CoreV1().Pods(namespace).Get(podName, metav1.GetOptions{})
+	if err != nil {
+		return pod, err
+	}
+
+	return pod, nil
+}
+
+func GetPodName(namespace, serviceName, accessWithinCluster string) (string, error) {
+	client, err := getClient(accessWithinCluster)
 	if err != nil {
 		return "", err
 	}
 
-	// create the clientset
-	clientset, err := kubernetes.NewForConfig(kubeConfig)
-	if err != nil {
-		return "", err
-	}
-
-	pods, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	pods, err := client.CoreV1().Pods(namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -48,37 +55,16 @@ func GetPod(namespace, serviceName, accessWithinCluster string) (string, error) 
 		}
 	}
 
-	/*
-		pod := "fossul-app-2-zpdgr"
-		_, err = clientset.CoreV1().Pods(namespace).Get(pod, metav1.GetOptions{})
-		if errors.IsNotFound(err) {
-			fmt.Printf("Pod %s in namespace %s not found\n", pod, namespace)
-		} else if statusError, isStatus := err.(*errors.StatusError); isStatus {
-			fmt.Printf("Error getting pod %s in namespace %s: %v\n",
-				pod, namespace, statusError.ErrStatus.Message)
-		} else if err != nil {
-			panic(err.Error())
-		} else {
-			fmt.Printf("Found pod %s in namespace %s\n", pod, namespace)
-		}
-	*/
-
 	return ourPod, nil
 }
 
 func GetPodByName(namespace, podName, accessWithinCluster string) (string, error) {
-	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	client, err := getClient(accessWithinCluster)
 	if err != nil {
 		return "", err
 	}
 
-	// create the clientset
-	clientset, err := kubernetes.NewForConfig(kubeConfig)
-	if err != nil {
-		return "", err
-	}
-
-	pods, err := clientset.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	pods, err := client.CoreV1().Pods(namespace).List(metav1.ListOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -97,18 +83,12 @@ func GetPodByName(namespace, podName, accessWithinCluster string) (string, error
 }
 
 func GetPodIp(namespace, podName, accessWithinCluster string) (string, error) {
-	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	client, err := getClient(accessWithinCluster)
 	if err != nil {
 		return "", err
 	}
 
-	// create the clientset
-	clientset, err := kubernetes.NewForConfig(kubeConfig)
-	if err != nil {
-		return "", err
-	}
-
-	pod, err := clientset.CoreV1().Pods(namespace).Get(podName, metav1.GetOptions{})
+	pod, err := client.CoreV1().Pods(namespace).Get(podName, metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -118,18 +98,12 @@ func GetPodIp(namespace, podName, accessWithinCluster string) (string, error) {
 }
 
 func GetPersistentVolumeName(namespace, pvcName, accessWithinCluster string) (string, error) {
-	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	client, err := getClient(accessWithinCluster)
 	if err != nil {
 		return "", err
 	}
 
-	// create the clientset
-	clientset, err := kubernetes.NewForConfig(kubeConfig)
-	if err != nil {
-		return "", err
-	}
-
-	pvc, err := clientset.CoreV1().PersistentVolumeClaims(namespace).Get(pvcName, metav1.GetOptions{})
+	pvc, err := client.CoreV1().PersistentVolumeClaims(namespace).Get(pvcName, metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -138,18 +112,12 @@ func GetPersistentVolumeName(namespace, pvcName, accessWithinCluster string) (st
 }
 
 func GetGlusterVolumePath(pvName, accessWithinCluster string) (string, error) {
-	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	client, err := getClient(accessWithinCluster)
 	if err != nil {
 		return "", err
 	}
 
-	// create the clientset
-	clientset, err := kubernetes.NewForConfig(kubeConfig)
-	if err != nil {
-		return "", err
-	}
-
-	pv, err := clientset.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
+	pv, err := client.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -160,18 +128,12 @@ func GetGlusterVolumePath(pvName, accessWithinCluster string) (string, error) {
 func GetPersistentVolume(pvName, accessWithinCluster string) (*v1.PersistentVolume, error) {
 	var pv *v1.PersistentVolume
 
-	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	client, err := getClient(accessWithinCluster)
 	if err != nil {
 		return pv, err
 	}
 
-	// create the clientset
-	clientset, err := kubernetes.NewForConfig(kubeConfig)
-	if err != nil {
-		return pv, err
-	}
-
-	pv, err = clientset.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
+	pv, err = client.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
 	if err != nil {
 		return pv, err
 	}

@@ -24,6 +24,8 @@ import (
 type appPlugin string
 
 var conn *MySQL
+var replicas *int32
+var scalingTimeoutSeconds int = 180
 var AppPlugin appPlugin
 
 type MySQL struct {
@@ -175,20 +177,65 @@ func (a appPlugin) PreRestore(config util.Config) util.Result {
 
 	var result util.Result
 	var messages []util.Message
+	var err error
 
 	if config.AppPluginParameters["DisableRestoreHooks"] == "false" {
-		msg := util.SetMessage("INFO", "Scaling deployment ["+config.AppPluginParameters["Deployment"]+"] to 0")
+
+		if config.AppPluginParameters["DeploymentType"] == "DeploymentConfig" {
+			replicasInt32, err := k8s.GetDeploymentConfigScaleInteger(config.AppPluginParameters["Namespace"], config.AppPluginParameters["DeploymentName"], config.AccessWithinCluster)
+			replicas = &replicasInt32
+			fmt.Printf("[DEBUG] DeploymentConfig has [%d] replicas", *replicas)
+
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+		} else if config.AppPluginParameters["DeploymentType"] == "DeploymentConfig" {
+			replicas, err = k8s.GetDeploymentScaleInteger(config.AppPluginParameters["Namespace"], config.AppPluginParameters["DeploymentName"], config.AccessWithinCluster)
+			fmt.Printf("[DEBUG] Deployment has [%d] replicas", *replicas)
+
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+		} else {
+			msg := util.SetMessage("ERROR", "Couldn't find Deployment or DeploymentConfig, check configuration")
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+
+		msg := util.SetMessage("INFO", "Scaling ["+config.AppPluginParameters["DeploymentType"]+"] name ["+config.AppPluginParameters["DeploymentName"]+"] to 0")
 		messages = append(messages, msg)
 
 		var err error
-		if config.ContainerPlatform == "openshift" {
-			err = k8s.ScaleDownDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 0)
-		} else {
-			err = k8s.ScaleDeployment(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 0)
-		}
+		if config.AppPluginParameters["DeploymentType"] == "DeploymentConfig" {
+			err = k8s.ScaleDownDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["DeploymentName"], config.AccessWithinCluster, 0, scalingTimeoutSeconds)
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
 
-		if err != nil {
-			msg := util.SetMessage("ERROR", err.Error())
+				result = util.SetResult(1, messages)
+				return result
+			}
+		} else if config.AppPluginParameters["DeploymentType"] == "Deployment" {
+			err = k8s.ScaleDownDeployment(config.AppPluginParameters["Namespace"], config.AppPluginParameters["DeploymentName"], config.AccessWithinCluster, 0, scalingTimeoutSeconds)
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+		} else {
+			msg := util.SetMessage("ERROR", "Couldn't find Deployment or DeploymentConfig, check configuration")
 			messages = append(messages, msg)
 
 			result = util.SetResult(1, messages)
@@ -206,24 +253,46 @@ func (a appPlugin) PostRestore(config util.Config) util.Result {
 	var messages []util.Message
 
 	if config.AppPluginParameters["DisableRestoreHooks"] == "false" {
-		msg := util.SetMessage("INFO", "Scaling deployment ["+config.AppPluginParameters["Deployment"]+"] to 1")
+		replicasInt := *replicas
+		replicasToString := util.Int32ToString(replicasInt)
+		var err error
+
+		msg := util.SetMessage("INFO", "Scaling ["+config.AppPluginParameters["DeploymentType"]+"] name ["+config.AppPluginParameters["DeploymentName"]+"] to ["+replicasToString+"]")
 		messages = append(messages, msg)
 
-		var err error
-		if config.ContainerPlatform == "openshift" {
-			err = k8s.ScaleUpDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 1)
-		} else {
-			err = k8s.ScaleDeployment(config.AppPluginParameters["Namespace"], config.AppPluginParameters["Deployment"], config.AccessWithinCluster, 1)
-		}
+		if replicasInt != 0 {
+			if config.AppPluginParameters["DeploymentType"] == "DeploymentConfig" {
+				fmt.Printf("[DEBUG] Deployment has [%d] replicas", *replicas)
 
-		if err != nil {
-			msg := util.SetMessage("ERROR", err.Error())
-			messages = append(messages, msg)
+				err = k8s.ScaleUpDeploymentConfig(config.AppPluginParameters["Namespace"], config.AppPluginParameters["DeploymentName"], config.AccessWithinCluster, *replicas, scalingTimeoutSeconds)
+				if err != nil {
+					msg := util.SetMessage("ERROR", err.Error())
+					messages = append(messages, msg)
 
-			result = util.SetResult(1, messages)
-			return result
+					result = util.SetResult(1, messages)
+					return result
+				}
+			} else if config.AppPluginParameters["DeploymentType"] == "DeploymentConfig" {
+				fmt.Printf("[DEBUG] Deployment has [%d] replicas", *replicas)
+
+				err = k8s.ScaleUpDeployment(config.AppPluginParameters["Namespace"], config.AppPluginParameters["DeploymentName"], config.AccessWithinCluster, *replicas, scalingTimeoutSeconds)
+				if err != nil {
+					msg := util.SetMessage("ERROR", err.Error())
+					messages = append(messages, msg)
+
+					result = util.SetResult(1, messages)
+					return result
+				}
+			} else {
+				msg := util.SetMessage("ERROR", "Couldn't find Deployment or DeploymentConfig, check configuration")
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
 		}
 	}
+
 	result = util.SetResult(0, messages)
 	return result
 }
