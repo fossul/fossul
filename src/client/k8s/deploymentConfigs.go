@@ -127,3 +127,31 @@ func ScaleUpDeploymentConfig(namespace, deploymentConfigName, accessWithinCluste
 		return false, nil
 	})
 }
+
+func UpdateDeploymentConfigVolume(pvcName, namespace, deploymentConfigName, accessWithinCluster string) error {
+
+	client, err := getDeploymentConfigClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	deploymentConfig, err := GetDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	//volumes := deploymentConfig.Spec.Template.Spec.Volumes
+	//for _, volume := range volumes {
+	// fmt.Println("[DEBUG] Updating pv [" + volume.Name + "] with new pvc [" + pvcName + "]")
+	//	volume.PersistentVolumeClaim = GeneratePersistentVolumeClaimVolumeName(pvcName)
+	//}
+
+	deploymentConfig.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim = GeneratePersistentVolumeClaimVolumeName(pvcName)
+
+	_, err = client.DeploymentConfigs(namespace).Update(deploymentConfig)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

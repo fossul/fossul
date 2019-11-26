@@ -23,7 +23,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
-	msg := util.SetMessage("INFO", "Performing CSI snapshot restore")
+	msg := util.SetMessage("INFO", "Performing CSI Ceph snapshot restore")
 	messages = append(messages, msg)
 
 	podName, err := k8s.GetPodByName(config.StoragePluginParameters["CephStorageNamespace"], config.StoragePluginParameters["CephToolsPodName"], config.AccessWithinCluster)
