@@ -2,7 +2,7 @@
 # Welcome to the Fossul Framework
 [Video Overview and Demo](https://youtu.be/-sNdIpArabI)
 
-[Video Demo using Gluster snapshots with Fossul](https://youtu.be/75E8WWnLUnc)
+[Video Demo using Gluster/OCS 3 snapshots with Fossul](https://youtu.be/75E8WWnLUnc)
 
 [Video Demo using Ceph/OCS 4 CSI snapshots with fossul](https://www.youtube.com/watch?v=lljRfLe6SAY)
 
