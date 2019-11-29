@@ -12,29 +12,32 @@ if [ $? != 0 ]; then exit 1; fi
 
 echo "Packaging services"
 # Tarball server service
-tar cf $GOBIN/server-service.tar $GOBIN/server $GOBIN/fossul-server-startup.sh
+cd $GOBIN
+tar cf server-service.tar server fossul-server-startup.sh
 if [ $? != 0 ]; then exit 1; fi
-gzip -f $GOBIN/server-service.tar
+gzip -f server-service.tar
 if [ $? != 0 ]; then exit 1; fi
 
 # Tarball app service
-tar cf $GOBIN/app-service.tar $GOBIN/app $GOBIN/fossul-app-startup.sh
+cd $GOBIN
+tar cf app-service.tar app fossul-app-startup.sh
 if [ $? != 0 ]; then exit 1; fi
-gzip -f $GOBIN/app-service.tar
+gzip -f app-service.tar
 if [ $? != 0 ]; then exit 1; fi
 
 # Tarball storage service
-tar cf $GOBIN/storage-service.tar $GOBIN/storage $GOBIN/fossul-storage-startup.sh
+cd $GOBIN
+tar cf storage-service.tar storage fossul-storage-startup.sh
 if [ $? != 0 ]; then exit 1; fi
-gzip -f $GOBIN/storage-service.tar
+gzip -f storage-service.tar
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Packaging plugins"
 # Tarball app plugins
 cd $PLUGIN_DIR
-tar cf $PLUGIN_DIR/plugins-app.tar app
+tar cf plugins-app.tar app
 if [ $? != 0 ]; then exit 1; fi
-gzip -f $PLUGIN_DIR/plugins-app.tar
+gzip -f plugins-app.tar
 if [ $? != 0 ]; then exit 1; fi
 
 # Tarball storage plugins
