@@ -14,6 +14,7 @@ ENV GOBIN=/app
 ENV HOME=/app
 
 RUN curl -L https://github.com/fossul/fossul/releases/download/latest/openshift-client-linux-4.2.8.tar.gz |tar xz;cp oc kubectl /app && \
+    curl -L https://github.com/fossul/fossul/releases/download/latest/app-service.tar.gz |tar xz -C /app && \
     curl -L https://github.com/fossul/fossul/releases/download/latest/plugins-app.tar.gz |tar xz -C /app/plugins    
 
 RUN chown -R fossul:fossul /app && \
