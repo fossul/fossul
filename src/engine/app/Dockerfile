@@ -18,7 +18,7 @@ ENV GOPATH=/go
 ENV GOBIN=/app
 ENV HOME=/app
 
-RUN curl -L https://github.com/fossul/fossul/releases/download/latest/openshift-client-linux-4.2.7.tar.gz |tar xz;cp oc kubectl /app
+RUN curl -L https://github.com/fossul/fossul/releases/download/latest/openshift-client-linux-4.2.8.tar.gz |tar xz;cp oc kubectl /app
 
 RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
 
