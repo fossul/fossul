@@ -13,9 +13,7 @@ limitations under the License.
 package main
 
 import (
-	"github.com/fossul/fossul/src/client/k8s"
 	"github.com/fossul/fossul/src/engine/util"
-	"github.com/fossul/fossul/src/plugins/pluginUtil"
 )
 
 func (s storagePlugin) Restore(config util.Config) util.Result {
@@ -26,7 +24,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	msg := util.SetMessage("INFO", "Performing CSI Ceph snapshot restore")
 	messages = append(messages, msg)
 
-	podName, err := k8s.GetPodByName(config.StoragePluginParameters["CephStorageNamespace"], config.StoragePluginParameters["CephToolsPodName"], config.AccessWithinCluster)
+	/*podName, err := k8s.GetPodByName(config.StoragePluginParameters["CephStorageNamespace"], config.StoragePluginParameters["CephToolsPodName"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -104,7 +102,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		result = util.SetResult(1, messages)
 	} else {
 		messages = util.PrependMessages(messages, snapshotRestoreResult.Messages)
-	}
+	}*/
 
 	result = util.SetResult(resultCode, messages)
 	return result
