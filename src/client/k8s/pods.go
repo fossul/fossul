@@ -13,10 +13,12 @@ limitations under the License.
 package k8s
 
 import (
+	"context"
 	"fmt"
+	"strings"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"strings"
 )
 
 func GetPod(podName, namespace, accessWithinCluster string) (*v1.Pod, error) {
@@ -26,7 +28,7 @@ func GetPod(podName, namespace, accessWithinCluster string) (*v1.Pod, error) {
 		return pod, err
 	}
 
-	pod, err = client.CoreV1().Pods(namespace).Get(podName, metav1.GetOptions{})
+	pod, err = client.CoreV1().Pods(namespace).Get(context.Background(), podName, metav1.GetOptions{})
 	if err != nil {
 		return pod, err
 	}
@@ -40,7 +42,7 @@ func GetPodName(namespace, serviceName, accessWithinCluster string) (string, err
 		return "", err
 	}
 
-	pods, err := client.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	pods, err := client.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -64,7 +66,7 @@ func GetPodByName(namespace, podName, accessWithinCluster string) (string, error
 		return "", err
 	}
 
-	pods, err := client.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+	pods, err := client.CoreV1().Pods(namespace).List(context.Background(), metav1.ListOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -88,7 +90,7 @@ func GetPodIp(namespace, podName, accessWithinCluster string) (string, error) {
 		return "", err
 	}
 
-	pod, err := client.CoreV1().Pods(namespace).Get(podName, metav1.GetOptions{})
+	pod, err := client.CoreV1().Pods(namespace).Get(context.Background(), podName, metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}

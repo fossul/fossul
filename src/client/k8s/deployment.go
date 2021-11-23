@@ -16,10 +16,12 @@ package k8s
 import (
 	apps "k8s.io/api/apps/v1"
 	//autoscalingv1 "k8s.io/api/autoscaling/v1"
+	"context"
 	"fmt"
+	"time"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"time"
 )
 
 func GetDeployment(namespace, deploymentName, accessWithinCluster string) (*apps.Deployment, error) {
@@ -29,7 +31,7 @@ func GetDeployment(namespace, deploymentName, accessWithinCluster string) (*apps
 		return deployment, err
 	}
 
-	deployment, err = client.Deployments(namespace).Get(deploymentName, metav1.GetOptions{})
+	deployment, err = client.Deployments(namespace).Get(context.Background(), deploymentName, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +61,7 @@ func ScaleDownDeployment(namespace, deploymentConfigName, accessWithinCluster st
 
 	deployment.Spec.Replicas = &size
 
-	_, err = client.Deployments(namespace).Update(deployment)
+	_, err = client.Deployments(namespace).Update(context.Background(), deployment, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
@@ -101,7 +103,7 @@ func ScaleUpDeployment(namespace, deploymentConfigName, accessWithinCluster stri
 
 	deployment.Spec.Replicas = &size
 
-	_, err = client.Deployments(namespace).Update(deployment)
+	_, err = client.Deployments(namespace).Update(context.Background(), deployment, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
@@ -142,7 +144,7 @@ func UpdateDeploymentVolume(pvcName, namespace, deploymentName, accessWithinClus
 
 	deployment.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim = GeneratePersistentVolumeClaimVolumeName(pvcName)
 
-	_, err = client.Deployments(namespace).Update(deployment)
+	_, err = client.Deployments(namespace).Update(context.Background(), deployment, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}

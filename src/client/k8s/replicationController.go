@@ -13,6 +13,8 @@ limitations under the License.
 package k8s
 
 import (
+	"context"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -24,7 +26,7 @@ func GetReplicationController(rcName, namespace, accessWithinCluster string) (*v
 		return rc, err
 	}
 
-	rc, err = client.CoreV1().ReplicationControllers(namespace).Get(rcName, metav1.GetOptions{})
+	rc, err = client.CoreV1().ReplicationControllers(namespace).Get(context.Background(), rcName, metav1.GetOptions{})
 	if err != nil {
 		return rc, err
 	}

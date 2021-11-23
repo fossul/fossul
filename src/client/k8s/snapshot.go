@@ -13,13 +13,14 @@ limitations under the License.
 package k8s
 
 import (
+	"context"
 	"fmt"
-	"github.com/kubernetes-csi/external-snapshotter/pkg/apis/volumesnapshot/v1alpha1"
-	snapClient "github.com/kubernetes-csi/external-snapshotter/pkg/client/clientset/versioned/typed/volumesnapshot/v1alpha1"
-	v1 "k8s.io/api/core/v1"
+	"time"
+
+	snapshotv1 "github.com/kubernetes-csi/external-snapshotter/client/v4/apis/volumesnapshot/v1"
+	snapClient "github.com/kubernetes-csi/external-snapshotter/client/v4/clientset/versioned/typed/volumesnapshot/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"time"
 )
 
 func CreateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessWithinCluster string, t int) error {
@@ -29,9 +30,9 @@ func CreateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessW
 		return err
 	}
 
-	snap := generateSnapshot(snapshotName, namespace, snapshotClassName, pvcName)
+	snap := generateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessWithinCluster)
 
-	_, err = sclient.VolumeSnapshots(snap.Namespace).Create(snap)
+	_, err = sclient.VolumeSnapshots(snap.Namespace).Create(context.Background(), snap, metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}
@@ -46,26 +47,27 @@ func CreateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessW
 
 	return wait.PollImmediate(poll, timeout, func() (bool, error) {
 		fmt.Printf("waiting for snapshot %s (%d seconds elapsed)\n", snap.Name, int(time.Since(start).Seconds()))
-		snaps, err := sclient.VolumeSnapshots(snap.Namespace).Get(name, metav1.GetOptions{})
+		snaps, err := sclient.VolumeSnapshots(snap.Namespace).Get(context.Background(), name, metav1.GetOptions{})
 		if err != nil {
 			fmt.Printf("Error getting snapshot in namespace: '%s': %v\n", snap.Namespace, err)
 			return false, err
 		}
-		if snaps.Status.ReadyToUse {
+		if *snaps.Status.ReadyToUse {
 			return true, nil
 		}
 		return false, nil
 	})
 }
 
-func ListSnapshots(namespace, accessWithinCluster string) (*v1alpha1.VolumeSnapshotList, error) {
-	var snapshots *v1alpha1.VolumeSnapshotList
+func ListSnapshots(namespace, accessWithinCluster string) (*snapshotv1.VolumeSnapshotList, error) {
+	var snapshots *snapshotv1.VolumeSnapshotList
 	sclient, err := getSnapshotClient(accessWithinCluster)
 	if err != nil {
 		return snapshots, err
 	}
 
-	snapshots, err = sclient.VolumeSnapshots(namespace).List(metav1.ListOptions{})
+	snapshots, err = sclient.VolumeSnapshots(namespace).List(context.Background(), metav1.ListOptions{})
+
 	if err != nil {
 		return snapshots, err
 	}
@@ -79,7 +81,7 @@ func DeleteSnapshot(name, namespace, accessWithinCluster string) error {
 		return err
 	}
 
-	err = sclient.VolumeSnapshots(namespace).Delete(name, &metav1.DeleteOptions{})
+	err = sclient.VolumeSnapshots(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
 	if err != nil {
 		return err
 	}
@@ -87,15 +89,15 @@ func DeleteSnapshot(name, namespace, accessWithinCluster string) error {
 	return nil
 }
 
-func GetSnapshot(name, namespace, accessWithinCluster string) (*v1alpha1.VolumeSnapshot, error) {
-	var snapshot *v1alpha1.VolumeSnapshot
+func GetSnapshot(name, namespace, accessWithinCluster string) (*snapshotv1.VolumeSnapshot, error) {
+	var snapshot *snapshotv1.VolumeSnapshot
 
 	sclient, err := getSnapshotClient(accessWithinCluster)
 	if err != nil {
 		return snapshot, err
 	}
 
-	snapshot, err = sclient.VolumeSnapshots(namespace).Get(name, metav1.GetOptions{})
+	snapshot, err = sclient.VolumeSnapshots(namespace).Get(context.Background(), name, metav1.GetOptions{})
 	if err != nil {
 		return snapshot, err
 	}
@@ -103,26 +105,9 @@ func GetSnapshot(name, namespace, accessWithinCluster string) (*v1alpha1.VolumeS
 	return snapshot, nil
 }
 
-func GetSnapshotHandle(contentName, namespace, accessWithinCluster string) (string, error) {
-	var snapshotHandle string
+func getSnapshotClient(accessWithinCluster string) (*snapClient.SnapshotV1Client, error) {
+	var sclient *snapClient.SnapshotV1Client
 
-	sclient, err := getSnapshotClient(accessWithinCluster)
-	if err != nil {
-		return snapshotHandle, err
-	}
-
-	snapshotContent, err := sclient.VolumeSnapshotContents().Get(contentName, metav1.GetOptions{})
-	if err != nil {
-		return snapshotHandle, err
-	}
-
-	snapshotHandle = snapshotContent.Spec.CSI.SnapshotHandle
-
-	return snapshotHandle, nil
-}
-
-func getSnapshotClient(accessWithinCluster string) (*snapClient.SnapshotV1alpha1Client, error) {
-	var sclient *snapClient.SnapshotV1alpha1Client
 	err, kubeConfig := getKubeConfig(accessWithinCluster)
 	if err != nil {
 		return sclient, err
@@ -136,17 +121,19 @@ func getSnapshotClient(accessWithinCluster string) (*snapClient.SnapshotV1alpha1
 	return sclient, nil
 }
 
-func generateSnapshot(snapshotName, namespace, snapshotClassName, pvcName string) *v1alpha1.VolumeSnapshot {
-	snapshot := v1alpha1.VolumeSnapshot{
+func generateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessWithinCluster string) *snapshotv1.VolumeSnapshot {
+
+	claimName, _ := GetPersistentVolumeClaim(namespace, pvcName, accessWithinCluster)
+
+	snapshot := snapshotv1.VolumeSnapshot{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      snapshotName,
 			Namespace: namespace,
 		},
-		Spec: v1alpha1.VolumeSnapshotSpec{
+		Spec: snapshotv1.VolumeSnapshotSpec{
 			VolumeSnapshotClassName: &snapshotClassName,
-			Source: &v1.TypedLocalObjectReference{
-				Name: pvcName,
-				Kind: "PersistentVolumeClaim",
+			Source: snapshotv1.VolumeSnapshotSource{
+				PersistentVolumeClaimName: &claimName.Name,
 			},
 		},
 	}

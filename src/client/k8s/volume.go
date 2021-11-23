@@ -13,6 +13,8 @@ limitations under the License.
 package k8s
 
 import (
+	"context"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -26,7 +28,7 @@ func GetPersistentVolume(pvName, accessWithinCluster string) (*v1.PersistentVolu
 		return pv, err
 	}
 
-	pv, err = client.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
+	pv, err = client.CoreV1().PersistentVolumes().Get(context.Background(), pvName, metav1.GetOptions{})
 	if err != nil {
 		return pv, err
 	}
@@ -42,7 +44,7 @@ func GetPersistentVolumeClaim(namespace, pvcName, accessWithinCluster string) (*
 		return pvc, err
 	}
 
-	pvc, err = client.CoreV1().PersistentVolumeClaims(namespace).Get(pvcName, metav1.GetOptions{})
+	pvc, err = client.CoreV1().PersistentVolumeClaims(namespace).Get(context.Background(), pvcName, metav1.GetOptions{})
 	if err != nil {
 		return pvc, err
 	}
@@ -58,7 +60,7 @@ func CreatePersistentVolumeClaimFromSnapshot(pvcName, pvcSize, snapshotName, nam
 
 	pvc := generatePersistentVolumeClaimFromSnapshot(pvcName, pvcSize, snapshotName, namespace, storageClassName)
 
-	_, err = client.CoreV1().PersistentVolumeClaims(namespace).Create(pvc)
+	_, err = client.CoreV1().PersistentVolumeClaims(namespace).Create(context.Background(), pvc, metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}
@@ -72,7 +74,7 @@ func GetPersistentVolumeName(namespace, pvcName, accessWithinCluster string) (st
 		return "", err
 	}
 
-	pvc, err := client.CoreV1().PersistentVolumeClaims(namespace).Get(pvcName, metav1.GetOptions{})
+	pvc, err := client.CoreV1().PersistentVolumeClaims(namespace).Get(context.Background(), pvcName, metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -86,7 +88,7 @@ func GetGlusterVolumePath(pvName, accessWithinCluster string) (string, error) {
 		return "", err
 	}
 
-	pv, err := client.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
+	pv, err := client.CoreV1().PersistentVolumes().Get(context.Background(), pvName, metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
