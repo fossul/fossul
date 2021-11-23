@@ -81,7 +81,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		return result
 	}
 
-	cephSnapshotHandle, err := k8s.GetSnapshotHandle(snapshot.Status.BoundVolumeSnapshotContentName, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster)
+	cephSnapshotHandle, err := k8s.GetSnapshotHandle(*snapshot.Status.BoundVolumeSnapshotContentName, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
