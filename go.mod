@@ -1,4 +1,4 @@
-module fossul
+module github.com/fossul/fossul
 
 go 1.16
 
@@ -6,7 +6,6 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/aws/aws-sdk-go v1.42.10
-	github.com/fossul/fossul v0.0.0-20211123024453-22a51b91234d
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/kubernetes-csi/external-snapshotter/client/v4 v4.2.0

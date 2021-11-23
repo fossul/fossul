@@ -13,8 +13,8 @@ limitations under the License.
 package main
 
 import (
-	"fossul/src/client/k8s"
-	"fossul/src/plugins/pluginUtil"
+	"github.com/fossul/fossul/src/client/k8s"
+	"github.com/fossul/fossul/src/plugins/pluginUtil"
 
 	"github.com/fossul/fossul/src/engine/util"
 )
