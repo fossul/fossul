@@ -89,7 +89,7 @@ func DeleteSnapshot(name, namespace, accessWithinCluster string) error {
 	return nil
 }
 
-func GetSnapshotHandle(contentName, namespace, accessWithinCluster string) (string, error) {
+func GetSnapshotHandle(contentName *string, namespace string, accessWithinCluster string) (string, error) {
 	var snapshotHandle string
 
 	sclient, err := getSnapshotClient(accessWithinCluster)
@@ -97,7 +97,7 @@ func GetSnapshotHandle(contentName, namespace, accessWithinCluster string) (stri
 		return snapshotHandle, err
 	}
 
-	snapshotContent, err := sclient.VolumeSnapshotContents().Get(context.Background(), contentName, metav1.GetOptions{})
+	snapshotContent, err := sclient.VolumeSnapshotContents().Get(context.Background(), *contentName, metav1.GetOptions{})
 	if err != nil {
 		return snapshotHandle, err
 	}
