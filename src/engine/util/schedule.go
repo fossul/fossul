@@ -14,8 +14,9 @@ package util
 
 import (
 	"encoding/json"
-	"gopkg.in/robfig/cron.v3"
 	"net/http"
+
+	"github.com/robfig/cron/v3"
 )
 
 type JobScheduleResult struct {

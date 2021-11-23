@@ -13,11 +13,12 @@ limitations under the License.
 package main
 
 import (
-	"github.com/fossul/fossul/src/client"
-	"github.com/fossul/fossul/src/engine/util"
-	"gopkg.in/robfig/cron.v3"
 	"os"
 	"strings"
+
+	"github.com/fossul/fossul/src/client"
+	"github.com/fossul/fossul/src/engine/util"
+	"github.com/robfig/cron/v3"
 )
 
 var c *CronScheduler
