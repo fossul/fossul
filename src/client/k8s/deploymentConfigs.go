@@ -14,11 +14,13 @@ limitations under the License.
 package k8s
 
 import (
+	"context"
 	"fmt"
+	"time"
+
 	apps "github.com/openshift/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
-	"time"
 )
 
 func GetDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster string) (*apps.DeploymentConfig, error) {
@@ -29,7 +31,7 @@ func GetDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster st
 		return deploymentConfig, err
 	}
 
-	deploymentConfig, err = client.DeploymentConfigs(namespace).Get(deploymentConfigName, metav1.GetOptions{})
+	deploymentConfig, err = client.DeploymentConfigs(namespace).Get(context.Background(), deploymentConfigName, metav1.GetOptions{})
 	if err != nil {
 		return deploymentConfig, err
 	}
@@ -59,7 +61,7 @@ func ScaleDownDeploymentConfig(namespace, deploymentConfigName, accessWithinClus
 
 	deploymentConfig.Spec.Replicas = size
 
-	_, err = client.DeploymentConfigs(namespace).Update(deploymentConfig)
+	_, err = client.DeploymentConfigs(namespace).Update(context.Background(), deploymentConfig, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
@@ -101,7 +103,7 @@ func ScaleUpDeploymentConfig(namespace, deploymentConfigName, accessWithinCluste
 
 	deploymentConfig.Spec.Replicas = size
 
-	_, err = client.DeploymentConfigs(namespace).Update(deploymentConfig)
+	_, err = client.DeploymentConfigs(namespace).Update(context.Background(), deploymentConfig, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
@@ -148,7 +150,7 @@ func UpdateDeploymentConfigVolume(pvcName, namespace, deploymentConfigName, acce
 
 	deploymentConfig.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim = GeneratePersistentVolumeClaimVolumeName(pvcName)
 
-	_, err = client.DeploymentConfigs(namespace).Update(deploymentConfig)
+	_, err = client.DeploymentConfigs(namespace).Update(context.Background(), deploymentConfig, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
