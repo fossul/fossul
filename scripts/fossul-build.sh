@@ -7,7 +7,7 @@ if [[ -z "${FOSSUL_BUILD_PLUGIN_DIR}" ]]; then
 fi  
 
 echo "Installing Dependencies"
-#$GOBIN/dep ensure
+go mod tidy
 
 echo "Running Unit Tests"
 go test github.com/fossul/fossul/src/engine/util
