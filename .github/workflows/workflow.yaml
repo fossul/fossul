@@ -1,0 +1,30 @@
+on: [push, pull_request]
+name: Fossul CI Workflow
+jobs:
+  test:
+    strategy:
+      matrix:
+        go-version: [1.16.x]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go-version }}
+    - name: Checkout code
+      uses: actions/checkout@master
+    - name: Print environment
+      run: echo "${GOPATH} ${GOBIN}"
+    - name: Run server build
+      run: scripts/fossul-server-build.sh
+      env:
+        PLUGIN_DIR: ${GOBIN}
+    - name: Run app plugin build
+      run: scripts/fossul-app-build.sh
+      env:
+        PLUGIN_DIR: ${GOBIN}
+    - name: Run storage plugin build
+      run: scripts/fossul-storage-build.sh
+      env:
+        PLUGIN_DIR: ${GOBIN}

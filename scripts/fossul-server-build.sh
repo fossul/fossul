@@ -1,9 +1,13 @@
 #!/bin/sh
 
-PLUGIN_DIR="/home/ktenzer/plugins"
+PLUGIN_DIR="${HOME}/plugins"
 
 if [[ -z "${FOSSUL_BUILD_PLUGIN_DIR}" ]]; then
     export FOSSUL_BUILD_PLUGIN_DIR=$PLUGIN_DIR
+
+  if [[ ! -e "${FOSSUL_BUILD_PLUGIN_DIR}" ]]; then
+      mkdir $FOSSUL_BUILD_PLUGIN_DIR
+  fi
 fi  
 
 echo "Installing Dependencies"
