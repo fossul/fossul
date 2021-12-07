@@ -4,11 +4,6 @@ PLUGIN_DIR="${HOME}/plugins"
 
 if [[ -z "${FOSSUL_BUILD_PLUGIN_DIR}" ]]; then
     export FOSSUL_BUILD_PLUGIN_DIR=$PLUGIN_DIR
-
-  if [[ ! -e "${FOSSUL_BUILD_PLUGIN_DIR}" ]]; then
-      mkdir -p $FOSSUL_BUILD_PLUGIN_DIR/storage
-      mkdir -p $FOSSUL_BUILD_PLUGIN_DIR/archive
-  fi
 fi  
 
 echo "Installing Dependencies"
@@ -54,14 +49,6 @@ if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Storage Service"
 go install github.com/fossul/fossul/src/engine/storage
-if [ $? != 0 ]; then exit 1; fi
-
-echo "Moving plugins to $FOSSUL_BUILD_PLUGIN_DIR"
-mv $GOBIN/sample-storage $FOSSUL_BUILD_PLUGIN_DIR/storage
-if [ $? != 0 ]; then exit 1; fi
-mv $GOBIN/sample-archive $FOSSUL_BUILD_PLUGIN_DIR/archive
-if [ $? != 0 ]; then exit 1; fi
-mv $GOBIN/container-basic $FOSSUL_BUILD_PLUGIN_DIR/storage
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Storage build completed successfully"

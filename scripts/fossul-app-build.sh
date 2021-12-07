@@ -4,10 +4,6 @@ PLUGIN_DIR="${HOME}/plugins"
 
 if [[ -z "${FOSSUL_BUILD_PLUGIN_DIR}" ]]; then
     export FOSSUL_BUILD_PLUGIN_DIR=$PLUGIN_DIR
-
-  if [[ ! -e "${FOSSUL_BUILD_PLUGIN_DIR}" ]]; then
-      mkdir -p $FOSSUL_BUILD_PLUGIN_DIR/app
-  fi
 fi  
 
 echo "Installing Dependencies"
@@ -49,9 +45,6 @@ if [ $? != 0 ]; then exit 1; fi
 
 echo "Building App Service"
 go install github.com/fossul/fossul/src/engine/app
-if [ $? != 0 ]; then exit 1; fi
-
-mv $GOBIN/sample-app $FOSSUL_BUILD_PLUGIN_DIR/app
 if [ $? != 0 ]; then exit 1; fi
 
 echo "App build completed successfully"
