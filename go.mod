@@ -6,6 +6,7 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/aws/aws-sdk-go v1.42.10
+	github.com/fossul/fossul/src/client/k8s/snapshotctrl/client/versioned v0.0.0-00010101000000-000000000000
 	github.com/fossul/fossul/src/client/k8s/virtctrl/client/versioned v0.0.0-00010101000000-000000000000
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/mux v1.8.0
@@ -21,10 +22,12 @@ require (
 	k8s.io/api v0.22.4
 	k8s.io/apimachinery v0.22.4
 	k8s.io/client-go v0.22.4
+	kubevirt.io/api v0.0.0-20211129173424-e2813e40f15a
 )
 
 replace (
 	github.com/fossul/fossul/src/client/k8s => ./src/client/k8s
+	github.com/fossul/fossul/src/client/k8s/snapshotctrl/client/versioned => ./src/client/k8s/snapshotctrl/client/versioned
 	github.com/fossul/fossul/src/client/k8s/virtctrl/client/versioned => ./src/client/k8s/virtctrl/client/versioned
 	k8s.io/api => k8s.io/api v0.22.4
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.22.4
