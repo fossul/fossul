@@ -6,7 +6,7 @@ if [[ -z "${FOSSUL_BUILD_PLUGIN_DIR}" ]]; then
     export FOSSUL_BUILD_PLUGIN_DIR=$PLUGIN_DIR
 
   if [[ ! -e "${FOSSUL_BUILD_PLUGIN_DIR}" ]]; then
-      mkdir $FOSSUL_BUILD_PLUGIN_DIR
+      mkdir -p $FOSSUL_BUILD_PLUGIN_DIR/app
   fi
 fi  
 
@@ -51,8 +51,6 @@ echo "Building App Service"
 go install github.com/fossul/fossul/src/engine/app
 if [ $? != 0 ]; then exit 1; fi
 
-echo "Moving plugins to $FOSSUL_BUILD_PLUGIN_DIR"
-if [ ! -d "$FOSSUL_BUILD_PLUGIN_DIR/app" ]; then mkdir $FOSSUL_BUILD_PLUGIN_DIR/app; fi
 mv $GOBIN/sample-app $FOSSUL_BUILD_PLUGIN_DIR/app
 if [ $? != 0 ]; then exit 1; fi
 
