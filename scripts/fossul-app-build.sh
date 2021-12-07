@@ -56,9 +56,5 @@ if [ ! -d "$FOSSUL_BUILD_PLUGIN_DIR/app" ]; then mkdir $FOSSUL_BUILD_PLUGIN_DIR/
 mv $GOBIN/sample-app $FOSSUL_BUILD_PLUGIN_DIR/app
 if [ $? != 0 ]; then exit 1; fi
 
-echo "Copying startup script"
-cp $GOPATH/src/github.com/fossul/fossul/scripts/fossul-app-startup.sh $GOBIN
-if [ $? != 0 ]; then exit 1; fi
-
 echo "App build completed successfully"
 
