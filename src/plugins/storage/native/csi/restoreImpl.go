@@ -30,8 +30,8 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
-		result = util.SetResult(1, messages)
 
+		result = util.SetResult(1, messages)
 		return result
 	}
 
@@ -52,6 +52,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		messages = append(messages, msg)
 
 		result = util.SetResult(1, messages)
+		return result
 	}
 
 	msg = util.SetMessage("INFO", "Updating deployment type ["+config.StoragePluginParameters["DeploymentType"]+"] deployment name  ["+config.StoragePluginParameters["DeploymentName"]+"] to use restore pvc ["+pvcRestoreName+"]")
@@ -64,6 +65,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			messages = append(messages, msg)
 
 			result = util.SetResult(1, messages)
+			return result
 		}
 	} else if config.StoragePluginParameters["DeploymentType"] == "Deployment" {
 		err := k8s.UpdateDeploymentVolume(pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
@@ -72,6 +74,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			messages = append(messages, msg)
 
 			result = util.SetResult(1, messages)
+			return result
 		}
 	} else {
 		msg := util.SetMessage("ERROR", "Couldn't find Deployment or DeploymentConfig, check configuration")

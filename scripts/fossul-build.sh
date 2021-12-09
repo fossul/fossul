@@ -105,5 +105,8 @@ if [ $? != 0 ]; then exit 1; fi
 cp $GOPATH/src/github.com/fossul/fossul/scripts/fossul-storage-startup.sh $GOBIN
 if [ $? != 0 ]; then exit 1; fi
 
-echo "Build completed successfully"
+echo "Building CLI"
+go install github.com/fossul/fossul/src/cli
+if [ $? != 0 ]; then exit 1; fi
 
+echo "Build completed successfully"
