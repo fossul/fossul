@@ -21,6 +21,7 @@ import (
 	apps "github.com/openshift/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/util/retry"
 )
 
 func GetDeploymentConfig(namespace, deploymentConfigName, accessWithinCluster string) (*apps.DeploymentConfig, error) {
@@ -144,16 +145,36 @@ func UpdateDeploymentConfigVolume(pvcName, namespace, deploymentConfigName, acce
 
 	//volumes := deploymentConfig.Spec.Template.Spec.Volumes
 	//for _, volume := range volumes {
-	// fmt.Println("[DEBUG] Updating pv [" + volume.Name + "] with new pvc [" + pvcName + "]")
+	//	fmt.Println("[DEBUG] Updating pv [" + volume.Name + "] with new pvc [" + pvcName + "]")
 	//	volume.PersistentVolumeClaim = GeneratePersistentVolumeClaimVolumeName(pvcName)
+	//	fmt.Println("here 123 " + pvcName + " " + volume.PersistentVolumeClaim.ClaimName + " " + deploymentConfig.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim.ClaimName)
 	//}
 
-	deploymentConfig.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim = GeneratePersistentVolumeClaimVolumeName(pvcName)
-
-	_, err = client.DeploymentConfigs(namespace).Update(context.Background(), deploymentConfig, metav1.UpdateOptions{})
-	if err != nil {
+	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
+		// Retrieve the latest version of Deployment before attempting update
+		// RetryOnConflict uses exponential backoff to avoid exhausting the apiserver
+		deploymentConfig.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim = GeneratePersistentVolumeClaimVolumeName(pvcName)
+		_, updateErr := client.DeploymentConfigs(namespace).Update(context.Background(), deploymentConfig, metav1.UpdateOptions{})
+		return updateErr
+	})
+	if retryErr != nil {
 		return err
 	}
+
+	//deploymentConfig.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim = GeneratePersistentVolumeClaimVolumeName(pvcName)
+
+	// Should switch to patch at some point, below is example
+	//dcLabelPatchPayload, err := json.Marshal(apps.DeploymentConfig{
+	//	ObjectMeta: metav1.ObjectMeta{
+	//		Label: map[string]string{"spec": "patched"},
+	//	},
+	//})
+	//testDcPatched, err := client.DeploymentConfigs(namespace).Patch(context.Background(), deploymentConfigName, types.StrategicMergePatchType, []byte(rcLabelPatchPayload), metav1.PatchOptions{})
+
+	//_, err = client.DeploymentConfigs(namespace).Update(context.Background(), deploymentConfig, metav1.UpdateOptions{})
+	//if err != nil {
+	//	return err
+	//}
 
 	return nil
 }

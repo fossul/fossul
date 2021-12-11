@@ -45,6 +45,7 @@ func CreateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessW
 	start := time.Now()
 	fmt.Printf("Waiting up to %v seconds to be in Ready state\n", timeout)
 
+	time.Sleep(poll)
 	return wait.PollImmediate(poll, timeout, func() (bool, error) {
 		fmt.Printf("waiting for snapshot %s (%d seconds elapsed)\n", snap.Name, int(time.Since(start).Seconds()))
 		snaps, err := sclient.VolumeSnapshots(snap.Namespace).Get(context.Background(), name, metav1.GetOptions{})
@@ -52,6 +53,12 @@ func CreateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessW
 			fmt.Printf("Error getting snapshot in namespace: '%s': %v\n", snap.Namespace, err)
 			return false, err
 		}
+
+		if snaps == nil {
+			fmt.Printf("Error getting snapshot status: '%s': %v\n", snap.Namespace, err)
+			return false, err
+		}
+
 		if *snaps.Status.ReadyToUse {
 			return true, nil
 		}

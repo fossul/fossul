@@ -14,10 +14,14 @@ package k8s
 
 import (
 	"context"
+	"fmt"
+	"strings"
+	"time"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 func GetPersistentVolume(pvName, accessWithinCluster string) (*v1.PersistentVolume, error) {
@@ -102,6 +106,56 @@ func GeneratePersistentVolumeClaimVolumeName(pvcName string) *v1.PersistentVolum
 	}
 
 	return &volumeSource
+}
+
+func ListPersistentVolumeClaims(namespace, accessWithinCluster string) (*v1.PersistentVolumeClaimList, error) {
+	var pvcList *v1.PersistentVolumeClaimList
+
+	client, err := getClient(accessWithinCluster)
+	if err != nil {
+		return pvcList, err
+	}
+
+	pvcList, err = client.CoreV1().PersistentVolumeClaims(namespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return pvcList, err
+	}
+
+	return pvcList, nil
+}
+
+func DeletePersistentVolumeClaim(pvcName, namespace, accessWithinCluster string) error {
+	client, err := getClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	err = client.CoreV1().PersistentVolumeClaims(namespace).Delete(context.Background(), pvcName, metav1.DeleteOptions{})
+	if err != nil {
+		return err
+	}
+
+	var poll = 5 * time.Second
+	timeout := time.Duration(60) * time.Second
+	start := time.Now()
+
+	fmt.Printf("[DEBUG] Waiting up to %v for pvc [%s] deletion\n", timeout, pvcName)
+
+	return wait.PollImmediate(poll, timeout, func() (bool, error) {
+		pvcList, err := ListPersistentVolumeClaims(namespace, accessWithinCluster)
+		if err != nil {
+			return false, nil
+		}
+
+		for _, pvc := range pvcList.Items {
+			if strings.Compare(pvc.Name, pvcName) == 0 {
+				fmt.Printf("[DEBUG] PVC [%s] exists, waiting to be deleted (%d seconds elapsed)\n", pvcName, int(time.Since(start).Seconds()))
+				return false, nil
+			}
+		}
+
+		return true, nil
+	})
 }
 
 func generatePersistentVolumeClaimFromSnapshot(pvcName, pvcSize, snapshotName, namespace, storageClassName string) *v1.PersistentVolumeClaim {
