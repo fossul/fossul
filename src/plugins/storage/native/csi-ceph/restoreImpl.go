@@ -50,7 +50,14 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		snapshotList = append(snapshotList, snapshot.Name)
 	}
 
-	restoreSnapshot := util.GetRestoreSnapshot(config, snapshotList)
+	restoreSnapshot, err := util.GetRestoreSnapshot(config, snapshotList)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+
+		result = util.SetResult(1, messages)
+		return result
+	}
 
 	pvName, err := k8s.GetPersistentVolumeName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PvcName"], config.AccessWithinCluster)
 	if err != nil {

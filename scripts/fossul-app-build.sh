@@ -36,6 +36,8 @@ go build -buildmode=plugin -o mongo.so github.com/fossul/fossul/src/plugins/app/
 if [ $? != 0 ]; then exit 1; fi
 go build -buildmode=plugin -o mongo-dump.so github.com/fossul/fossul/src/plugins/app/native/mongo-dump
 if [ $? != 0 ]; then exit 1; fi
+go build -buildmode=plugin -o kubevirt.so github.com/fossul/fossul/src/plugins/app/native/kubevirt
+if [ $? != 0 ]; then exit 1; fi
 
 echo "Building App Service"
 go install github.com/fossul/fossul/src/engine/app

@@ -20,8 +20,7 @@ package versioned
 
 import (
 	"fmt"
-	flavorv1alpha1 "github.com/fossul/fossul/src/client/k8s/snapshotctrl/client/versioned/typed/flavor/v1alpha1"
-	snapshotv1alpha "github.com/fossul/fossul/src/client/k8s/snapshotctrl/client/versioned/typed/snapshot/v1alpha"
+	snapshotv1alpha1 "github.com/fossul/fossul/src/client/k8s/snapshotctrl/client/versioned/typed/snapshot/v1alpha1"
 
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
@@ -30,26 +29,19 @@ import (
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
-	FlavorV1alpha1() flavorv1alpha1.FlavorV1alpha1Interface
-	SnapshotV1alpha() snapshotv1alpha.SnapshotV1alphaInterface
+	SnapshotV1alpha1() snapshotv1alpha1.SnapshotV1alpha1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
 // version included in a Clientset.
 type Clientset struct {
 	*discovery.DiscoveryClient
-	flavorV1alpha1  *flavorv1alpha1.FlavorV1alpha1Client
-	snapshotV1alpha *snapshotv1alpha.SnapshotV1alphaClient
+	snapshotV1alpha1 *snapshotv1alpha1.SnapshotV1alpha1Client
 }
 
-// FlavorV1alpha1 retrieves the FlavorV1alpha1Client
-func (c *Clientset) FlavorV1alpha1() flavorv1alpha1.FlavorV1alpha1Interface {
-	return c.flavorV1alpha1
-}
-
-// SnapshotV1alpha retrieves the SnapshotV1alphaClient
-func (c *Clientset) SnapshotV1alpha() snapshotv1alpha.SnapshotV1alphaInterface {
-	return c.snapshotV1alpha
+// SnapshotV1alpha1 retrieves the SnapshotV1alpha1Client
+func (c *Clientset) SnapshotV1alpha1() snapshotv1alpha1.SnapshotV1alpha1Interface {
+	return c.snapshotV1alpha1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -73,11 +65,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	}
 	var cs Clientset
 	var err error
-	cs.flavorV1alpha1, err = flavorv1alpha1.NewForConfig(&configShallowCopy)
-	if err != nil {
-		return nil, err
-	}
-	cs.snapshotV1alpha, err = snapshotv1alpha.NewForConfig(&configShallowCopy)
+	cs.snapshotV1alpha1, err = snapshotv1alpha1.NewForConfig(&configShallowCopy)
 	if err != nil {
 		return nil, err
 	}
@@ -93,8 +81,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 // panics if there is an error in the config.
 func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
-	cs.flavorV1alpha1 = flavorv1alpha1.NewForConfigOrDie(c)
-	cs.snapshotV1alpha = snapshotv1alpha.NewForConfigOrDie(c)
+	cs.snapshotV1alpha1 = snapshotv1alpha1.NewForConfigOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
@@ -103,8 +90,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 // New creates a new Clientset for the given RESTClient.
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
-	cs.flavorV1alpha1 = flavorv1alpha1.New(c)
-	cs.snapshotV1alpha = snapshotv1alpha.New(c)
+	cs.snapshotV1alpha1 = snapshotv1alpha1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

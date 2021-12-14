@@ -56,11 +56,45 @@ func GetPersistentVolumeClaim(namespace, pvcName, accessWithinCluster string) (*
 	return pvc, nil
 }
 
+func CreatePersistentVolumeClaimFromSnapshotWithModes(pvcName, pvcSize, snapshotName, namespace, storageClassName, accessWithinCluster string, accessModes []v1.PersistentVolumeAccessMode, volumeMode *v1.PersistentVolumeMode) error {
+	client, err := getClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	//existingPvc, err := client.CoreV1().PersistentVolumeClaims(namespace).Get(context.Background(), pvcName, metav1.GetOptions{})
+	//if err != nil {
+	//	return err
+	//}
+
+	//accessModes := existingPvc.Spec.AccessModes
+	//volumeMode := existingPvc.Spec.VolumeMode
+
+	pvc := generatePersistentVolumeClaimFromSnapshot(pvcName, pvcSize, snapshotName, namespace, storageClassName)
+	pvc.Spec.AccessModes = accessModes
+	pvc.Spec.VolumeMode = volumeMode
+
+	_, err = client.CoreV1().PersistentVolumeClaims(namespace).Create(context.Background(), pvc, metav1.CreateOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func CreatePersistentVolumeClaimFromSnapshot(pvcName, pvcSize, snapshotName, namespace, storageClassName, accessWithinCluster string) error {
 	client, err := getClient(accessWithinCluster)
 	if err != nil {
 		return err
 	}
+
+	//existingPvc, err := client.CoreV1().PersistentVolumeClaims(namespace).Get(context.Background(), pvcName, metav1.GetOptions{})
+	//if err != nil {
+	//	return err
+	//}
+
+	//accessModes := existingPvc.Spec.AccessModes
+	//volumeMode := existingPvc.Spec.VolumeMode
 
 	pvc := generatePersistentVolumeClaimFromSnapshot(pvcName, pvcSize, snapshotName, namespace, storageClassName)
 

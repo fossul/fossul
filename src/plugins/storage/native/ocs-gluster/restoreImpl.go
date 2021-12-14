@@ -13,9 +13,10 @@ limitations under the License.
 package main
 
 import (
+	"strings"
+
 	"github.com/fossul/fossul/src/client/k8s"
 	"github.com/fossul/fossul/src/engine/util"
-	"strings"
 )
 
 func (s storagePlugin) Restore(config util.Config) util.Result {
@@ -51,7 +52,14 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	}
 
 	snapshotList := strings.Split(listSnapshotStdout, "\n")
-	restoreSnapshot := util.GetRestoreSnapshot(config, snapshotList)
+	restoreSnapshot, err := util.GetRestoreSnapshot(config, snapshotList)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+
+		result = util.SetResult(1, messages)
+		return result
+	}
 
 	pvName, err := k8s.GetPersistentVolumeName(config.StoragePluginParameters["DatabaseNamespace"], config.StoragePluginParameters["PvcName"], config.AccessWithinCluster)
 	if err != nil {

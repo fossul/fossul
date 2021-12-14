@@ -14,6 +14,7 @@ package util
 
 import (
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -80,17 +81,19 @@ func GetRestoreSrcPath(config Config) (string, error) {
 	return "", nil
 }
 
-func GetRestoreSnapshot(config Config, snapshots []string) string {
+func GetRestoreSnapshot(config Config, snapshots []string) (string, error) {
 	snapshotNameSubString := config.StoragePluginParameters["BackupName"] + "-" + config.SelectedBackupPolicy + "-" + IntToString(config.SelectedWorkflowId)
 
 	fmt.Println("[DEBUG] snapshot search string [" + snapshotNameSubString + "]")
 
 	for _, snapshot := range snapshots {
 		if strings.Contains(snapshot, snapshotNameSubString) {
-			return snapshot
+			return snapshot, nil
 		}
 	}
-	return ""
+
+	err := errors.New("Couldn't find snapshot using substring [" + snapshotNameSubString + "]")
+	return "", err
 }
 
 func GetRestoreSrcPathFromMap(configMap map[string]string) (string, error) {
