@@ -14,6 +14,7 @@ package k8s
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -22,9 +23,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	v1 "kubevirt.io/api/core/v1"
 	virtv1 "kubevirt.io/api/core/v1"
 	snapshotv1 "kubevirt.io/api/snapshot/v1alpha1"
 )
+
+const vmiSubresourceURL = "/apis/subresources.kubevirt.io/%s/namespaces/%s/virtualmachineinstances/%s/%s"
 
 func CreateVirtualMachineSnapshot(namespace, accessWithinCluster, vmName string) error {
 
@@ -233,7 +237,23 @@ func StartVirtualMachine(namespace, accessWithinCluster, vmName string) error {
 		return err
 	}
 
-	return nil
+	var poll = 5 * time.Second
+	timeout := time.Duration(300) * time.Second
+	start := time.Now()
+
+	return wait.PollImmediate(poll, timeout, func() (bool, error) {
+		vm, err = virtualMachineClient.KubevirtV1().VirtualMachines(namespace).Get(context.Background(), vmName, metav1.GetOptions{})
+		if err != nil {
+			return false, err
+		}
+
+		fmt.Printf("[DEBUG] Waiting for vm [%s] to start (%d seconds elapsed)\n", vm.Name, int(time.Since(start).Seconds()))
+		if *vm.Spec.RunStrategy == "Always" {
+			return true, nil
+		}
+
+		return false, nil
+	})
 }
 
 func StopVirtualMachine(namespace, accessWithinCluster, vmName string) error {
@@ -258,7 +278,23 @@ func StopVirtualMachine(namespace, accessWithinCluster, vmName string) error {
 		return err
 	}
 
-	return nil
+	var poll = 5 * time.Second
+	timeout := time.Duration(300) * time.Second
+	start := time.Now()
+
+	return wait.PollImmediate(poll, timeout, func() (bool, error) {
+		vm, err = virtualMachineClient.KubevirtV1().VirtualMachines(namespace).Get(context.Background(), vmName, metav1.GetOptions{})
+		if err != nil {
+			return false, err
+		}
+
+		fmt.Printf("[DEBUG] Waiting for vm [%s] to stop (%d seconds elapsed)\n", vm.Name, int(time.Since(start).Seconds()))
+		if *vm.Spec.RunStrategy == "Halted" {
+			return true, nil
+		}
+
+		return false, nil
+	})
 }
 
 func vmSnapshotSucceeded(vmSnapshot *snapshotv1.VirtualMachineSnapshot) bool {
@@ -279,6 +315,39 @@ func getVirtualMachineClient(accessWithinCluster string) (*virtclient.Clientset,
 	}
 
 	return virtualMachineClient, nil
+}
+
+func PauseVirtualMachine(namespace, accessWithinCluster, vmName string, unfreezeTimeout time.Duration) error {
+	virtualMachineClient, err := getVirtualMachineClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	uri := fmt.Sprintf(vmiSubresourceURL, v1.ApiStorageVersion, namespace, vmName, "pause")
+
+	freezeUnfreezeTimeout := &v1.FreezeUnfreezeTimeout{
+		UnfreezeTimeout: &metav1.Duration{
+			Duration: unfreezeTimeout,
+		},
+	}
+
+	JSON, err := json.Marshal(freezeUnfreezeTimeout)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(uri)
+	return virtualMachineClient.RESTClient().Put().RequestURI(uri).Body([]byte(JSON)).Do(context.Background()).Error()
+}
+
+func UnPauseVirtualMachine(namespace, accessWithinCluster, vmName string, unfreezeTimeout time.Duration) error {
+	virtualMachineClient, err := getVirtualMachineClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	uri := fmt.Sprintf(vmiSubresourceURL, v1.ApiStorageVersion, namespace, vmName, "unpause")
+	return virtualMachineClient.RESTClient().Put().RequestURI(uri).Do(context.Background()).Error()
 }
 
 func getVirtSnapshotClient(accessWithinCluster string) (*snapclient.Clientset, error) {

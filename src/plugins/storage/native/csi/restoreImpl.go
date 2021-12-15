@@ -13,8 +13,6 @@ limitations under the License.
 package main
 
 import (
-	"fmt"
-
 	"github.com/fossul/fossul/src/client/k8s"
 	"github.com/fossul/fossul/src/engine/util"
 
@@ -157,7 +155,6 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		msg = util.SetMessage("INFO", "Restoring snapshot ["+restoreSnapshot+"] to new pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"] using storage class ["+config.StoragePluginParameters["StorageClass"]+"]")
 		messages = append(messages, msg)
 
-		fmt.Println("here 123")
 		err = k8s.CreatePersistentVolumeClaimFromSnapshotWithModes(pvcRestoreName, config.StoragePluginParameters["PvcSize"], restoreSnapshot, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["StorageClass"], config.AccessWithinCluster, accessModes, volumeMode)
 		if err != nil {
 			msg := util.SetMessage("ERROR", err.Error())
