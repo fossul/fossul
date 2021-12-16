@@ -66,18 +66,18 @@ func (a appPlugin) Quiesce(config util.Config) util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
-	msg := util.SetMessage("INFO", "Pausing virtual machine ["+config.AppPluginParameters["VmName"]+"]")
+	msg := util.SetMessage("INFO", "Freezing virtual machine ["+config.AppPluginParameters["VmName"]+"]")
 	messages = append(messages, msg)
 
-	err := k8s.PauseVirtualMachine(config.AppPluginParameters["Namespace"], config.AccessWithinCluster, config.AppPluginParameters["VmName"], 60000000000)
+	err := k8s.FreezeVirtualMachine(config.AppPluginParameters["Namespace"], config.AccessWithinCluster, config.AppPluginParameters["VmName"], 60000000000)
 	if err != nil {
-		msg = util.SetMessage("ERROR", "Pausing virtual machine ["+config.AppPluginParameters["VmName"]+"] failed! "+err.Error())
+		msg = util.SetMessage("ERROR", "Freezing virtual machine ["+config.AppPluginParameters["VmName"]+"] failed! "+err.Error())
 		messages = append(messages, msg)
 		result = util.SetResult(1, messages)
 
 		return result
 	} else {
-		msg = util.SetMessage("INFO", "Pausing virtual machine ["+config.AppPluginParameters["VmName"]+"] successful")
+		msg = util.SetMessage("INFO", "Freezing virtual machine ["+config.AppPluginParameters["VmName"]+"] successful")
 		messages = append(messages, msg)
 	}
 
@@ -90,18 +90,18 @@ func (a appPlugin) Unquiesce(config util.Config) util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
-	msg := util.SetMessage("INFO", "Un-Pausing virtual machine ["+config.AppPluginParameters["VmName"]+"]")
+	msg := util.SetMessage("INFO", "Un-Freezing virtual machine ["+config.AppPluginParameters["VmName"]+"]")
 	messages = append(messages, msg)
 
-	err := k8s.UnPauseVirtualMachine(config.AppPluginParameters["Namespace"], config.AccessWithinCluster, config.AppPluginParameters["VmName"], 60000000000)
+	err := k8s.UnFreezeVirtualMachine(config.AppPluginParameters["Namespace"], config.AccessWithinCluster, config.AppPluginParameters["VmName"], 60000000000)
 	if err != nil {
-		msg = util.SetMessage("ERROR", "Un-Pausing virtual machine ["+config.AppPluginParameters["VmName"]+"] failed! "+err.Error())
+		msg = util.SetMessage("ERROR", "Un-Freezing virtual machine ["+config.AppPluginParameters["VmName"]+"] failed! "+err.Error())
 		messages = append(messages, msg)
 		result = util.SetResult(1, messages)
 
 		return result
 	} else {
-		msg = util.SetMessage("INFO", "Un-Pausing virtual machine ["+config.AppPluginParameters["VmName"]+"] successful")
+		msg = util.SetMessage("INFO", "Un-Freezing virtual machine ["+config.AppPluginParameters["VmName"]+"] successful")
 		messages = append(messages, msg)
 	}
 

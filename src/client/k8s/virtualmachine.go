@@ -317,6 +317,39 @@ func getVirtualMachineClient(accessWithinCluster string) (*virtclient.Clientset,
 	return virtualMachineClient, nil
 }
 
+func FreezeVirtualMachine(namespace, accessWithinCluster, vmName string, unfreezeTimeout time.Duration) error {
+	virtualMachineClient, err := getVirtualMachineClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	uri := fmt.Sprintf(vmiSubresourceURL, v1.ApiStorageVersion, namespace, vmName, "freeze")
+
+	freezeUnfreezeTimeout := &v1.FreezeUnfreezeTimeout{
+		UnfreezeTimeout: &metav1.Duration{
+			Duration: unfreezeTimeout,
+		},
+	}
+
+	JSON, err := json.Marshal(freezeUnfreezeTimeout)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(uri)
+	return virtualMachineClient.RESTClient().Put().RequestURI(uri).Body([]byte(JSON)).Do(context.Background()).Error()
+}
+
+func UnFreezeVirtualMachine(namespace, accessWithinCluster, vmName string, unfreezeTimeout time.Duration) error {
+	virtualMachineClient, err := getVirtualMachineClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	uri := fmt.Sprintf(vmiSubresourceURL, v1.ApiStorageVersion, namespace, vmName, "unfreeze")
+	return virtualMachineClient.RESTClient().Put().RequestURI(uri).Do(context.Background()).Error()
+}
+
 func PauseVirtualMachine(namespace, accessWithinCluster, vmName string, unfreezeTimeout time.Duration) error {
 	virtualMachineClient, err := getVirtualMachineClient(accessWithinCluster)
 	if err != nil {
