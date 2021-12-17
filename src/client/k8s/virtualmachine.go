@@ -78,7 +78,8 @@ func DeleteVirtualMachineSnapshot(namespace, accessWithinCluster, snapshotName s
 	return nil
 }
 
-func UpdateVirtualMachineDisk(namespace, accessWithinCluster, vmName, pvcName string) error {
+// Needs work getting nil pointer trying to create addVolumeOptions
+func UpdateVirtualMachineDisk(namespace, accessWithinCluster, vmName, diskName, pvcName string) error {
 	virtualMachineClient, err := getVirtualMachineClient(accessWithinCluster)
 	if err != nil {
 		return err
@@ -89,12 +90,28 @@ func UpdateVirtualMachineDisk(namespace, accessWithinCluster, vmName, pvcName st
 		return err
 	}
 
-	// need to persist and map disk to pvc in case we have many
-	volumes := vm.Spec.Template.Spec.Volumes
-	for _, volume := range volumes {
-		if volume.Name == "rootdisk" {
-			volume.PersistentVolumeClaim.ClaimName = pvcName
+	var addVolumeOptions v1.AddVolumeOptions
+	var hostplugVolumeSource *v1.HotplugVolumeSource
+	hostplugVolumeSource.PersistentVolumeClaim.ClaimName = pvcName
+
+	addVolumeOptions.Name = pvcName
+	disks := vm.Spec.Template.Spec.Domain.Devices.Disks
+
+	var existsDisk bool = false
+	for _, disk := range disks {
+		if disk.Name == diskName {
+			existsDisk = true
+			break
 		}
+	}
+
+	if !existsDisk {
+		err = AddVirtualMachineDisk(namespace, accessWithinCluster, diskName, addVolumeOptions)
+		if err != nil {
+			return err
+		}
+	} else {
+
 	}
 
 	_, err = virtualMachineClient.KubevirtV1().VirtualMachines(namespace).Update(context.Background(), vm, metav1.UpdateOptions{})
@@ -348,6 +365,37 @@ func UnFreezeVirtualMachine(namespace, accessWithinCluster, vmName string, unfre
 
 	uri := fmt.Sprintf(vmiSubresourceURL, v1.ApiStorageVersion, namespace, vmName, "unfreeze")
 	return virtualMachineClient.RESTClient().Put().RequestURI(uri).Do(context.Background()).Error()
+}
+
+func AddVirtualMachineDisk(namespace, accessWithinCluster, diskName string, addVolumeOptions v1.AddVolumeOptions) error {
+	virtualMachineClient, err := getVirtualMachineClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	JSON, err := json.Marshal(addVolumeOptions)
+	if err != nil {
+		return err
+	}
+
+	uri := fmt.Sprintf(vmiSubresourceURL, v1.ApiStorageVersion, namespace, diskName, "addvolume")
+	return virtualMachineClient.RESTClient().Put().RequestURI(uri).Body([]byte(JSON)).Do(context.Background()).Error()
+}
+
+func RemoveVirtualMachineDisk(namespace, accessWithinCluster, diskName string) error {
+	virtualMachineClient, err := getVirtualMachineClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	var removeVolumeOptions v1.RemoveVolumeOptions
+	JSON, err := json.Marshal(removeVolumeOptions)
+	if err != nil {
+		return err
+	}
+
+	uri := fmt.Sprintf(vmiSubresourceURL, v1.ApiStorageVersion, namespace, diskName, "removevolume")
+	return virtualMachineClient.RESTClient().Put().RequestURI(uri).Body([]byte(JSON)).Do(context.Background()).Error()
 }
 
 func PauseVirtualMachine(namespace, accessWithinCluster, vmName string, unfreezeTimeout time.Duration) error {

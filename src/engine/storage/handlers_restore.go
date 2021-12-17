@@ -14,10 +14,11 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/fossul/fossul/src/engine/util"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/fossul/fossul/src/engine/util"
 )
 
 // Restore godoc
@@ -50,7 +51,7 @@ func Restore(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pluginPath := util.GetPluginPath(config.StoragePlugin,"storage")
+	pluginPath := util.GetPluginPath(config.StoragePlugin, "storage")
 
 	if pluginPath == "" {
 		var plugin string = pluginDir + "/storage/" + config.StoragePlugin

@@ -16,11 +16,12 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"github.com/BurntSushi/toml"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
+
+	"github.com/BurntSushi/toml"
 )
 
 type Config struct {
@@ -29,8 +30,9 @@ type Config struct {
 	WorkflowId               string             `json:"workflowId,omitempty"`
 	WorkflowType             string             `json:"workflowType,omitempty"`
 	WorkflowTimestamp        int64              `json:"workflowTimestamp,omitempty"`
-	ContainerPlatform		 string             `json:"containerPlatform,omitempty"`
-	AccessWithinCluster		 string             `json:"accessWithinCluster,omitempty"`
+	Backup                   Backup             `json:"backup,omitempty"`
+	ContainerPlatform        string             `json:"containerPlatform,omitempty"`
+	AccessWithinCluster      string             `json:"accessWithinCluster,omitempty"`
 	AppPlugin                string             `json:"appPlugin"`
 	StoragePlugin            string             `json:"storagePlugin"`
 	ArchivePlugin            string             `json:"archivePlugin"`
@@ -237,6 +239,7 @@ func GetConfig(w http.ResponseWriter, r *http.Request) (Config, error) {
 	if err := json.NewDecoder(r.Body).Decode(&config); err != nil {
 		return config, err
 	}
+
 	defer r.Body.Close()
 
 	_, err := json.Marshal(&config)

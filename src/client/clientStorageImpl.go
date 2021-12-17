@@ -16,8 +16,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/fossul/fossul/src/engine/util"
 	"net/http"
+
+	"github.com/fossul/fossul/src/engine/util"
 )
 
 func StoragePluginList(auth Auth, pluginType string) ([]string, error) {

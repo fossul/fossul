@@ -22,7 +22,23 @@ func startRestoreWorkflowImpl(dataDir string, config util.Config, workflow *util
 	resultsDir := dataDir + "/" + config.ProfileName + "/" + config.ConfigName + "/" + util.IntToString(workflow.Id)
 	policy := config.SelectedBackupPolicy
 
-	commentMsg := "Performing Application Pre Restore"
+	commentMsg := "Retrieving backup contents"
+	setComment(resultsDir, commentMsg, workflow)
+
+	step := stepInit(resultsDir, workflow)
+	backupContentsDir := dataDir + "/" + config.ProfileName + "/" + config.ConfigName + "/" + util.IntToString(config.SelectedWorkflowId)
+	backup := &util.Backup{}
+	err := util.ReadGob(backupContentsDir+"/backup", backup)
+
+	if err != nil {
+		result := util.SetResultMessage(1, "ERROR", "Couldn't retrieve backup contents for workflow id ["+config.WorkflowId+"] "+err.Error())
+		StepErrorHandler(resultsDir, policy, step, workflow, result, config)
+		return result.Code
+	}
+
+	config.Backup = *backup
+
+	commentMsg = "Performing Application Pre Restore"
 	setComment(resultsDir, commentMsg, workflow)
 
 	if config.PreAppRestoreCmd != "" {

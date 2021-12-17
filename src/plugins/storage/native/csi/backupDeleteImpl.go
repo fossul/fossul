@@ -14,6 +14,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/fossul/fossul/src/client/k8s"
 	"github.com/fossul/fossul/src/engine/util"
 	"github.com/fossul/fossul/src/plugins/pluginUtil"
@@ -58,21 +59,23 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 				messages = append(messages, msg)
 				backupCount = backupCount - 1
 
-				backupName := backup.Name + "-" + backup.Policy + "-" + backup.WorkflowId + "-" + util.IntToString(backup.Epoch)
-				msg = util.SetMessage("INFO", "Deleting backup "+backupName)
-				messages = append(messages, msg)
-
-				err := k8s.DeleteSnapshot(backupName, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster)
-				if err != nil {
-					msg := util.SetMessage("ERROR", err.Error())
+				for _, content := range backup.Contents {
+					snapshotName := content.Data
+					msg = util.SetMessage("INFO", "Deleting backup "+snapshotName)
 					messages = append(messages, msg)
-					result = util.SetResult(1, messages)
 
-					return result
+					err := k8s.DeleteSnapshot(snapshotName, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster)
+					if err != nil {
+						msg := util.SetMessage("ERROR", err.Error())
+						messages = append(messages, msg)
+						result = util.SetResult(1, messages)
+
+						return result
+					}
+
+					msg = util.SetMessage("INFO", "Backup "+snapshotName+" deleted successfully")
+					messages = append(messages, msg)
 				}
-
-				msg = util.SetMessage("INFO", "Backup "+backupName+" deleted successfully")
-				messages = append(messages, msg)
 			}
 			count = count + 1
 		}

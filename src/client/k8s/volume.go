@@ -158,7 +158,7 @@ func ListPersistentVolumeClaims(namespace, accessWithinCluster string) (*v1.Pers
 	return pvcList, nil
 }
 
-func DeletePersistentVolumeClaim(pvcName, namespace, accessWithinCluster string) error {
+func DeletePersistentVolumeClaim(pvcName, namespace, accessWithinCluster string, timeoutSeconds int) error {
 	client, err := getClient(accessWithinCluster)
 	if err != nil {
 		return err
@@ -170,7 +170,7 @@ func DeletePersistentVolumeClaim(pvcName, namespace, accessWithinCluster string)
 	}
 
 	var poll = 5 * time.Second
-	timeout := time.Duration(60) * time.Second
+	timeout := time.Duration(timeoutSeconds) * time.Second
 	start := time.Now()
 
 	fmt.Printf("[DEBUG] Waiting up to %v for pvc [%s] deletion\n", timeout, pvcName)

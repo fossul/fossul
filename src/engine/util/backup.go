@@ -12,17 +12,32 @@ limitations under the License.
 */
 package util
 
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+)
+
 type Backups struct {
 	Backups []Backup `json:"backup,omitempty"`
 	Result  Result   `json:"result,omitempty"`
 }
 
 type Backup struct {
-	Name       string `json:"name,omitempty"`
-	Timestamp  string `json:"timestamp,omitempty"`
-	Epoch      int    `json:"epoch,omitempty"`
-	Policy     string `json:"policy,omitempty"`
-	WorkflowId string `json:"workflowId,omitempty"`
+	Name       string    `json:"name,omitempty"`
+	Timestamp  string    `json:"timestamp,omitempty"`
+	Epoch      int       `json:"epoch,omitempty"`
+	Policy     string    `json:"policy,omitempty"`
+	WorkflowId string    `json:"workflowId,omitempty"`
+	Contents   []Content `json:"contents,omitempty"`
+}
+
+type Content struct {
+	Type     string `json:"type,omitempty"`
+	Source   string `json:"source,omitempty"`
+	Metadata string `json:"metadata,omitempty"`
+	Data     string `json:"data,omitempty"`
 }
 
 type ByEpochBackup []Backup
@@ -40,4 +55,34 @@ func GetBackupsByPolicy(policy string, backups []Backup) []Backup {
 	}
 
 	return backupsByPolicy
+}
+
+func SerializeBackup(resultsDir string, backup *Backup) {
+	err := CreateDir(resultsDir, 0755)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	err = WriteGob(resultsDir+"/backup", backup)
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+func GetBackup(w http.ResponseWriter, r *http.Request) (Backup, error) {
+
+	var backup Backup
+	fmt.Println(r.Body)
+	if err := json.NewDecoder(r.Body).Decode(&backup); err != nil {
+		return backup, err
+	}
+
+	defer r.Body.Close()
+
+	_, err := json.Marshal(&backup)
+	if err != nil {
+		return backup, err
+	}
+
+	return backup, nil
 }

@@ -13,9 +13,10 @@ limitations under the License.
 package main
 
 import (
+	"strings"
+
 	"github.com/fossul/fossul/src/client"
 	"github.com/fossul/fossul/src/engine/util"
-	"strings"
 )
 
 func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.Workflow) int {
@@ -136,6 +137,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
 			return resultCode
 		}
+
+		util.SerializeBackup(resultsDir, &result.Backup)
 	}
 
 	commentMsg = "Performing Application Unquiesce"

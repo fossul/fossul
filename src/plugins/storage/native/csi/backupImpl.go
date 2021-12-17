@@ -27,6 +27,15 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	timestampToString := fmt.Sprintf("%d", config.WorkflowTimestamp)
 	timeout := util.StringToInt(config.StoragePluginParameters["SnapshotTimeoutSeconds"])
 
+	var backup util.Backup
+	backup.Timestamp = timestampToString
+	backup.Epoch = int(config.WorkflowTimestamp)
+	backup.Policy = config.SelectedBackupPolicy
+	backup.WorkflowId = config.WorkflowId
+
+	var contents []util.Content
+	var content util.Content
+
 	if config.StoragePluginParameters["DeploymentType"] == "DeploymentConfig" {
 		deploymentConfig, err := k8s.GetDeploymentConfig(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
 		if err != nil {
@@ -41,8 +50,10 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 		for _, volume := range volumes {
 			pvcName := volume.PersistentVolumeClaim.ClaimName
 			backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
+			backup.Name = backupName
+			snapshotName := backupName + "-" + pvcName
 
-			msg := util.SetMessage("INFO", "Creating CSI snapshot ["+backupName+"] of pvc ["+config.StoragePluginParameters["PvcName"]+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+config.StoragePluginParameters["SnapshotClass"]+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
+			msg := util.SetMessage("INFO", "Creating CSI snapshot ["+backupName+"] of pvc ["+pvcName+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+config.StoragePluginParameters["SnapshotClass"]+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
 			messages = append(messages, msg)
 
 			err := k8s.CreateSnapshot(backupName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["SnapshotClass"], pvcName, config.AccessWithinCluster, timeout)
@@ -53,6 +64,11 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 				result = util.SetResult(1, messages)
 				return result
 			}
+
+			content.Type = "volume"
+			content.Source = pvcName
+			content.Data = snapshotName
+			contents = append(contents, content)
 
 			msg = util.SetMessage("INFO", "CSI snapshot created successfully")
 			messages = append(messages, msg)
@@ -71,8 +87,10 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 		for _, volume := range volumes {
 			pvcName := volume.PersistentVolumeClaim.ClaimName
 			backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
+			backup.Name = backupName
+			snapshotName := backupName + "-" + pvcName
 
-			msg := util.SetMessage("INFO", "Creating CSI snapshot ["+backupName+"] of pvc ["+config.StoragePluginParameters["PvcName"]+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+config.StoragePluginParameters["SnapshotClass"]+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
+			msg := util.SetMessage("INFO", "Creating CSI snapshot ["+backupName+"] of pvc ["+pvcName+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+config.StoragePluginParameters["SnapshotClass"]+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
 			messages = append(messages, msg)
 
 			err := k8s.CreateSnapshot(backupName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["SnapshotClass"], pvcName, config.AccessWithinCluster, timeout)
@@ -83,6 +101,11 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 				result = util.SetResult(1, messages)
 				return result
 			}
+
+			content.Type = "volume"
+			content.Source = pvcName
+			content.Data = snapshotName
+			contents = append(contents, content)
 
 			msg = util.SetMessage("INFO", "CSI snapshot created successfully")
 			messages = append(messages, msg)
@@ -103,13 +126,23 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 				continue
 			}
 
-			pvcName := volume.DataVolume.Name
-			backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
+			var pvcName string
+			if volume.PersistentVolumeClaim == nil {
+				fmt.Println("here1")
+				pvcName = volume.DataVolume.Name
+			} else {
+				fmt.Println("here2")
+				pvcName = volume.PersistentVolumeClaim.ClaimName
+			}
 
-			msg := util.SetMessage("INFO", "Creating CSI snapshot ["+backupName+"] of pvc ["+config.StoragePluginParameters["PvcName"]+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+config.StoragePluginParameters["SnapshotClass"]+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
+			backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
+			backup.Name = backupName
+			snapshotName := backupName + "-" + pvcName
+
+			msg := util.SetMessage("INFO", "Creating CSI snapshot ["+snapshotName+"] of pvc ["+pvcName+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+config.StoragePluginParameters["SnapshotClass"]+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
 			messages = append(messages, msg)
 
-			err := k8s.CreateSnapshot(backupName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["SnapshotClass"], pvcName, config.AccessWithinCluster, timeout)
+			err := k8s.CreateSnapshot(snapshotName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["SnapshotClass"], pvcName, config.AccessWithinCluster, timeout)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)
@@ -117,6 +150,12 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 				result = util.SetResult(1, messages)
 				return result
 			}
+
+			content.Type = "volume"
+			content.Source = pvcName
+			content.Metadata = volume.Name
+			content.Data = snapshotName
+			contents = append(contents, content)
 
 			msg = util.SetMessage("INFO", "CSI snapshot created successfully")
 			messages = append(messages, msg)
@@ -130,5 +169,9 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	}
 
 	result = util.SetResult(resultCode, messages)
+
+	backup.Contents = contents
+	result.Backup = backup
+
 	return result
 }
