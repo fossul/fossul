@@ -78,7 +78,6 @@ func DeleteVirtualMachineSnapshot(namespace, accessWithinCluster, snapshotName s
 	return nil
 }
 
-// Needs work getting nil pointer trying to create addVolumeOptions
 func UpdateVirtualMachineDisk(namespace, accessWithinCluster, vmName, diskName, pvcName string) error {
 	virtualMachineClient, err := getVirtualMachineClient(accessWithinCluster)
 	if err != nil {
@@ -90,13 +89,18 @@ func UpdateVirtualMachineDisk(namespace, accessWithinCluster, vmName, diskName, 
 		return err
 	}
 
-	var addVolumeOptions v1.AddVolumeOptions
-	var hostplugVolumeSource *v1.HotplugVolumeSource
-	hostplugVolumeSource.PersistentVolumeClaim.ClaimName = pvcName
+	addVolumeOptions := &v1.AddVolumeOptions{
+		Name: pvcName,
+		VolumeSource: &v1.HotplugVolumeSource{
+			PersistentVolumeClaim: &v1.PersistentVolumeClaimVolumeSource{
+				PersistentVolumeClaimVolumeSource: corev1.PersistentVolumeClaimVolumeSource{
+					ClaimName: pvcName,
+				},
+			},
+		},
+	}
 
-	addVolumeOptions.Name = pvcName
 	disks := vm.Spec.Template.Spec.Domain.Devices.Disks
-
 	var existsDisk bool = false
 	for _, disk := range disks {
 		if disk.Name == diskName {
@@ -367,7 +371,7 @@ func UnFreezeVirtualMachine(namespace, accessWithinCluster, vmName string, unfre
 	return virtualMachineClient.RESTClient().Put().RequestURI(uri).Do(context.Background()).Error()
 }
 
-func AddVirtualMachineDisk(namespace, accessWithinCluster, diskName string, addVolumeOptions v1.AddVolumeOptions) error {
+func AddVirtualMachineDisk(namespace, accessWithinCluster, diskName string, addVolumeOptions *v1.AddVolumeOptions) error {
 	virtualMachineClient, err := getVirtualMachineClient(accessWithinCluster)
 	if err != nil {
 		return err
