@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [[ -z "${GOBIN}" ]]; then
-        export GOBIN=$HOME
+        export GOBIN=.
 fi
 
 STORAGE_DIR="${HOME}/plugins/storage"
