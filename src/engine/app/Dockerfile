@@ -15,5 +15,5 @@ WORKDIR /opt/app-root/src/github.com/fossul/fossul
 RUN /opt/app-root/src/github.com/fossul/fossul/scripts/fossul-app-build.sh
 
 USER 1001
-WORKDIR /opt/app-root
-CMD /opt/app-root/fossul-app-startup.sh
+WORKDIR /opt/app-root/fossul
+CMD ./fossul-app-startup.sh

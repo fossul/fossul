@@ -134,11 +134,9 @@
           openshift.io/host.generated: "true"
         name: fossul-server
       spec:
-        host: "fossul-{{ ansible_operator_meta.namespace }}.{{application_domain}}"
+        host: "fossul-server-{{ ansible_operator_meta.namespace }}.{{application_domain}}"
         port:
           targetPort: 8000
-        tls:
-          termination: edge
         to:
           kind: Service
           name: fossul-server
@@ -219,6 +217,25 @@
           app: fossul-app
           name: fossul-app
       status:
+- name: Deploy Fossul App route
+  k8s:
+    definition:
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        annotations:
+          openshift.io/host.generated: "true"
+        name: fossul-app
+      spec:
+        host: "fossul-app-{{ ansible_operator_meta.namespace }}.{{application_domain}}"
+        port:
+          targetPort: 8001
+        to:
+          kind: Service
+          name: fossul-app
+          weight: 100
+        wildcardPolicy: None        
 
 # tasks for fossul storage
 - name: Deploy Fossul Storage persistent volume
@@ -315,4 +332,23 @@
           app: fossul-storage
           name: fossul-storage
       status:
-        loadBalancer: {}           
+        loadBalancer: {}    
+- name: Deploy Fossul Storage route
+  k8s:
+    definition:
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        annotations:
+          openshift.io/host.generated: "true"
+        name: fossul-storage
+      spec:
+        host: "fossul-storage-{{ ansible_operator_meta.namespace }}.{{application_domain}}"
+        port:
+          targetPort: 8002
+        to:
+          kind: Service
+          name: fossul-storage
+          weight: 100
+        wildcardPolicy: None               
