@@ -1,42 +1,19 @@
-FROM fedora:latest
+FROM registry.access.redhat.com/ubi8/go-toolset:latest
 
-
-LABEL ios.k8s.display-name="fossul-storage" \
+LABEL ios.k8s.display-name="fossul-app" \
     maintainer="Keith Tenzer <ktenzer@redhat.com>"
 
-RUN dnf install -y golang
+ENV GOBIN=/opt/app-root
+ENV STORAGE_PLUGIN_DIR=/opt/app-root/plugins/storage
+ENV ARCHIVE_PLUGIN_DIR=/opt/app-root/plugins/archive
 
-RUN mkdir -p /go/src/github.com/fossul/fossul
-RUN mkdir /app
-RUN mkdir /app/backups
+#RUN curl -L https://github.com/fossul/fossul/releases/download/latest/openshift-client-linux-4.2.8.tar.gz |tar xz;cp oc kubectl /app
 
-RUN groupadd -r fossul &&\
-    useradd -r -g fossul -d /app -u 1001 -s /sbin/nologin -c "Fossul user" fossul
+COPY . /opt/app-root/src/github.com/fossul/fossul
 
-WORKDIR /go/src/github.com/fossul/fossul
+WORKDIR /opt/app-root/src/github.com/fossul/fossul
+RUN /opt/app-root/src/github.com/fossul/fossul/scripts/fossul-storage-build.sh
 
-ENV FOSSUL_BUILD_PLUGIN_DIR=/app/plugins
-ENV GOPATH=/go
-ENV GOBIN=/app
-ENV HOME=/app
-
-RUN curl -L https://github.com/fossul/fossul/releases/download/latest/openshift-client-linux-4.2.8.tar.gz |tar xz;cp oc kubectl /app
-
-RUN curl https://raw.githubusercontent.com/golang/dep/v0.5.1/install.sh | sh
-
-COPY . /go/src/github.com/fossul/fossul
-
-RUN /go/src/github.com/fossul/fossul/scripts/fossul-storage-build.sh
-
-RUN chown -R fossul:fossul /app && \
-    chmod -R 775 /app
-
-RUN chmod -R 777 /tmp
-
-RUN echo "1.0" > /etc/imageversion
-
-USER fossul
-
-WORKDIR /app
-
-CMD /app/fossul-storage-startup.sh
+USER 1001
+WORKDIR /opt/app-root
+CMD /opt/app-root/fossul-storage-startup.sh

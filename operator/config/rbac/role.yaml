@@ -1,0 +1,91 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+  ##
+  ## Base operator rules
+  ##
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - pods
+      - pods/exec
+      - pods/log
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - daemonsets
+      - replicasets
+      - statefulsets
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  ##
+  ## Rules for cache.fossul.com/v1, Kind: Fossul
+  ##
+  - apiGroups:
+      - cache.fossul.com
+    resources:
+      - fossuls
+      - fossuls/status
+      - fossuls/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  ##
+  ## Rules for cache.fossul.com/v1, Kind: Backup
+  ##
+  - apiGroups:
+      - cache.fossul.com
+    resources:
+      - backups
+      - backups/status
+      - backups/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  ##
+  ## Rules for cache.fossul.com/v1, Kind: Restore
+  ##
+  - apiGroups:
+      - cache.fossul.com
+    resources:
+      - restores
+      - restores/status
+      - restores/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+#+kubebuilder:scaffold:rules

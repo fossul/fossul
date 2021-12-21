@@ -1,5 +1,15 @@
 #!/bin/sh
 
+APP_DIR="${HOME}/plugins/app"
+if [[ -z "${APP_PLUGIN_DIR}" ]]; then
+    export APP_PLUGIN_DIR=$APP_DIR
+
+  if [[ ! -e "${APP_PLUGIN_DIR}" ]]; then
+      mkdir -p  $APP_PLUGIN_DIR
+  fi
+fi
+
+
 echo "Installing Dependencies"
 go mod tidy
 
@@ -22,25 +32,34 @@ if [ $? != 0 ]; then exit 1; fi
 echo "Building Plugins"
 go install github.com/fossul/fossul/src/plugins/app/basic/sample-app
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o sample-app.so github.com/fossul/fossul/src/plugins/app/native/sample-app
+echo $APP_PLUGIN_DIR
+go build -buildmode=plugin -o $APP_PLUGIN_DIR/sample-app.so github.com/fossul/fossul/src/plugins/app/native/sample-app
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o mariadb.so github.com/fossul/fossul/src/plugins/app/native/mariadb
+go build -buildmode=plugin -o $APP_PLUGIN_DIR/mariadb.so github.com/fossul/fossul/src/plugins/app/native/mariadb
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o mariadb-dump.so github.com/fossul/fossul/src/plugins/app/native/mariadb-dump
+go build -buildmode=plugin -o $APP_PLUGIN_DIR/mariadb-dump.so github.com/fossul/fossul/src/plugins/app/native/mariadb-dump
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o postgres.so github.com/fossul/fossul/src/plugins/app/native/postgres
+go build -buildmode=plugin -o $APP_PLUGIN_DIR/postgres.so github.com/fossul/fossul/src/plugins/app/native/postgres
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o postgres-dump.so github.com/fossul/fossul/src/plugins/app/native/postgres-dump
+go build -buildmode=plugin -o $APP_PLUGIN_DIR/postgres-dump.so github.com/fossul/fossul/src/plugins/app/native/postgres-dump
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o mongo.so github.com/fossul/fossul/src/plugins/app/native/mongo
+go build -buildmode=plugin -o $APP_PLUGIN_DIR/mongo.so github.com/fossul/fossul/src/plugins/app/native/mongo
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o mongo-dump.so github.com/fossul/fossul/src/plugins/app/native/mongo-dump
+go build -buildmode=plugin -o $APP_PLUGIN_DIR/mongo-dump.so github.com/fossul/fossul/src/plugins/app/native/mongo-dump
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o kubevirt.so github.com/fossul/fossul/src/plugins/app/native/kubevirt
+go build -buildmode=plugin -o $APP_PLUGIN_DIR/kubevirt.so github.com/fossul/fossul/src/plugins/app/native/kubevirt
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building App Service"
 go install github.com/fossul/fossul/src/engine/app
 if [ $? != 0 ]; then exit 1; fi
+
+echo "Moving plugins to $APP_PLUGIN_DIR"
+mv $GOBIN/sample-app $APP_PLUGIN_DIR
+
+echo "Copying startup scripts"
+cp scripts/fossul-app-startup.sh $GOBIN
+if [ $? != 0 ]; then exit 1; fi
+
 
 echo "App build completed successfully"

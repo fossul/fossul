@@ -1,5 +1,23 @@
 #!/bin/sh
 
+STORAGE_DIR="${HOME}/plugins/storage"
+ARCHIVE_DIR="${HOME}/plugins/archive"
+if [[ -z "${STORAGE_PLUGIN_DIR}" ]]; then
+    export STORAGE_PLUGIN_DIR=$STORAGE_DIR
+
+  if [[ ! -e "${STORAGE_PLUGIN_DIR}" ]]; then
+      mkdir -p $STORAGE_PLUGIN_DIR
+  fi
+fi
+
+if [[ -z "${ARCHIVE_PLUGIN_DIR}" ]]; then
+    export ARCHIVE_PLUGIN_DIR=ARCHIVE_DIR
+
+  if [[ ! -e "${ARCHIVE_PLUGIN_DIR}" ]]; then
+      mkdir -p $ARCHIVE_PLUGIN_DIR
+  fi
+fi
+
 echo "Installing Dependencies"
 go mod tidy
 
@@ -22,27 +40,39 @@ if [ $? != 0 ]; then exit 1; fi
 echo "Building Plugins"
 go install github.com/fossul/fossul/src/plugins/storage/basic/sample-storage
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o sample-storage.so github.com/fossul/fossul/src/plugins/storage/native/sample-storage
+go build -buildmode=plugin -o $STORAGE_PLUGIN_DIR/sample-storage.so github.com/fossul/fossul/src/plugins/storage/native/sample-storage
 if [ $? != 0 ]; then exit 1; fi
 go install github.com/fossul/fossul/src/plugins/archive/basic/sample-archive
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o sample-archive.so github.com/fossul/fossul/src/plugins/archive/native/sample-archive
+go build -buildmode=plugin -o $ARCHIVE_PLUGIN_DIR/sample-archive.so github.com/fossul/fossul/src/plugins/archive/native/sample-archive
 if [ $? != 0 ]; then exit 1; fi
 go install github.com/fossul/fossul/src/plugins/storage/basic/container-basic
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o container-basic.so github.com/fossul/fossul/src/plugins/storage/native/container-basic
+go build -buildmode=plugin -o $STORAGE_PLUGIN_DIR/container-basic.so github.com/fossul/fossul/src/plugins/storage/native/container-basic
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o aws.so github.com/fossul/fossul/src/plugins/archive/native/aws
+go build -buildmode=plugin -o $ARCHIVE_PLUGIN_DIR/aws.so github.com/fossul/fossul/src/plugins/archive/native/aws
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o ocs-gluster.so github.com/fossul/fossul/src/plugins/storage/native/ocs-gluster
+go build -buildmode=plugin -o $STORAGE_PLUGIN_DIR/ocs-gluster.so github.com/fossul/fossul/src/plugins/storage/native/ocs-gluster
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o csi-ceph.so github.com/fossul/fossul/src/plugins/storage/native/csi-ceph
+go build -buildmode=plugin -o $STORAGE_PLUGIN_DIR/csi-ceph.so github.com/fossul/fossul/src/plugins/storage/native/csi-ceph
 if [ $? != 0 ]; then exit 1; fi
-go build -buildmode=plugin -o csi.so github.com/fossul/fossul/src/plugins/storage/native/csi
+go build -buildmode=plugin -o $STORAGE_PLUGIN_DIR/csi.so github.com/fossul/fossul/src/plugins/storage/native/csi
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Storage Service"
 go install github.com/fossul/fossul/src/engine/storage
+if [ $? != 0 ]; then exit 1; fi
+
+echo "Moving plugins to $PLUGIN_DIR"
+mv $GOBIN/sample-storage $STORAGE_PLUGIN_DIR
+if [ $? != 0 ]; then exit 1; fi
+mv $GOBIN/sample-archive $ARCHIVE_PLUGIN_DIR
+if [ $? != 0 ]; then exit 1; fi
+mv $GOBIN/container-basic $STORAGE_PLUGIN_DIR
+if [ $? != 0 ]; then exit 1; fi
+
+echo "Copying startup scripts"
+cp scripts/fossul-storage-startup.sh $GOBIN
 if [ $? != 0 ]; then exit 1; fi
 
 echo "Storage build completed successfully"

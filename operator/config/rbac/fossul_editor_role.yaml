@@ -1,0 +1,24 @@
+# permissions for end users to edit fossuls.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fossul-editor-role
+rules:
+- apiGroups:
+  - cache.fossul.com
+  resources:
+  - fossuls
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cache.fossul.com
+  resources:
+  - fossuls/status
+  verbs:
+  - get

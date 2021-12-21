@@ -1,0 +1,7 @@
+apiVersion: cache.fossul.com/v1
+kind: Restore
+metadata:
+  name: restore-sample
+spec:
+  # Add fields here
+  foo: bar

@@ -1,0 +1,31 @@
+domain: fossul.com
+layout:
+- ansible.sdk.operatorframework.io/v1
+plugins:
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}
+  sdk.x-openshift.io/v1: {}
+projectName: operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: fossul.com
+  group: cache
+  kind: Fossul
+  version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: fossul.com
+  group: cache
+  kind: Backup
+  version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: fossul.com
+  group: cache
+  kind: Restore
+  version: v1
+version: "3"

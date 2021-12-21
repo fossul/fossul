@@ -1,0 +1,15 @@
+---
+# Use the 'create api' subcommand to add watches to this file.
+- version: v1
+  group: cache.fossul.com
+  kind: Fossul
+  role: fossul
+- version: v1
+  group: cache.fossul.com
+  kind: Backup
+  role: backup
+- version: v1
+  group: cache.fossul.com
+  kind: Restore
+  role: restore
+#+kubebuilder:scaffold:watch

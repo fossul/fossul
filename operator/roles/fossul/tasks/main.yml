@@ -1,0 +1,318 @@
+---
+# Get app domain 
+- name: Get Application Domain from Cluster Ingress
+  k8s_info:
+    api_version: config.openshift.io/v1
+    kind: Ingress
+    name: cluster
+  when: application_domain is undefined
+  register: ingress
+
+- name: Set Application Domain
+  set_fact:
+    application_domain: "{{ ingress.resources[0].spec.domain }}"
+  when: application_domain is undefined
+
+- name: Print application domain
+  debug:
+    msg: "Application Domain: {{ application_domain }}"
+
+# tasks for fossul server
+- name: Deploy Fossul Secret
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: fossul-secret
+        namespace: "{{ ansible_operator_meta.namespace }}"
+      stringData:
+        fossul-password: "{{password}}"
+- name: Deploy Fossul Server persistent volume
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        name: fossul-server-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi        
+- name: Deploy Fossul Server
+  k8s:
+    definition:
+      kind: Deployment
+      apiVersion: apps/v1
+      metadata:
+        name: fossul-server
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        labels:
+          app: fossul-server
+      spec:
+        replicas: 1
+        strategy:
+          type: RollingUpdate
+        selector:
+          matchLabels:
+            app: fossul-server
+        template:
+          metadata:
+            labels:
+              app: fossul-server
+              name: fossul-server
+          spec:
+            containers:
+            - env:
+              - name: FOSSUL_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    key: fossul-password
+                    name: fossul-secret
+              - name: FOSSUL_USER
+                value: "{{username}}"
+              image: quay.io/ktenzer/fossul-server:latest
+              imagePullPolicy: Always
+              name: fossul-server
+              readinessProbe:
+                httpGet:
+                  path: /status
+                  port: 8000
+                initialDelaySeconds: 60
+                periodSeconds: 10
+                timeoutSeconds: 60
+              livenessProbe:
+                httpGet:
+                  path: /status
+                  port: 8000
+                initialDelaySeconds: 120
+                periodSeconds: 10
+              ports:
+              - containerPort: 8000
+              volumeMounts:
+              - mountPath: /opt/app-root/metadata
+                name: data  
+            volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: fossul-server-data   
+          securityContext:
+            fsGroup: 1001                                        
+            restartPolicy: Always
+        triggers:
+        - type: ConfigChange
+- name: Deploy Fossul Server service
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        labels:
+          app: fossul-server
+        name: fossul-server
+      spec:
+        ports:
+        - port: 8000
+          targetPort: 8000
+        selector:
+          app: fossul-server
+          name: fossul-server
+      status:
+        loadBalancer: {}
+- name: Deploy Fossul Server route
+  k8s:
+    definition:
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        annotations:
+          openshift.io/host.generated: "true"
+        name: fossul-server
+      spec:
+        host: "fossul-{{ ansible_operator_meta.namespace }}.{{application_domain}}"
+        port:
+          targetPort: 8000
+        tls:
+          termination: edge
+        to:
+          kind: Service
+          name: fossul-server
+          weight: 100
+        wildcardPolicy: None
+
+# tasks for fossul apps
+- name: Deploy Fossul Apps
+  k8s:
+    definition:
+      kind: Deployment
+      apiVersion: apps/v1
+      metadata:
+        name: fossul-app
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        labels:
+          app: fossul-app
+      spec:
+        replicas: 1
+        strategy:
+          type: RollingUpdate
+        selector:
+          matchLabels:
+            app: fossul-app
+        template:
+          metadata:
+            labels:
+              app: fossul-app
+              name: fossul-app
+          spec:
+            containers:
+            - env:
+              - name: FOSSUL_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    key: fossul-password
+                    name: fossul-secret
+              - name: FOSSUL_USER
+                value: "{{username}}"
+              image: quay.io/ktenzer/fossul-app:latest
+              imagePullPolicy: Always
+              name: fossul-app
+              readinessProbe:
+                httpGet:
+                  path: /status
+                  port: 8001
+                initialDelaySeconds: 60
+                periodSeconds: 10
+                timeoutSeconds: 60
+              livenessProbe:
+                httpGet:
+                  path: /status
+                  port: 8001
+                initialDelaySeconds: 120
+                periodSeconds: 10
+              ports:
+              - containerPort: 8001
+            restartPolicy: Always
+          securityContext:
+            fsGroup: 1001             
+        triggers:
+        - type: ConfigChange
+- name: Deploy Fossul App service
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        labels:
+          app: fossul-app
+        name: fossul-app
+      spec:
+        ports:
+        - port: 8001
+          targetPort: 8001
+        selector:
+          app: fossul-app
+          name: fossul-app
+      status:
+
+# tasks for fossul storage
+- name: Deploy Fossul Storage persistent volume
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        name: fossul-storage-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi  
+- name: Deploy Fossul Storage
+  k8s:
+    definition:
+      kind: Deployment
+      apiVersion: apps/v1
+      metadata:
+        name: fossul-storage
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        labels:
+          app: fossul-storage
+      spec:
+        replicas: 1
+        strategy:
+          type: RollingUpdate
+        selector:
+          matchLabels:
+            app: fossul-storage
+        template:
+          metadata:
+            labels:
+              app: fossul-storage
+              name: fossul-storage
+          spec:
+            containers:
+            - env:
+              - name: FOSSUL_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    key: fossul-password
+                    name: fossul-secret
+              - name: FOSSUL_USER
+                value: "{{username}}}"
+              image: quay.io/ktenzer/fossul-storage:latest
+              imagePullPolicy: Always
+              name: fossul-storage
+              readinessProbe:
+                httpGet:
+                  path: /status
+                  port: 8002
+                initialDelaySeconds: 60
+                periodSeconds: 10
+                timeoutSeconds: 60
+              livenessProbe:
+                httpGet:
+                  path: /status
+                  port: 8002
+                initialDelaySeconds: 120
+                periodSeconds: 10
+              ports:
+              - containerPort: 8002
+              volumeMounts:
+              - mountPath: /opt/app-root/data
+                name: data  
+            volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: fossul-storage-data                           
+            restartPolicy: Always
+          securityContext:
+            fsGroup: 1001             
+        triggers:
+        - type: ConfigChange
+- name: Deploy Fossul Storage service
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        labels:
+          app: fossul-storage
+        name: fossul-storage
+      spec:
+        ports:
+        - port: 8002
+          targetPort: 8002
+        selector:
+          app: fossul-storage
+          name: fossul-storage
+      status:
+        loadBalancer: {}           

@@ -1,0 +1,8 @@
+apiVersion: cache.fossul.com/v1
+kind: Fossul
+metadata:
+  name: fossul-sample
+spec:
+  # Add fields here
+  username: admin
+  password: blue12345

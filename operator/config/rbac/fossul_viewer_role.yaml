@@ -1,0 +1,20 @@
+# permissions for end users to view fossuls.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fossul-viewer-role
+rules:
+- apiGroups:
+  - cache.fossul.com
+  resources:
+  - fossuls
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - cache.fossul.com
+  resources:
+  - fossuls/status
+  verbs:
+  - get
