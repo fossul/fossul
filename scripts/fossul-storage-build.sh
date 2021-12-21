@@ -7,15 +7,19 @@ if [[ -z "${STORAGE_PLUGIN_DIR}" ]]; then
   if [[ ! -e "${STORAGE_PLUGIN_DIR}" ]]; then
       mkdir -p $STORAGE_PLUGIN_DIR
   fi
+else
+    export STORAGE_PLUGIN_DIR="."
 fi
 
 if [[ -z "${ARCHIVE_PLUGIN_DIR}" ]]; then
     ARCHIVE_DIR="${HOME}/plugins/archive"
-    export ARCHIVE_PLUGIN_DIR=ARCHIVE_DIR
+    export ARCHIVE_PLUGIN_DIR=$ARCHIVE_DIR
 
   if [[ ! -e "${ARCHIVE_PLUGIN_DIR}" ]]; then
       mkdir -p $ARCHIVE_PLUGIN_DIR
   fi
+else
+    export ARCHIVE_PLUGIN_DIR="."
 fi
 
 echo "Installing Dependencies"

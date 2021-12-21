@@ -7,6 +7,8 @@ if [[ -z "${APP_PLUGIN_DIR}" ]]; then
   if [[ ! -e "${APP_PLUGIN_DIR}" ]]; then
       mkdir -p  $APP_PLUGIN_DIR
   fi
+else
+    export APP_PLUGIN_DIR="."
 fi
 
 
