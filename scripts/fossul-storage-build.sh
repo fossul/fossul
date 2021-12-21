@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [[ -z "${GOBIN}" ]]; then
+        export GOBIN=$HOME
+fi
+
 STORAGE_DIR="${HOME}/plugins/storage"
 ARCHIVE_DIR="${HOME}/plugins/archive"
 if [[ -z "${STORAGE_PLUGIN_DIR}" ]]; then

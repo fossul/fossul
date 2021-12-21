@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [[ -z "${GOBIN}" ]]; then
+        export GOBIN=$HOME
+fi
+
 APP_DIR="${HOME}/plugins/app"
 if [[ -z "${APP_PLUGIN_DIR}" ]]; then
     export APP_PLUGIN_DIR=$APP_DIR

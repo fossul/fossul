@@ -18,20 +18,14 @@ jobs:
       run: echo "${GOPATH} ${GOBIN}"
     - name: Run server build
       run: scripts/fossul-server-build.sh
-      env:
-        GOBIN: ${HOME}
     - name: Run app plugin build
       run: scripts/fossul-app-build.sh
       env:
-        GOBIN: ${HOME}
         APP_PLUGIN_DIR: ${HOME}
     - name: Run storage plugin build
       run: scripts/fossul-storage-build.sh
       env:
-        GOBIN: ${HOME}
         STORAGE_PLUGIN_DIR: ${HOME}
         ARCHIVE_PLUGIN_DIR: ${HOME}
     - name: Run CLI build
-      env:
-        GOBIN: ${HOME}
       run: scripts/fossul-cli-build.sh
