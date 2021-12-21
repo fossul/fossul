@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [[ -z "${APP_PLUGIN_DIR}" ]]; then
     APP_DIR="${HOME}/plugins/app"

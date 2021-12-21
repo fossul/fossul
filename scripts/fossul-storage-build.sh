@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [[ -z "${STORAGE_PLUGIN_DIR}" ]]; then
     STORAGE_DIR="${HOME}/plugins/storage"
