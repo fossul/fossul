@@ -23,7 +23,7 @@ echo "Building Server Service"
 go install github.com/fossul/fossul/src/engine/server
 if [ $? != 0 ]; then exit 1; fi
 
-if [[ -z "${GOBIN}" ]]; then
+if [[ ! -z "${GOBIN}" ]]; then
 	echo "Copying startup scripts"
 	cp scripts/fossul-server-startup.sh $GOBIN
 	if [ $? != 0 ]; then exit 1; fi
