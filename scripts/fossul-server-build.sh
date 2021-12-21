@@ -1,9 +1,5 @@
 #!/bin/sh
 
-if [[ -z "${GOBIN}" ]]; then
-	export GOBIN=.
-fi
-
 echo "Installing Dependencies"
 go mod tidy
 
@@ -27,9 +23,11 @@ echo "Building Server Service"
 go install github.com/fossul/fossul/src/engine/server
 if [ $? != 0 ]; then exit 1; fi
 
-echo "Copying startup scripts"
-cp scripts/fossul-server-startup.sh $GOBIN
-if [ $? != 0 ]; then exit 1; fi
+if [[ -z "${GOBIN}" ]]; then
+	echo "Copying startup scripts"
+	cp scripts/fossul-server-startup.sh $GOBIN
+	if [ $? != 0 ]; then exit 1; fi
+fi
 
 echo "Server build completed successfully"
 

@@ -1,9 +1,5 @@
 #!/bin/sh
 
-if [[ -z "${GOBIN}" ]]; then
-        export GOBIN=.
-fi
-
 STORAGE_DIR="${HOME}/plugins/storage"
 ARCHIVE_DIR="${HOME}/plugins/archive"
 if [[ -z "${STORAGE_PLUGIN_DIR}" ]]; then
@@ -75,9 +71,11 @@ if [ $? != 0 ]; then exit 1; fi
 mv $GOBIN/container-basic $STORAGE_PLUGIN_DIR
 if [ $? != 0 ]; then exit 1; fi
 
-echo "Copying startup scripts"
-cp scripts/fossul-storage-startup.sh $GOBIN
-if [ $? != 0 ]; then exit 1; fi
+if [[ -z "${GOBIN}" ]]; then
+	echo "Copying startup scripts"
+	cp scripts/fossul-storage-startup.sh $GOBIN
+	if [ $? != 0 ]; then exit 1; fi
+fi
 
 echo "Storage build completed successfully"
 

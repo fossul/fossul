@@ -1,9 +1,5 @@
 #!/bin/sh
 
-if [[ -z "${GOBIN}" ]]; then
-        export GOBIN=.
-fi
-
 APP_DIR="${HOME}/plugins/app"
 if [[ -z "${APP_PLUGIN_DIR}" ]]; then
     export APP_PLUGIN_DIR=$APP_DIR
@@ -61,9 +57,11 @@ if [ $? != 0 ]; then exit 1; fi
 echo "Moving plugins to $APP_PLUGIN_DIR"
 mv $GOBIN/sample-app $APP_PLUGIN_DIR
 
-echo "Copying startup scripts"
-cp scripts/fossul-app-startup.sh $GOBIN
-if [ $? != 0 ]; then exit 1; fi
+if [[ -z "${GOBIN}" ]]; then
+	echo "Copying startup scripts"
+	cp scripts/fossul-app-startup.sh $GOBIN
+	if [ $? != 0 ]; then exit 1; fi
+fi
 
 
 echo "App build completed successfully"
