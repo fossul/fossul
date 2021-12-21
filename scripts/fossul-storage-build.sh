@@ -7,8 +7,6 @@ if [[ -z "${STORAGE_PLUGIN_DIR}" ]]; then
   if [[ ! -e "${STORAGE_PLUGIN_DIR}" ]]; then
       mkdir -p $STORAGE_PLUGIN_DIR
   fi
-else
-    export STORAGE_PLUGIN_DIR="."
 fi
 
 if [[ -z "${ARCHIVE_PLUGIN_DIR}" ]]; then
@@ -18,9 +16,13 @@ if [[ -z "${ARCHIVE_PLUGIN_DIR}" ]]; then
   if [[ ! -e "${ARCHIVE_PLUGIN_DIR}" ]]; then
       mkdir -p $ARCHIVE_PLUGIN_DIR
   fi
-else
+fi
+
+if [[ "$CI" == "true" ]]; then
+    export STORAGE_PLUGIN_DIR="."
     export ARCHIVE_PLUGIN_DIR="."
 fi
+
 
 echo "Installing Dependencies"
 go mod tidy

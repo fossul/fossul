@@ -14,8 +14,6 @@ COPY . /opt/app-root/src/github.com/fossul/fossul
 WORKDIR /opt/app-root/src/github.com/fossul/fossul
 RUN /opt/app-root/src/github.com/fossul/fossul/scripts/fossul-app-build.sh
 
-RUN chmod -R 777 /tmp
-
 USER 1001
 WORKDIR /opt/app-root
 CMD /opt/app-root/fossul-app-startup.sh

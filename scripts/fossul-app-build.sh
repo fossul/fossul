@@ -7,10 +7,11 @@ if [[ -z "${APP_PLUGIN_DIR}" ]]; then
   if [[ ! -e "${APP_PLUGIN_DIR}" ]]; then
       mkdir -p  $APP_PLUGIN_DIR
   fi
-else
-    export APP_PLUGIN_DIR="."
 fi
 
+if [[ "$CI" == "true" ]]; then
+    export APP_PLUGIN_DIR="."
+fi
 
 echo "Installing Dependencies"
 go mod tidy
@@ -34,7 +35,6 @@ if [ $? != 0 ]; then exit 1; fi
 echo "Building Plugins"
 go install github.com/fossul/fossul/src/plugins/app/basic/sample-app
 if [ $? != 0 ]; then exit 1; fi
-echo $APP_PLUGIN_DIR
 go build -buildmode=plugin -o $APP_PLUGIN_DIR/sample-app.so github.com/fossul/fossul/src/plugins/app/native/sample-app
 if [ $? != 0 ]; then exit 1; fi
 go build -buildmode=plugin -o $APP_PLUGIN_DIR/mariadb.so github.com/fossul/fossul/src/plugins/app/native/mariadb
