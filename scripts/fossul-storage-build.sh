@@ -67,15 +67,15 @@ echo "Building Storage Service"
 go install github.com/fossul/fossul/src/engine/storage
 if [ $? != 0 ]; then exit 1; fi
 
-echo "Moving plugins to $PLUGIN_DIR"
-mv $GOBIN/sample-storage $STORAGE_PLUGIN_DIR
-if [ $? != 0 ]; then exit 1; fi
-mv $GOBIN/sample-archive $ARCHIVE_PLUGIN_DIR
-if [ $? != 0 ]; then exit 1; fi
-mv $GOBIN/container-basic $STORAGE_PLUGIN_DIR
-if [ $? != 0 ]; then exit 1; fi
+if [[ ! -z "${GOBIN}" ]]; then
+	echo "Moving plugins to $PLUGIN_DIR"
+	mv $GOBIN/sample-storage $STORAGE_PLUGIN_DIR
+	if [ $? != 0 ]; then exit 1; fi
+	mv $GOBIN/sample-archive $ARCHIVE_PLUGIN_DIR
+	if [ $? != 0 ]; then exit 1; fi
+	mv $GOBIN/container-basic $STORAGE_PLUGIN_DIR
+	if [ $? != 0 ]; then exit 1; fi
 
-if [[ -z "${GOBIN}" ]]; then
 	echo "Copying startup scripts"
 	cp scripts/fossul-storage-startup.sh $GOBIN
 	if [ $? != 0 ]; then exit 1; fi

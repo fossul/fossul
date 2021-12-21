@@ -56,10 +56,10 @@ echo "Building App Service"
 go install github.com/fossul/fossul/src/engine/app
 if [ $? != 0 ]; then exit 1; fi
 
-echo "Moving plugins to $APP_PLUGIN_DIR"
-mv $GOBIN/sample-app $APP_PLUGIN_DIR
+if [[ ! -z "${GOBIN}" ]]; then
+	echo "Moving plugins to $APP_PLUGIN_DIR"
+	mv $GOBIN/sample-app $APP_PLUGIN_DIR
 
-if [[ -z "${GOBIN}" ]]; then
 	echo "Copying startup scripts"
 	cp scripts/fossul-app-startup.sh $GOBIN
 	if [ $? != 0 ]; then exit 1; fi
