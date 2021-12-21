@@ -1,7 +1,7 @@
 #!/bin/sh
 
-APP_DIR="${HOME}/plugins/app"
 if [[ -z "${APP_PLUGIN_DIR}" ]]; then
+    APP_DIR="${HOME}/plugins/app"
     export APP_PLUGIN_DIR=$APP_DIR
 
   if [[ ! -e "${APP_PLUGIN_DIR}" ]]; then
