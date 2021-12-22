@@ -53,10 +53,44 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 			backup.Name = backupName
 			snapshotName := backupName + "-" + pvcName
 
-			msg := util.SetMessage("INFO", "Creating CSI snapshot ["+backupName+"] of pvc ["+pvcName+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+config.StoragePluginParameters["SnapshotClass"]+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
+			pvc, err := k8s.GetPersistentVolumeClaim(config.StoragePluginParameters["Namespace"], pvcName, config.AccessWithinCluster)
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+			pvcSize := pvc.Status.Capacity.Storage().String()
+			storageClassName := pvc.Spec.StorageClassName
+
+			content.Size = pvcSize
+			content.StorageClass = *storageClassName
+
+			provisionerName, err := k8s.GetStorageClassProvisionerName(content.StorageClass, config.AccessWithinCluster)
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+
+			snapshotClassName, err := k8s.GetVolumeSnapshotClassName(provisionerName, config.AccessWithinCluster)
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+
+			content.VolumeSnapshotClass = snapshotClassName
+
+			msg := util.SetMessage("INFO", "Creating CSI snapshot ["+backupName+"] of pvc ["+pvcName+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+snapshotClassName+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
 			messages = append(messages, msg)
 
-			err := k8s.CreateSnapshot(backupName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["SnapshotClass"], pvcName, config.AccessWithinCluster, timeout)
+			err = k8s.CreateSnapshot(backupName, config.StoragePluginParameters["Namespace"], snapshotClassName, pvcName, config.AccessWithinCluster, timeout)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)
@@ -90,10 +124,44 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 			backup.Name = backupName
 			snapshotName := backupName + "-" + pvcName
 
-			msg := util.SetMessage("INFO", "Creating CSI snapshot ["+backupName+"] of pvc ["+pvcName+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+config.StoragePluginParameters["SnapshotClass"]+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
+			pvc, err := k8s.GetPersistentVolumeClaim(config.StoragePluginParameters["Namespace"], pvcName, config.AccessWithinCluster)
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+			pvcSize := pvc.Status.Capacity.Storage().String()
+			storageClassName := pvc.Spec.StorageClassName
+
+			content.Size = pvcSize
+			content.StorageClass = *storageClassName
+
+			provisionerName, err := k8s.GetStorageClassProvisionerName(content.StorageClass, config.AccessWithinCluster)
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+
+			snapshotClassName, err := k8s.GetVolumeSnapshotClassName(provisionerName, config.AccessWithinCluster)
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+
+			content.VolumeSnapshotClass = snapshotClassName
+
+			msg := util.SetMessage("INFO", "Creating CSI snapshot ["+backupName+"] of pvc ["+pvcName+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+snapshotClassName+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
 			messages = append(messages, msg)
 
-			err := k8s.CreateSnapshot(backupName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["SnapshotClass"], pvcName, config.AccessWithinCluster, timeout)
+			err = k8s.CreateSnapshot(backupName, config.StoragePluginParameters["Namespace"], snapshotClassName, pvcName, config.AccessWithinCluster, timeout)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)
@@ -128,10 +196,8 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 
 			var pvcName string
 			if volume.PersistentVolumeClaim == nil {
-				fmt.Println("here1")
 				pvcName = volume.DataVolume.Name
 			} else {
-				fmt.Println("here2")
 				pvcName = volume.PersistentVolumeClaim.ClaimName
 			}
 
@@ -139,10 +205,44 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 			backup.Name = backupName
 			snapshotName := backupName + "-" + pvcName
 
-			msg := util.SetMessage("INFO", "Creating CSI snapshot ["+snapshotName+"] of pvc ["+pvcName+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+config.StoragePluginParameters["SnapshotClass"]+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
+			pvc, err := k8s.GetPersistentVolumeClaim(config.StoragePluginParameters["Namespace"], pvcName, config.AccessWithinCluster)
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+			pvcSize := pvc.Status.Capacity.Storage().String()
+			storageClassName := pvc.Spec.StorageClassName
+
+			content.Size = pvcSize
+			content.StorageClass = *storageClassName
+
+			provisionerName, err := k8s.GetStorageClassProvisionerName(content.StorageClass, config.AccessWithinCluster)
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+
+			snapshotClassName, err := k8s.GetVolumeSnapshotClassName(provisionerName, config.AccessWithinCluster)
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+
+			content.VolumeSnapshotClass = snapshotClassName
+
+			msg := util.SetMessage("INFO", "Creating CSI snapshot ["+snapshotName+"] of pvc ["+pvcName+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+snapshotClassName+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
 			messages = append(messages, msg)
 
-			err := k8s.CreateSnapshot(snapshotName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["SnapshotClass"], pvcName, config.AccessWithinCluster, timeout)
+			err = k8s.CreateSnapshot(snapshotName, config.StoragePluginParameters["Namespace"], snapshotClassName, pvcName, config.AccessWithinCluster, timeout)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)

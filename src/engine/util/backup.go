@@ -34,10 +34,13 @@ type Backup struct {
 }
 
 type Content struct {
-	Type     string `json:"type,omitempty"`
-	Source   string `json:"source,omitempty"`
-	Metadata string `json:"metadata,omitempty"`
-	Data     string `json:"data,omitempty"`
+	Type                string `json:"type,omitempty"`
+	Source              string `json:"source,omitempty"`
+	Metadata            string `json:"metadata,omitempty"`
+	Data                string `json:"data,omitempty"`
+	Size                string `json:"size,omitempty"`
+	StorageClass        string `json:"storageClass,omitempty"`
+	VolumeSnapshotClass string `json:"volumeSnapshotClass,omitempty"`
 }
 
 type ByEpochBackup []Backup

@@ -14,6 +14,7 @@ package k8s
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -128,6 +129,26 @@ func GetSnapshot(name, namespace, accessWithinCluster string) (*snapshotv1.Volum
 	}
 
 	return snapshot, nil
+}
+
+func GetVolumeSnapshotClassName(storageDriverName, accessWithinCluster string) (string, error) {
+	sclient, err := getSnapshotClient(accessWithinCluster)
+	if err != nil {
+		return "", err
+	}
+
+	snapshotClassList, err := sclient.VolumeSnapshotClasses().List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	for _, snapshotClass := range snapshotClassList.Items {
+		if snapshotClass.Driver == storageDriverName {
+			return snapshotClass.Name, nil
+		}
+	}
+
+	return "", errors.New("ERROR: COuldn't determine snapshot class using driver [" + storageDriverName + "]")
 }
 
 func getSnapshotClient(accessWithinCluster string) (*snapClient.SnapshotV1Client, error) {

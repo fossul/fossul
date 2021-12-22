@@ -126,10 +126,10 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			msg := util.SetMessage("WARN", "The pvc ["+backedUpPvc.Source+"] from backup does not exist in namespace ["+config.StoragePluginParameters["Namespace"]+"]")
 			messages = append(messages, msg)
 
-			msg = util.SetMessage("INFO", "Restoring snapshot ["+backedUpPvc.Data+"] to new pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"] using storage class ["+config.StoragePluginParameters["StorageClass"]+"]")
+			msg = util.SetMessage("INFO", "Restoring snapshot ["+backedUpPvc.Data+"] to new pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"] using storage class ["+backedUpPvc.StorageClass+"]")
 			messages = append(messages, msg)
 
-			err = k8s.CreatePersistentVolumeClaimFromSnapshot(pvcRestoreName, config.StoragePluginParameters["PvcSize"], backedUpPvc.Data, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["StorageClass"], config.AccessWithinCluster)
+			err = k8s.CreatePersistentVolumeClaimFromSnapshot(pvcRestoreName, backedUpPvc.Size, backedUpPvc.Data, config.StoragePluginParameters["Namespace"], backedUpPvc.StorageClass, config.AccessWithinCluster)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)
@@ -166,10 +166,10 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 				}
 			}
 
-			msg = util.SetMessage("INFO", "Restoring snapshot ["+backedUpPvc.Data+"] to new pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"] using storage class ["+config.StoragePluginParameters["StorageClass"]+"]")
+			msg = util.SetMessage("INFO", "Restoring snapshot ["+backedUpPvc.Data+"] to new pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"] using storage class ["+backedUpPvc.StorageClass+"]")
 			messages = append(messages, msg)
 
-			err = k8s.CreatePersistentVolumeClaimFromSnapshotWithModes(pvcRestoreName, config.StoragePluginParameters["PvcSize"], backedUpPvc.Data, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["StorageClass"], config.AccessWithinCluster, accessModes, volumeMode)
+			err = k8s.CreatePersistentVolumeClaimFromSnapshotWithModes(pvcRestoreName, backedUpPvc.Size, backedUpPvc.Data, config.StoragePluginParameters["Namespace"], backedUpPvc.StorageClass, config.AccessWithinCluster, accessModes, volumeMode)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)

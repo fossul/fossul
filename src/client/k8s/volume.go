@@ -192,6 +192,22 @@ func DeletePersistentVolumeClaim(pvcName, namespace, accessWithinCluster string,
 	})
 }
 
+func GetStorageClassProvisionerName(storageClassName, accessWithinCluster string) (string, error) {
+	client, err := getClient(accessWithinCluster)
+	if err != nil {
+		return "", err
+	}
+
+	storageClass, err := client.StorageV1().StorageClasses().Get(context.Background(), storageClassName, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	provisioner := storageClass.Provisioner
+
+	return provisioner, nil
+}
+
 func generatePersistentVolumeClaimFromSnapshot(pvcName, pvcSize, snapshotName, namespace, storageClassName string) *v1.PersistentVolumeClaim {
 	apiGroup := "snapshot.storage.k8s.io"
 	pvc := v1.PersistentVolumeClaim{
