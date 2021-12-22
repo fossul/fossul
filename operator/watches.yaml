@@ -7,7 +7,10 @@
 - version: v1
   group: cache.fossul.com
   kind: Backup
-  role: backup
+  role: backupCreate
+  finalizer:
+    name:  cache.fossul.com/finalizer
+    role: backupDelete 
 - version: v1
   group: cache.fossul.com
   kind: Restore

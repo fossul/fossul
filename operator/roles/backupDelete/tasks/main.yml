@@ -1,0 +1,35 @@
+---
+# tasks file for Backup
+- name: Delete Backup Schedule
+  uri:
+    url: "{{fossul_server_url}}/deleteSchedule/{{ profile }}/{{ config }}/{{ policy }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{password}}"
+    method: GET
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: schedule
+- name: print schedule
+  debug:
+    msg: "{{ schedule }}"  
+
+- name: Delete Backup Config
+  uri:
+    url: "{{fossul_server_url}}/deleteConfigDir/{{ profile }}/{{ config }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{password}}"
+    method: GET
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: config
+- name: print delete config
+  debug:
+    msg: "{{ config }}"  

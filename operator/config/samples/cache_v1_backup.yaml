@@ -4,4 +4,21 @@ metadata:
   name: backup-sample
 spec:
   # Add fields here
-  foo: bar
+  fossul_server_url: http://fossul-server-fossul.apps.ocp4.sandbox1398.opentlc.com
+  username: admin
+  password: blue12345
+  profile: test
+  config: test
+  policy: daily
+  cron_schedule: "0 * * * *"
+  app_plugin: kubevirt.so
+  storage_plugin: csi.so
+  retention: 7
+  vm_name: rhel8-vm
+  deployment_name: rhel8-vm
+  deployment_type: VirtualMachine
+  pvc_size: 20Gi
+  pvc_deletion_timeout: 300
+  snapshot_timeout: 180
+  storage_class: ocs-storagecluster-ceph-rbd
+  snapshot_class: ocs-storagecluster-rbdplugin-snapclass

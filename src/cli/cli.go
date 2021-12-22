@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/fossul/fossul/src/engine/util"
 	"github.com/pborman/getopt/v2"
-	"os"
 )
 
 const version = "1.0.0"
@@ -354,6 +355,11 @@ func main() {
 
 		AddSchedule(auth, *optProfile, *optConfig, *optPolicy, *optCronSchedule)
 	} else if *optAction == "deleteSchedule" {
+		if getopt.IsSet("policy") != true {
+			fmt.Println("[ERROR] missing parameter --policy")
+			os.Exit(1)
+		}
+
 		DeleteSchedule(auth, *optProfile, *optConfig, *optPolicy)
 	} else {
 		fmt.Println("[ERROR] incorrect parameter", *optAction)

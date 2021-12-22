@@ -1,0 +1,116 @@
+---
+# tasks file for Backup
+- name: Create Backup Profile
+  uri:
+    url: "{{fossul_server_url}}/addProfile/{{ profile }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{password}}"
+    method: GET
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: profile
+- name: print profile
+  debug:
+    msg: "{{ profile }}"     
+
+- name: Create Backup Config
+  uri:
+    url: "{{fossul_server_url}}/addConfig/{{ profile }}/{{ config }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{password}}"
+    method: POST
+    body: "{ \"accessWithinCluster\": \"true\",
+             \"appPlugin\": \"{{ app_plugin }}\",
+             \"storagePlugin\": \"{{ storage_plugin }}\",
+             \"containerPlatform\": \"openshift\",
+             \"jobRetention\": 50,
+             \"autoDiscovery\": true,
+             \"backupRetentions\": [{\"policy\": \"{{ policy }}\",\"retentionNumber\": {{ retention }}}]},
+     }"
+    body_format: json    
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: config
+- name: print config
+  debug:
+    msg: "{{ config }}"
+    
+- name: Create App Plugin Config
+  uri:
+    url: "{{fossul_server_url}}/addPluginConfig/{{ profile }}/{{ config }}/{{ app_plugin }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{password}}"
+    method: POST
+    body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
+             \"VmName\": \"{{ vm_name }}\",
+     }"
+    body_format: json    
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: app_config
+- name: print app config
+  debug:
+    msg: "{{ app_config }}"  
+    
+- name: Create Storage Plugin Config
+  uri:
+    url: "{{fossul_server_url}}/addPluginConfig/{{ profile }}/{{ config }}/{{ storage_plugin }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{password}}"
+    method: POST
+    body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
+             \"BackupName\": \"{{ vm_name }}\",
+             \"DeploymentName\": \"{{ deployment_name }}\",
+             \"DeploymentType\": \"VirtualMachine\",
+             \"PvcSize\": \"{{ pvc_size }}\",
+             \"SnapshotClass\": \"{{ snapshot_class }}\",
+             \"StorageClass\": \"{{ storage_class }}\",
+             \"PvcDeletionTimeout\": \"{{ pvc_deletion_timeout }}\",
+             \"SnapshotTimeoutSeconds\": \"{{ snapshot_timeout }}\",
+             \"OverwritePvcOnRestore\": \"true\",
+             \"RestoreToNewPvc\": \"false\",
+             
+     }"
+
+    body_format: json    
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: app_config
+- name: print app config
+  debug:
+    msg: "{{ app_config }}"       
+      
+- name: Create Backup Schedule
+  uri:
+    url: "{{fossul_server_url}}/addSchedule/{{ profile }}/{{ config }}/{{ policy }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{password}}"
+    method: POST
+    body: "{ \"value\": \"{{ cron_schedule }}\" }"
+    body_format: json
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: schedule
+- name: print schedule
+  debug:
+    msg: "{{ schedule }}"  
