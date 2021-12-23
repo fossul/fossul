@@ -15,4 +15,12 @@
   group: cache.fossul.com
   kind: Restore
   role: restore
+- version: v1
+  group: kubevirt.io
+  kind: VirtualMachine
+  role: vmCreate
+  finalizer:
+    name: kubevirt.io/finalizer
+    role: vmDelete
+  manageStatus: False
 #+kubebuilder:scaffold:watch

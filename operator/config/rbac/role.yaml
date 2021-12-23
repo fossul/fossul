@@ -37,6 +37,34 @@ rules:
       - patch
       - update
       - watch
+  - apiGroups:
+    - ""
+    - route.openshift.io
+    resources:
+    - routes
+    - routes/custom-host
+    verbs:
+    - create
+    - delete
+    - deletecollection
+    - get
+    - list
+    - patch
+    - update
+    - watch
+  - apiGroups:
+    - ""
+    - security.openshift.io
+    resources:
+    - securitycontextconstraints
+    verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - update
+    - watch
   ##
   ## Rules for cache.fossul.com/v1, Kind: Fossul
   ##
@@ -80,6 +108,23 @@ rules:
       - restores
       - restores/status
       - restores/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  ##
+  ## Rules for kubevirt.io.fossul.com/v1, Kind: VirtualMachine
+  ##
+  - apiGroups:
+      - kubevirt.io.fossul.com
+    resources:
+      - virtualmachines
+      - virtualmachines/status
+      - virtualmachines/finalizers
     verbs:
       - create
       - delete

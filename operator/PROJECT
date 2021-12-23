@@ -1,6 +1,7 @@
 domain: fossul.com
 layout:
 - ansible.sdk.operatorframework.io/v1
+multigroup: true
 plugins:
   manifests.sdk.operatorframework.io/v2: {}
   scorecard.sdk.operatorframework.io/v2: {}
@@ -27,5 +28,12 @@ resources:
   domain: fossul.com
   group: cache
   kind: Restore
+  version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: fossul.com
+  group: kubevirt.io
+  kind: VirtualMachine
   version: v1
 version: "3"

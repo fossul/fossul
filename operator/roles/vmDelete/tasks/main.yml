@@ -1,0 +1,5 @@
+---
+# tasks file for VirtualMachine
+- name: Deleting VM
+  debug:
+    msg: "delete 1234"

@@ -1,0 +1,134 @@
+---
+# tasks file for VirtualMachine
+- name: Get Fossul Secret
+  k8s_info:
+    api_version: v1
+    kind: Secret
+    name: fossul-secret
+    namespace: fossul
+  register: secret     
+
+- name: Set Password
+  set_fact:
+    fossul_password: "{{ item.value | b64decode }}" 
+  with_dict: "{{ secret.resources[0].data }}"
+
+- name: Get Fossul Route
+  k8s_info:
+    api_version: route.openshift.io/v1
+    kind: Route
+    name: fossul-server
+    namespace: fossul
+  register: route  
+
+- name: Create Backup Profile
+  uri:
+    url: "http://{{ route.resources[0].spec.host }}/addProfile/{{ ansible_operator_meta.namespace }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "admin"
+    password: "{{ fossul_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: profile
+- name: print profile
+  debug:
+    msg: "{{ profile }}"     
+
+- name: Create Backup Config
+  uri:
+    url: "http://{{ route.resources[0].spec.host }}/addConfig/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "admin"
+    password: "{{ fossul_password }}"
+    method: POST
+    body: "{ \"accessWithinCluster\": \"true\",
+             \"appPlugin\": \"kubevirt.so\",
+             \"storagePlugin\": \"csi.so\",
+             \"containerPlatform\": \"openshift\",
+             \"jobRetention\": 50,
+             \"autoDiscovery\": true,
+             \"backupRetentions\": [{\"policy\": \"daily\",\"retentionNumber\": 7}]},
+     }"
+    body_format: json    
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: config
+- name: print config
+  debug:
+    msg: "{{ config }}"
+    
+- name: Create App Plugin Config
+  uri:
+    url: "http://{{ route.resources[0].spec.host }}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}/kubevirt.so"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "admin"
+    password: "{{ fossul_password }}"
+    method: POST
+    body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
+             \"VmName\": \"{{ ansible_operator_meta.name }}\",
+     }"
+    body_format: json    
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: app_config
+- name: print app config
+  debug:
+    msg: "{{ app_config }}"  
+    
+- name: Create Storage Plugin Config
+  uri:
+    url: "http://{{ route.resources[0].spec.host }}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}/csi.so"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "admin"
+    password: "{{ fossul_password }}"
+    method: POST
+    body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
+             \"BackupName\": \"{{ ansible_operator_meta.name }}\",
+             \"DeploymentName\": \"{{ ansible_operator_meta.name }}\",
+             \"DeploymentType\": \"VirtualMachine\",
+             \"PvcDeletionTimeout\": \"300\",
+             \"SnapshotTimeoutSeconds\": \"180\",
+             \"OverwritePvcOnRestore\": \"true\",
+             \"RestoreToNewPvc\": \"false\",
+             
+     }"
+
+    body_format: json    
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: app_config
+- name: print app config
+  debug:
+    msg: "{{ app_config }}"       
+      
+- name: Create Backup Schedule
+  uri:
+    url: "http://{{ route.resources[0].spec.host }}/addSchedule/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}/daily"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "admin"
+    password: "{{ fossul_password }}"
+    method: POST
+    body: "{ \"value\": \"0 0 * * *\" }"
+    body_format: json
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: schedule
+- name: print schedule
+  debug:
+    msg: "{{ schedule }}"     

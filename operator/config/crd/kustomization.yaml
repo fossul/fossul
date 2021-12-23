@@ -5,4 +5,5 @@ resources:
 - bases/cache.fossul.com_fossuls.yaml
 - bases/cache.fossul.com_backups.yaml
 - bases/cache.fossul.com_restores.yaml
+- bases/kubevirt.io.fossul.com_virtualmachines.yaml
 #+kubebuilder:scaffold:crdkustomizeresource

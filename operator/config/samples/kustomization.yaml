@@ -3,4 +3,5 @@ resources:
 - cache_v1_fossul.yaml
 - cache_v1_backup.yaml
 - cache_v1_restore.yaml
+- kubevirt.io_v1_virtualmachine.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

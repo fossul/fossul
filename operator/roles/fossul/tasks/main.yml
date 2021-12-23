@@ -27,7 +27,7 @@
         name: fossul-secret
         namespace: "{{ ansible_operator_meta.namespace }}"
       stringData:
-        fossul-password: "{{password}}"
+        fossul-passowrd: "{{password}}"
 - name: Deploy Fossul Server persistent volume
   k8s:
     definition:
