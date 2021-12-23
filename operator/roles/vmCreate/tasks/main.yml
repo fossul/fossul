@@ -1,29 +1,71 @@
----
-# tasks file for VirtualMachine
+# tasks file for VirtualMachine create
+- name: Get Virtual Machine
+  k8s_info:
+    api_version: v1
+    kind: VirtualMachine
+    name: "{{ ansible_operator_meta.name }}"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+  register: virtualmachine
+
+- name: Set Defaults
+  set_fact:
+    is_backup: false
+    fossul_policy: daily
+    fossul_retention: 7
+
+- name: Determine if backup enabled via annotations
+  set_fact:
+    is_backup: "{{ item.value }}"
+  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations) }}"
+  when: item.key == "fossul.io/backup"
+
+- name: Get the fossul namespace
+  set_fact:
+    fossul_namespace: "{{ item.value }}"
+  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations) }}"
+  when: item.key == "fossul.io/namespace"
+
+- name: Get the fossul server url from annotations
+  set_fact:
+    fossul_server_url: "{{ item.value }}"
+  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations) }}"
+  when: item.key == "fossul.io/url" 
+
+- name: Get the fossul policy from annotations
+  set_fact:
+    fossul_policy: "{{ item.value }}"
+  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations) }}"
+  when: item.key == "fossul.io/policy"   
+
+- name: Get the fossul retention from annotations
+  set_fact:
+    fossul_retention: "{{ item.value }}"
+  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations) }}"
+  when: item.key == "fossul.io/retention" 
+
+- name: Set Fossul Server URL to default
+  set_fact:
+    fossul_server_url: "http://fossul-server.{{ fossul_namespace }}.svc.cluster.local:8000"
+  when: (fossul_server_url is not defined) and (is_backup | bool)
+
 - name: Get Fossul Secret
   k8s_info:
     api_version: v1
     kind: Secret
     name: fossul-secret
-    namespace: fossul
+    namespace: "{{ fossul_namespace }}"
   register: secret     
+  when: is_backup | bool
 
-- name: Set Password
+- name: Get Fossul Password
   set_fact:
     fossul_password: "{{ item.value | b64decode }}" 
   with_dict: "{{ secret.resources[0].data }}"
-
-- name: Get Fossul Route
-  k8s_info:
-    api_version: route.openshift.io/v1
-    kind: Route
-    name: fossul-server
-    namespace: fossul
-  register: route  
+  when: (is_backup | bool) and (item.key == "fossul-password") 
 
 - name: Create Backup Profile
   uri:
-    url: "http://{{ route.resources[0].spec.host }}/addProfile/{{ ansible_operator_meta.namespace }}"
+    url: "{{ fossul_server_url }}/addProfile/{{ ansible_operator_meta.namespace }}"
     headers:
       Content-Type: application/json
       Accept: application/json    
@@ -34,13 +76,16 @@
     status_code: [200]
     return_content: yes
   register: profile
+  when: is_backup | bool 
+  
 - name: print profile
   debug:
     msg: "{{ profile }}"     
+  when: is_backup | bool 
 
 - name: Create Backup Config
   uri:
-    url: "http://{{ route.resources[0].spec.host }}/addConfig/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}"
+    url: "{{ fossul_server_url }}/addConfig/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}"
     headers:
       Content-Type: application/json
       Accept: application/json    
@@ -53,20 +98,23 @@
              \"containerPlatform\": \"openshift\",
              \"jobRetention\": 50,
              \"autoDiscovery\": true,
-             \"backupRetentions\": [{\"policy\": \"daily\",\"retentionNumber\": 7}]},
+             \"backupRetentions\": [{\"policy\": \"{{ fossul_policy }}\",\"retentionNumber\": {{ fossul_retention }}}]},
      }"
     body_format: json    
     force_basic_auth: yes
     status_code: [200]
     return_content: yes
   register: config
+  when: is_backup | bool 
+
 - name: print config
   debug:
     msg: "{{ config }}"
+  when: is_backup | bool     
     
 - name: Create App Plugin Config
   uri:
-    url: "http://{{ route.resources[0].spec.host }}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}/kubevirt.so"
+    url: "{{ fossul_server_url }}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}/kubevirt.so"
     headers:
       Content-Type: application/json
       Accept: application/json    
@@ -81,13 +129,16 @@
     status_code: [200]
     return_content: yes
   register: app_config
+  when: is_backup | bool 
+
 - name: print app config
   debug:
     msg: "{{ app_config }}"  
-    
+  when: is_backup | bool 
+
 - name: Create Storage Plugin Config
   uri:
-    url: "http://{{ route.resources[0].spec.host }}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}/csi.so"
+    url: "{{ fossul_server_url }}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}/csi.so"
     headers:
       Content-Type: application/json
       Accept: application/json    
@@ -110,13 +161,16 @@
     status_code: [200]
     return_content: yes
   register: app_config
+  when: is_backup | bool 
+
 - name: print app config
   debug:
     msg: "{{ app_config }}"       
-      
+  when: is_backup | bool 
+
 - name: Create Backup Schedule
   uri:
-    url: "http://{{ route.resources[0].spec.host }}/addSchedule/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}/daily"
+    url: "{{ fossul_server_url }}/addSchedule/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}/{{ fossul_policy }}"
     headers:
       Content-Type: application/json
       Accept: application/json    
@@ -129,6 +183,9 @@
     status_code: [200]
     return_content: yes
   register: schedule
+  when: is_backup | bool 
+
 - name: print schedule
   debug:
-    msg: "{{ schedule }}"     
+    msg: "{{ schedule }}"   
+  when: is_backup | bool    

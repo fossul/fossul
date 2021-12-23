@@ -6,7 +6,7 @@ spec:
   # Add fields here
   fossul_server_url: http://fossul-server-fossul.apps.ocp4.sandbox1398.opentlc.com
   username: admin
-  password: blue12345
+  fossul_namespace: fossul
   profile: test
   config: test
   policy: daily
@@ -17,8 +17,5 @@ spec:
   vm_name: rhel8-vm
   deployment_name: rhel8-vm
   deployment_type: VirtualMachine
-  pvc_size: 20Gi
   pvc_deletion_timeout: 300
   snapshot_timeout: 180
-  storage_class: ocs-storagecluster-ceph-rbd
-  snapshot_class: ocs-storagecluster-rbdplugin-snapclass

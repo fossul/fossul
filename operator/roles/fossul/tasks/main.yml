@@ -17,6 +17,18 @@
   debug:
     msg: "Application Domain: {{ application_domain }}"
 
+- name: Get Fossul Secret
+  k8s_info:
+    api_version: v1
+    kind: Secret
+    name: fossul-secret
+    namespace: fossul
+  register: secret_exists     
+
+- name: Create Fossul Password
+  set_fact:
+    fossul_password: "{{ lookup('password', '/dev/null length=12') }}"
+
 # tasks for fossul server
 - name: Deploy Fossul Secret
   k8s:
@@ -27,7 +39,8 @@
         name: fossul-secret
         namespace: "{{ ansible_operator_meta.namespace }}"
       stringData:
-        fossul-passowrd: "{{password}}"
+        fossul-password: "{{fossul_password}}"
+  when: secret_exists.resources[0] is not defined      
 - name: Deploy Fossul Server persistent volume
   k8s:
     definition:

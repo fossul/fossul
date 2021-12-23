@@ -1,5 +1,29 @@
 ---
 # tasks file for Backup
+- name: Set Fossul namespace 
+  set_fact:
+    fossul_namespace: "fossul"
+  when: fossul_namespace is not defined
+
+- name: Set Fossul Server URL 
+  set_fact:
+    fossul_server_url: "http://fossul-server.{{ fossul_namespace }}.svc.cluster.local:8000"
+  when: fossul_server_url is not defined
+
+- name: Get Fossul Secret
+  k8s_info:
+    api_version: v1
+    kind: Secret
+    name: fossul-secret
+    namespace: "{{ fossul_namespace }}"
+  register: secret     
+
+- name: Get Fossul Password
+  set_fact:
+    fossul_password: "{{ item.value | b64decode }}" 
+  with_dict: "{{ secret.resources[0].data }}"
+  when: item.key == "fossul-password"
+
 - name: Create Backup Profile
   uri:
     url: "{{fossul_server_url}}/addProfile/{{ profile }}"
@@ -7,7 +31,7 @@
       Content-Type: application/json
       Accept: application/json    
     user: "{{username}}"
-    password: "{{password}}"
+    password: "{{fossul_password}}"
     method: GET
     force_basic_auth: yes
     status_code: [200]
@@ -24,7 +48,7 @@
       Content-Type: application/json
       Accept: application/json    
     user: "{{username}}"
-    password: "{{password}}"
+    password: "{{fossul_password}}"
     method: POST
     body: "{ \"accessWithinCluster\": \"true\",
              \"appPlugin\": \"{{ app_plugin }}\",
@@ -50,7 +74,7 @@
       Content-Type: application/json
       Accept: application/json    
     user: "{{username}}"
-    password: "{{password}}"
+    password: "{{fossul_password}}"
     method: POST
     body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
              \"VmName\": \"{{ vm_name }}\",
@@ -71,15 +95,12 @@
       Content-Type: application/json
       Accept: application/json    
     user: "{{username}}"
-    password: "{{password}}"
+    password: "{{fossul_password}}"
     method: POST
     body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
              \"BackupName\": \"{{ vm_name }}\",
              \"DeploymentName\": \"{{ deployment_name }}\",
              \"DeploymentType\": \"VirtualMachine\",
-             \"PvcSize\": \"{{ pvc_size }}\",
-             \"SnapshotClass\": \"{{ snapshot_class }}\",
-             \"StorageClass\": \"{{ storage_class }}\",
              \"PvcDeletionTimeout\": \"{{ pvc_deletion_timeout }}\",
              \"SnapshotTimeoutSeconds\": \"{{ snapshot_timeout }}\",
              \"OverwritePvcOnRestore\": \"true\",
@@ -103,7 +124,7 @@
       Content-Type: application/json
       Accept: application/json    
     user: "{{username}}"
-    password: "{{password}}"
+    password: "{{fossul_password}}"
     method: POST
     body: "{ \"value\": \"{{ cron_schedule }}\" }"
     body_format: json
