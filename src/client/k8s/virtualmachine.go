@@ -78,6 +78,33 @@ func DeleteVirtualMachineSnapshot(namespace, accessWithinCluster, snapshotName s
 	return nil
 }
 
+func UpdateVirtualMachineVolumeSource(namespace, accessWithinCluster, vmName, pvcName string) error {
+	virtualMachineClient, err := getVirtualMachineClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	vm, err := GetVirtualMachine(namespace, accessWithinCluster, vmName)
+	if err != nil {
+		return err
+	}
+
+	volumeTemplates := vm.Spec.DataVolumeTemplates
+	for _, volumeTemplate := range volumeTemplates {
+		if volumeTemplate.ObjectMeta.Name == vmName {
+			volumeTemplate.Spec.Source.PVC.Name = pvcName
+			volumeTemplate.Spec.Source.PVC.Namespace = namespace
+		}
+	}
+
+	_, err = virtualMachineClient.KubevirtV1().VirtualMachines(namespace).Update(context.Background(), vm, metav1.UpdateOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func UpdateVirtualMachineDisk(namespace, accessWithinCluster, vmName, diskName, pvcName string) error {
 	virtualMachineClient, err := getVirtualMachineClient(accessWithinCluster)
 	if err != nil {

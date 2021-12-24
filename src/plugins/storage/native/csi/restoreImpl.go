@@ -73,8 +73,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			return result
 		}
 	} else if config.StoragePluginParameters["DeploymentType"] == "VirtualMachine" {
-
-		/*msg = util.SetMessage("INFO", "Stopping virtual machine ["+config.StoragePluginParameters["DeploymentName"]+"]")
+		msg = util.SetMessage("INFO", "Stopping virtual machine ["+config.StoragePluginParameters["DeploymentName"]+"]")
 		messages = append(messages, msg)
 
 		err := k8s.StopVirtualMachine(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, config.StoragePluginParameters["DeploymentName"])
@@ -84,7 +83,8 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 
 			result = util.SetResult(1, messages)
 			return result
-		}*/
+		}
+
 	} else {
 		msg := util.SetMessage("ERROR", "Couldn't find Deployment or DeploymentConfig, check configuration")
 		messages = append(messages, msg)
@@ -124,6 +124,37 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			}
 		}
 
+		var pvcDeleteTimeoutSeconds int
+		pvcDeleteTimeoutSeconds = util.StringToInt(config.StoragePluginParameters["PvcDeletionTimeout"])
+
+		if config.StoragePluginParameters["DeploymentType"] == "VirtualMachine" {
+
+			msg = util.SetMessage("INFO", "Updating volume source for virtual machine ["+config.StoragePluginParameters["DeploymentName"]+"]")
+			messages = append(messages, msg)
+
+			err := k8s.UpdateVirtualMachineVolumeSource(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, config.StoragePluginParameters["DeploymentName"], pvcRestoreName)
+			if err != nil {
+				msg := util.SetMessage("ERROR", err.Error())
+				messages = append(messages, msg)
+
+				result = util.SetResult(1, messages)
+				return result
+			}
+
+			if config.StoragePluginParameters["OverwritePvcOnRestore"] == "true" && existsRestorePvc {
+				msg := util.SetMessage("INFO", "Deleting existing pvc restore ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"]")
+				messages = append(messages, msg)
+				err = k8s.DeletePersistentVolumeClaim(pvcRestoreName, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, pvcDeleteTimeoutSeconds)
+				if err != nil {
+					msg := util.SetMessage("ERROR", err.Error())
+					messages = append(messages, msg)
+
+					result = util.SetResult(1, messages)
+					return result
+				}
+			}
+		}
+
 		if !existsPvc {
 			msg := util.SetMessage("WARN", "The pvc ["+backedUpPvc.Source+"] from backup does not exist in namespace ["+config.StoragePluginParameters["Namespace"]+"]")
 			messages = append(messages, msg)
@@ -152,13 +183,11 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			accessModes := existingPvc.Spec.AccessModes
 			volumeMode := existingPvc.Spec.VolumeMode
 
-			var pvcDeleteTimeoutSeconds int
-			pvcDeleteTimeoutSeconds = util.StringToInt(config.StoragePluginParameters["PvcDeletionTimeout"])
-
-			if config.StoragePluginParameters["OverwritePvcOnRestore"] == "true" && existsRestorePvc {
-				msg := util.SetMessage("INFO", "Deleting existing pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"]")
+			if config.StoragePluginParameters["DeploymentType"] == "VirtualMachine" {
+				msg = util.SetMessage("INFO", "Restoring snapshot ["+backedUpPvc.Data+"] to new pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"] using storage class ["+backedUpPvc.StorageClass+"]")
 				messages = append(messages, msg)
-				err = k8s.DeletePersistentVolumeClaim(pvcRestoreName, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, pvcDeleteTimeoutSeconds)
+
+				err = k8s.CreatePersistentVolumeClaimFromSnapshotWithModes(pvcRestoreName, backedUpPvc.Size, backedUpPvc.Data, config.StoragePluginParameters["Namespace"], backedUpPvc.StorageClass, config.AccessWithinCluster, accessModes, volumeMode)
 				if err != nil {
 					msg := util.SetMessage("ERROR", err.Error())
 					messages = append(messages, msg)
@@ -168,16 +197,17 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 				}
 			}
 
-			msg = util.SetMessage("INFO", "Restoring snapshot ["+backedUpPvc.Data+"] to new pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"] using storage class ["+backedUpPvc.StorageClass+"]")
-			messages = append(messages, msg)
-
-			err = k8s.CreatePersistentVolumeClaimFromSnapshotWithModes(pvcRestoreName, backedUpPvc.Size, backedUpPvc.Data, config.StoragePluginParameters["Namespace"], backedUpPvc.StorageClass, config.AccessWithinCluster, accessModes, volumeMode)
-			if err != nil {
-				msg := util.SetMessage("ERROR", err.Error())
+			if config.StoragePluginParameters["OverwritePvcOnRestore"] == "true" && existsRestorePvc {
+				msg := util.SetMessage("INFO", "Deleting existing pvc ["+backedUpPvc.Source+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"]")
 				messages = append(messages, msg)
+				err = k8s.DeletePersistentVolumeClaim(backedUpPvc.Source, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, pvcDeleteTimeoutSeconds)
+				if err != nil {
+					msg := util.SetMessage("ERROR", err.Error())
+					messages = append(messages, msg)
 
-				result = util.SetResult(1, messages)
-				return result
+					result = util.SetResult(1, messages)
+					return result
+				}
 			}
 
 			msg = util.SetMessage("INFO", "Updating deployment type ["+config.StoragePluginParameters["DeploymentType"]+"] deployment name  ["+config.StoragePluginParameters["DeploymentName"]+"] to use restore pvc ["+pvcRestoreName+"]")
@@ -208,7 +238,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			} else if config.StoragePluginParameters["DeploymentType"] == "VirtualMachine" {
 
 				// This needs work for now not add/removing vm disks
-				msg = util.SetMessage("INFO", "Updating virtual machine disk ["+backedUpPvc.Metadata+"] pvc ["+pvcRestoreName+"] for virtual machine ["+config.StoragePluginParameters["DeploymentName"]+"]")
+				/*msg = util.SetMessage("INFO", "Updating virtual machine disk ["+backedUpPvc.Metadata+"] pvc ["+pvcRestoreName+"] for virtual machine ["+config.StoragePluginParameters["DeploymentName"]+"]")
 				messages = append(messages, msg)
 
 				err := k8s.UpdateVirtualMachineDisk(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, config.StoragePluginParameters["DeploymentName"], backedUpPvc.Metadata, pvcRestoreName)
@@ -221,7 +251,8 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 				}
 
 				time.Sleep(5 * time.Second)
-
+				*/
+				time.Sleep(5 * time.Second)
 			}
 		}
 	}
@@ -255,14 +286,14 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		msg = util.SetMessage("INFO", "Starting virtual machine ["+config.StoragePluginParameters["DeploymentName"]+"]")
 		messages = append(messages, msg)
 
-		/*err = k8s.StartVirtualMachine(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, config.StoragePluginParameters["DeploymentName"])
+		err = k8s.StartVirtualMachine(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, config.StoragePluginParameters["DeploymentName"])
 		if err != nil {
 			msg := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, msg)
 
 			result = util.SetResult(1, messages)
 			return result
-		}*/
+		}
 	} else {
 		msg := util.SetMessage("ERROR", "Couldn't find Deployment or DeploymentConfig, check configuration")
 		messages = append(messages, msg)

@@ -169,7 +169,7 @@ func DeletePersistentVolumeClaim(pvcName, namespace, accessWithinCluster string,
 		return err
 	}
 
-	var poll = 5 * time.Second
+	var poll = 1 * time.Second
 	timeout := time.Duration(timeoutSeconds) * time.Second
 	start := time.Now()
 
