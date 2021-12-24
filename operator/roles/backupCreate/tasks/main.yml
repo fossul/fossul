@@ -104,7 +104,7 @@
              \"PvcDeletionTimeout\": \"{{ pvc_deletion_timeout }}\",
              \"SnapshotTimeoutSeconds\": \"{{ snapshot_timeout }}\",
              \"OverwritePvcOnRestore\": \"true\",
-             \"RestoreToNewPvc\": \"false\",
+             \"RestoreToNewPvc\": \"true\",
              
      }"
 

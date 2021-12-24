@@ -152,7 +152,7 @@
              \"PvcDeletionTimeout\": \"300\",
              \"SnapshotTimeoutSeconds\": \"180\",
              \"OverwritePvcOnRestore\": \"true\",
-             \"RestoreToNewPvc\": \"false\",
+             \"RestoreToNewPvc\": \"true\",
              
      }"
 
