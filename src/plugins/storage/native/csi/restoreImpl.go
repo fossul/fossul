@@ -73,7 +73,8 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			return result
 		}
 	} else if config.StoragePluginParameters["DeploymentType"] == "VirtualMachine" {
-		msg = util.SetMessage("INFO", "Stopping virtual machine ["+config.StoragePluginParameters["DeploymentName"]+"]")
+
+		/*msg = util.SetMessage("INFO", "Stopping virtual machine ["+config.StoragePluginParameters["DeploymentName"]+"]")
 		messages = append(messages, msg)
 
 		err := k8s.StopVirtualMachine(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, config.StoragePluginParameters["DeploymentName"])
@@ -83,7 +84,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 
 			result = util.SetResult(1, messages)
 			return result
-		}
+		}*/
 	} else {
 		msg := util.SetMessage("ERROR", "Couldn't find Deployment or DeploymentConfig, check configuration")
 		messages = append(messages, msg)
@@ -114,6 +115,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 
 		for _, existingPvc := range pvcList.Items {
 			if backedUpPvc.Source == existingPvc.Name {
+				pvcRestoreName = existingPvc.Name + "-restore"
 				existsPvc = true
 			}
 
@@ -206,7 +208,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			} else if config.StoragePluginParameters["DeploymentType"] == "VirtualMachine" {
 
 				// This needs work for now not add/removing vm disks
-				/*msg = util.SetMessage("INFO", "Updating virtual machine disk ["+backedUpPvc.Metadata+"] pvc ["+pvcRestoreName+"] for virtual machine ["+config.StoragePluginParameters["DeploymentName"]+"]")
+				msg = util.SetMessage("INFO", "Updating virtual machine disk ["+backedUpPvc.Metadata+"] pvc ["+pvcRestoreName+"] for virtual machine ["+config.StoragePluginParameters["DeploymentName"]+"]")
 				messages = append(messages, msg)
 
 				err := k8s.UpdateVirtualMachineDisk(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, config.StoragePluginParameters["DeploymentName"], backedUpPvc.Metadata, pvcRestoreName)
@@ -219,7 +221,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 				}
 
 				time.Sleep(5 * time.Second)
-				*/
+
 			}
 		}
 	}
@@ -253,14 +255,14 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		msg = util.SetMessage("INFO", "Starting virtual machine ["+config.StoragePluginParameters["DeploymentName"]+"]")
 		messages = append(messages, msg)
 
-		err = k8s.StartVirtualMachine(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, config.StoragePluginParameters["DeploymentName"])
+		/*err = k8s.StartVirtualMachine(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, config.StoragePluginParameters["DeploymentName"])
 		if err != nil {
 			msg := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, msg)
 
 			result = util.SetResult(1, messages)
 			return result
-		}
+		}*/
 	} else {
 		msg := util.SetMessage("ERROR", "Couldn't find Deployment or DeploymentConfig, check configuration")
 		messages = append(messages, msg)

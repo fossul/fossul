@@ -251,6 +251,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 				return result
 			}
 
+			fmt.Println("here 123 " + pvcName)
 			content.Type = "volume"
 			content.Source = pvcName
 			content.Metadata = volume.Name
