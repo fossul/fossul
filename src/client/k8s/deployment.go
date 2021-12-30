@@ -130,7 +130,7 @@ func ScaleUpDeployment(namespace, deploymentConfigName, accessWithinCluster stri
 	})
 }
 
-func UpdateDeploymentVolume(pvcName, namespace, deploymentName, accessWithinCluster string) error {
+func UpdateDeploymentVolume(pvcName, restorePvcName, namespace, deploymentName, accessWithinCluster string) error {
 
 	client, err := getDeploymentClient(accessWithinCluster)
 	if err != nil {
@@ -142,7 +142,11 @@ func UpdateDeploymentVolume(pvcName, namespace, deploymentName, accessWithinClus
 		return err
 	}
 
-	deployment.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim = GeneratePersistentVolumeClaimVolumeName(pvcName)
+	for _, volume := range deployment.Spec.Template.Spec.Volumes {
+		if volume.Name == pvcName {
+			volume.PersistentVolumeClaim.ClaimName = restorePvcName
+		}
+	}
 
 	_, err = client.Deployments(namespace).Update(context.Background(), deployment, metav1.UpdateOptions{})
 	if err != nil {

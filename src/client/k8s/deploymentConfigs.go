@@ -131,7 +131,7 @@ func ScaleUpDeploymentConfig(namespace, deploymentConfigName, accessWithinCluste
 	})
 }
 
-func UpdateDeploymentConfigVolume(pvcName, namespace, deploymentConfigName, accessWithinCluster string) error {
+func UpdateDeploymentConfigVolume(pvcName, restorePvcName, namespace, deploymentConfigName, accessWithinCluster string) error {
 
 	client, err := getDeploymentConfigClient(accessWithinCluster)
 	if err != nil {
@@ -153,7 +153,11 @@ func UpdateDeploymentConfigVolume(pvcName, namespace, deploymentConfigName, acce
 	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		// Retrieve the latest version of Deployment before attempting update
 		// RetryOnConflict uses exponential backoff to avoid exhausting the apiserver
-		deploymentConfig.Spec.Template.Spec.Volumes[0].PersistentVolumeClaim = GeneratePersistentVolumeClaimVolumeName(pvcName)
+		for _, volume := range deploymentConfig.Spec.Template.Spec.Volumes {
+			if volume.Name == pvcName {
+				volume.PersistentVolumeClaim.ClaimName = restorePvcName
+			}
+		}
 		_, updateErr := client.DeploymentConfigs(namespace).Update(context.Background(), deploymentConfig, metav1.UpdateOptions{})
 		return updateErr
 	})

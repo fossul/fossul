@@ -168,7 +168,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			messages = append(messages, msg)
 
 			if config.StoragePluginParameters["DeploymentType"] == "DeploymentConfig" {
-				err := k8s.UpdateDeploymentConfigVolume(pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
+				err := k8s.UpdateDeploymentConfigVolume(backedUpPvc.Source, pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
 				if err != nil {
 					msg := util.SetMessage("ERROR", err.Error())
 					messages = append(messages, msg)
@@ -179,7 +179,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 
 				time.Sleep(5 * time.Second)
 			} else if config.StoragePluginParameters["DeploymentType"] == "Deployment" {
-				err := k8s.UpdateDeploymentVolume(pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
+				err := k8s.UpdateDeploymentVolume(backedUpPvc.Source, pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
 				if err != nil {
 					msg := util.SetMessage("ERROR", err.Error())
 					messages = append(messages, msg)
@@ -250,7 +250,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			messages = append(messages, msg)
 
 			if config.StoragePluginParameters["DeploymentType"] == "DeploymentConfig" {
-				err := k8s.UpdateDeploymentConfigVolume(pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
+				err := k8s.UpdateDeploymentConfigVolume(backedUpPvc.Source, pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
 				if err != nil {
 					msg := util.SetMessage("ERROR", err.Error())
 					messages = append(messages, msg)
@@ -261,7 +261,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 
 				time.Sleep(5 * time.Second)
 			} else if config.StoragePluginParameters["DeploymentType"] == "Deployment" {
-				err := k8s.UpdateDeploymentVolume(pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
+				err := k8s.UpdateDeploymentVolume(backedUpPvc.Source, pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
 				if err != nil {
 					msg := util.SetMessage("ERROR", err.Error())
 					messages = append(messages, msg)
