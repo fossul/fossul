@@ -39,7 +39,7 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 		snapshotList = append(snapshotList, snapshot.Name)
 	}
 
-	backups, err := pluginUtil.ListSnapshots(snapshotList, config.StoragePluginParameters["PvcName"])
+	backups, err := pluginUtil.ListSnapshots(snapshotList, config.StoragePluginParameters["BackupName"])
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)

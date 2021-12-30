@@ -101,6 +101,10 @@ func ListSnapshots(snapshots []string, backupName string) ([]util.Backup, error)
 
 		if len(match) != 0 {
 			backup.Name = match[1]
+			if backup.Name != backupName {
+				continue
+			}
+
 			backup.Policy = match[2]
 			backup.WorkflowId = match[3]
 
