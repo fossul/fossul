@@ -110,15 +110,8 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			pvcRestoreName = backedUpPvc.Source
 		}
 
-		var existsPvc bool = false
 		var existsRestorePvc bool = false
-
 		for _, existingPvc := range pvcList.Items {
-			if backedUpPvc.Source == existingPvc.Name {
-				pvcRestoreName = existingPvc.Name + "-restore"
-				existsPvc = true
-			}
-
 			if existingPvc.Name == pvcRestoreName {
 				existsRestorePvc = true
 			}
@@ -155,11 +148,11 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			}
 		}
 
-		if !existsPvc {
-			msg := util.SetMessage("WARN", "The pvc ["+backedUpPvc.Source+"] from backup does not exist in namespace ["+config.StoragePluginParameters["Namespace"]+"]")
+		if !existsRestorePvc {
+			msg := util.SetMessage("INFO", "The pvc ["+backedUpPvc.Source+"] from backup does not exist in namespace ["+config.StoragePluginParameters["Namespace"]+"]")
 			messages = append(messages, msg)
 
-			msg = util.SetMessage("INFO", "Restoring snapshot ["+backedUpPvc.Data+"] to new pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"] using storage class ["+backedUpPvc.StorageClass+"]")
+			msg = util.SetMessage("INFO", "Restoring snapshot ["+backedUpPvc.Data+"] to pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"] using storage class ["+backedUpPvc.StorageClass+"]")
 			messages = append(messages, msg)
 
 			err = k8s.CreatePersistentVolumeClaimFromSnapshot(pvcRestoreName, backedUpPvc.Size, backedUpPvc.Data, config.StoragePluginParameters["Namespace"], backedUpPvc.StorageClass, config.AccessWithinCluster)
@@ -170,8 +163,37 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 				result = util.SetResult(1, messages)
 				return result
 			}
+
+			msg = util.SetMessage("INFO", "Updating deployment type ["+config.StoragePluginParameters["DeploymentType"]+"] deployment name  ["+config.StoragePluginParameters["DeploymentName"]+"] to use restore pvc ["+pvcRestoreName+"]")
+			messages = append(messages, msg)
+
+			if config.StoragePluginParameters["DeploymentType"] == "DeploymentConfig" {
+				err := k8s.UpdateDeploymentConfigVolume(pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
+				if err != nil {
+					msg := util.SetMessage("ERROR", err.Error())
+					messages = append(messages, msg)
+
+					result = util.SetResult(1, messages)
+					return result
+				}
+
+				time.Sleep(5 * time.Second)
+			} else if config.StoragePluginParameters["DeploymentType"] == "Deployment" {
+				err := k8s.UpdateDeploymentVolume(pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
+				if err != nil {
+					msg := util.SetMessage("ERROR", err.Error())
+					messages = append(messages, msg)
+
+					result = util.SetResult(1, messages)
+					return result
+				}
+
+				time.Sleep(5 * time.Second)
+			} else if config.StoragePluginParameters["DeploymentType"] == "VirtualMachine" {
+				time.Sleep(5 * time.Second)
+			}
 		} else {
-			existingPvc, err := k8s.GetPersistentVolumeClaim(config.StoragePluginParameters["Namespace"], backedUpPvc.Source, config.AccessWithinCluster)
+			existingPvc, err := k8s.GetPersistentVolumeClaim(config.StoragePluginParameters["Namespace"], pvcRestoreName, config.AccessWithinCluster)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)
@@ -198,9 +220,23 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 			}
 
 			if config.StoragePluginParameters["OverwritePvcOnRestore"] == "true" && existsRestorePvc {
-				msg := util.SetMessage("INFO", "Deleting existing pvc ["+backedUpPvc.Source+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"]")
+				msg := util.SetMessage("INFO", "Deleting existing pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"]")
 				messages = append(messages, msg)
-				err = k8s.DeletePersistentVolumeClaim(backedUpPvc.Source, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, pvcDeleteTimeoutSeconds)
+				err = k8s.DeletePersistentVolumeClaim(pvcRestoreName, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, pvcDeleteTimeoutSeconds)
+				if err != nil {
+					msg := util.SetMessage("ERROR", err.Error())
+					messages = append(messages, msg)
+
+					result = util.SetResult(1, messages)
+					return result
+				}
+			}
+
+			if config.StoragePluginParameters["DeploymentType"] == "Deployment" || config.StoragePluginParameters["DeploymentType"] == "DeploymentConfig" {
+				msg = util.SetMessage("INFO", "Restoring snapshot ["+backedUpPvc.Data+"] to new pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"] using storage class ["+backedUpPvc.StorageClass+"]")
+				messages = append(messages, msg)
+
+				err = k8s.CreatePersistentVolumeClaimFromSnapshot(pvcRestoreName, backedUpPvc.Size, backedUpPvc.Data, config.StoragePluginParameters["Namespace"], backedUpPvc.StorageClass, config.AccessWithinCluster)
 				if err != nil {
 					msg := util.SetMessage("ERROR", err.Error())
 					messages = append(messages, msg)
@@ -236,22 +272,6 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 
 				time.Sleep(5 * time.Second)
 			} else if config.StoragePluginParameters["DeploymentType"] == "VirtualMachine" {
-
-				// This needs work for now not add/removing vm disks
-				/*msg = util.SetMessage("INFO", "Updating virtual machine disk ["+backedUpPvc.Metadata+"] pvc ["+pvcRestoreName+"] for virtual machine ["+config.StoragePluginParameters["DeploymentName"]+"]")
-				messages = append(messages, msg)
-
-				err := k8s.UpdateVirtualMachineDisk(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster, config.StoragePluginParameters["DeploymentName"], backedUpPvc.Metadata, pvcRestoreName)
-				if err != nil {
-					msg := util.SetMessage("ERROR", err.Error())
-					messages = append(messages, msg)
-
-					result = util.SetResult(1, messages)
-					return result
-				}
-
-				time.Sleep(5 * time.Second)
-				*/
 				time.Sleep(5 * time.Second)
 			}
 		}

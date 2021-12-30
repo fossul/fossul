@@ -148,7 +148,7 @@ func GetVolumeSnapshotClassName(storageDriverName, accessWithinCluster string) (
 		}
 	}
 
-	return "", errors.New("ERROR: COuldn't determine snapshot class using driver [" + storageDriverName + "]")
+	return "", errors.New("ERROR: Volume Snapshot Class does not exist for driver [" + storageDriverName + "]")
 }
 
 func getSnapshotClient(accessWithinCluster string) (*snapClient.SnapshotV1Client, error) {
