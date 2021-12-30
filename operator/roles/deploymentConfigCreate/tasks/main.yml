@@ -1,11 +1,11 @@
-# tasks file for VirtualMachine create
-- name: Get Virtual Machine
+# tasks file for DeploymentConfig create
+- name: Get Deployment Config
   k8s_info:
-    api_version: v1
-    kind: VirtualMachine
+    api_version: apps.openshift.io/v1
+    kind: DeploymentConfig
     name: "{{ ansible_operator_meta.name }}"
     namespace: "{{ ansible_operator_meta.namespace }}"
-  register: virtualmachine
+  register: deploymentconfig
 
 - name: Set Defaults
   set_fact:
@@ -13,7 +13,7 @@
     is_backup: false
     fossul_policy: daily
     fossul_retention: 7
-    fossul_app_plugin: "kubevirt.so"
+    fossul_app_plugin: ""
     fossul_storage_plugin: "csi.so"
     fossul_archive_plugin: ""
     fossul_cron_schedule: "0 0 * * *"
@@ -21,56 +21,56 @@
 - name: Determine if backup enabled via annotations
   set_fact:
     is_backup: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
   when: item.key == "fossul.io/backup"
 
 - name: Get the fossul namespace
   set_fact:
     fossul_namespace: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
   when: item.key == "fossul.io/namespace"
 
 - name: Get the fossul server url from annotations
   set_fact:
     fossul_server_url: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
   when: item.key == "fossul.io/url" 
 
 - name: Get the fossul policy from annotations
   set_fact:
     fossul_policy: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
   when: item.key == "fossul.io/policy"   
 
 - name: Get the fossul retention from annotations
   set_fact:
     fossul_retention: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
   when: item.key == "fossul.io/retention" 
 
 - name: Get the fossul app plugin
   set_fact:
     fossul_app_plugin: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
   when: item.key == "fossul.io/app_plugin" 
 
 - name: Get the fossul storage plugin
   set_fact:
     fossul_storage_plugin: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
   when: item.key == "fossul.io/storage_plugin" 
 
 - name: Get the fossul archive plugin
   set_fact:
     fossul_archive_plugin: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
-  when: item.key == "fossul.io/archive_plugin"     
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
+  when: item.key == "fossul.io/archive_plugin"   
 
 - name: Get the fossul cron schedule
   set_fact:
     fossul_cron_schedule: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
-  when: item.key == "fossul.io/cron_schedule"    
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
+  when: item.key == "fossul.io/cron_schedule"   
 
 - name: Set Fossul Server URL to default
   set_fact:
@@ -123,7 +123,7 @@
     method: POST
     body: "{ \"accessWithinCluster\": \"true\",
              \"appPlugin\": \"{{ fossul_app_plugin }}\",
-             \"storagePlugin\": \"{{ fossul_app_plugin }}\",
+             \"storagePlugin\": \"{{ fossul_storage_plugin }}\",
              \"archivePlugin\": \"{{ fossul_archive_plugin }}\",
              \"containerPlatform\": \"openshift\",
              \"jobRetention\": 50,
@@ -141,30 +141,6 @@
   debug:
     msg: "{{ config }}"
   when: is_backup | bool     
-    
-- name: Create App Plugin Config
-  uri:
-    url: "{{ fossul_server_url }}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ ansible_operator_meta.name }}/kubevirt.so"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "admin"
-    password: "{{ fossul_password }}"
-    method: POST
-    body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
-             \"VmName\": \"{{ ansible_operator_meta.name }}\",
-     }"
-    body_format: json    
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: app_config
-  when: is_backup | bool 
-
-- name: print app config
-  debug:
-    msg: "{{ app_config }}"  
-  when: is_backup | bool 
 
 - name: Create Storage Plugin Config
   uri:
@@ -178,7 +154,7 @@
     body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
              \"BackupName\": \"{{ ansible_operator_meta.name }}\",
              \"DeploymentName\": \"{{ ansible_operator_meta.name }}\",
-             \"DeploymentType\": \"VirtualMachine\",
+             \"DeploymentType\": \"DeploymentConfig\",
              \"PvcDeletionTimeout\": \"300\",
              \"SnapshotTimeoutSeconds\": \"180\",
              \"OverwritePvcOnRestore\": \"true\",

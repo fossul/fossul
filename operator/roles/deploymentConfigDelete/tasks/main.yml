@@ -1,40 +1,41 @@
 ---
-# tasks file for VirtualMachine delete
-- name: Get Virtual Machine
+# tasks file for DeploymentConfig delete
+- name: Get Deployment Config
   k8s_info:
-    api_version: v1
-    kind: VirtualMachine
+    api_version: apps.openshift.io/v1
+    kind: DeploymentConfig
     name: "{{ ansible_operator_meta.name }}"
     namespace: "{{ ansible_operator_meta.namespace }}"
-  register: virtualmachine
+  register: deploymentconfig
 
 - name: Set Defaults
   set_fact:
+    fossul_namespace: fossul
     is_backup: false
     fossul_policy: daily
 
 - name: Determine if backup enabled via annotations
   set_fact:
     is_backup: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
   when: item.key == "fossul.io/backup"
 
 - name: Get the fossul namespace
   set_fact:
     fossul_namespace: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
   when: item.key == "fossul.io/namespace"
 
 - name: Get the fossul server url from annotations
   set_fact:
     fossul_server_url: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
   when: item.key == "fossul.io/url" 
 
 - name: Get the fossul policy from annotations
   set_fact:
     fossul_policy: "{{ item.value }}"
-  loop: "{{ lookup('dict', virtualmachine.resources[0].metadata.annotations, wantlist=True) }}"
+  loop: "{{ lookup('dict', deploymentconfig.resources[0].metadata.annotations, wantlist=True) }}"
   when: item.key == "fossul.io/policy"    
 
 - name: Set Fossul Server URL to default

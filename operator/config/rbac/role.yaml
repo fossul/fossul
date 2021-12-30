@@ -39,14 +39,15 @@ rules:
       - watch
   - apiGroups:
     - ""
-    - route.openshift.io
+    - apps.openshift.io
     resources:
-    - routes
-    - routes/custom-host
+    - deploymentconfigs
+  - apiGroups:
+    - ""
+    - apps.openshift.io
+    resources:
+    - deploymentconfigs
     verbs:
-    - create
-    - delete
-    - deletecollection
     - get
     - list
     - patch

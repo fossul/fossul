@@ -15,12 +15,28 @@
   group: cache.fossul.com
   kind: Restore
   role: restore
+#- version: v1
+#  group: kubevirt.io
+#  kind: VirtualMachine
+#  role: vmCreate
+#  finalizer:
+#    name: kubevirt.io/finalizer
+#    role: vmDelete
+#  manageStatus: False
 - version: v1
-  group: kubevirt.io
-  kind: VirtualMachine
-  role: vmCreate
+  group: apps.openshift.io
+  kind: DeploymentConfig
+  role: deploymentConfigCreate
   finalizer:
-    name: kubevirt.io/finalizer
-    role: vmDelete
+    name: apps.openshift.io/finalizer
+    role: deploymentConfigDelete
+  manageStatus: False
+- version: v1
+  group: apps
+  kind: Deployment
+  role: deploymentCreate
+  finalizer:
+    name: apps/finalizer
+    role: deploymentDelete
   manageStatus: False
 #+kubebuilder:scaffold:watch
