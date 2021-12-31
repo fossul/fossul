@@ -40,3 +40,4 @@
     role: deploymentDelete
   manageStatus: False
 #+kubebuilder:scaffold:watch
+#+kubebuilder:subresource:status

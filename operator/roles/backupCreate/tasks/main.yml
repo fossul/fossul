@@ -5,10 +5,70 @@
     fossul_namespace: "fossul"
   when: fossul_namespace is not defined
 
+- name: Set Fossul policy 
+  set_fact:
+    policy: "daily"
+  when: policy is not defined
+
+- name: Set Fossul retention 
+  set_fact:
+    retention: 7
+  when: retention is not defined  
+
+- name: Set Fossul app plugin 
+  set_fact:
+    app_plugin: ""
+  when: app_plugin is not defined    
+
+- name: Set Fossul archive plugin 
+  set_fact:
+    archive_plugin: ""
+  when: archive_plugin is not defined 
+
+- name: Set Fossul schedule 
+  set_fact:
+    schedule: "0 0 * * *"
+  when: schedule is not defined     
+
+- name: Set Fossul job retention 
+  set_fact:
+    job_retention: 50
+  when: job_retention is not defined      
+
+- name: Set Fossul auto discovery
+  set_fact:
+    auto_discovery: "false"
+  when: auto_discovery is not defined    
+
+- name: Set Fossul pvc deletion timeout
+  set_fact:
+    pvc_deletion_timeout: "300"
+  when: pvc_deletion_timeout is not defined
+
+- name: Set Fossul snapshot timeout
+  set_fact:
+    snapshot_timeout: "180"
+  when: snapshot_timeout is not defined
+
+- name: Set Fossul pvc overwrite
+  set_fact:
+    overwrite_pvc_on_restore: "false"
+  when: overwrite_pvc_on_restore is not defined
+
+- name: Set Fossul pvc restore target
+  set_fact:
+    restore_to_new_pvc: "false"
+  when: restore_to_new_pvc is not defined                 
+
 - name: Set Fossul Server URL 
   set_fact:
     fossul_server_url: "http://fossul-server.{{ fossul_namespace }}.svc.cluster.local:8000"
   when: fossul_server_url is not defined
+
+- name: Set Default Fossul Storage Plugin 
+  set_fact:
+    storage_plugin: "csi.so"
+  when: storage_plugin is not defined  
 
 - name: Get Fossul Secret
   k8s_info:
@@ -26,7 +86,7 @@
 
 - name: Create Backup Profile
   uri:
-    url: "{{fossul_server_url}}/addProfile/{{ profile }}"
+    url: "{{fossul_server_url}}/addProfile/{{ ansible_operator_meta.namespace }}"
     headers:
       Content-Type: application/json
       Accept: application/json    
@@ -37,13 +97,15 @@
     status_code: [200]
     return_content: yes
   register: profile
+  failed_when: profile.json.messages[0].level == "ERROR"
+
 - name: print profile
   debug:
     msg: "{{ profile }}"     
 
 - name: Create Backup Config
   uri:
-    url: "{{fossul_server_url}}/addConfig/{{ profile }}/{{ config }}"
+    url: "{{fossul_server_url}}/addConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}"
     headers:
       Content-Type: application/json
       Accept: application/json    
@@ -53,9 +115,10 @@
     body: "{ \"accessWithinCluster\": \"true\",
              \"appPlugin\": \"{{ app_plugin }}\",
              \"storagePlugin\": \"{{ storage_plugin }}\",
+             \"archivePlugin\": \"{{ archive_plugin }}\",
              \"containerPlatform\": \"openshift\",
-             \"jobRetention\": 50,
-             \"autoDiscovery\": true,
+             \"jobRetention\": {{ job_retention }},
+             \"autoDiscovery\": {{ auto_discovery | lower }},
              \"backupRetentions\": [{\"policy\": \"{{ policy }}\",\"retentionNumber\": {{ retention }}}]},
      }"
     body_format: json    
@@ -63,13 +126,15 @@
     status_code: [200]
     return_content: yes
   register: config
+  failed_when: config.json.messages[0].level == "ERROR"
+
 - name: print config
   debug:
     msg: "{{ config }}"
     
 - name: Create App Plugin Config
   uri:
-    url: "{{fossul_server_url}}/addPluginConfig/{{ profile }}/{{ config }}/{{ app_plugin }}"
+    url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ app_plugin }}"
     headers:
       Content-Type: application/json
       Accept: application/json    
@@ -77,20 +142,24 @@
     password: "{{fossul_password}}"
     method: POST
     body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
-             \"VmName\": \"{{ vm_name }}\",
+             \"VmName\": \"{{ deployment_name }}\",
      }"
     body_format: json    
     force_basic_auth: yes
     status_code: [200]
     return_content: yes
   register: app_config
+  when: (app_plugin is defined) and (app_plugin == "kubevirt.io")
+  failed_when: app_config.json.messages[0].level == "ERROR"
+
 - name: print app config
   debug:
     msg: "{{ app_config }}"  
+  when: (app_plugin is defined) and (app_plugin == "kubevirt.io")  
     
 - name: Create Storage Plugin Config
   uri:
-    url: "{{fossul_server_url}}/addPluginConfig/{{ profile }}/{{ config }}/{{ storage_plugin }}"
+    url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ storage_plugin }}"
     headers:
       Content-Type: application/json
       Accept: application/json    
@@ -98,13 +167,13 @@
     password: "{{fossul_password}}"
     method: POST
     body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
-             \"BackupName\": \"{{ vm_name }}\",
+             \"BackupName\": \"{{ deployment_name }}\",
              \"DeploymentName\": \"{{ deployment_name }}\",
-             \"DeploymentType\": \"VirtualMachine\",
+             \"DeploymentType\": \"{{ deployment_type }}\",
              \"PvcDeletionTimeout\": \"{{ pvc_deletion_timeout }}\",
              \"SnapshotTimeoutSeconds\": \"{{ snapshot_timeout }}\",
-             \"OverwritePvcOnRestore\": \"true\",
-             \"RestoreToNewPvc\": \"true\",
+             \"OverwritePvcOnRestore\": \"{{ overwrite_pcv_on_restore }}\",
+             \"RestoreToNewPvc\": \"{{ restore_to_new_pvc }}\",
              
      }"
 
@@ -112,14 +181,18 @@
     force_basic_auth: yes
     status_code: [200]
     return_content: yes
-  register: app_config
-- name: print app config
+  register: storage_config
+  when: (storage_plugin is defined) and (storage_plugin == "csi.so")
+  failed_when: storage_config.json.messages[0].level == "ERROR"
+
+- name: print storage config
   debug:
-    msg: "{{ app_config }}"       
+    msg: "{{ storage_config }}" 
+  when: storage_plugin is defined        
       
 - name: Create Backup Schedule
   uri:
-    url: "{{fossul_server_url}}/addSchedule/{{ profile }}/{{ config }}/{{ policy }}"
+    url: "{{fossul_server_url}}/addSchedule/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}"
     headers:
       Content-Type: application/json
       Accept: application/json    
@@ -132,6 +205,8 @@
     status_code: [200]
     return_content: yes
   register: schedule
+  failed_when: schedule.json.messages[0].level == "ERROR"
+
 - name: print schedule
   debug:
     msg: "{{ schedule }}"  

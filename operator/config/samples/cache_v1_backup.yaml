@@ -4,18 +4,18 @@ metadata:
   name: backup-sample
 spec:
   # Add fields here
-  fossul_server_url: http://fossul-server-fossul.apps.ocp4.sandbox1398.opentlc.com
+  fossul_server_url: http://fossul-server-fossul.apps.cluster-hqnpv.hqnpv.sandbox545.opentlc.com
   username: admin
   fossul_namespace: fossul
-  profile: test
-  config: test
-  policy: daily
-  cron_schedule: "0 * * * *"
-  app_plugin: kubevirt.so
+  policy: hourly
+  cron_schedule: "*/5 * * * *"
+  auto_discovery: false
+  job_retention: 50
   storage_plugin: csi.so
   retention: 7
-  vm_name: rhel8-vm
-  deployment_name: rhel8-vm
-  deployment_type: VirtualMachine
+  deployment_type: DeploymentConfig
+  deployment_name: postgresql
   pvc_deletion_timeout: 300
   snapshot_timeout: 180
+  overwrite_pcv_on_restore: true
+  restore_to_new_pvc: false

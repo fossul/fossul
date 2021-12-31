@@ -5,6 +5,11 @@
     fossul_namespace: "fossul"
   when: fossul_namespace is not defined
 
+- name: Set Fossul policy 
+  set_fact:
+    policy: "daily"
+  when: policy is not defined  
+
 - name: Set Fossul Server URL 
   set_fact:
     fossul_server_url: "http://fossul-server.{{ fossul_namespace }}.svc.cluster.local:8000"
@@ -26,7 +31,7 @@
   
 - name: Delete Backup Schedule
   uri:
-    url: "{{fossul_server_url}}/deleteSchedule/{{ profile }}/{{ config }}/{{ policy }}"
+    url: "{{fossul_server_url}}/deleteSchedule/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}"
     headers:
       Content-Type: application/json
       Accept: application/json    
@@ -37,13 +42,15 @@
     status_code: [200]
     return_content: yes
   register: schedule
+  failed_when: schedule.json.messages[0].level == "ERROR"
+
 - name: print schedule
   debug:
     msg: "{{ schedule }}"  
 
 - name: Delete Backup Config
   uri:
-    url: "{{fossul_server_url}}/deleteConfigDir/{{ profile }}/{{ config }}"
+    url: "{{fossul_server_url}}/deleteConfigDir/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}"
     headers:
       Content-Type: application/json
       Accept: application/json    
@@ -54,6 +61,8 @@
     status_code: [200]
     return_content: yes
   register: config
+  failed_when: config.json.messages[0].level == "ERROR"
+
 - name: print delete config
   debug:
     msg: "{{ config }}"  
