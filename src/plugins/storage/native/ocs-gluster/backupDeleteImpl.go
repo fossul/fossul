@@ -14,13 +14,26 @@ package main
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/fossul/fossul/src/client/k8s"
 	"github.com/fossul/fossul/src/engine/util"
 	"github.com/fossul/fossul/src/plugins/pluginUtil"
-	"strings"
 )
 
 func (s storagePlugin) BackupDelete(config util.Config) util.Result {
+	var result util.Result
+	var messages []util.Message
+	var resultCode int = 0
+
+	msg := util.SetMessage("INFO", "Not implemented yet")
+	messages = append(messages, msg)
+
+	result = util.SetResult(resultCode, messages)
+	return result
+}
+
+func (s storagePlugin) BackupDeleteWorkflow(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 	var resultCode int = 0

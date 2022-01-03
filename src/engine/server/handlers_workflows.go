@@ -14,10 +14,11 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/fossul/fossul/src/engine/util"
-	"github.com/gorilla/mux"
 	"net/http"
 	"time"
+
+	"github.com/fossul/fossul/src/engine/util"
+	"github.com/gorilla/mux"
 )
 
 // StartBackupWorkflowLocalConfig godoc
@@ -118,7 +119,7 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	workflowResult.Id = workflow.Id
 
-	config, err := GetConsolidatedConfig(profileName, configName, policyName)
+	config, err := util.GetConsolidatedConfig(configDir, profileName, configName, policyName)
 	printConfigDebug(config)
 
 	if err != nil {
@@ -154,7 +155,7 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 
 // StartRestoreWorkflowLocalConfig godoc
 // @Description Start restore workflow using local config
-// @Param config body util.Config true "config struct"
+// @Param workflowId body workflowId true int
 // @Accept  json
 // @Produce  json
 // @Success 200 {object} util.WorkflowResult
@@ -256,7 +257,7 @@ func StartRestoreWorkflow(w http.ResponseWriter, r *http.Request) {
 
 	workflowResult.Id = workflow.Id
 
-	config, err := GetConsolidatedConfig(profileName, configName, policyName)
+	config, err := util.GetConsolidatedConfig(configDir, profileName, configName, policyName)
 	printConfigDebug(config)
 
 	if err != nil {

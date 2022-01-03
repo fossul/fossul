@@ -14,10 +14,11 @@ package main
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/fossul/fossul/src/client/k8s"
 	"github.com/fossul/fossul/src/engine/util"
 	"github.com/fossul/fossul/src/plugins/pluginUtil"
-	"strings"
 )
 
 type storagePlugin string
@@ -176,6 +177,18 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
+	msg := util.SetMessage("INFO", "Not implemented yet")
+	messages = append(messages, msg)
+
+	result = util.SetResult(resultCode, messages)
+	return result
+}
+
+func (s storagePlugin) BackupDeleteWorkflow(config util.Config) util.Result {
+	var result util.Result
+	var messages []util.Message
+	var resultCode int = 0
+
 	backupDir := util.GetBackupDirFromConfig(config)
 	backups, err := pluginUtil.ListBackups(backupDir)
 	if err != nil {
@@ -288,7 +301,7 @@ func setPlugin() (plugin util.Plugin) {
 	backupListCap.Name = "backupList"
 
 	var backupDeleteCap util.Capability
-	backupDeleteCap.Name = "backupDelete"
+	backupDeleteCap.Name = "backupDeleteWorkflow"
 
 	var restoreCap util.Capability
 	restoreCap.Name = "restore"

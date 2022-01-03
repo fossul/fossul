@@ -50,7 +50,7 @@ func setPlugin() (plugin util.Plugin) {
 	backupListCap.Name = "backupList"
 
 	var backupDeleteCap util.Capability
-	backupDeleteCap.Name = "backupDelete"
+	backupDeleteCap.Name = "backupDeleteWorkflow"
 
 	var infoCap util.Capability
 	infoCap.Name = "info"

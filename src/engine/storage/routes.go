@@ -13,9 +13,10 @@ limitations under the License.
 package main
 
 import (
+	"net/http"
+
 	"github.com/fossul/fossul/src/engine/util"
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
 type Route struct {
@@ -76,6 +77,12 @@ var routes = Routes{
 		"POST",
 		"/backupList",
 		BackupList,
+	},
+	Route{
+		"BackupDeleteWorkflow",
+		"POST",
+		"/backupDeleteWorkflow",
+		BackupDeleteWorkflow,
 	},
 	Route{
 		"BackupDelete",

@@ -25,7 +25,7 @@ func main() {
 	optCredentialFile := getopt.StringLong("credential-file", 'h', "", "Path to credential file")
 	optConfigFile := getopt.StringLong("config-file", 'f', "", "Path to config file")
 	optPolicy := getopt.StringLong("policy", 'i', "", "Backup policy as defined in config")
-	optAction := getopt.StringLong("action", 'a', "", "backup|restore|backupList|archiveList|listProfiles|listConfigs|listPluginConfigs|"+
+	optAction := getopt.StringLong("action", 'a', "", "backup|restore|backupList|backupDelete|archiveList|listProfiles|listConfigs|listPluginConfigs|"+
 		"addProfile|addConfig|addPluginConfig|deleteProfile|deleteConfig|deleteConfigDir|"+
 		"deletePluginConfig|jobList|"+"addSchedule|deleteSchedule|jobStatus")
 	optPluginName := getopt.StringLong("plugin", 'l', "", "Name of plugin")
@@ -299,7 +299,7 @@ func main() {
 	}
 
 	// Check retention policy
-	if *optAction == "backup" || *optAction == "backupList" || *optAction == "restore" || *optAction == "archiveList" {
+	if *optAction == "backup" || *optAction == "backupList" || *optAction == "restore" || *optAction == "archiveList" || *optAction == "backupDelete" {
 		if getopt.IsSet("policy") != true {
 			fmt.Println("[ERROR] missing parameter --policy")
 			os.Exit(1)
@@ -342,6 +342,13 @@ func main() {
 		}
 
 		JobStatus(auth, *optProfile, *optConfig, *optWorkflowId)
+	} else if *optAction == "backupDelete" {
+		if getopt.IsSet("workflow-id") != true {
+			fmt.Println("[ERROR] Missing parameter --workflow-id")
+			os.Exit(1)
+		}
+
+		BackupDelete(auth, string(*optProfile), string(*optConfig), string(*optPolicy), string(*optWorkflowId))
 	} else if *optAction == "addSchedule" {
 		if getopt.IsSet("policy") != true {
 			fmt.Println("[ERROR] missing parameter --policy")

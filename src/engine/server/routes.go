@@ -234,4 +234,10 @@ var routes = Routes{
 		"/listSchedules",
 		ListSchedules,
 	},
+	Route{
+		"DeleteBackup",
+		"POST",
+		"/deleteBackup/{profileName}/{configName}/{policy}/{workflowId}",
+		DeleteBackup,
+	},
 }

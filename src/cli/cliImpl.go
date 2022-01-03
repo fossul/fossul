@@ -3,11 +3,12 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/fossul/fossul/src/client"
-	"github.com/fossul/fossul/src/engine/util"
 	"os"
 	"text/tabwriter"
 	"time"
+
+	"github.com/fossul/fossul/src/client"
+	"github.com/fossul/fossul/src/engine/util"
 )
 
 func WriteCredentialFile(credentialFile, serverHostname, serverPort, appHostname, appPort, storageHostname, storagePort, username, password string) {
@@ -539,6 +540,16 @@ func BackupList(auth client.Auth, profileName, configName, policyName string, co
 	for _, backup := range backupsByPolicy {
 		fmt.Println(backup.Name, backup.Policy, backup.WorkflowId, backup.Timestamp)
 	}
+}
+
+func BackupDelete(auth client.Auth, profileName, configName, policyName, workflowId string) {
+	result, err := client.ServerBackupDelete(auth, profileName, configName, policyName, workflowId)
+	if err != nil {
+		fmt.Println("[ERROR] " + err.Error())
+		os.Exit(1)
+	}
+
+	printResult(result)
 }
 
 func ArchiveList(auth client.Auth, profileName, configName, policyName string, config util.Config) {

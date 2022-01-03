@@ -14,14 +14,15 @@ package main
 
 import (
 	"context"
-	_ "github.com/fossul/fossul/src/engine/storage/docs"
-	"github.com/fossul/fossul/src/engine/util"
-	"github.com/swaggo/http-swagger"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	_ "github.com/fossul/fossul/src/engine/storage/docs"
+	"github.com/fossul/fossul/src/engine/util"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 const version = "1.0.0"

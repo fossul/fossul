@@ -49,6 +49,71 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 	}
 
 	backupsByPolicy := util.GetBackupsByPolicy(config.SelectedBackupPolicy, backups)
+	var backupExists bool = false
+	for backup := range pluginUtil.ReverseBackupList(backupsByPolicy) {
+		if util.IntToString(config.SelectedWorkflowId) == backup.WorkflowId {
+			backupExists = true
+			for _, content := range backup.Contents {
+				snapshotName := content.Data
+				msg := util.SetMessage("INFO", "Deleting backup "+snapshotName)
+				messages = append(messages, msg)
+
+				err := k8s.DeleteSnapshot(snapshotName, config.StoragePluginParameters["Namespace"], config.AccessWithinCluster)
+				if err != nil {
+					msg := util.SetMessage("ERROR", err.Error())
+					messages = append(messages, msg)
+					result = util.SetResult(1, messages)
+
+					return result
+				}
+
+				msg = util.SetMessage("INFO", "Backup "+snapshotName+" deleted successfully")
+				messages = append(messages, msg)
+			}
+		}
+	}
+
+	if !backupExists {
+		msg := util.SetMessage("ERROR", "No backup was found for profile ["+config.ProfileName+"] config ["+config.ConfigName+"]")
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+
+		return result
+	}
+
+	result = util.SetResult(resultCode, messages)
+	return result
+}
+
+func (s storagePlugin) BackupDeleteWorkflow(config util.Config) util.Result {
+	var result util.Result
+	var messages []util.Message
+	var resultCode int = 0
+
+	snapshots, err := k8s.ListSnapshots(config.StoragePluginParameters["Namespace"], config.AccessWithinCluster)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+
+		return result
+	}
+
+	var snapshotList []string
+	for _, snapshot := range snapshots.Items {
+		snapshotList = append(snapshotList, snapshot.Name)
+	}
+
+	backups, err := pluginUtil.ListSnapshots(snapshotList, config.StoragePluginParameters["BackupName"])
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+
+		return result
+	}
+
+	backupsByPolicy := util.GetBackupsByPolicy(config.SelectedBackupPolicy, backups)
 	backupCount := len(backupsByPolicy)
 
 	if backupCount > config.SelectedBackupRetention {

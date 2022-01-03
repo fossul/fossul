@@ -212,7 +212,7 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 
 	if config.StoragePlugin != "" {
 		step := stepInit(resultsDir, workflow)
-		result, err := client.BackupDelete(auth, config)
+		result, err := client.BackupDeleteWorkflow(auth, config)
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1

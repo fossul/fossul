@@ -66,6 +66,18 @@ func (s storagePlugin) BackupDelete(config util.Config) util.Result {
 	return result
 }
 
+func (s storagePlugin) BackupDeleteWorkflow(config util.Config) util.Result {
+	var result util.Result
+	var messages []util.Message
+	var resultCode int = 0
+
+	msg := util.SetMessage("INFO", "*** Backup Delete Workflow ***")
+	messages = append(messages, msg)
+
+	result = util.SetResult(resultCode, messages)
+	return result
+}
+
 func (s storagePlugin) BackupList(config util.Config) util.Backups {
 	var backups util.Backups
 
@@ -115,7 +127,7 @@ func setPlugin() (plugin util.Plugin) {
 	backupListCap.Name = "backupList"
 
 	var backupDeleteCap util.Capability
-	backupDeleteCap.Name = "backupDelete"
+	backupDeleteCap.Name = "backupDeleteWorkflow"
 
 	var infoCap util.Capability
 	infoCap.Name = "info"

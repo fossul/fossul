@@ -34,6 +34,7 @@ type StoragePlugin interface {
 	Backup(Config) Result
 	Restore(Config) Result
 	BackupDelete(Config) Result
+	BackupDeleteWorkflow(Config) Result
 	Mount(Config) Result
 	Unmount(Config) Result
 	BackupList(Config) Backups

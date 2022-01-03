@@ -14,10 +14,12 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/fossul/fossul/src/engine/util"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
+
+	"github.com/fossul/fossul/src/client"
+	"github.com/fossul/fossul/src/engine/util"
+	"github.com/gorilla/mux"
 )
 
 // GetStatus godoc
@@ -164,4 +166,65 @@ func GetJobs(w http.ResponseWriter, r *http.Request) {
 
 	_ = json.NewDecoder(r.Body).Decode(&jobs)
 	json.NewEncoder(w).Encode(jobs)
+}
+
+// DeleteBackup godoc
+// @Description Delete a individual backup
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param policy path string true "name of backup policy"
+// @Param workflowId path string true "workflow id"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /deleteBackup/{profileName}/{configName}/{policy}/{workflowId} [post]
+func DeleteBackup(w http.ResponseWriter, r *http.Request) {
+	auth := SetAuth()
+
+	params := mux.Vars(r)
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+	var policyName string = params["policy"]
+	var selectedWorkflowId string = params["workflowId"]
+
+	var result util.Result
+	var messages []util.Message
+
+	config, err := util.GetConsolidatedConfig(configDir, profileName, configName, policyName)
+	printConfigDebug(config)
+
+	config.SelectedWorkflowId = util.StringToInt(selectedWorkflowId)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read config! "+err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+
+		return
+	}
+
+	result, err = client.BackupDelete(auth, config)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+
+		return
+	} else {
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
 }

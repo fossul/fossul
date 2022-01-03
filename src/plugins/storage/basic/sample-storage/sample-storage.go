@@ -15,16 +15,17 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+
 	"github.com/fossul/fossul/src/engine/util"
 	"github.com/pborman/getopt/v2"
-	"os"
 )
 
 func main() {
 	optBackup := getopt.BoolLong("backup", 0, "Backup")
 	optRestore := getopt.BoolLong("restore", 0, "Restore")
 	optBackupList := getopt.BoolLong("backupList", 0, "Backup List")
-	optBackupDelete := getopt.BoolLong("backupDelete", 0, "Backup Delete")
+	optBackupDelete := getopt.BoolLong("backupDeleteWorkflow", 0, "Backup Delete")
 	optMount := getopt.BoolLong("mount", 0, "Mount a backup or snapshot volume")
 	optUnmount := getopt.BoolLong("unmount", 0, "Mount a backup or snapshot volume")
 	optInfo := getopt.BoolLong("info", 0, "Storage Plugin Information")
@@ -46,7 +47,7 @@ func main() {
 	} else if *optBackupList {
 		backupList(configMap)
 	} else if *optBackupDelete {
-		backupDelete(configMap)
+		backupDeleteWorkflow(configMap)
 	} else if *optMount {
 		mount(configMap)
 	} else if *optUnmount {
@@ -74,7 +75,7 @@ func backupList(configMap map[string]string) {
 	fmt.Println("INFO *** Backup list ***")
 }
 
-func backupDelete(configMap map[string]string) {
+func backupDeleteWorkflow(configMap map[string]string) {
 	printEnv(configMap)
 	fmt.Println("INFO *** Backup delete ***")
 }
@@ -115,7 +116,7 @@ func setPlugin() (plugin util.Plugin) {
 	backupListCap.Name = "backupList"
 
 	var backupDeleteCap util.Capability
-	backupDeleteCap.Name = "backupDelete"
+	backupDeleteCap.Name = "backupDeleteWorkflow"
 
 	var infoCap util.Capability
 	infoCap.Name = "info"

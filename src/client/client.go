@@ -16,9 +16,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/fossul/fossul/src/engine/util"
 	"log"
 	"net/http"
+
+	"github.com/fossul/fossul/src/engine/util"
 )
 
 type Auth struct {
@@ -326,6 +327,38 @@ func StartRestoreWorkflow(auth Auth, profileName, configName, policyName, select
 	var result util.WorkflowResult
 
 	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startRestoreWorkflow/"+profileName+"/"+configName+"/"+policyName+"/"+selectedWorkflowId, nil)
+	if err != nil {
+		return result, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result, err
+		}
+	} else {
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result, nil
+
+}
+
+func ServerBackupDelete(auth Auth, profileName, configName, policyName, selectedWorkflowId string) (util.Result, error) {
+	var result util.Result
+
+	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/deleteBackup/"+profileName+"/"+configName+"/"+policyName+"/"+selectedWorkflowId, nil)
 	if err != nil {
 		return result, err
 	}
