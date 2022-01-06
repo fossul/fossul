@@ -12,6 +12,7 @@ LABEL ios.k8s.display-name="fossul-cli" \
     maintainer="Keith Tenzer <ktenzer@redhat.com>"
 
 ENV GOBIN=/opt/app-root
+ENV HOME=/opt/app-root
 RUN mkdir -p /opt/app-root
 WORKDIR /opt/app-root
 COPY --from=0 /opt/app-root/src/cli ./

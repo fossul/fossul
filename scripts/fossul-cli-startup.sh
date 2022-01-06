@@ -6,4 +6,5 @@ $GOBIN/cli --set-credentials --user admin --pass $FOSSUL_PASSWORD --server-host 
 if [ $? != 0 ]; then exit 1; fi
 
 echo "CLI credentials successfully"
+tail -f /dev/null
 
