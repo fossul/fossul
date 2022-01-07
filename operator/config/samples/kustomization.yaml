@@ -1,7 +1,7 @@
 ## Append samples you want in your CSV to this file as resources ##
 resources:
-- cache_v1_fossul.yaml
-- cache_v1_backup.yaml
-- cache_v1_restore.yaml
-- kubevirt.io_v1_virtualmachine.yaml
+- _v1_backup.yaml
+- _v1_backupconfig.yaml
+- _v1_fossul.yaml
+- _v1_backupschedule.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

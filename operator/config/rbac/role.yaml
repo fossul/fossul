@@ -37,57 +37,11 @@ rules:
       - patch
       - update
       - watch
-  - apiGroups:
-    - ""
-    - apps.openshift.io
-    resources:
-    - deploymentconfigs
-  - apiGroups:
-    - ""
-    - apps.openshift.io
-    resources:
-    - deploymentconfigs
-    verbs:
-    - get
-    - list
-    - patch
-    - update
-    - watch
-  - apiGroups:
-    - ""
-    - security.openshift.io
-    resources:
-    - securitycontextconstraints
-    verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
   ##
-  ## Rules for cache.fossul.com/v1, Kind: Fossul
+  ## Rules for backup.fossul.io.fossul.io/v1, Kind: Backup
   ##
   - apiGroups:
-      - cache.fossul.com
-    resources:
-      - fossuls
-      - fossuls/status
-      - fossuls/finalizers
-    verbs:
-      - create
-      - delete
-      - get
-      - list
-      - patch
-      - update
-      - watch
-  ##
-  ## Rules for cache.fossul.com/v1, Kind: Backup
-  ##
-  - apiGroups:
-      - cache.fossul.com
+      - backup.fossul.io.fossul.io
     resources:
       - backups
       - backups/status
@@ -101,14 +55,14 @@ rules:
       - update
       - watch
   ##
-  ## Rules for cache.fossul.com/v1, Kind: Restore
+  ## Rules for backup.fossul.io.fossul.io/v1, Kind: BackupConfig
   ##
   - apiGroups:
-      - cache.fossul.com
+      - backup.fossul.io.fossul.io
     resources:
-      - restores
-      - restores/status
-      - restores/finalizers
+      - backupconfigs
+      - backupconfigs/status
+      - backupconfigs/finalizers
     verbs:
       - create
       - delete
@@ -118,14 +72,31 @@ rules:
       - update
       - watch
   ##
-  ## Rules for kubevirt.io.fossul.com/v1, Kind: VirtualMachine
+  ## Rules for backup.fossul.io.fossul.io/v1, Kind: BackupSchedule
   ##
   - apiGroups:
-      - kubevirt.io.fossul.com
+      - backup.fossul.io.fossul.io
     resources:
-      - virtualmachines
-      - virtualmachines/status
-      - virtualmachines/finalizers
+      - backupschedules
+      - backupschedules/status
+      - backupschedules/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  ##
+  ## Rules for fossul.io.fossul.io/v1, Kind: Fossul
+  ##
+  - apiGroups:
+      - fossul.io.fossul.io
+    resources:
+      - fossuls
+      - fossuls/status
+      - fossuls/finalizers
     verbs:
       - create
       - delete
@@ -135,3 +106,34 @@ rules:
       - update
       - watch
 #+kubebuilder:scaffold:rules
+
+## Additional rules for fossul
+- apiGroups:
+  - ""
+  - route.openshift.io
+  resources:
+  - routes
+  - routes/custom-host
+  verbs:
+  - create
+  - delete
+  - deletecollection
+  - get
+  - list
+  - patch
+  - update
+  - watch
+
+- apiGroups:
+  - ""
+  - security.openshift.io
+  resources:
+  - securitycontextconstraints
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch

@@ -358,7 +358,7 @@ func StartRestoreWorkflow(auth Auth, profileName, configName, policyName, select
 func ServerBackupDelete(auth Auth, profileName, configName, policyName, selectedWorkflowId string) (util.Result, error) {
 	var result util.Result
 
-	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/deleteBackup/"+profileName+"/"+configName+"/"+policyName+"/"+selectedWorkflowId, nil)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/deleteBackup/"+profileName+"/"+configName+"/"+policyName+"/"+selectedWorkflowId, nil)
 	if err != nil {
 		return result, err
 	}
@@ -430,4 +430,36 @@ func GetJobList(auth Auth, profileName, configName string) (util.Jobs, error) {
 	}
 
 	return jobs, nil
+}
+
+func UpdateCustomBackupResource(auth Auth, profileName, configName, policyName, crName, workflowId string) (util.Result, error) {
+	var result util.Result
+
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/updateCustomBackupResource/"+profileName+"/"+configName+"/"+policyName+"/"+crName+"/"+workflowId, nil)
+	if err != nil {
+		return result, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result, err
+		}
+	} else {
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result, nil
+
 }

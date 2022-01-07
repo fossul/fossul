@@ -1,7 +1,6 @@
-domain: fossul.com
+domain: fossul.io
 layout:
 - ansible.sdk.operatorframework.io/v1
-multigroup: true
 plugins:
   manifests.sdk.operatorframework.io/v2: {}
   scorecard.sdk.operatorframework.io/v2: {}
@@ -11,29 +10,25 @@ resources:
 - api:
     crdVersion: v1
     namespaced: true
-  domain: fossul.com
-  group: cache
-  kind: Fossul
-  version: v1
-- api:
-    crdVersion: v1
-    namespaced: true
-  domain: fossul.com
-  group: cache
+  domain: fossul.io
   kind: Backup
   version: v1
 - api:
     crdVersion: v1
     namespaced: true
-  domain: fossul.com
-  group: cache
-  kind: Restore
+  domain: fossul.io
+  kind: BackupConfig
   version: v1
 - api:
     crdVersion: v1
     namespaced: true
-  domain: fossul.com
-  group: kubevirt.io
-  kind: VirtualMachine
+  domain: fossul.io
+  kind: Fossul
+  version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: fossul.io
+  kind: BackupSchedule
   version: v1
 version: "3"

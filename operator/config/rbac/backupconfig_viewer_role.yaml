@@ -1,0 +1,20 @@
+# permissions for end users to view backupconfigs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: backupconfig-viewer-role
+rules:
+- apiGroups:
+  - fossul.io
+  resources:
+  - backupconfigs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - fossul.io
+  resources:
+  - backupconfigs/status
+  verbs:
+  - get

@@ -14,13 +14,15 @@ package k8s
 
 import (
 	"errors"
+	"log"
+	"os"
+
 	deploymentConfigClient "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	deploymentClient "k8s.io/client-go/kubernetes/typed/apps/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"log"
-	"os"
 )
 
 func getClient(accessWithinCluster string) (*kubernetes.Clientset, error) {
@@ -61,6 +63,21 @@ func getDeploymentClient(accessWithinCluster string) (*deploymentClient.AppsV1Cl
 	}
 
 	client, err = deploymentClient.NewForConfig(kubeConfig)
+	if err != nil {
+		return client, err
+	}
+
+	return client, nil
+}
+
+func getDynamicClient(accessWithinCluster string) (dynamic.Interface, error) {
+	var client dynamic.Interface
+	err, kubeConfig := getKubeConfig(accessWithinCluster)
+	if err != nil {
+		return client, err
+	}
+
+	client, err = dynamic.NewForConfig(kubeConfig)
 	if err != nil {
 		return client, err
 	}

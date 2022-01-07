@@ -2,8 +2,8 @@
 # since it depends on service name and namespace that are out of this kustomize package.
 # It should be run by config/default
 resources:
-- bases/cache.fossul.com_fossuls.yaml
-- bases/cache.fossul.com_backups.yaml
-- bases/cache.fossul.com_restores.yaml
-- bases/kubevirt.io.fossul.com_virtualmachines.yaml
+- bases/fossul.io_backups.yaml
+- bases/fossul.io_backupconfigs.yaml
+- bases/fossul.io_fossuls.yaml
+- bases/fossul.io_backupschedules.yaml
 #+kubebuilder:scaffold:crdkustomizeresource

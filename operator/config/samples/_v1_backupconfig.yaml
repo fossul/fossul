@@ -1,0 +1,7 @@
+apiVersion: fossul.io/v1
+kind: BackupConfig
+metadata:
+  name: backupconfig-sample
+spec:
+  # Add fields here
+  foo: bar

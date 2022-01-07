@@ -1,43 +1,19 @@
 ---
 # Use the 'create api' subcommand to add watches to this file.
 - version: v1
-  group: cache.fossul.com
+  group: fossul.io
+  kind: Backup
+  role: backup
+- version: v1
+  group: fossul.io
+  kind: BackupConfig
+  role: backupconfig
+- version: v1
+  group: fossul.io
   kind: Fossul
   role: fossul
 - version: v1
-  group: cache.fossul.com
-  kind: Backup
-  role: backupCreate
-  finalizer:
-    name:  cache.fossul.com/finalizer
-    role: backupDelete 
-- version: v1
-  group: cache.fossul.com
-  kind: Restore
-  role: restore
-#- version: v1
-#  group: kubevirt.io
-#  kind: VirtualMachine
-#  role: vmCreate
-#  finalizer:
-#    name: kubevirt.io/finalizer
-#    role: vmDelete
-#  manageStatus: False
-- version: v1
-  group: apps.openshift.io
-  kind: DeploymentConfig
-  role: deploymentConfigCreate
-  finalizer:
-    name: apps.openshift.io/finalizer
-    role: deploymentConfigDelete
-  manageStatus: False
-- version: v1
-  group: apps
-  kind: Deployment
-  role: deploymentCreate
-  finalizer:
-    name: apps/finalizer
-    role: deploymentDelete
-  manageStatus: False
+  group: fossul.io
+  kind: BackupSchedule
+  role: backupschedule
 #+kubebuilder:scaffold:watch
-#+kubebuilder:subresource:status

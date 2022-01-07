@@ -1,0 +1,20 @@
+apiVersion: fossul.io/v1
+kind: BackupConfig
+metadata:
+  name: backupconfig-sample
+spec:
+  auto_discovery: false
+  deployment_name: postgresql
+  deployment_type: DeploymentConfig
+  fossul_namespace: fossul
+  fossul_server_url: http://fossul-server
+  job_retention: 50
+  overwrite_pcv_on_restore: true
+  policy: hourly
+  pvc_deletion_timeout: 300
+  restore_to_new_pvc: false
+  retention: 7
+  snapshot_timeout: 180
+  storage_plugin: csi.so
+  username: admin
+

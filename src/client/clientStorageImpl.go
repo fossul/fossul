@@ -293,7 +293,7 @@ func BackupDelete(auth Auth, config util.Config) (util.Result, error) {
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://"+auth.StorageHostname+":"+auth.StoragePort+"/backupDelete", b)
+	req, err := http.NewRequest("GET", "http://"+auth.StorageHostname+":"+auth.StoragePort+"/backupDelete", b)
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {

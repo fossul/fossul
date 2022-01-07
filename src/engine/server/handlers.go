@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/fossul/fossul/src/client"
+	"github.com/fossul/fossul/src/client/k8s"
 	"github.com/fossul/fossul/src/engine/util"
 	"github.com/gorilla/mux"
 )
@@ -224,6 +225,65 @@ func DeleteBackup(w http.ResponseWriter, r *http.Request) {
 
 		return
 	} else {
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
+}
+
+// UpdateBackupCustomResource godoc
+// @Description Update custom backup resource
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param policy path string true "name of backup policy"
+// @Param crName path string true "name of custom resource"
+// @Param op path string true "operation for patching resource"
+// @Param specKey path string true "spec key we want to alter"
+// @Param specValue path string true "spec key's value we want to alter"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /updateBackupCustomResource/{profileName}/{configName}/{policy}/{crName}/{op}/{specKey}/{specValue} [post]
+func UpdateBackupCustomResource(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+	var policyName string = params["policy"]
+	var crName string = params["crName"]
+	var op string = params["op"]
+	var specKey string = params["specKey"]
+	var specValue string = params["specValue"]
+
+	var result util.Result
+	var messages []util.Message
+
+	config, err := util.GetConsolidatedConfig(configDir, profileName, configName, policyName)
+	printConfigDebug(config)
+
+	msg := util.SetMessage("INFO", "Updating custom resource ["+crName+"] with workflowId ["+params["workflowId"]+"]")
+	messages = append(messages, msg)
+
+	err = k8s.UpdateBackupCustomResource(config.AccessWithinCluster, profileName, crName, op, specKey, specValue)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+
+		return
+	} else {
+		msg := util.SetMessage("INFO", "Updating custom resource ["+crName+"] with workflowId ["+params["workflowId"]+"] completed successfully")
+		messages = append(messages, msg)
+
+		result = util.SetResult(0, messages)
+
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}

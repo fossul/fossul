@@ -13,6 +13,11 @@
     application_domain: "{{ ingress.resources[0].spec.domain }}"
   when: application_domain is undefined
 
+- name: Set Default Username
+  set_fact:
+    username: "admin"
+  when: username is not defined  
+
 - name: Print application domain
   debug:
     msg: "Application Domain: {{ application_domain }}"
@@ -112,8 +117,8 @@
             - name: data
               persistentVolumeClaim:
                 claimName: fossul-server-data   
-          securityContext:
-            fsGroup: 1001                                        
+            securityContext:
+              fsGroup: 1001                                        
             restartPolicy: Always
         triggers:
         - type: ConfigChange
@@ -208,8 +213,8 @@
               ports:
               - containerPort: 8001
             restartPolicy: Always
-          securityContext:
-            fsGroup: 1001             
+            securityContext:
+              fsGroup: 1001             
         triggers:
         - type: ConfigChange
 - name: Deploy Fossul App service
@@ -323,8 +328,8 @@
               persistentVolumeClaim:
                 claimName: fossul-storage-data                           
             restartPolicy: Always
-          securityContext:
-            fsGroup: 1001             
+            securityContext:
+              fsGroup: 1001             
         triggers:
         - type: ConfigChange
 - name: Deploy Fossul Storage service
@@ -364,4 +369,45 @@
           kind: Service
           name: fossul-storage
           weight: 100
-        wildcardPolicy: None               
+        wildcardPolicy: None
+
+- name: Deploy Fossul CLI
+  k8s:
+    definition:
+      kind: Deployment
+      apiVersion: apps/v1
+      metadata:
+        name: fossul-cli
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        labels:
+          app: fossul-cli
+      spec:
+        replicas: 1
+        strategy:
+          type: RollingUpdate
+        selector:
+          matchLabels:
+            app: fossul-cli
+        template:
+          metadata:
+            labels:
+              app: fossul-cli
+              name: fossul-cli
+          spec:
+            containers:
+            - env:
+              - name: FOSSUL_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    key: fossul-password
+                    name: fossul-secret
+              - name: FOSSUL_USER
+                value: "{{username}}"
+              image: quay.io/ktenzer/fossul-cli:latest
+              imagePullPolicy: Always
+              name: fossul-cli  
+            securityContext:
+              fsGroup: 1001                                        
+            restartPolicy: Always
+        triggers:
+        - type: ConfigChange

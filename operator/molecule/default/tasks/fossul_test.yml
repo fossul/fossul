@@ -1,5 +1,5 @@
 ---
-- name: Create the cache.fossul.com/v1.Fossul
+- name: Create the fossul.io/v1.Fossul
   k8s:
     state: present
     namespace: '{{ namespace }}'
@@ -11,7 +11,7 @@
       reason: Successful
       status: "True"
   vars:
-    cr_file: 'cache_v1_fossul.yaml'
+    cr_file: '_v1_fossul.yaml'
 
 - name: Add assertions here
   assert:

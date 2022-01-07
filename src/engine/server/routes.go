@@ -236,8 +236,14 @@ var routes = Routes{
 	},
 	Route{
 		"DeleteBackup",
-		"POST",
+		"GET",
 		"/deleteBackup/{profileName}/{configName}/{policy}/{workflowId}",
 		DeleteBackup,
+	},
+	Route{
+		"UpdateBackupCustomResource",
+		"GET",
+		"/updateBackupCustomResource/{profileName}/{configName}/{policy}/{crName}/{op}/{specKey}/{specValue}",
+		UpdateBackupCustomResource,
 	},
 }

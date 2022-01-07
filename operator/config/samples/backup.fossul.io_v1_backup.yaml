@@ -1,0 +1,10 @@
+apiVersion: fossul.io/v1
+kind: Backup
+metadata:
+  name: backup-sample
+spec:
+  deployment_name: postgresql
+  fossul_namespace: fossul
+  fossul_server_url: http://fossul-server
+  policy: hourly
+  username: admin

@@ -1,0 +1,7 @@
+apiVersion: fossul.io/v1
+kind: BackupSchedule
+metadata:
+  name: backupschedule-sample
+spec:
+  # Add fields here
+  foo: bar

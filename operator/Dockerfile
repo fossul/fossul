@@ -1,4 +1,4 @@
-FROM registry.redhat.io/openshift4/ose-ansible-operator:v4.9
+FROM registry.redhat.io/openshift4/ose-ansible-operator:v4.8
 
 COPY requirements.yml ${HOME}/requirements.yml
 RUN ansible-galaxy collection install -r ${HOME}/requirements.yml \
