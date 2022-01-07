@@ -100,6 +100,9 @@ func Backup(auth Auth, config util.Config) (util.Result, error) {
 		return result, err
 	}
 
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
@@ -132,6 +135,9 @@ func Restore(auth Auth, config util.Config) (util.Result, error) {
 	if err != nil {
 		return result, err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
@@ -166,6 +172,9 @@ func Mount(auth Auth, config util.Config) (util.Result, error) {
 		return result, err
 	}
 
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
@@ -198,6 +207,9 @@ func Unmount(auth Auth, config util.Config) (util.Result, error) {
 	if err != nil {
 		return result, err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
@@ -234,6 +246,9 @@ func BackupList(auth Auth, profileName, configName, policyName string, config ut
 		return backups, err
 	}
 
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
@@ -267,6 +282,9 @@ func BackupDeleteWorkflow(auth Auth, config util.Config) (util.Result, error) {
 		return result, err
 	}
 
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
 	client := &http.Client{}
 
 	resp, err := client.Do(req)
@@ -299,6 +317,9 @@ func BackupDelete(auth Auth, config util.Config) (util.Result, error) {
 	if err != nil {
 		return result, err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 

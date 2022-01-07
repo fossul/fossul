@@ -135,6 +135,7 @@ func GetServerServiceStatus(auth Auth) (util.Status, error) {
 		log.Println("NewRequest: ", err)
 	}
 
+	req.Header.Add("Content-Type", "application/json")
 	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
@@ -165,6 +166,7 @@ func GetAppServiceStatus(auth Auth) (util.Status, error) {
 		return status, err
 	}
 
+	req.Header.Add("Content-Type", "application/json")
 	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
@@ -196,6 +198,7 @@ func GetStorageServiceStatus(auth Auth) (util.Status, error) {
 		return status, err
 	}
 
+	req.Header.Add("Content-Type", "application/json")
 	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}

@@ -13,9 +13,10 @@ limitations under the License.
 package main
 
 import (
+	"net/http"
+
 	"github.com/fossul/fossul/src/engine/util"
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
 type Route struct {
@@ -35,6 +36,10 @@ func NewRouter() *mux.Router {
 
 		handler = route.HandlerFunc
 		handler = util.LogApi(handler, route.Name)
+
+		if route.Name != "GetStatus" {
+			handler = util.BasicAuth(handler, myUser, myPass)
+		}
 
 		router.
 			Methods(route.Method).

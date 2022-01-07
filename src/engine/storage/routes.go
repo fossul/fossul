@@ -37,6 +37,10 @@ func NewRouter() *mux.Router {
 		handler = route.HandlerFunc
 		handler = util.LogApi(handler, route.Name)
 
+		if route.Name != "GetStatus" {
+			handler = util.BasicAuth(handler, myUser, myPass)
+		}
+
 		router.
 			Methods(route.Method).
 			Path(route.Pattern).

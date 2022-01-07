@@ -38,7 +38,7 @@ func NewRouter() *mux.Router {
 		handler = util.LogApi(handler, route.Name)
 
 		if route.Name != "GetStatus" {
-			handler = basicAuth(handler)
+			handler = util.BasicAuth(handler, myUser, myPass)
 		}
 
 		router.
@@ -49,20 +49,6 @@ func NewRouter() *mux.Router {
 	}
 
 	return router
-}
-
-func basicAuth(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		user, pass, _ := r.BasicAuth()
-
-		if myUser != user || myPass != pass {
-			w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
-			http.Error(w, "Unauthorized.", http.StatusUnauthorized)
-			return
-		}
-
-		h.ServeHTTP(w, r)
-	})
 }
 
 var routes = Routes{

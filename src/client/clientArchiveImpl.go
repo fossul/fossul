@@ -16,9 +16,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/fossul/fossul/src/engine/util"
 	"log"
 	"net/http"
+
+	"github.com/fossul/fossul/src/engine/util"
 )
 
 func ArchivePluginList(auth Auth, pluginType string) ([]string, error) {
@@ -135,6 +136,9 @@ func ArchiveList(auth Auth, profileName, configName, policyName string, config u
 	if err != nil {
 		return archives, err
 	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
 
 	client := &http.Client{}
 
