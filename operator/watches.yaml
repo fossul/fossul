@@ -26,3 +26,4 @@
     name: backupschedule.fossul.io/finalizer
     role: backupscheduleDelete  
 #+kubebuilder:scaffold:watch
+#+kubebuilder:scaffold:status
