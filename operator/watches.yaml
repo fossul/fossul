@@ -3,11 +3,17 @@
 - version: v1
   group: fossul.io
   kind: Backup
-  role: backup
+  role: backupCreate
+  finalizer:
+    name: backup.fossul.io/finalizer
+    role: backupDelete
 - version: v1
   group: fossul.io
   kind: BackupConfig
-  role: backupconfig
+  role: backupconfigCreate
+  finalizer:
+    name: backupconfig.fossul.io/finalizer
+    role: backupconfigDelete  
 - version: v1
   group: fossul.io
   kind: Fossul
@@ -15,5 +21,8 @@
 - version: v1
   group: fossul.io
   kind: BackupSchedule
-  role: backupschedule
+  role: backupscheduleCreate
+  finalizer:
+    name: backupschedule.fossul.io/finalizer
+    role: backupscheduleDelete  
 #+kubebuilder:scaffold:watch

@@ -16,8 +16,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/fossul/fossul/src/engine/util"
 	"net/http"
+
+	"github.com/fossul/fossul/src/engine/util"
 )
 
 func AddSchedule(auth Auth, profileName, configName, policy, cronScheduleInput string) (util.Result, error) {
@@ -29,7 +30,7 @@ func AddSchedule(auth Auth, profileName, configName, policy, cronScheduleInput s
 
 	var result util.Result
 
-	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/addSchedule/"+profileName+"/"+configName+"/"+policy, b)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/addSchedule/"+profileName+"/"+configName+"/"+policy, b)
 	if err != nil {
 		return result, err
 	}

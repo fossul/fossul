@@ -37,8 +37,8 @@
   set_fact:
     fossul_password: "{{ item.value | b64decode }}" 
   with_dict: "{{ secret.resources[0].data }}"
-  when: item.key == "fossul-password"    
-      
+  when: item.key == "fossul-password"
+  
 - name: Create Backup
   uri:
     url: "{{fossul_server_url}}/startBackupWorkflow/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}"
@@ -52,7 +52,7 @@
     status_code: [200]
     return_content: yes
   register: backup
-  failed_when: backup.json.messages[0].level == "ERROR"
+  failed_when: backup.json.result.messages[0].level == "ERROR"
   when: workflow_id is not defined
 
 - name: print backup
@@ -72,14 +72,36 @@
     force_basic_auth: yes
     status_code: [200]
     return_content: yes
-  register: status
-  until: status.json.status == "COMPLETE"
+  register: backup_status
+  until: backup_status.json.workflow.status == "COMPLETE"
   retries: 50
   delay: 10
   when: workflow_id is not defined
 
-- name: print status
+- name: print backup status
   debug:
-    msg: "{{ status }}"
+    msg: "{{ backup_status }}"
   when: workflow_id is not defined    
 
+- name: Update Workflow ID
+  uri:
+    url: "{{fossul_server_url}}/updateBackupCustomResource/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}/{{ ansible_operator_meta.name }}/add/workflow_id/{{ backup.json.id }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{fossul_password}}"
+    method: GET
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: update_workflow_id
+  failed_when: update_workflow_id.json.messages[0].level == "ERROR"
+  retries: 50
+  delay: 10
+  when: workflow_id is not defined
+
+- name: print update workflow id
+  debug:
+    msg: "{{ update_workflow_id }}"
+  when: workflow_id is not defined   

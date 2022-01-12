@@ -229,7 +229,7 @@ func StartBackupWorkflowLocalConfig(auth Auth, profileName, configName, policyNa
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startBackupWorkflowLocalConfig", b)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startBackupWorkflowLocalConfig", b)
 	if err != nil {
 		return result, err
 	}
@@ -261,7 +261,7 @@ func StartBackupWorkflowLocalConfig(auth Auth, profileName, configName, policyNa
 func StartBackupWorkflow(auth Auth, profileName, configName, policyName string) (util.WorkflowResult, error) {
 	var result util.WorkflowResult
 
-	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startBackupWorkflow/"+profileName+"/"+configName+"/"+policyName, nil)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startBackupWorkflow/"+profileName+"/"+configName+"/"+policyName, nil)
 	if err != nil {
 		return result, err
 	}
@@ -297,7 +297,7 @@ func StartRestoreWorkflowLocalConfig(auth Auth, profileName, configName, policyN
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startRestoreWorkflowLocalConfig/"+selectedWorkflowId, b)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startRestoreWorkflowLocalConfig/"+selectedWorkflowId, b)
 	if err != nil {
 		return result, err
 	}
@@ -329,7 +329,7 @@ func StartRestoreWorkflowLocalConfig(auth Auth, profileName, configName, policyN
 func StartRestoreWorkflow(auth Auth, profileName, configName, policyName, selectedWorkflowId string) (util.WorkflowResult, error) {
 	var result util.WorkflowResult
 
-	req, err := http.NewRequest("POST", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startRestoreWorkflow/"+profileName+"/"+configName+"/"+policyName+"/"+selectedWorkflowId, nil)
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startRestoreWorkflow/"+profileName+"/"+configName+"/"+policyName+"/"+selectedWorkflowId, nil)
 	if err != nil {
 		return result, err
 	}

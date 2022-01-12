@@ -17,5 +17,11 @@ echo "Building CLI"
 go install github.com/fossul/fossul/src/cli
 if [ $? != 0 ]; then exit 1; fi
 
+if [[ ! -z "${GOBIN}" ]]; then
+        echo "Copying startup scripts"
+        cp scripts/fossul-cli-startup.sh $GOBIN
+        if [ $? != 0 ]; then exit 1; fi
+fi
+
 echo "CLI build completed successfully"
 

@@ -1,0 +1,59 @@
+---
+# tasks file for Backup
+- name: Set Default Username
+  set_fact:
+    username: "admin"
+  when: username is not defined  
+  
+- name: Set Fossul namespace 
+  set_fact:
+    fossul_namespace: "fossul"
+  when: fossul_namespace is not defined
+
+- name: Set Fossul policy 
+  set_fact:
+    policy: "daily"
+  when: policy is not defined
+
+- name: Set Fossul schedule 
+  set_fact:
+    schedule: "0 0 * * *"
+  when: schedule is not defined     
+
+- name: Set Fossul Server URL 
+  set_fact:
+    fossul_server_url: "http://fossul-server.{{ fossul_namespace }}.svc.cluster.local:8000"
+  when: fossul_server_url is not defined
+
+- name: Get Fossul Secret
+  k8s_info:
+    api_version: v1
+    kind: Secret
+    name: fossul-secret
+    namespace: "{{ fossul_namespace }}"
+  register: secret     
+
+- name: Get Fossul Password
+  set_fact:
+    fossul_password: "{{ item.value | b64decode }}" 
+  with_dict: "{{ secret.resources[0].data }}"
+  when: item.key == "fossul-password"    
+      
+- name: Delete Backup
+  uri:
+    url: "{{fossul_server_url}}/deleteBackup/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}/{{ workflow_id }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{fossul_password}}"
+    method: GET
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: backup_delete
+  failed_when: backup_delete.json.messages[0].level == "ERROR"
+
+- name: print backup delete
+  debug:
+    msg: "{{ backup_delete }}"  

@@ -47,6 +47,14 @@ func DeploymentConfigBackupWorkflow(config util.Config) util.Result {
 
 	volumes := deploymentConfig.Spec.Template.Spec.Volumes
 	for _, volume := range volumes {
+		if volume.PersistentVolumeClaim == nil {
+			msg := util.SetMessage("ERROR", "No persistent volume claim found for deployment ["+config.StoragePluginParameters["DeploymentName"]+"]")
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+
 		pvcName := volume.PersistentVolumeClaim.ClaimName
 		backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
 		backup.Name = backupName

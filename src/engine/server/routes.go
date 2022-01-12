@@ -60,25 +60,25 @@ var routes = Routes{
 	},
 	Route{
 		"StartBackupWorkflowLocalConfig",
-		"POST",
+		"GET",
 		"/startBackupWorkflowLocalConfig",
 		StartBackupWorkflowLocalConfig,
 	},
 	Route{
 		"StartBackupWorkflow",
-		"POST",
+		"GET",
 		"/startBackupWorkflow/{profileName}/{configName}/{policy}",
 		StartBackupWorkflow,
 	},
 	Route{
 		"StartRestoreWorkflowLocalConfig",
-		"POST",
+		"GET",
 		"/startRestoreWorkflowLocalConfig/{workflowId}",
 		StartRestoreWorkflowLocalConfig,
 	},
 	Route{
 		"StartRestoreWorkflow",
-		"POST",
+		"GET",
 		"/startRestoreWorkflow/{profileName}/{configName}/{policy}/{workflowId}",
 		StartRestoreWorkflow,
 	},
@@ -204,7 +204,7 @@ var routes = Routes{
 	},
 	Route{
 		"AddSchedule",
-		"POST",
+		"GET",
 		"/addSchedule/{profileName}/{configName}/{policy}",
 		AddSchedule,
 	},

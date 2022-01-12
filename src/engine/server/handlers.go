@@ -263,7 +263,7 @@ func UpdateBackupCustomResource(w http.ResponseWriter, r *http.Request) {
 	config, err := util.GetConsolidatedConfig(configDir, profileName, configName, policyName)
 	printConfigDebug(config)
 
-	msg := util.SetMessage("INFO", "Updating custom resource ["+crName+"] with workflowId ["+params["workflowId"]+"]")
+	msg := util.SetMessage("INFO", "Updating custom resource ["+crName+"] with workflowId ["+params["specValue"]+"]")
 	messages = append(messages, msg)
 
 	err = k8s.UpdateBackupCustomResource(config.AccessWithinCluster, profileName, crName, op, specKey, specValue)
@@ -279,7 +279,7 @@ func UpdateBackupCustomResource(w http.ResponseWriter, r *http.Request) {
 
 		return
 	} else {
-		msg := util.SetMessage("INFO", "Updating custom resource ["+crName+"] with workflowId ["+params["workflowId"]+"] completed successfully")
+		msg := util.SetMessage("INFO", "Updating custom resource ["+crName+"] with workflowId ["+params["specValue"]+"] completed successfully")
 		messages = append(messages, msg)
 
 		result = util.SetResult(0, messages)

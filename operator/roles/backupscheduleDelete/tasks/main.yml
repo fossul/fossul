@@ -13,12 +13,7 @@
 - name: Set Fossul policy 
   set_fact:
     policy: "daily"
-  when: policy is not defined
-
-- name: Set Fossul schedule 
-  set_fact:
-    schedule: "0 0 * * *"
-  when: schedule is not defined     
+  when: policy is not defined  
 
 - name: Set Fossul Server URL 
   set_fact:
@@ -39,23 +34,21 @@
   with_dict: "{{ secret.resources[0].data }}"
   when: item.key == "fossul-password"    
       
-- name: Create Backup Schedule
+- name: Delete Backup Schedule
   uri:
-    url: "{{fossul_server_url}}/addSchedule/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}"
+    url: "{{fossul_server_url}}/deleteSchedule/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}"
     headers:
       Content-Type: application/json
       Accept: application/json    
     user: "{{username}}"
     password: "{{fossul_password}}"
-    method: POST
-    body: "{ \"value\": \"{{ cron_schedule }}\" }"
-    body_format: json
+    method: GET
     force_basic_auth: yes
     status_code: [200]
     return_content: yes
-  register: schedule
-  failed_when: schedule.json.messages[0].level == "ERROR"
+  register: schedule_delete
+  failed_when: schedule_delete.json.messages[0].level == "ERROR"
 
-- name: print schedule
+- name: print schedule delete
   debug:
-    msg: "{{ schedule }}"  
+    msg: "{{ schedule_delete }}"  

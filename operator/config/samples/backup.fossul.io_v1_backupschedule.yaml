@@ -5,8 +5,7 @@ metadata:
 spec:
   deployment_name: postgresql
   fossul_namespace: fossul
-  fossul_server_url: http://fossul-server
   policy: hourly
   cron_schedule: "0/5 * * * *"
-  username: admin
+  fossul_server_url: http://fossul-server-fossul.apps.cluster-qs8nh.qs8nh.sandbox1672.opentlc.com
 
