@@ -7,7 +7,7 @@
   
 - name: Set Fossul namespace 
   set_fact:
-    fossul_namespace: "fossul"
+    fossul_namespace: "fossul-operator"
   when: fossul_namespace is not defined
 
 - name: Set Fossul policy 
@@ -172,8 +172,8 @@
              \"DeploymentType\": \"{{ deployment_type }}\",
              \"PvcDeletionTimeout\": \"{{ pvc_deletion_timeout }}\",
              \"SnapshotTimeoutSeconds\": \"{{ snapshot_timeout }}\",
-             \"OverwritePvcOnRestore\": \"{{ overwrite_pcv_on_restore }}\",
-             \"RestoreToNewPvc\": \"{{ restore_to_new_pvc }}\",
+             \"OverwritePvcOnRestore\": \"{{ overwrite_pcv_on_restore | lower }}\",
+             \"RestoreToNewPvc\": \"{{ restore_to_new_pvc | lower }}\",
              
      }"
 

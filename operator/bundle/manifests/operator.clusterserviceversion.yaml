@@ -1,0 +1,332 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "fossul.io/v1",
+          "kind": "Backup",
+          "metadata": {
+            "name": "backup-sample"
+          },
+          "spec": {
+            "foo": "bar"
+          }
+        },
+        {
+          "apiVersion": "fossul.io/v1",
+          "kind": "BackupConfig",
+          "metadata": {
+            "name": "backupconfig-sample"
+          },
+          "spec": {
+            "foo": "bar"
+          }
+        },
+        {
+          "apiVersion": "fossul.io/v1",
+          "kind": "BackupSchedule",
+          "metadata": {
+            "name": "backupschedule-sample"
+          },
+          "spec": {
+            "foo": "bar"
+          }
+        },
+        {
+          "apiVersion": "fossul.io/v1",
+          "kind": "Fossul",
+          "metadata": {
+            "name": "fossul-sample"
+          },
+          "spec": {
+            "foo": "bar"
+          }
+        },
+        {
+          "apiVersion": "fossul.io/v1",
+          "kind": "Backup",
+          "metadata": {
+            "name": "backup-sample"
+          },
+          "spec": {
+            "deployment_name": "postgresql",
+            "fossul_namespace": "fossul",
+            "fossul_server_url": "http://fossul-server-fossul.apps.cluster-qs8nh.qs8nh.sandbox1672.opentlc.com",
+            "policy": "hourly"
+          }
+        },
+        {
+          "apiVersion": "fossul.io/v1",
+          "kind": "BackupConfig",
+          "metadata": {
+            "name": "backupconfig-sample"
+          },
+          "spec": {
+            "auto_discovery": false,
+            "deployment_name": "postgresql",
+            "deployment_type": "DeploymentConfig",
+            "fossul_namespace": "fossul",
+            "fossul_server_url": "http://fossul-server-fossul.apps.cluster-qs8nh.qs8nh.sandbox1672.opentlc.com",
+            "job_retention": 50,
+            "overwrite_pcv_on_restore": true,
+            "policy": "hourly",
+            "pvc_deletion_timeout": 300,
+            "restore_to_new_pvc": false,
+            "retention": 7,
+            "snapshot_timeout": 180,
+            "storage_plugin": "csi.so"
+          }
+        },
+        {
+          "apiVersion": "fossul.io/v1",
+          "kind": "BackupSchedule",
+          "metadata": {
+            "name": "backupschedule-sample"
+          },
+          "spec": {
+            "cron_schedule": "0/5 * * * *",
+            "deployment_name": "postgresql",
+            "fossul_namespace": "fossul",
+            "fossul_server_url": "http://fossul-server-fossul.apps.cluster-qs8nh.qs8nh.sandbox1672.opentlc.com",
+            "policy": "hourly"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    operators.operatorframework.io/builder: operator-sdk-v1.10.1-ocp
+    operators.operatorframework.io/project_layout: ansible.sdk.operatorframework.io/v1
+  name: operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: BackupConfig
+      name: backupconfigs.fossul.io
+      version: v1
+    - kind: Backup
+      name: backups.fossul.io
+      version: v1
+    - kind: BackupSchedule
+      name: backupschedules.fossul.io
+      version: v1
+    - kind: Fossul
+      name: fossuls.fossul.io
+      version: v1
+  description: Application Backup and Restore Framework
+  displayName: Fossul Operator
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - "fossul.io"
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        - apiGroups:
+          - "snapshot.storage.k8s.io"
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - persistentvolumeclaims
+          - persistentvolumes
+          verbs:
+          - '*'
+        - apiGroups:
+          - "apps"
+          resources:
+          - deployments
+          verbs:
+          - '*'
+        - apiGroups:
+          - "apps.openshift.io"
+          resources:
+          - deploymentconfigs
+          verbs:
+          - '*'
+        - apiGroups:
+          - authentication.k8s.io
+          resources:
+          - tokenreviews
+          verbs:
+          - create
+        - apiGroups:
+          - authorization.k8s.io
+          resources:
+          - subjectaccessreviews
+          verbs:
+          - create
+        serviceAccountName: default
+      deployments:
+        - name: fossul-operator
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                name: fossul-operator
+            template:
+              metadata:
+                labels:
+                  name: fossul-operator
+              spec:
+                serviceAccountName: default
+                containers:
+                  - name: fossul-operator
+                    image: quay.io/ktenzer/fossul-operator:latest
+                    imagePullPolicy: Always
+                    env:
+                      - name: WATCH_NAMESPACE
+                        value: ''
+                      - name: POD_NAME
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.name
+                      - name: OPERATOR_NAME
+                        value: fossul-operator
+      permissions:
+      - rules:
+        - apiGroups:
+          - "fossul.io"
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - watch
+          - create
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          - services
+          - services/finalizers
+          - endpoints
+          - persistentvolumeclaims
+          - events
+          - configmaps
+          - secrets
+          - serviceaccounts
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          - security.openshift.io
+          resources:
+          - securitycontextconstraints
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - daemonsets
+          - replicasets
+          - statefulsets
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          - route.openshift.io
+          resources:
+          - routes
+          - routes/custom-host
+          verbs:
+          - create
+          - delete
+          - deletecollection
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ""
+          - config.openshift.io
+          resources:
+          - ingresses
+          verbs:
+          - get
+          - list
+          - watch
+        serviceAccountName: default
+    strategy: deployment
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - backup
+  - restore
+  - application
+  - consistent
+  links:
+  - name: Operator
+    url: https://operator.domain
+  maturity: alpha
+  provider:
+    name: Keith Tenzer
+    url: https://github.com/fossul/fossul
+  version: 0.0.1

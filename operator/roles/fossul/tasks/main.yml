@@ -1,5 +1,10 @@
 ---
 # Get app domain 
+- name: Set Fossul namespace 
+  set_fact:
+    fossul_namespace: "{{ ansible_operator_meta.namespace }}"
+  when: fossul_namespace is not defined
+
 - name: Get Application Domain from Cluster Ingress
   k8s_info:
     api_version: config.openshift.io/v1
@@ -27,7 +32,7 @@
     api_version: v1
     kind: Secret
     name: fossul-secret
-    namespace: fossul
+    namespace: "{{ fossul_namespace }}"
   register: secret_exists     
 
 - name: Create Fossul Password
@@ -35,6 +40,54 @@
     fossul_password: "{{ lookup('password', '/dev/null length=12') }}"
 
 # tasks for fossul server
+- name: Deploy Fossul Service Account
+  k8s:
+    definition:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: fossul-operator
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        labels:
+          app: fossul-operator
+- name: Deploy Fossul Security Context
+  k8s:
+    definition:
+      apiVersion: security.openshift.io/v1
+      kind: SecurityContextConstraints
+      metadata:
+        name: fossul-scc
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        labels:
+          app: fossul-scc
+      allowHostDirVolumePlugin: false
+      allowHostIPC: false
+      allowHostNetwork: false
+      allowHostPID: false
+      allowHostPorts: false
+      allowPrivilegeEscalation: true
+      allowPrivilegedContainer: false
+      defaultAddCapabilities: null
+      allowedCapabilities: null
+      fsGroup:
+        type: RunAsAny
+      runAsUser:
+        type: MustRunAs
+        uid: 1001
+      seLinuxContext:
+        type: MustRunAs
+      supplementalGroups:
+        type: RunAsAny
+      users:
+      - system:serviceaccount:{{ ansible_operator_meta.namespace }}:default
+      - system:serviceaccount:{{ ansible_operator_meta.namespace }}:fossul-operator
+      volumes:
+      - configMap
+      - downwardAPI
+      - emptyDir
+      - persistentVolumeClaim
+      - projected
+      - secret
 - name: Deploy Fossul Secret
   k8s:
     definition:
