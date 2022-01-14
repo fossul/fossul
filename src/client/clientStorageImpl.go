@@ -239,7 +239,7 @@ func BackupList(auth Auth, profileName, configName, policyName string, config ut
 	b := new(bytes.Buffer)
 	json.NewEncoder(b).Encode(config)
 
-	req, err := http.NewRequest("POST", "http://"+auth.StorageHostname+":"+auth.StoragePort+"/backupList", b)
+	req, err := http.NewRequest("GET", "http://"+auth.StorageHostname+":"+auth.StoragePort+"/backupList", b)
 	req.Header.Add("Content-Type", "application/json")
 
 	if err != nil {

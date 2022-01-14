@@ -182,7 +182,7 @@ func GetJobs(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {string} string
 // @Failure 404 {string} string
 // @Failure 500 {string} string
-// @Router /deleteBackup/{profileName}/{configName}/{policy}/{workflowId} [post]
+// @Router /deleteBackup/{profileName}/{configName}/{policy}/{workflowId} [get]
 func DeleteBackup(w http.ResponseWriter, r *http.Request) {
 	auth := SetAuth()
 
@@ -230,6 +230,73 @@ func DeleteBackup(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetBackup godoc
+// @Description Get a individual backup
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param workflowId path string true "workflow id"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.BackupByWorkflow
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /getBackup/{profileName}/{configName}/{workflowId} [get]
+func GetBackup(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+	var selectedWorkflowId string = params["workflowId"]
+
+	var backupByWorkflow util.BackupByWorkflow
+	backup := &util.Backup{}
+	var result util.Result
+	var messages []util.Message
+
+	backupFile := dataDir + "/" + profileName + "/" + configName + "/" + selectedWorkflowId + "/" + "backup"
+
+	err := util.ReadGob(backupFile, &backup)
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read backup! "+err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		backupByWorkflow.Result = result
+
+		_ = json.NewDecoder(r.Body).Decode(&backupByWorkflow)
+		json.NewEncoder(w).Encode(backupByWorkflow)
+
+		return
+	}
+
+	if err != nil {
+		message := util.SetMessage("ERROR", "Couldn't read backup! "+err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		backupByWorkflow.Result = result
+
+		_ = json.NewDecoder(r.Body).Decode(&backupByWorkflow)
+		json.NewEncoder(w).Encode(backupByWorkflow)
+
+	} else {
+		backupByWorkflow.Backup = *backup
+
+		message := util.SetMessage("INFO", "Get backup for workflow id ["+selectedWorkflowId+"] completed successfully")
+		messages = append(messages, message)
+
+		result = util.SetResult(0, messages)
+		backupByWorkflow.Result = result
+
+		_ = json.NewDecoder(r.Body).Decode(&backupByWorkflow)
+		json.NewEncoder(w).Encode(backupByWorkflow)
+	}
+}
+
 // UpdateBackupCustomResource godoc
 // @Description Update custom backup resource
 // @Param profileName path string true "name of profile"
@@ -246,7 +313,7 @@ func DeleteBackup(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {string} string
 // @Failure 404 {string} string
 // @Failure 500 {string} string
-// @Router /updateBackupCustomResource/{profileName}/{configName}/{policy}/{crName}/{op}/{specKey}/{specValue} [post]
+// @Router /updateBackupCustomResource/{profileName}/{configName}/{policy}/{crName}/{op}/{specKey}/{specValue} [get]
 func UpdateBackupCustomResource(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var profileName string = params["profileName"]

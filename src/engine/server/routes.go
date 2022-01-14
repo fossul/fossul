@@ -232,4 +232,10 @@ var routes = Routes{
 		"/updateBackupCustomResource/{profileName}/{configName}/{policy}/{crName}/{op}/{specKey}/{specValue}",
 		UpdateBackupCustomResource,
 	},
+	Route{
+		"GetBackup",
+		"GET",
+		"/getBackup/{profileName}/{configName}/{workflowId}",
+		GetBackup,
+	},
 }

@@ -4,7 +4,7 @@ metadata:
   name: backup-sample
 spec:
   deployment_name: postgresql
-  fossul_namespace: fossul
+  fossul_namespace: fossul-operator
   policy: hourly
-  fossul_server_url: http://fossul-server-fossul.apps.cluster-qs8nh.qs8nh.sandbox1672.opentlc.com
+  fossul_server_url: http://fossul-server-fossul-operator.apps.cluster-qs8nh.qs8nh.sandbox1672.opentlc.com
 

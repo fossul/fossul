@@ -24,6 +24,11 @@ type Backups struct {
 	Result  Result   `json:"result,omitempty"`
 }
 
+type BackupByWorkflow struct {
+	Backup Backup `json:"backup,omitempty"`
+	Result Result `json:"result,omitempty"`
+}
+
 type Backup struct {
 	Name       string    `json:"name,omitempty"`
 	Timestamp  string    `json:"timestamp,omitempty"`

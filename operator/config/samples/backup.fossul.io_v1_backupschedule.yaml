@@ -4,8 +4,8 @@ metadata:
   name: backupschedule-sample
 spec:
   deployment_name: postgresql
-  fossul_namespace: fossul
+  fossul_namespace: fossul-operator
   policy: hourly
   cron_schedule: "0/5 * * * *"
-  fossul_server_url: http://fossul-server-fossul.apps.cluster-qs8nh.qs8nh.sandbox1672.opentlc.com
+  fossul_server_url: http://fossul-server-fossul-operator.apps.cluster-qs8nh.qs8nh.sandbox1672.opentlc.com/
 

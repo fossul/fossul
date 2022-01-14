@@ -15,11 +15,6 @@
     policy: "daily"
   when: policy is not defined
 
-- name: Set Fossul schedule 
-  set_fact:
-    schedule: "0 0 * * *"
-  when: schedule is not defined     
-
 - name: Set Fossul Server URL 
   set_fact:
     fossul_server_url: "http://fossul-server.{{ fossul_namespace }}.svc.cluster.local:8000"
@@ -97,11 +92,51 @@
     return_content: yes
   register: update_workflow_id
   failed_when: update_workflow_id.json.messages[0].level == "ERROR"
-  retries: 50
-  delay: 10
   when: workflow_id is not defined
 
 - name: print update workflow id
   debug:
     msg: "{{ update_workflow_id }}"
   when: workflow_id is not defined   
+
+- name: Get Backup Data
+  uri:
+    url: "{{fossul_server_url}}/getBackup/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ backup.json.id }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{fossul_password}}"
+    method: GET
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: get_backup
+  failed_when: get_backup.json.result.messages[0].level == "ERROR"
+  when: workflow_id is not defined
+
+- name: print get backup
+  debug:
+    msg: "{{ get_backup }}"
+  when: workflow_id is not defined     
+
+- name: Update Backup Name
+  uri:
+    url: "{{fossul_server_url}}/updateBackupCustomResource/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}/{{ ansible_operator_meta.name }}/add/backup_name/{{ get_backup.json.backup.name }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{fossul_password}}"
+    method: GET
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: update_backup_name
+  failed_when: update_backup_name.json.messages[0].level == "ERROR"
+  when: workflow_id is not defined
+
+- name: print update workflow id
+  debug:
+    msg: "{{ update_backup_name }}"
+  when: workflow_id is not defined     
