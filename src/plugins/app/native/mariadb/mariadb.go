@@ -16,6 +16,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
 	"github.com/fossul/fossul/src/client/k8s"
 	"github.com/fossul/fossul/src/engine/util"
 	_ "github.com/go-sql-driver/mysql"
@@ -165,7 +166,10 @@ func (a appPlugin) Unquiesce(config util.Config) util.Result {
 		messages = append(messages, msg)
 	}
 
-	conn.DB.Close()
+	if conn.DB != nil {
+		conn.DB.Close()
+	}
+
 	conn = nil
 
 	result = util.SetResult(resultCode, messages)

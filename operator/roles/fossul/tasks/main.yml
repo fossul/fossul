@@ -152,15 +152,15 @@
                 httpGet:
                   path: /status
                   port: 8000
-                initialDelaySeconds: 60
-                periodSeconds: 10
+                initialDelaySeconds: 15
+                periodSeconds: 30
                 timeoutSeconds: 60
               livenessProbe:
                 httpGet:
                   path: /status
                   port: 8000
                 initialDelaySeconds: 120
-                periodSeconds: 10
+                periodSeconds: 30
               ports:
               - containerPort: 8000
               volumeMounts:
@@ -254,15 +254,15 @@
                 httpGet:
                   path: /status
                   port: 8001
-                initialDelaySeconds: 60
-                periodSeconds: 10
+                initialDelaySeconds: 15
+                periodSeconds: 30
                 timeoutSeconds: 60
               livenessProbe:
                 httpGet:
                   path: /status
                   port: 8001
                 initialDelaySeconds: 120
-                periodSeconds: 10
+                periodSeconds: 30
               ports:
               - containerPort: 8001
             restartPolicy: Always
@@ -362,15 +362,15 @@
                 httpGet:
                   path: /status
                   port: 8002
-                initialDelaySeconds: 60
-                periodSeconds: 10
+                initialDelaySeconds: 15
+                periodSeconds: 30
                 timeoutSeconds: 60
               livenessProbe:
                 httpGet:
                   path: /status
                   port: 8002
                 initialDelaySeconds: 120
-                periodSeconds: 10
+                periodSeconds: 30
               ports:
               - containerPort: 8002
               volumeMounts:

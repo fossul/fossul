@@ -40,7 +40,7 @@ func CreateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessW
 
 	fmt.Printf("snapshot with name %v created in %v namespace\n", snap.Name, snap.Namespace)
 
-	var poll = 2 * time.Second
+	var poll = 5 * time.Second
 	timeout := time.Duration(t) * time.Second
 	name := snap.Name
 	start := time.Now()
@@ -55,7 +55,14 @@ func CreateSnapshot(snapshotName, namespace, snapshotClassName, pvcName, accessW
 			return false, err
 		}
 
+		time.Sleep(2 * time.Second)
+
 		if snaps == nil {
+			fmt.Printf("Error getting snapshot status: '%s': %v\n", snap.Namespace, err)
+			return false, err
+		}
+
+		if snaps.Status == nil {
 			fmt.Printf("Error getting snapshot status: '%s': %v\n", snap.Namespace, err)
 			return false, err
 		}
