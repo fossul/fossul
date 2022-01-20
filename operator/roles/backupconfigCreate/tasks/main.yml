@@ -60,6 +60,16 @@
     restore_to_new_pvc: "false"
   when: restore_to_new_pvc is not defined      
 
+- name: Set Mysql Host 
+  set_fact:
+    mysql_host: mariadb.{{ ansible_operator_meta.namespace }}.svc.cluster.local
+  when: mysql_host is not defined     
+
+- name: Set Mysql Port 
+  set_fact:
+    mysql_port: 3306
+  when: mysql_port is not defined   
+
 - name: Set Postgresql Host 
   set_fact:
     pq_host: postgresql.{{ ansible_operator_meta.namespace }}.svc.cluster.local
@@ -80,11 +90,6 @@
     mariadb_secret: mariadb
   when: mariadb_secret is not defined               
 
-- name: Set MySql Secret 
-  set_fact:
-    mysl_secret: mysql
-  when: mysql_secret is not defined     
-
 - name: Set Fossul Server URL 
   set_fact:
     fossul_server_url: "http://fossul-server.{{ fossul_namespace }}.svc.cluster.local:8000"
@@ -101,7 +106,28 @@
     kind: Secret
     name: fossul-secret
     namespace: "{{ fossul_namespace }}"
-  register: secret
+  register: secret        
+
+- name: Get Mariadb Secret
+  k8s_info:
+    api_version: v1
+    kind: Secret
+    name: "{{ mariadb_secret }}"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+  register: mysql_secret
+  when: (app_plugin is defined) and (app_plugin == "mariadb.so")  
+
+- name: Get Mariadb Database 
+  set_fact:
+    mysql_db: "{{ item.value | b64decode }}" 
+  with_dict: "{{ mysql_secret.resources[0].data }}"
+  when: (app_plugin == "mariadb.so") and (mysql_db is not defined) and (item.key == "database-name")
+
+- name: Get Mariadb Root Password 
+  set_fact:
+    mysql_root_password: "{{ item.value | b64decode }}" 
+  with_dict: "{{ mysql_secret.resources[0].data }}"
+  when: (app_plugin == "mariadb.so") and (mysql_root_password is not defined) and (item.key == "database-root-password")          
 
 - name: Get Postgresql Secret
   k8s_info:
@@ -116,19 +142,20 @@
   set_fact:
     pq_db: "{{ item.value | b64decode }}" 
   with_dict: "{{ pq_secret.resources[0].data }}"
-  when: (item.key == "database-name") and (app_plugin == "postgres.so") and (pq_db is not defined)
+  when: (app_plugin == "postgres.so") and (pq_user is not defined) and (item.key == "database-name")
+
 
 - name: Get Postgresql User 
   set_fact:
     pq_user: "{{ item.value | b64decode }}" 
   with_dict: "{{ pq_secret.resources[0].data }}"
-  when: (item.key == "database-name") and (app_plugin == "postgres.so") and (pq_user is not defined)
+  when: (app_plugin == "postgres.so") and (pq_user is not defined) and (item.key == "database-name")
 
 - name: Get Postgresql Password 
   set_fact:
     pq_password: "{{ item.value | b64decode }}" 
   with_dict: "{{ pq_secret.resources[0].data }}"
-  when: (item.key == "database-name") and (app_plugin == "postgres.so") and (pq_password is not defined)       
+  when: (app_plugin == "postgres.so") and (pq_password is not defined) and (item.key == "database-name")     
 
 - name: Get Fossul Password
   set_fact:
@@ -202,6 +229,34 @@
     return_content: yes
   register: app_config
   when: (app_plugin is defined) and (app_plugin == "kubevirt.so")
+  failed_when: app_config.json.messages[0].level == "ERROR"
+
+- name: Create Mariadb App Plugin Config
+  uri:
+    url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ app_plugin }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{fossul_password}}"
+    method: POST
+    body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
+             \"DeploymentType\": \"{{ deployment_type }}\",
+             \"DeploymentName\": \"{{ deployment_name }}\",
+             \"DisableRestoreHooks\": \"false | lower\",
+             \"MysqlProto\": \"tcp\",
+             \"MysqlHost\": \"{{ mysql_host }}\",
+             \"MysqlPort\": \"{{ mysql_port }}\",
+             \"MysqlUser\": \"root\",
+             \"MysqlPassword\": \"{{ mysql_root_password }}\",
+             \"MysqlDb\": \"{{ mysql_db }}\",
+     }"
+    body_format: json    
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: app_config
+  when: (app_plugin is defined) and (app_plugin == "mariadb.so")
   failed_when: app_config.json.messages[0].level == "ERROR"
 
 - name: Create Postgresql App Plugin Config
