@@ -58,7 +58,32 @@
 - name: Set Fossul pvc restore target
   set_fact:
     restore_to_new_pvc: "false"
-  when: restore_to_new_pvc is not defined                 
+  when: restore_to_new_pvc is not defined      
+
+- name: Set Postgresql Host 
+  set_fact:
+    pq_host: postgresql.{{ ansible_operator_meta.namespace }}.svc.cluster.local
+  when: pq_host is not defined     
+
+- name: Set Postgresql Port 
+  set_fact:
+    pq_port: 5432
+  when: pq_port is not defined      
+
+- name: Set Postgresql Secret 
+  set_fact:
+    postgresql_secret: postgresql
+  when: postgresql_secret is not defined               
+
+- name: Set Mariadb Secret 
+  set_fact:
+    mariadb_secret: mariadb
+  when: mariadb_secret is not defined               
+
+- name: Set MySql Secret 
+  set_fact:
+    mysl_secret: mysql
+  when: mysql_secret is not defined     
 
 - name: Set Fossul Server URL 
   set_fact:
@@ -76,7 +101,34 @@
     kind: Secret
     name: fossul-secret
     namespace: "{{ fossul_namespace }}"
-  register: secret     
+  register: secret
+
+- name: Get Postgresql Secret
+  k8s_info:
+    api_version: v1
+    kind: Secret
+    name: "{{ postgresql_secret }}"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+  register: pq_secret
+  when: (app_plugin is defined) and (app_plugin == "postgres.so")        
+
+- name: Get Postgresql Database 
+  set_fact:
+    pq_db: "{{ item.value | b64decode }}" 
+  with_dict: "{{ pq_secret.resources[0].data }}"
+  when: (item.key == "database-name") and (app_plugin == "postgres.so") and (pq_db is not defined)
+
+- name: Get Postgresql User 
+  set_fact:
+    pq_user: "{{ item.value | b64decode }}" 
+  with_dict: "{{ pq_secret.resources[0].data }}"
+  when: (item.key == "database-name") and (app_plugin == "postgres.so") and (pq_user is not defined)
+
+- name: Get Postgresql Password 
+  set_fact:
+    pq_password: "{{ item.value | b64decode }}" 
+  with_dict: "{{ pq_secret.resources[0].data }}"
+  when: (item.key == "database-name") and (app_plugin == "postgres.so") and (pq_password is not defined)       
 
 - name: Get Fossul Password
   set_fact:
@@ -132,7 +184,7 @@
   debug:
     msg: "{{ config }}"
     
-- name: Create App Plugin Config
+- name: Create Kubevirt App Plugin Config
   uri:
     url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ app_plugin }}"
     headers:
@@ -149,13 +201,41 @@
     status_code: [200]
     return_content: yes
   register: app_config
-  when: (app_plugin is defined) and (app_plugin == "kubevirt.io")
+  when: (app_plugin is defined) and (app_plugin == "kubevirt.so")
+  failed_when: app_config.json.messages[0].level == "ERROR"
+
+- name: Create Postgresql App Plugin Config
+  uri:
+    url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ app_plugin }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json    
+    user: "{{username}}"
+    password: "{{fossul_password}}"
+    method: POST
+    body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
+             \"DeploymentType\": \"{{ deployment_type }}\",
+             \"DeploymentName\": \"{{ deployment_name }}\",
+             \"DisableRestoreHooks\": \"false | lower\",
+             \"PqSslMode\": \"disable\",
+             \"PqHost\": \"{{ pq_host }}\",
+             \"PqPort\": \"{{ pq_port }}\",
+             \"PqUser\": \"{{ pq_user }}\",
+             \"PqPassword\": \"{{ pq_password }}\",
+             \"PqDb\": \"{{ pq_db }}\",
+     }"
+    body_format: json    
+    force_basic_auth: yes
+    status_code: [200]
+    return_content: yes
+  register: app_config
+  when: (app_plugin is defined) and (app_plugin == "postgres.so")
   failed_when: app_config.json.messages[0].level == "ERROR"
 
 - name: print app config
   debug:
     msg: "{{ app_config }}"  
-  when: (app_plugin is defined) and (app_plugin == "kubevirt.io")  
+  when: (app_plugin is defined)
     
 - name: Create Storage Plugin Config
   uri:
