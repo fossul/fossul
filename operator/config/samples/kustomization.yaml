@@ -4,4 +4,5 @@ resources:
 - _v1_backupconfig.yaml
 - _v1_fossul.yaml
 - _v1_backupschedule.yaml
+- _v1_restore.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

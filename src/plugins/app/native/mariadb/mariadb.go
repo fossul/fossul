@@ -166,7 +166,7 @@ func (a appPlugin) Unquiesce(config util.Config) util.Result {
 		messages = append(messages, msg)
 	}
 
-	if conn.DB != nil {
+	if conn != nil {
 		conn.DB.Close()
 	}
 

@@ -105,6 +105,23 @@ rules:
       - patch
       - update
       - watch
+  ##
+  ## Rules for fossul.io/v1, Kind: Restore
+  ##
+  - apiGroups:
+      - fossul.io
+    resources:
+      - restores
+      - restores/status
+      - restores/finalizers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
 #+kubebuilder:scaffold:rules
 
 ## Additional rules for fossul

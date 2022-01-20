@@ -6,4 +6,5 @@ resources:
 - bases/fossul.io_backupconfigs.yaml
 - bases/fossul.io_fossuls.yaml
 - bases/fossul.io_backupschedules.yaml
+- bases/fossul.io_restores.yaml
 #+kubebuilder:scaffold:crdkustomizeresource

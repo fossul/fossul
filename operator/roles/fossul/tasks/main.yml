@@ -148,19 +148,13 @@
               image: quay.io/ktenzer/fossul-server:latest
               imagePullPolicy: Always
               name: fossul-server
-              readinessProbe:
-                httpGet:
-                  path: /status
-                  port: 8000
-                initialDelaySeconds: 15
-                periodSeconds: 30
-                timeoutSeconds: 60
               livenessProbe:
                 httpGet:
                   path: /status
                   port: 8000
-                initialDelaySeconds: 120
-                periodSeconds: 30
+                initialDelaySeconds: 10
+                periodSeconds: 60
+                timeoutSeconds: 120
               ports:
               - containerPort: 8000
               volumeMounts:
@@ -250,19 +244,13 @@
               image: quay.io/ktenzer/fossul-app:latest
               imagePullPolicy: Always
               name: fossul-app
-              readinessProbe:
-                httpGet:
-                  path: /status
-                  port: 8001
-                initialDelaySeconds: 15
-                periodSeconds: 30
-                timeoutSeconds: 60
               livenessProbe:
                 httpGet:
                   path: /status
                   port: 8001
-                initialDelaySeconds: 120
-                periodSeconds: 30
+                initialDelaySeconds: 10
+                periodSeconds: 60
+                timeoutSeconds: 120
               ports:
               - containerPort: 8001
             restartPolicy: Always
@@ -358,19 +346,13 @@
               image: quay.io/ktenzer/fossul-storage:latest
               imagePullPolicy: Always
               name: fossul-storage
-              readinessProbe:
-                httpGet:
-                  path: /status
-                  port: 8002
-                initialDelaySeconds: 15
-                periodSeconds: 30
-                timeoutSeconds: 60
               livenessProbe:
                 httpGet:
                   path: /status
                   port: 8002
-                initialDelaySeconds: 120
-                periodSeconds: 30
+                initialDelaySeconds: 10
+                periodSeconds: 60
+                timeoutSeconds: 120
               ports:
               - containerPort: 8002
               volumeMounts:
