@@ -166,10 +166,6 @@ func (a appPlugin) Unquiesce(config util.Config) util.Result {
 		messages = append(messages, msg)
 	}
 
-	//if conn != nil {
-	//	conn.DB.Close()
-	//}
-
 	result = util.SetResult(resultCode, messages)
 	return result
 
