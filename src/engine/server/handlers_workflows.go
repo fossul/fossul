@@ -68,14 +68,14 @@ func StartBackupWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	config.WorkflowTimestamp = util.GetTimestamp()
 	workflow.Policy = config.SelectedBackupPolicy
 
-	_, ok := runningWorkflowMap[config.ProfileName+"-"+config.ConfigName]
+	_, ok := runningWorkflowMap.Load(config.ProfileName + "-" + config.ConfigName)
 	if ok {
 		result = util.SetResultMessage(1, "ERROR", "Workflow id ["+util.IntToString(workflow.Id)+"] failed to start. Another workflow is running under profile ["+config.ProfileName+"] config ["+config.ConfigName+"]")
 		workflowResult.Result = result
 		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
 		json.NewEncoder(w).Encode(workflowResult)
 	} else {
-		runningWorkflowMap[config.ProfileName+"-"+config.ConfigName] = config.SelectedBackupPolicy
+		runningWorkflowMap.Store(config.ProfileName+"-"+config.ConfigName, config.SelectedBackupPolicy)
 
 		go func() {
 			startBackupWorkflowImpl(dataDir, config, workflow)
@@ -133,14 +133,14 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	config.WorkflowType = workflow.Type
 	config.WorkflowTimestamp = util.GetTimestamp()
 
-	_, ok := runningWorkflowMap[config.ProfileName+"-"+config.ConfigName]
+	_, ok := runningWorkflowMap.Load(config.ProfileName + "-" + config.ConfigName)
 	if ok {
 		result := util.SetResultMessage(1, "ERROR", "Workflow id ["+util.IntToString(workflow.Id)+"] failed to start. Another workflow is running under profile ["+config.ProfileName+"] config ["+config.ConfigName+"]")
 		workflowResult.Result = result
 		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
 		json.NewEncoder(w).Encode(workflowResult)
 	} else {
-		runningWorkflowMap[config.ProfileName+"-"+config.ConfigName] = config.SelectedBackupPolicy
+		runningWorkflowMap.Store(config.ProfileName+"-"+config.ConfigName, config.SelectedBackupPolicy)
 
 		go func() {
 			startBackupWorkflowImpl(dataDir, config, workflow)
@@ -204,14 +204,14 @@ func StartRestoreWorkflowLocalConfig(w http.ResponseWriter, r *http.Request) {
 	config.SelectedWorkflowId = util.StringToInt(selectedWorkflowId)
 	workflow.Policy = config.SelectedBackupPolicy
 
-	_, ok := runningWorkflowMap[config.ProfileName+"-"+config.ConfigName]
+	_, ok := runningWorkflowMap.Load(config.ProfileName + "-" + config.ConfigName)
 	if ok {
 		result = util.SetResultMessage(1, "ERROR", "Workflow id ["+util.IntToString(workflow.Id)+"] failed to start. Another workflow is running under profile ["+config.ProfileName+"] config ["+config.ConfigName+"]")
 		workflowResult.Result = result
 		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
 		json.NewEncoder(w).Encode(workflowResult)
 	} else {
-		runningWorkflowMap[config.ProfileName+"-"+config.ConfigName] = config.SelectedBackupPolicy
+		runningWorkflowMap.Store(config.ProfileName+"-"+config.ConfigName, config.SelectedBackupPolicy)
 
 		go func() {
 			startRestoreWorkflowImpl(dataDir, config, workflow)
@@ -272,14 +272,14 @@ func StartRestoreWorkflow(w http.ResponseWriter, r *http.Request) {
 	config.WorkflowTimestamp = util.GetTimestamp()
 	config.SelectedWorkflowId = util.StringToInt(selectedWorkflowId)
 
-	_, ok := runningWorkflowMap[config.ProfileName+"-"+config.ConfigName]
+	_, ok := runningWorkflowMap.Load(config.ProfileName + "-" + config.ConfigName)
 	if ok {
 		result := util.SetResultMessage(1, "ERROR", "Workflow id ["+util.IntToString(workflow.Id)+"] failed to start. Another workflow is running under profile ["+config.ProfileName+"] config ["+config.ConfigName+"]")
 		workflowResult.Result = result
 		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
 		json.NewEncoder(w).Encode(workflowResult)
 	} else {
-		runningWorkflowMap[config.ProfileName+"-"+config.ConfigName] = config.SelectedBackupPolicy
+		runningWorkflowMap.Store(config.ProfileName+"-"+config.ConfigName, config.SelectedBackupPolicy)
 
 		go func() {
 			startRestoreWorkflowImpl(dataDir, config, workflow)

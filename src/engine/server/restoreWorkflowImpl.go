@@ -150,7 +150,7 @@ func startRestoreWorkflowImpl(dataDir string, config util.Config, workflow *util
 	util.SerializeWorkflow(resultsDir, workflow)
 
 	//remove workflow lock
-	delete(runningWorkflowMap, config.ProfileName+"-"+config.ConfigName)
+	runningWorkflowMap.Delete(config.ProfileName + "-" + config.ConfigName)
 
 	return 0
 }

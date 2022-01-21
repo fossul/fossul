@@ -67,7 +67,7 @@
     return_content: yes
   register: restore_status
   until: restore_status.json.workflow.status == "COMPLETE"
-  retries: 50
+  retries: 100
   delay: 10
 
 - name: print restore status

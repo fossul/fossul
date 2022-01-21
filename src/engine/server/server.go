@@ -14,14 +14,16 @@ package main
 
 import (
 	"context"
-	_ "github.com/fossul/fossul/src/engine/server/docs"
-	"github.com/fossul/fossul/src/engine/util"
-	"github.com/swaggo/http-swagger"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
+
+	_ "github.com/fossul/fossul/src/engine/server/docs"
+	"github.com/fossul/fossul/src/engine/util"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 const version = "1.0.0"
@@ -39,8 +41,10 @@ var storageHostname string = os.Getenv("FOSSUL_STORAGE_CLIENT_HOSTNAME")
 var storagePort string = os.Getenv("FOSSUL_STORAGE_CLIENT_PORT")
 var debug string = os.Getenv("FOSSUL_SERVER_DEBUG")
 
-var runningWorkflowMap map[string]string = make(map[string]string)
+var runningWorkflowMap sync.Map
 
+//var runningWorkflowMapMutex = sync.RWMutex{}
+//var runningWorkflowMap map[string]string = make(map[string]string)
 // @title Fossul Framework Server API
 // @version 1.0
 // @description APIs for managing Fossul workflows, jobs, profile, and configs

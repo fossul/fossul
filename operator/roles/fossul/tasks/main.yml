@@ -147,14 +147,27 @@
                 value: "{{username}}"
               image: quay.io/ktenzer/fossul-server:latest
               imagePullPolicy: Always
-              name: fossul-server
+              name: fossul-server  
+              readinessProbe:
+                httpGet:
+                  path: /status
+                  port: 8000
+                  scheme: HTTP
+                initialDelaySeconds: 10
+                timeoutSeconds: 10
+                periodSeconds: 15
+                successThreshold: 1
+                failureThreshold: 3              
               livenessProbe:
                 httpGet:
                   path: /status
                   port: 8000
+                  scheme: HTTP
                 initialDelaySeconds: 10
-                periodSeconds: 60
-                timeoutSeconds: 120
+                timeoutSeconds: 10
+                periodSeconds: 30
+                successThreshold: 1
+                failureThreshold: 3              
               ports:
               - containerPort: 8000
               volumeMounts:
@@ -244,13 +257,26 @@
               image: quay.io/ktenzer/fossul-app:latest
               imagePullPolicy: Always
               name: fossul-app
+              readinessProbe:
+                httpGet:
+                  path: /status
+                  port: 8001
+                  scheme: HTTP
+                initialDelaySeconds: 10
+                timeoutSeconds: 10
+                periodSeconds: 15
+                successThreshold: 1
+                failureThreshold: 3              
               livenessProbe:
                 httpGet:
                   path: /status
                   port: 8001
+                  scheme: HTTP
                 initialDelaySeconds: 10
-                periodSeconds: 60
-                timeoutSeconds: 120
+                timeoutSeconds: 10
+                periodSeconds: 30
+                successThreshold: 1
+                failureThreshold: 3 
               ports:
               - containerPort: 8001
             restartPolicy: Always
@@ -346,13 +372,26 @@
               image: quay.io/ktenzer/fossul-storage:latest
               imagePullPolicy: Always
               name: fossul-storage
+              readinessProbe:
+                httpGet:
+                  path: /status
+                  port: 8002
+                  scheme: HTTP
+                initialDelaySeconds: 10
+                timeoutSeconds: 10
+                periodSeconds: 15
+                successThreshold: 1
+                failureThreshold: 3              
               livenessProbe:
                 httpGet:
                   path: /status
                   port: 8002
+                  scheme: HTTP
                 initialDelaySeconds: 10
-                periodSeconds: 60
-                timeoutSeconds: 120
+                timeoutSeconds: 10
+                periodSeconds: 30
+                successThreshold: 1
+                failureThreshold: 3 
               ports:
               - containerPort: 8002
               volumeMounts:

@@ -72,7 +72,7 @@ func StepErrorHandlerBackup(isQuiesce, isMount bool, resultsDir, policy string, 
 		util.SerializeWorkflow(resultsDir, workflow)
 
 		//remove workflow lock
-		delete(runningWorkflowMap, config.ProfileName+"-"+config.ConfigName)
+		runningWorkflowMap.Delete(config.ProfileName + "-" + config.ConfigName)
 
 		return 1
 	} else {
@@ -95,7 +95,7 @@ func StepErrorHandler(resultsDir, policy string, step util.Step, workflow *util.
 		util.SerializeWorkflow(resultsDir, workflow)
 
 		//remove workflow lock
-		delete(runningWorkflowMap, config.ProfileName+"-"+config.ConfigName)
+		runningWorkflowMap.Delete(config.ProfileName + "-" + config.ConfigName)
 
 		return 1
 	} else {
@@ -154,7 +154,7 @@ func HttpErrorHandlerBackup(err error, isQuiesce, isMount bool, resultsDir, poli
 	util.SerializeWorkflow(resultsDir, workflow)
 
 	//remove workflow lock
-	delete(runningWorkflowMap, config.ProfileName+"-"+config.ConfigName)
+	runningWorkflowMap.Delete(config.ProfileName + "-" + config.ConfigName)
 }
 
 func HttpErrorHandler(err error, resultsDir, policy string, step util.Step, workflow *util.Workflow, result util.Result, config util.Config) {
@@ -171,7 +171,7 @@ func HttpErrorHandler(err error, resultsDir, policy string, step util.Step, work
 	util.SerializeWorkflow(resultsDir, workflow)
 
 	//remove workflow lock
-	delete(runningWorkflowMap, config.ProfileName+"-"+config.ConfigName)
+	runningWorkflowMap.Delete(config.ProfileName + "-" + config.ConfigName)
 }
 
 func stepInit(resultsDir string, workflow *util.Workflow) util.Step {
