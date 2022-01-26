@@ -182,6 +182,10 @@
   debug:
     msg: "{{ profile }}"     
 
+- name: Print backup policies 
+  debug:
+    msg: "{{ policies }}"
+
 - name: Create Backup Config
   uri:
     url: "{{fossul_server_url}}/addConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}"
@@ -198,7 +202,7 @@
              \"containerPlatform\": \"openshift\",
              \"jobRetention\": {{ job_retention }},
              \"autoDiscovery\": {{ auto_discovery | lower }},
-             \"backupRetentions\": [{\"policy\": \"{{ policy }}\",\"retentionNumber\": {{ retention }}}]},
+             \"backupRetentions\": {{ policies }},
      }"
     body_format: json    
     force_basic_auth: yes

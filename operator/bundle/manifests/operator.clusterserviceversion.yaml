@@ -8,30 +8,65 @@ metadata:
           "apiVersion": "fossul.io/v1",
           "kind": "Backup",
           "metadata": {
-            "name": "backup-sample"
+            "name": "mariadb-sample"
           },
           "spec": {
-            "foo": "bar"
+            "deployment_name": "mariadb",
+            "policy": "daily"
           }
         },
         {
           "apiVersion": "fossul.io/v1",
-          "kind": "BackupConfig",
+          "kind": "Restore",
           "metadata": {
-            "name": "backupconfig-sample"
+            "name": "mariadb-sample"
           },
           "spec": {
-            "foo": "bar"
+            "deployment_name": "mariadb",
+            "policy": "daily",
+            "workflow_id": "xxxx"
+          }
+        },        
+        {
+          "apiVersion": "fossul.io/v1",
+          "kind": "BackupConfig",
+          "metadata": {
+            "name": "mariadb-sample"
+          },
+          "spec": {
+            "auto_discovery": false,
+            "deployment_name": "mariadb",
+            "deployment_type": "DeploymentConfig",
+            "job_retention": 50,
+            "overwrite_pcv_on_restore": true,
+            "policies": [
+              {
+                "policy": "hourly",
+                "retentionNumber": 3
+              },
+              {
+                "policy": "daily",
+                "retentionNumber": 10
+              }
+            ],
+            "pvc_deletion_timeout": 300,
+            "restore_to_new_pvc": false,
+            "snapshot_timeout": 180,
+            "storage_plugin": "csi.so",
+            "app_plugin": "mariadb.so"
           }
         },
         {
           "apiVersion": "fossul.io/v1",
           "kind": "BackupSchedule",
           "metadata": {
-            "name": "backupschedule-sample"
+            "name": "mariadb-sample"
           },
           "spec": {
-            "foo": "bar"
+            "cron_schedule": "23 59 * * *",
+            "deployment_name": "mariadb",
+            "policy": "daily"
+
           }
         },
         {
@@ -41,50 +76,6 @@ metadata:
             "name": "fossul-sample"
           },
           "spec": {
-            "foo": "bar"
-          }
-        },
-        {
-          "apiVersion": "fossul.io/v1",
-          "kind": "Backup",
-          "metadata": {
-            "name": "backup-sample"
-          },
-          "spec": {
-            "deployment_name": "postgresql",
-            "policy": "hourly"
-          }
-        },
-        {
-          "apiVersion": "fossul.io/v1",
-          "kind": "BackupConfig",
-          "metadata": {
-            "name": "backupconfig-sample"
-          },
-          "spec": {
-            "auto_discovery": false,
-            "deployment_name": "postgresql",
-            "deployment_type": "DeploymentConfig",
-            "job_retention": 50,
-            "overwrite_pcv_on_restore": true,
-            "policy": "hourly",
-            "pvc_deletion_timeout": 300,
-            "restore_to_new_pvc": false,
-            "retention": 7,
-            "snapshot_timeout": 180,
-            "storage_plugin": "csi.so"
-          }
-        },
-        {
-          "apiVersion": "fossul.io/v1",
-          "kind": "BackupSchedule",
-          "metadata": {
-            "name": "backupschedule-sample"
-          },
-          "spec": {
-            "cron_schedule": "0/5 * * * *",
-            "deployment_name": "postgresql",
-            "policy": "hourly"
           }
         }
       ]
@@ -103,6 +94,9 @@ spec:
     - kind: Backup
       name: backups.fossul.io
       version: v1
+    - kind: Restore
+      name: restores.fossul.io
+      version: v1      
     - kind: BackupSchedule
       name: backupschedules.fossul.io
       version: v1
@@ -167,6 +161,12 @@ spec:
           - subjectaccessreviews
           verbs:
           - create
+        - apiGroups:
+          - rbac.authorization.k8s.io
+          resources:
+          - '*'
+          verbs:
+          - '*'
         serviceAccountName: default
       deployments:
         - name: fossul-operator
@@ -183,7 +183,7 @@ spec:
                 serviceAccountName: default
                 containers:
                   - name: fossul-operator
-                    image: quay.io/ktenzer/fossul-operator:latest
+                    image: quay.io/fossul/fossul-operator:latest
                     imagePullPolicy: Always
                     env:
                       - name: WATCH_NAMESPACE
@@ -308,11 +308,11 @@ spec:
         serviceAccountName: default
     strategy: deployment
   installModes:
-  - supported: false
+  - supported: true
     type: OwnNamespace
-  - supported: false
+  - supported: true
     type: SingleNamespace
-  - supported: false
+  - supported: true
     type: MultiNamespace
   - supported: true
     type: AllNamespaces
