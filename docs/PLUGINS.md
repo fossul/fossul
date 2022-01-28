@@ -39,6 +39,8 @@ This plugin requires WAL archive logging to be configured in order to perform ba
 * max_wal_senders=3
 * archive_command = '/bin/cp %p /var/lib/pgsql/data/userdata/archive/%f'
 
+The user used for backups also needs permission to execute pg_backup_start and pg_backup_stop. You can grant user admin permissions ```ALTER USER username WITH SUPERUSER;``` or give granular permissions.
+
 ### Mongo
 
 #### Mongo-Dump 

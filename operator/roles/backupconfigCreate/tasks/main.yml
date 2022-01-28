@@ -60,6 +60,41 @@
     restore_to_new_pvc: "false"
   when: restore_to_new_pvc is not defined      
 
+- name: Set Fossul App Quiesce Command
+  set_fact:
+    app_quiesce_cmd: ""
+  when: app_quiesce_cmd is not defined    
+
+- name: Set Fossul App UnQuiesce Command
+  set_fact:
+    app_unquiesce_cmd: ""
+  when: app_unquiesce_cmd is not defined
+
+- name: Set Fossul Backup Create Command
+  set_fact:
+    backup_create_cmd: ""
+  when: backup_create_cmd is not defined          
+
+- name: Set Fossul Pre App Quiesce Command
+  set_fact:
+    pre_app_quiesce_cmd: ""
+  when: pre_app_quiesce_cmd is not defined 
+
+- name: Set Fossul Post App Quiesce Command
+  set_fact:
+    post_app_quiesce_cmd: ""
+  when: post_app_quiesce_cmd is not defined         
+
+- name: Set Fossul Pre App UnQuiesce Command
+  set_fact:
+    pre_app_unquiesce_cmd: ""
+  when: pre_app_unquiesce_cmd is not defined 
+
+- name: Set Fossul Post App UnQuiesce Command
+  set_fact:
+    post_app_unquiesce_cmd: ""
+  when: post_app_unquiesce_cmd is not defined   
+
 - name: Set Mysql Host 
   set_fact:
     mysql_host: mariadb.{{ ansible_operator_meta.namespace }}.svc.cluster.local
@@ -144,18 +179,17 @@
   with_dict: "{{ pq_secret.resources[0].data }}"
   when: (app_plugin == "postgres.so") and (pq_user is not defined) and (item.key == "database-name")
 
-
 - name: Get Postgresql User 
   set_fact:
     pq_user: "{{ item.value | b64decode }}" 
   with_dict: "{{ pq_secret.resources[0].data }}"
-  when: (app_plugin == "postgres.so") and (pq_user is not defined) and (item.key == "database-name")
+  when: (app_plugin == "postgres.so") and (pq_user is not defined) and (item.key == "database-user")
 
 - name: Get Postgresql Password 
   set_fact:
     pq_password: "{{ item.value | b64decode }}" 
   with_dict: "{{ pq_secret.resources[0].data }}"
-  when: (app_plugin == "postgres.so") and (pq_password is not defined) and (item.key == "database-name")     
+  when: (app_plugin == "postgres.so") and (pq_password is not defined) and (item.key == "database-password")     
 
 - name: Get Fossul Password
   set_fact:
@@ -203,6 +237,13 @@
              \"jobRetention\": {{ job_retention }},
              \"autoDiscovery\": {{ auto_discovery | lower }},
              \"backupRetentions\": {{ policies }},
+             \"PreAppQuiesceCmd\": \"{{ pre_app_quiesce_cmd }}\",
+             \"AppQuiesceCmd\": \"{{ app_quiesce_cmd }}\",
+             \"PostAppQuiesceCmd\": \"{{ post_app_quiesce_cmd }}\",
+             \"BackupCreateCmd\": \"{{ backup_create_cmd }}\",
+             \"PreAppUnQuiesceCmd\": \"{{ pre_app_unquiesce_cmd }}\",
+             \"AppUnQuiesceCmd\": \"{{ app_unquiesce_cmd }}\",
+             \"PostAppUnQuiesceCmd\": \"{{ post_app_unquiesce_cmd }}\",
      }"
     body_format: json    
     force_basic_auth: yes
