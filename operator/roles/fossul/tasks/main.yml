@@ -5,18 +5,28 @@
     fossul_namespace: "{{ ansible_operator_meta.namespace }}"
   when: fossul_namespace is not defined
 
+- name: Set Enable Routes
+  set_fact:
+    enable_routes: false
+  when: enable_routes is not defined  
+
+- name: Set Enable Virtual Machines
+  set_fact:
+    enable_virtualmachines: false
+  when: enable_virtualmachines is not defined  
+
 - name: Get Application Domain from Cluster Ingress
   k8s_info:
     api_version: config.openshift.io/v1
     kind: Ingress
     name: cluster
-  when: application_domain is undefined
+  when: (application_domain is undefined) and (enable_routes)
   register: ingress
 
 - name: Set Application Domain
   set_fact:
     application_domain: "{{ ingress.resources[0].spec.domain }}"
-  when: application_domain is undefined
+  when: (application_domain is undefined) and (enable_routes)
 
 - name: Set Default Username
   set_fact:
@@ -26,6 +36,7 @@
 - name: Print application domain
   debug:
     msg: "Application Domain: {{ application_domain }}"
+  when: (application_domain is defined) and (enable_routes)
 
 - name: Get Fossul Secret
   k8s_info:
@@ -39,17 +50,144 @@
   set_fact:
     fossul_password: "{{ lookup('password', '/dev/null length=12') }}"
 
-# tasks for fossul server
-- name: Deploy Fossul Service Account
+# Create clusterrole
+- name: Create Fossul Cluster Role
   k8s:
     definition:
-      apiVersion: v1
-      kind: ServiceAccount
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
       metadata:
-        name: fossul-operator
+        name: fossul
+      rules:
+      - apiGroups:
+        - "fossul.io"
+        resources:
+        - '*'
+        verbs:
+        - '*'
+      - apiGroups:
+        - "snapshot.storage.k8s.io"
+        resources:
+        - '*'
+        verbs:
+        - '*'
+      - apiGroups:
+        - ""
+        resources:
+        - pods
+        - persistentvolumeclaims
+        - persistentvolumes
+        verbs:
+        - '*'
+      - apiGroups:
+        - "apps"
+        resources:
+        - deployments
+        verbs:
+        - '*'
+      - apiGroups:
+        - "apps.openshift.io"
+        resources:
+        - deploymentconfigs
+        verbs:
+        - '*'
+      - apiGroups:
+        - authentication.k8s.io
+        resources:
+        - tokenreviews
+        verbs:
+        - create
+      - apiGroups:
+        - authorization.k8s.io
+        resources:
+        - subjectaccessreviews
+        verbs:
+        - create
+
+- name: Create Fossul Cluster Role Binding
+  k8s:
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: fossul
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: fossul
+      subjects:
+      - kind: ServiceAccount
+        name: default
         namespace: "{{ ansible_operator_meta.namespace }}"
-        labels:
-          app: fossul-operator
+
+- name: Update Fossul Cluster Role for Virtual Machine
+  k8s:
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRole
+      metadata:
+        name: fossul
+      rules:
+      - apiGroups:
+        - "fossul.io"
+        resources:
+        - '*'
+        verbs:
+        - '*'
+      - apiGroups:
+        - "snapshot.storage.k8s.io"
+        resources:
+        - '*'
+        verbs:
+        - '*'
+      - apiGroups:
+        - ""
+        resources:
+        - pods
+        - persistentvolumeclaims
+        - persistentvolumes
+        verbs:
+        - '*'
+      - apiGroups:
+        - "apps"
+        resources:
+        - deployments
+        verbs:
+        - '*'
+      - apiGroups:
+        - "apps.openshift.io"
+        resources:
+        - deploymentconfigs
+        verbs:
+        - '*'
+      - apiGroups:
+        - authentication.k8s.io
+        resources:
+        - tokenreviews
+        verbs:
+        - create
+      - apiGroups:
+        - authorization.k8s.io
+        resources:
+        - subjectaccessreviews
+        verbs:
+        - create      
+      - apiGroups:
+        - "kubevirt.io"
+        resources:
+        - 'virtualmachines'
+        - 'virtualmachinesnapshots'
+        verbs:
+        - '*'
+      - apiGroups:
+        - "subresources.kubevirt.io"
+        resources:
+        - '*'
+        verbs:
+        - '*'        
+  when: enable_virtualmachines      
+
+# tasks for fossul server
 - name: Deploy Fossul Security Context
   k8s:
     definition:
@@ -80,7 +218,6 @@
         type: RunAsAny
       users:
       - system:serviceaccount:{{ ansible_operator_meta.namespace }}:default
-      - system:serviceaccount:{{ ansible_operator_meta.namespace }}:fossul-operator
       volumes:
       - configMap
       - downwardAPI
@@ -215,11 +352,15 @@
         host: "fossul-server-{{ ansible_operator_meta.namespace }}.{{application_domain}}"
         port:
           targetPort: 8000
+        tls:
+          insecureEdgeTerminationPolicy: Redirect
+          termination: edge
         to:
           kind: Service
           name: fossul-server
           weight: 100
         wildcardPolicy: None
+  when: (application_domain is defined) and (enable_routes)      
 
 # tasks for fossul apps
 - name: Deploy Fossul Apps
@@ -298,6 +439,9 @@
         ports:
         - port: 8001
           targetPort: 8001
+        tls:
+          insecureEdgeTerminationPolicy: Redirect
+          termination: edge          
         selector:
           app: fossul-app
           name: fossul-app
@@ -320,7 +464,8 @@
           kind: Service
           name: fossul-app
           weight: 100
-        wildcardPolicy: None        
+        wildcardPolicy: None
+  when: (application_domain is defined) and (enable_routes)              
 
 # tasks for fossul storage
 - name: Deploy Fossul Storage persistent volume
@@ -439,11 +584,15 @@
         host: "fossul-storage-{{ ansible_operator_meta.namespace }}.{{application_domain}}"
         port:
           targetPort: 8002
+        tls:
+          insecureEdgeTerminationPolicy: Redirect
+          termination: edge          
         to:
           kind: Service
           name: fossul-storage
           weight: 100
         wildcardPolicy: None
+  when: (application_domain is defined) and (enable_routes)      
 
 - name: Deploy Fossul CLI
   k8s:

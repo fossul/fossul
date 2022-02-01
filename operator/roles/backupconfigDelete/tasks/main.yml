@@ -7,7 +7,7 @@
   
 - name: Set Fossul namespace 
   set_fact:
-    fossul_namespace: "fossul-operator"
+    fossul_namespace: "fossul"
   when: fossul_namespace is not defined       
 
 - name: Set Fossul Server URL 
