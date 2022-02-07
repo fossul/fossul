@@ -11,7 +11,7 @@ RUN /opt/app-root/src/github.com/fossul/fossul/scripts/fossul-server-build.sh
 #RUN mkdir -p /opt/app-root/metadata/configs/default/default
 #COPY src/cli/configs/default /opt/app-root/metadata/configs/default/default
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
+FROM registry.access.redhat.com/ubi8/ubi:latest
 LABEL ios.k8s.display-name="fossul-server" \
     maintainer="Keith Tenzer <ktenzer@redhat.com>"
 

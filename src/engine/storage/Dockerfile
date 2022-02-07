@@ -14,7 +14,7 @@ COPY . /opt/app-root/src/github.com/fossul/fossul
 WORKDIR /opt/app-root/src/github.com/fossul/fossul
 RUN /opt/app-root/src/github.com/fossul/fossul/scripts/fossul-storage-build.sh
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
+FROM registry.access.redhat.com/ubi8/ubi:latest
 LABEL ios.k8s.display-name="fossul-app" \
     maintainer="Keith Tenzer <ktenzer@redhat.com>"
 

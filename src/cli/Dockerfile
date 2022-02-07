@@ -7,7 +7,7 @@ COPY . /opt/app-root/src/github.com/fossul/fossul
 WORKDIR /opt/app-root/src/github.com/fossul/fossul
 RUN /opt/app-root/src/github.com/fossul/fossul/scripts/fossul-cli-build.sh
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
+FROM registry.access.redhat.com/ubi8/ubi:latest
 LABEL ios.k8s.display-name="fossul-cli" \
     maintainer="Keith Tenzer <ktenzer@redhat.com>"
 
