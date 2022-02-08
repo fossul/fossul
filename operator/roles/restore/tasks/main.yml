@@ -38,52 +38,92 @@
     fossul_password: "{{ item.value | b64decode }}" 
   with_dict: "{{ secret.resources[0].data }}"
   when: item.key == "fossul-password"
-  
-- name: Start Restore Workflow
-  uri:
-    url: "{{fossul_server_url}}/startRestoreWorkflow/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}/{{ workflow_id }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: GET
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: restore
-  failed_when: restore.json.result.messages[0].level == "ERROR"
 
-- name: print restore
-  debug:
-    msg: "{{ restore }}"
-      
-- name: Get Restore Status
-  uri:
-    url: "{{fossul_server_url}}/getWorkflowStatus/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ restore.json.id }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: GET
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: restore_status
-  until: restore_status.json.workflow.status == "COMPLETE"
-  retries: 100
-  delay: 10
+- name: Start Restore Workflow Block
+  block:  
+  - name: Start Restore Workflow
+    uri:
+      url: "{{fossul_server_url}}/startRestoreWorkflow/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}/{{ workflow_id }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: GET
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: restore
+    failed_when: restore.json.result.messages[0].level == "ERROR"
 
-- name: print restore status
-  debug:
-    msg: "{{ restore_status }}"
+  - name: Update Restore Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Restore
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          restoreStatus: "[{{ restore.json.result.messages[0].level }}] {{ restore.json.result.messages[0].message }}"  
+  - name: print restore
+    debug:
+      msg: "{{ restore }}"        
 
-- name: Remove Restore Custom Resource
-  k8s:
-    state: absent
-    api_version: fossul.io/v1
-    kind: Restore
-    namespace: "{{ ansible_operator_meta.namespace }}"
-    name: "{{ ansible_operator_meta.name }}" 
-  when: cleanup_cr
+  rescue:
+  - name: print restore
+    debug:
+      msg: "{{ restore }}"
+
+  - name: Update Restore Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Restore
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          restoreStatus: "[{{ restore.json.result.messages[0].level }}] {{ restore.json.result.messages[0].message }}"            
+
+- name: Get Restore Status Block
+  block:      
+  - name: Get Restore Status
+    uri:
+      url: "{{fossul_server_url}}/getWorkflowStatus/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ restore.json.id }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: GET
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: restore_status
+    until: (restore_status.json.workflow.status == "COMPLETE") or (restore_status.json.workflow.status == "ERROR")
+    failed_when: restore_status.json.workflow.status == "ERROR"
+    retries: 100
+    delay: 10
+
+  - name: Remove Restore Custom Resource
+    k8s:
+      state: absent
+      api_version: fossul.io/v1
+      kind: Restore
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      name: "{{ ansible_operator_meta.name }}" 
+    when: cleanup_cr
+
+  rescue:
+  - name: print restore status
+    debug:
+      msg: "{{ restore_status }}"
+
+  - name: Update Restore Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Restore
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          restoreStatus: "{{ restore_status.json.workflow.status }}"       

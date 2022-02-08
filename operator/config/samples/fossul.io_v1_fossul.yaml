@@ -3,5 +3,5 @@ kind: Fossul
 metadata:
   name: fossul-sample
 spec:
-  # Add fields here
-  foo: bar
+  enable_routes: false
+  enable_virtualmachines: false

@@ -35,13 +35,17 @@ If you want to be a contributor the first step is getting a development environm
 
 ## Using Fossul
 Follow the deployment guide to get Fossul up and running.
-* [Deploy Fossul and Get It Running!](docs/DEPLOY.md)
+* [Deploy Fossul and Get It Running](docs/DEPLOY.md)
 
 Once Fossul is operational start using it by setting up demo environment or following some of the examples in the getting started guide.
 * [Demo Environment](docs/DEMO.md)
 * [Getting Started](docs/GETTING_STARTED.md)
 
+## Fossul Operator
+Fossul provides an operator that is available in the OpenShift Operator Hub.
 
+Follow the operator guide to get fossul up and running
+* [Deploy Fossul and Get It Running using the Operator](docs/OPERATOR.md)
 
 
 

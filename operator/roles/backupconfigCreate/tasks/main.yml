@@ -197,175 +197,329 @@
   with_dict: "{{ secret.resources[0].data }}"
   when: item.key == "fossul-password"
 
-- name: Create Backup Profile
-  uri:
-    url: "{{fossul_server_url}}/addProfile/{{ ansible_operator_meta.namespace }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: GET
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: profile
-  failed_when: profile.json.messages[0].level == "ERROR"
+- name: Create Backup Profile Block
+  block:
+  - name: Create Backup Profile
+    uri:
+      url: "{{fossul_server_url}}/addProfile/{{ ansible_operator_meta.namespace }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: GET
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: profile
+    failed_when: profile.json.messages[0].level == "ERROR"
 
-- name: print profile
-  debug:
-    msg: "{{ profile }}"     
+  - name: Update profile status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          profileStatus: "[{{ profile.json.messages[0].level }}] {{ profile.json.messages[0].message }}"  
 
-- name: Print backup policies 
-  debug:
-    msg: "{{ policies }}"
+  rescue:
+  - name: print profile
+    debug:
+      msg: "{{ profile }}"
 
-- name: Create Backup Config
-  uri:
-    url: "{{fossul_server_url}}/addConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: POST
-    body: "{ \"accessWithinCluster\": \"true\",
-             \"appPlugin\": \"{{ app_plugin }}\",
-             \"storagePlugin\": \"{{ storage_plugin }}\",
-             \"archivePlugin\": \"{{ archive_plugin }}\",
-             \"containerPlatform\": \"openshift\",
-             \"jobRetention\": {{ job_retention }},
-             \"autoDiscovery\": {{ auto_discovery | lower }},
-             \"backupRetentions\": {{ policies }},
-             \"PreAppQuiesceCmd\": \"{{ pre_app_quiesce_cmd }}\",
-             \"AppQuiesceCmd\": \"{{ app_quiesce_cmd }}\",
-             \"PostAppQuiesceCmd\": \"{{ post_app_quiesce_cmd }}\",
-             \"BackupCreateCmd\": \"{{ backup_create_cmd }}\",
-             \"PreAppUnQuiesceCmd\": \"{{ pre_app_unquiesce_cmd }}\",
-             \"AppUnQuiesceCmd\": \"{{ app_unquiesce_cmd }}\",
-             \"PostAppUnQuiesceCmd\": \"{{ post_app_unquiesce_cmd }}\",
-     }"
-    body_format: json    
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: config
-  failed_when: config.json.messages[0].level == "ERROR"
+  - name: Update profile status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          profileStatus: "[{{ profile.json.messages[0].level }}] {{ profile.json.messages[0].message }}"           
 
-- name: print config
-  debug:
-    msg: "{{ config }}"
-    
-- name: Create Kubevirt App Plugin Config
-  uri:
-    url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ app_plugin }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: POST
-    body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
-             \"VmName\": \"{{ deployment_name }}\",
-     }"
-    body_format: json    
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: app_config
-  when: (app_plugin is defined) and (app_plugin == "kubevirt.so")
-  failed_when: app_config.json.messages[0].level == "ERROR"
+- name: Create Backup Config Block
+  block:
+  - name: Create Backup Config
+    uri:
+      url: "{{fossul_server_url}}/addConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: POST
+      body: "{ \"accessWithinCluster\": \"true\",
+               \"appPlugin\": \"{{ app_plugin }}\",
+               \"storagePlugin\": \"{{ storage_plugin }}\",
+               \"archivePlugin\": \"{{ archive_plugin }}\",
+               \"containerPlatform\": \"openshift\",
+               \"jobRetention\": {{ job_retention }},
+               \"autoDiscovery\": {{ auto_discovery | lower }},
+               \"backupRetentions\": {{ policies }},
+               \"PreAppQuiesceCmd\": \"{{ pre_app_quiesce_cmd }}\",
+               \"AppQuiesceCmd\": \"{{ app_quiesce_cmd }}\",
+               \"PostAppQuiesceCmd\": \"{{ post_app_quiesce_cmd }}\",
+               \"BackupCreateCmd\": \"{{ backup_create_cmd }}\",
+               \"PreAppUnQuiesceCmd\": \"{{ pre_app_unquiesce_cmd }}\",
+               \"AppUnQuiesceCmd\": \"{{ app_unquiesce_cmd }}\",
+               \"PostAppUnQuiesceCmd\": \"{{ post_app_unquiesce_cmd }}\",
+       }"
+      body_format: json    
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: config
+    failed_when: config.json.messages[0].level == "ERROR"
 
-- name: Create Mariadb App Plugin Config
-  uri:
-    url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ app_plugin }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: POST
-    body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
-             \"DeploymentType\": \"{{ deployment_type }}\",
-             \"DeploymentName\": \"{{ deployment_name }}\",
-             \"DisableRestoreHooks\": \"false | lower\",
-             \"MysqlProto\": \"tcp\",
-             \"MysqlHost\": \"{{ mysql_host }}\",
-             \"MysqlPort\": \"{{ mysql_port }}\",
-             \"MysqlUser\": \"root\",
-             \"MysqlPassword\": \"{{ mysql_root_password }}\",
-             \"MysqlDb\": \"{{ mysql_db }}\",
-     }"
-    body_format: json    
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: app_config
-  when: (app_plugin is defined) and (app_plugin == "mariadb.so")
-  failed_when: app_config.json.messages[0].level == "ERROR"
+  - name: Update backup config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          backupConfigStatus: "[{{ config.json.messages[0].level }}] {{ config.json.messages[0].message }}"    
 
-- name: Create Postgresql App Plugin Config
-  uri:
-    url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ app_plugin }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: POST
-    body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
-             \"DeploymentType\": \"{{ deployment_type }}\",
-             \"DeploymentName\": \"{{ deployment_name }}\",
-             \"DisableRestoreHooks\": \"false | lower\",
-             \"PqSslMode\": \"disable\",
-             \"PqHost\": \"{{ pq_host }}\",
-             \"PqPort\": \"{{ pq_port }}\",
-             \"PqUser\": \"{{ pq_user }}\",
-             \"PqPassword\": \"{{ pq_password }}\",
-             \"PqDb\": \"{{ pq_db }}\",
-     }"
-    body_format: json    
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: app_config
-  when: (app_plugin is defined) and (app_plugin == "postgres.so")
-  failed_when: app_config.json.messages[0].level == "ERROR"
+  rescue:
+  - name: print config
+    debug:
+      msg: "{{ config }}"
 
-- name: print app config
-  debug:
-    msg: "{{ app_config }}"  
-  when: (app_plugin is defined)
-    
-- name: Create Storage Plugin Config
-  uri:
-    url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ storage_plugin }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: POST
-    body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
-             \"BackupName\": \"{{ deployment_name }}\",
-             \"DeploymentName\": \"{{ deployment_name }}\",
-             \"DeploymentType\": \"{{ deployment_type }}\",
-             \"PvcDeletionTimeout\": \"{{ pvc_deletion_timeout }}\",
-             \"SnapshotTimeoutSeconds\": \"{{ snapshot_timeout }}\",
-             \"OverwritePvcOnRestore\": \"{{ overwrite_pcv_on_restore | lower }}\",
-             \"RestoreToNewPvc\": \"{{ restore_to_new_pvc | lower }}\",
+  - name: Update backup config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          backupConfigStatus: "[{{ config.json.messages[0].level }}] {{ config.json.messages[0].message }}"        
+
+- name: Create Kubevirt App Plugin Config Block
+  block:    
+  - name: Create Kubevirt App Plugin Config
+    uri:
+      url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ app_plugin }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: POST
+      body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
+               \"VmName\": \"{{ deployment_name }}\",
+       }"
+      body_format: json    
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: kubevirt_config
+    when: (app_plugin is defined) and (app_plugin == "kubevirt.so")
+    failed_when: kubevirt_config.json.messages[0].level == "ERROR"         
+
+
+  - name: Update kubevirt app config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          appConfigStatus: "[{{ kubevirt_config.json.messages[0].level }}] {{ kubevirt_config.json.messages[0].message }}"
+    when: (app_plugin is defined) and (app_plugin == "kubevirt.so")  
+
+  rescue:
+  - name: print kubevirt app config
+    debug:
+      msg: "{{ kubevirt_config }}"  
+    when: (app_plugin is defined) and (app_plugin == "kubevirt.so")
+
+  - name: Update kubevirt app config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          appConfigStatus: "[{{ kubevirt_config.json.messages[0].level }}] {{ kubevirt_config.json.messages[0].message }}"
+    when: (app_plugin is defined) and (app_plugin == "kubevirt.so")        
+
+- name: Create Mariadb App Plugin Config Block
+  block:
+  - name: Create Mariadb App Plugin Config
+    uri:
+      url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ app_plugin }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: POST
+      body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
+               \"DeploymentType\": \"{{ deployment_type }}\",
+               \"DeploymentName\": \"{{ deployment_name }}\",
+               \"DisableRestoreHooks\": \"false | lower\",
+               \"MysqlProto\": \"tcp\",
+               \"MysqlHost\": \"{{ mysql_host }}\",
+               \"MysqlPort\": \"{{ mysql_port }}\",
+               \"MysqlUser\": \"root\",
+               \"MysqlPassword\": \"{{ mysql_root_password }}\",
+               \"MysqlDb\": \"{{ mysql_db }}\",
+       }"
+      body_format: json    
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: mariadb_config
+    when: (app_plugin is defined) and (app_plugin == "mariadb.so")
+    failed_when: mariadb_config.json.messages[0].level == "ERROR"
+
+  - name: Update mariadb app config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          appConfigStatus: "[{{ mariadb_config.json.messages[0].level }}] {{ mariadb_config.json.messages[0].message }}"
+    when: (app_plugin is defined) and (app_plugin == "mariadb.so")   
+
+  rescue:
+  - name: print mariadb app config
+    debug:
+      msg: "{{ mariadb_config }}"  
+    when: (app_plugin is defined) and (app_plugin == "mariadb.so")
+
+  - name: Update mariadb app config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          appConfigStatus: "[{{ mariadb_config.json.messages[0].level }}] {{ mariadb_config.json.messages[0].message }}"
+    when: (app_plugin is defined) and (app_plugin == "mariadb.so")      
+
+- name: Create Postgresql App Plugin Config Block
+  block:
+  - name: Create Postgresql App Plugin Config
+    uri:
+      url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ app_plugin }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: POST
+      body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
+               \"DeploymentType\": \"{{ deployment_type }}\",
+               \"DeploymentName\": \"{{ deployment_name }}\",
+               \"DisableRestoreHooks\": \"false | lower\",
+               \"PqSslMode\": \"disable\",
+               \"PqHost\": \"{{ pq_host }}\",
+               \"PqPort\": \"{{ pq_port }}\",
+               \"PqUser\": \"{{ pq_user }}\",
+               \"PqPassword\": \"{{ pq_password }}\",
+               \"PqDb\": \"{{ pq_db }}\",
+       }"
+      body_format: json    
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: postgresql_config
+    when: (app_plugin is defined) and (app_plugin == "postgres.so")
+    failed_when: postgresql_config.json.messages[0].level == "ERROR"
+
+  - name: Update postgresql app config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          appConfigStatus: "[{{ postgresql_config.json.messages[0].level }}] {{ postgresql_config.json.messages[0].message }}"
+    when: (app_plugin is defined) and (app_plugin == "postgres.so")  
+
+  rescue:
+  - name: print postgresql app config
+    debug:
+      msg: "{{ postgresql_config }}"  
+    when: (app_plugin is defined) and (app_plugin == "postgres.so")
+
+  - name: Update postgresql app config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          appConfigStatus: "[{{ postgresql_config.json.messages[0].level }}] {{ postgresql_config.json.messages[0].message }}"
+    when: (app_plugin is defined) and (app_plugin == "postgres.so")    
+
+- name: Create Storage Plugin Config Block
+  block:    
+  - name: Create Storage Plugin Config
+    uri:
+      url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ storage_plugin }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: POST
+      body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
+               \"BackupName\": \"{{ deployment_name }}\",
+               \"DeploymentName\": \"{{ deployment_name }}\",
+               \"DeploymentType\": \"{{ deployment_type }}\",
+               \"PvcDeletionTimeout\": \"{{ pvc_deletion_timeout }}\",
+               \"SnapshotTimeoutSeconds\": \"{{ snapshot_timeout }}\",
+               \"OverwritePvcOnRestore\": \"{{ overwrite_pcv_on_restore | lower }}\",
+               \"RestoreToNewPvc\": \"{{ restore_to_new_pvc | lower }}\",
              
-     }"
+       }"
 
-    body_format: json    
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: storage_config
-  when: (storage_plugin is defined) and (storage_plugin == "csi.so")
-  failed_when: storage_config.json.messages[0].level == "ERROR"
+      body_format: json    
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: csi_config
+    when: (storage_plugin is defined) and (storage_plugin == "csi.so")
+    failed_when: csi_config.json.messages[0].level == "ERROR"
 
-- name: print storage config
-  debug:
-    msg: "{{ storage_config }}" 
-  when: storage_plugin is defined        
+  - name: Update storage config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          storageConfigStatus: "[{{ csi_config.json.messages[0].level }}] {{ csi_config.json.messages[0].message }}"
+    when: (storage_plugin is defined) and (storage_plugin == "csi.so")  
+
+  rescue:
+  - name: print storage config
+    debug:
+      msg: "{{ csi_config }}" 
+    when: (storage_plugin is defined) and (storage_plugin == "csi.so")  
+
+  - name: Update storage config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          storageConfigStatus: "[{{ csi_config.json.messages[0].level }}] {{ csi_config.json.messages[0].message }}"
+    when: (storage_plugin is defined) and (storage_plugin == "csi.so")  
+ 

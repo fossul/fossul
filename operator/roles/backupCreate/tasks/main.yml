@@ -34,109 +34,235 @@
   with_dict: "{{ secret.resources[0].data }}"
   when: item.key == "fossul-password"
   
-- name: Create Backup
-  uri:
-    url: "{{fossul_server_url}}/startBackupWorkflow/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: GET
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: backup
-  failed_when: backup.json.result.messages[0].level == "ERROR"
-  when: workflow_id is not defined
+- name: Create Backup Block  
+  block:
+  - name: Create Backup
+    uri:
+      url: "{{fossul_server_url}}/startBackupWorkflow/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: GET
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: backup
+    failed_when: backup.json.result.messages[0].level == "ERROR"
+    when: workflow_id is not defined
 
-- name: print backup
-  debug:
-    msg: "{{ backup }}"
-  when: workflow_id is not defined   
-      
-- name: Get Backup Status
-  uri:
-    url: "{{fossul_server_url}}/getWorkflowStatus/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ backup.json.id }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: GET
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: backup_status
-  until: backup_status.json.workflow.status == "COMPLETE"
-  retries: 50
-  delay: 10
-  when: workflow_id is not defined
+  - name: Update backup status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Backup
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          backupStatus: "[{{ backup.json.result.messages[0].level }}] {{ backup.json.result.messages[0].message }}"     
+    when: workflow_id is not defined
 
-- name: print backup status
-  debug:
-    msg: "{{ backup_status }}"
-  when: workflow_id is not defined    
+  rescue:
+  - name: print backup
+    debug:
+      msg: "{{ backup }}"
+    when: workflow_id is not defined
 
-- name: Update Workflow ID
-  uri:
-    url: "{{fossul_server_url}}/updateBackupCustomResource/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}/{{ ansible_operator_meta.name }}/add/workflow_id/{{ backup.json.id }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: GET
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: update_workflow_id
-  failed_when: update_workflow_id.json.messages[0].level == "ERROR"
-  when: workflow_id is not defined
+  - name: Update backup status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Backup
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          backupStatus: "[{{ backup.json.result.messages[0].level }}] {{ backup.json.result.messages[0].message }}"     
+    when: workflow_id is not defined
 
-- name: print update workflow id
-  debug:
-    msg: "{{ update_workflow_id }}"
-  when: workflow_id is not defined   
+- name: Get Backup Status Block
+  block:
+  - name: Get Backup Status
+    uri:
+      url: "{{fossul_server_url}}/getWorkflowStatus/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ backup.json.id }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: GET
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: backup_status
+    until: (backup_status.json.workflow.status == "COMPLETE") or (backup_status.json.workflow.status == "ERROR")
+    failed_when: backup_status.json.workflow.status == "ERROR"
+    retries: 50
+    delay: 10
+    when: workflow_id is not defined
 
-- name: Get Backup Data
-  uri:
-    url: "{{fossul_server_url}}/getBackup/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ backup.json.id }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: GET
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: get_backup
-  failed_when: get_backup.json.result.messages[0].level == "ERROR"
-  when: workflow_id is not defined
+  - name: Update backup status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Backup
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          backupStatus: "{{ backup_status.json.workflow.status }}"     
+    when: workflow_id is not defined      
 
-- name: print get backup
-  debug:
-    msg: "{{ get_backup }}"
-  when: workflow_id is not defined     
+  rescue:
+  - name: print backup status
+    debug:
+      msg: "{{ backup_status }}"
+    when: workflow_id is not defined
 
-- name: Update Backup Name
-  uri:
-    url: "{{fossul_server_url}}/updateBackupCustomResource/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}/{{ ansible_operator_meta.name }}/add/backup_name/{{ get_backup.json.backup.name }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: GET
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: update_backup_name
-  failed_when: update_backup_name.json.messages[0].level == "ERROR"
-  when: workflow_id is not defined
+  - name: Update backup status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Backup
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          backupStatus: "{{ backup_status.json.workflow.status }}"     
+    when: workflow_id is not defined      
 
-- name: print update workflow id
-  debug:
-    msg: "{{ update_backup_name }}"
-  when: workflow_id is not defined     
+- name: Update Workflow ID Block
+  block:
+  - name: Update Workflow ID
+    uri:
+      url: "{{fossul_server_url}}/updateBackupCustomResource/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}/{{ ansible_operator_meta.name }}/add/workflow_id/{{ backup.json.id }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: GET
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: update_workflow_id
+    failed_when: update_workflow_id.json.messages[0].level == "ERROR"
+    when: workflow_id is not defined
+
+  - name: Update backup status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Backup
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          updateWorkflowIdStatus: "[{{ update_workflow_id.json.messages[0].level }}] {{ update_workflow_id.json.messages[0].message }}"     
+    when: workflow_id is not defined  
+
+  rescue:
+  - name: print update workflow id
+    debug:
+      msg: "{{ update_workflow_id }}"
+    when: workflow_id is not defined
+
+  - name: Update backup status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Backup
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          updateWorkflowIdStatus: "[{{ update_workflow_id.json.messages[0].level }}] {{ update_workflow_id.json.messages[0].message }}"     
+    when: workflow_id is not defined             
+
+- name: Get Backup Data Block
+  block:
+  - name: Get Backup Data
+    uri:
+      url: "{{fossul_server_url}}/getBackup/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ backup.json.id }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: GET
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: get_backup
+    failed_when: get_backup.json.result.messages[0].level == "ERROR"
+    when: workflow_id is not defined
+
+  - name: Update backup status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Backup
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          retrieveBackupStatus: "[{{ get_backup.json.result.messages[0].level }}] {{ get_backup.json.result.messages[0].message }}"     
+    when: workflow_id is not defined    
+
+  rescue:
+  - name: print get backup
+    debug:
+      msg: "{{ get_backup }}"
+    when: workflow_id is not defined     
+
+  - name: Update backup status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Backup
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          retrieveBackupStatus: "[{{ get_backup.json.result.messages[0].level }}] {{ get_backup.json.result.messages[0].message }}"     
+    when: workflow_id is not defined    
+
+- name: Update Backup Name Block
+  block:
+  - name: Update Backup Name
+    uri:
+      url: "{{fossul_server_url}}/updateBackupCustomResource/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}/{{ ansible_operator_meta.name }}/add/backup_name/{{ get_backup.json.backup.name }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: GET
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: update_backup_name
+    failed_when: update_backup_name.json.messages[0].level == "ERROR"
+    when: workflow_id is not defined
+
+  - name: Update backup status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Backup
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          updateBackupStatus: "[{{ update_backup_name.json.messages[0].level }}] {{ update_backup_name.json.messages[0].message }}"     
+    when: workflow_id is not defined    
+
+  rescue:
+  - name: print update workflow id
+    debug:
+      msg: "{{ update_backup_name }}"
+    when: workflow_id is not defined    
+
+  - name: Update backup status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Backup
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          updateBackupStatus: "[{{ update_backup_name.json.messages[0].level }}]  {{ update_backup_name.json.messages[0].message }}"     
+    when: workflow_id is not defined       

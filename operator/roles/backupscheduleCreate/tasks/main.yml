@@ -39,23 +39,46 @@
   with_dict: "{{ secret.resources[0].data }}"
   when: item.key == "fossul-password"    
       
-- name: Create Backup Schedule
-  uri:
-    url: "{{fossul_server_url}}/addSchedule/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: GET
-    body: "{ \"value\": \"{{ cron_schedule }}\" }"
-    body_format: json
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: schedule_create
-  failed_when: schedule_create.json.messages[0].level == "ERROR"
+- name: Create Backup Schedule Block
+  block:
+  - name: Create Backup Schedule
+    uri:
+      url: "{{fossul_server_url}}/addSchedule/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: GET
+      body: "{ \"value\": \"{{ cron_schedule }}\" }"
+      body_format: json
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: schedule_create
+    failed_when: schedule_create.json.messages[0].level == "ERROR"
 
-- name: print schedule create
-  debug:
-    msg: "{{ schedule_create }}"  
+  - name: Update Schedule Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupSchedule
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          scheduleStatus: "[{{ schedule_create.json.messages[0].level }}] {{ schedule_create.json.messages[0].message }}"  
+
+  rescue:
+  - name: print schedule create
+    debug:
+      msg: "{{ schedule_create }}"
+
+  - name: Update Schedule Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupSchedule
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          scheduleStatus: "[{{ schedule_create.json.messages[0].level }}] {{ schedule_create.json.messages[0].message }}"                

@@ -29,21 +29,44 @@
   with_dict: "{{ secret.resources[0].data }}"
   when: item.key == "fossul-password"
 
-- name: Delete Backup Config
-  uri:
-    url: "{{fossul_server_url}}/deleteConfigDir/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: GET
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: config
-  failed_when: config.json.messages[0].level == "ERROR"
+- name: Delete Backup Config Block
+  block:
+  - name: Delete Backup Config
+    uri:
+      url: "{{fossul_server_url}}/deleteConfigDir/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: GET
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: config
+    failed_when: config.json.messages[0].level == "ERROR"
 
-- name: print delete config
-  debug:
-    msg: "{{ config }}"  
+  - name: Update backup config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          backupConfigStatus: "[{{ config.json.messages[0].level }}] {{ config.json.messages[0].message }}"
+
+  rescue:
+  - name: print delete config
+    debug:
+      msg: "{{ config }}"
+
+  - name: Update backup config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          backupConfigStatus: "[{{ config.json.messages[0].level }}] {{ config.json.messages[0].message }}"

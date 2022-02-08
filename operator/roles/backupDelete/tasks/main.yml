@@ -38,22 +38,45 @@
     fossul_password: "{{ item.value | b64decode }}" 
   with_dict: "{{ secret.resources[0].data }}"
   when: item.key == "fossul-password"    
-      
-- name: Delete Backup
-  uri:
-    url: "{{fossul_server_url}}/deleteBackup/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}/{{ workflow_id }}"
-    headers:
-      Content-Type: application/json
-      Accept: application/json    
-    user: "{{username}}"
-    password: "{{fossul_password}}"
-    method: GET
-    force_basic_auth: yes
-    status_code: [200]
-    return_content: yes
-  register: backup_delete
-  failed_when: backup_delete.json.messages[0].level == "ERROR"
 
-- name: print backup delete
-  debug:
-    msg: "{{ backup_delete }}"  
+- name: Delete Backup Block      
+  block:
+  - name: Delete Backup
+    uri:
+      url: "{{fossul_server_url}}/deleteBackup/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ policy }}/{{ workflow_id }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: GET
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: backup_delete
+    failed_when: backup_delete.json.messages[0].level == "ERROR"
+
+  - name: Update backup status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Backup
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          backupStatus: "[{{ backup_delete.json.messages[0].level }}]  {{ backup_delete.json.messages[0].message }}"    
+
+  rescue:
+  - name: print backup delete
+    debug:
+      msg: "{{ backup_delete }}"
+
+  - name: Update backup status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Backup
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          backupStatus: "[{{ backup_delete.json.messages[0].level }}] {{ backup_delete.json.messages[0].message }}"        
