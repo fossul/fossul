@@ -94,6 +94,9 @@ echo "Copying default configs"
 if [ ! -z $GOBIN/metadata/configs/default ]; then
   mkdir -p $GOBIN/metadata/configs/default
   if [ $? != 0 ]; then exit 1; fi
+
+  cp -r src/cli/configs/default $GOBIN
+	if [ $? != 0 ]; then exit 1; fi
 fi
 
 cp -r $GOPATH/src/github.com/fossul/fossul/src/cli/configs/default $GOBIN/metadata/configs/default

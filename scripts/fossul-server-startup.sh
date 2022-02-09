@@ -62,7 +62,9 @@ fi
 
 if [ ! -d "${FOSSUL_SERVER_CONFIG_DIR}/default" ]; then
     mkdir -p ${FOSSUL_SERVER_CONFIG_DIR}/default
-    curl -L https://github.com/fossul/fossul/releases/download/latest/default-configs.tar.gz |tar xz;mv default ${FOSSUL_SERVER_CONFIG_DIR}/default
+     if [ ! -d "${FOSSUL_SERVER_CONFIG_DIR}/default/default" ]; then
+        cp -r default ${FOSSUL_SERVER_CONFIG_DIR}/default
+     fi
 fi
 
 $GOBIN/server

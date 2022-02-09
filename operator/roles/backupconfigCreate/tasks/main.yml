@@ -35,6 +35,11 @@
     job_retention: 50
   when: job_retention is not defined      
 
+- name: Disable Restore Hooks
+  set_fact:
+    disable_restore_hooks: "false"
+  when: disable_restore_hooks is not defined    
+
 - name: Set Fossul auto discovery
   set_fact:
     auto_discovery: "false"
@@ -182,7 +187,7 @@
   set_fact:
     pq_db: "{{ item.value | b64decode }}" 
   with_dict: "{{ pq_secret.resources[0].data }}"
-  when: (app_plugin == "postgres.so") and (pq_user is not defined) and (item.key == "database-name")
+  when: (app_plugin == "postgres.so") and (pq_db is not defined) and (item.key == "database-name")
 
 - name: Get Postgresql User 
   set_fact:
@@ -369,7 +374,7 @@
       body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
                \"DeploymentType\": \"{{ deployment_type }}\",
                \"DeploymentName\": \"{{ deployment_name }}\",
-               \"DisableRestoreHooks\": \"false | lower\",
+               \"DisableRestoreHooks\": \"{{ disable_restore_hooks | lower }}\",
                \"MysqlProto\": \"tcp\",
                \"MysqlHost\": \"{{ mysql_host }}\",
                \"MysqlPort\": \"{{ mysql_port }}\",
@@ -428,7 +433,7 @@
       body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
                \"DeploymentType\": \"{{ deployment_type }}\",
                \"DeploymentName\": \"{{ deployment_name }}\",
-               \"DisableRestoreHooks\": \"false | lower\",
+               \"DisableRestoreHooks\": \"{{ disable_restore_hooks | lower }}\",
                \"PqSslMode\": \"disable\",
                \"PqHost\": \"{{ pq_host }}\",
                \"PqPort\": \"{{ pq_port }}\",

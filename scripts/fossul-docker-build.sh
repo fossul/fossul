@@ -1,7 +1,7 @@
 #!/bin/bash
 # Needs to be run from fossul root directory
 
-RELEASE="v0.3.0"
+RELEASE="v0.4.0"
 SERVER_IMAGE="fossul-server"
 APP_IMAGE="fossul-app"
 STORAGE_IMAGE="fossul-storage"

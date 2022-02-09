@@ -63,7 +63,7 @@ metadata:
             "name": "mariadb-sample"
           },
           "spec": {
-            "cron_schedule": "23 59 * * *",
+            "cron_schedule": "59 23 * * *",
             "deployment_name": "mariadb",
             "policy": "daily"
 
@@ -240,7 +240,7 @@ spec:
       name: mariadb-sample
       namespace: databases
     spec:
-      cron_schedule: '23 59 * * *'
+      cron_schedule: '59 23 * * *'
       deployment_name: mariadb
       policy: daily
     </pre>

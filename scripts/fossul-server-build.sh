@@ -27,6 +27,9 @@ if [[ ! -z "${GOBIN}" ]]; then
 	echo "Copying startup scripts"
 	cp scripts/fossul-server-startup.sh $GOBIN
 	if [ $? != 0 ]; then exit 1; fi
+
+	cp -r src/cli/configs/default $GOBIN
+	if [ $? != 0 ]; then exit 1; fi
 fi
 
 echo "Server build completed successfully"
