@@ -109,7 +109,8 @@
       namespace: "{{ ansible_operator_meta.namespace }}"
       status:
         fossulResult: 
-          backupStatus: "{{ backup_status.json.workflow.status }}"     
+          backupStatus: "{{ backup_status.json.workflow.status }}" 
+          lastMessage: "{{ backup_status.json.workflow.lastMessage }}"     
     when: workflow_id is not defined      
 
   rescue:

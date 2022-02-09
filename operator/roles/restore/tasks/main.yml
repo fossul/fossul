@@ -126,4 +126,5 @@
       namespace: "{{ ansible_operator_meta.namespace }}"
       status:
         fossulResult: 
-          restoreStatus: "{{ restore_status.json.workflow.status }}"       
+          restoreStatus: "{{ restore_status.json.workflow.status }}" 
+          lastMessage: "{{ restore_status.json.workflow.lastMessage }}"   

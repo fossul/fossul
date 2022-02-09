@@ -14,11 +14,12 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/fossul/fossul/src/client/k8s"
-	"github.com/fossul/fossul/src/engine/util"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/fossul/fossul/src/client/k8s"
+	"github.com/fossul/fossul/src/engine/util"
 )
 
 // PreRestore godoc
@@ -207,7 +208,7 @@ func PreAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 
 		if k8s.IsRemoteCommand(args[0]) {
 			args[0] = strings.Replace(args[0], ":", "", 1)
-			podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+			podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["PodSelector"], config.AccessWithinCluster)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)
@@ -284,7 +285,7 @@ func PostAppRestoreCmd(w http.ResponseWriter, r *http.Request) {
 
 		if k8s.IsRemoteCommand(args[0]) {
 			args[0] = strings.Replace(args[0], ":", "", 1)
-			podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+			podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["PodSelector"], config.AccessWithinCluster)
 			if err != nil {
 				msg := util.SetMessage("ERROR", err.Error())
 				messages = append(messages, msg)

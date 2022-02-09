@@ -15,13 +15,14 @@ package k8s
 import (
 	"bytes"
 	"fmt"
+	"regexp"
+	"strings"
+
 	"github.com/fossul/fossul/src/engine/util"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/remotecommand"
-	"regexp"
-	"strings"
 )
 
 func ExecuteCommand(podName, containerName, namespace, accessWithinCluster string, args ...string) util.Result {
@@ -38,6 +39,18 @@ func ExecuteCommand(podName, containerName, namespace, accessWithinCluster strin
 
 		result = util.SetResult(1, messages)
 		return result
+	}
+
+	if len(containerName) == 0 {
+		containerName, err = GetPodContainer(podName, namespace, accessWithinCluster)
+
+		if err != nil {
+			message := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, message)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
 	}
 
 	s0 := fmt.Sprintf("Executing command [%s %s] in namespace [%s] on pod [%s] container [%s]", baseCmd, strings.Join(cmdArgs, " "), namespace, podName, containerName)
@@ -124,6 +137,18 @@ func ExecuteCommandWithStdout(podName, containerName, namespace, accessWithinClu
 
 		result = util.SetResult(1, messages)
 		return result, ""
+	}
+
+	if len(containerName) == 0 {
+		containerName, err = GetPodContainer(podName, namespace, accessWithinCluster)
+
+		if err != nil {
+			message := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, message)
+
+			result = util.SetResult(1, messages)
+			return result, ""
+		}
 	}
 
 	s0 := fmt.Sprintf("Executing command [%s %s] in namespace [%s] on pod [%s] container [%s]", baseCmd, strings.Join(cmdArgs, " "), namespace, podName, containerName)

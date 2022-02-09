@@ -217,6 +217,20 @@ func setDiscoverFileList(config util.Config, discoverResult util.DiscoverResult)
 	return dataFilePaths, logFilePaths
 }
 
+func setLastMessage(result util.Result, workflow *util.Workflow) *util.Workflow {
+
+	if result.Messages != nil {
+		if len(result.Messages) > 0 {
+			lastMessage := result.Messages[len(result.Messages)-1]
+
+			lastMessageText := lastMessage.Message
+			workflow.LastMessage = lastMessageText
+		}
+	}
+
+	return workflow
+}
+
 func SetAuth() client.Auth {
 	var auth client.Auth
 	auth.ServerHostname = serverHostname

@@ -43,7 +43,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	msg := util.SetMessage("INFO", "Performing container backup")
 	messages = append(messages, msg)
 
-	podName, err := k8s.GetPodName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["ServiceName"], config.AccessWithinCluster)
+	podName, err := k8s.GetPodName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodSelector"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -109,7 +109,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	msg := util.SetMessage("INFO", "Performing container restore")
 	messages = append(messages, msg)
 
-	podName, err := k8s.GetPodName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["ServiceName"], config.AccessWithinCluster)
+	podName, err := k8s.GetPodName(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["PodSelector"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)

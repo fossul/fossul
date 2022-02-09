@@ -32,6 +32,7 @@ func startRestoreWorkflowImpl(dataDir string, config util.Config, workflow *util
 
 	if err != nil {
 		result := util.SetResultMessage(1, "ERROR", "Couldn't retrieve backup contents for workflow id ["+config.WorkflowId+"] "+err.Error())
+		workflow := setLastMessage(result, workflow)
 		StepErrorHandler(resultsDir, policy, step, workflow, result, config)
 		return result.Code
 	}
@@ -44,6 +45,8 @@ func startRestoreWorkflowImpl(dataDir string, config util.Config, workflow *util
 	if config.PreAppRestoreCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.PreAppRestoreCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandler(err, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -56,6 +59,8 @@ func startRestoreWorkflowImpl(dataDir string, config util.Config, workflow *util
 	if config.AppPlugin != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.PreRestore(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandler(err, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -71,6 +76,8 @@ func startRestoreWorkflowImpl(dataDir string, config util.Config, workflow *util
 	if config.RestoreCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.RestoreCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandler(err, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -83,6 +90,8 @@ func startRestoreWorkflowImpl(dataDir string, config util.Config, workflow *util
 	if config.StoragePlugin != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Restore(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandler(err, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -98,6 +107,8 @@ func startRestoreWorkflowImpl(dataDir string, config util.Config, workflow *util
 	if config.PostAppRestoreCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.PostAppRestoreCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandler(err, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -110,6 +121,8 @@ func startRestoreWorkflowImpl(dataDir string, config util.Config, workflow *util
 	if config.AppPlugin != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.PostRestore(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandler(err, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -147,6 +160,7 @@ func startRestoreWorkflowImpl(dataDir string, config util.Config, workflow *util
 	setComment(resultsDir, commentMsg, workflow)
 
 	util.SetWorkflowStatusEnd(workflow)
+	workflow.LastMessage = commentMsg
 	util.SerializeWorkflow(resultsDir, workflow)
 
 	//remove workflow lock

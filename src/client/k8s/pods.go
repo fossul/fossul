@@ -14,6 +14,7 @@ package k8s
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -29,6 +30,7 @@ func GetPod(podName, namespace, accessWithinCluster string) (*v1.Pod, error) {
 	}
 
 	pod, err = client.CoreV1().Pods(namespace).Get(context.Background(), podName, metav1.GetOptions{})
+
 	if err != nil {
 		return pod, err
 	}
@@ -36,7 +38,29 @@ func GetPod(podName, namespace, accessWithinCluster string) (*v1.Pod, error) {
 	return pod, nil
 }
 
-func GetPodName(namespace, serviceName, accessWithinCluster string) (string, error) {
+func GetPodContainer(podName, namespace, accessWithinCluster string) (string, error) {
+	var containerName string
+	var pod *v1.Pod
+	client, err := getClient(accessWithinCluster)
+	if err != nil {
+		return containerName, err
+	}
+
+	pod, err = client.CoreV1().Pods(namespace).Get(context.Background(), podName, metav1.GetOptions{})
+	fmt.Println("here " + pod.Name)
+	if pod.Spec.Containers != nil {
+		if len(pod.Spec.Containers) > 1 {
+			return "", errors.New("Pod [" + pod.Name + "] has more than one containers please specify ContainerName parameter in storage plugin config")
+		}
+		containerName = pod.Spec.Containers[0].Name
+	} else {
+		return "", errors.New("Couldn't get ContainerName from pod [" + pod.Name + "] Spec, try providing ContainerName parameter in storage plugin config")
+	}
+
+	return containerName, nil
+}
+
+func GetPodName(namespace, podSelector, accessWithinCluster string) (string, error) {
 	client, err := getClient(accessWithinCluster)
 	if err != nil {
 		return "", err
@@ -51,7 +75,7 @@ func GetPodName(namespace, serviceName, accessWithinCluster string) (string, err
 	var ourPod string
 	for _, pod := range pods.Items {
 		fmt.Println("[INFO] Pod", pod.Name, pod.Status.Phase)
-		if strings.Contains(pod.Name, serviceName) && pod.Status.Phase == "Running" {
+		if strings.Contains(pod.Name, podSelector) && pod.Status.Phase == "Running" {
 			fmt.Println("[INFO] Running Pod Found:", pod.Name)
 			ourPod = pod.Name
 		}

@@ -85,7 +85,7 @@ MysqlProto = "tcp"
 MysqlRestoreCmd = "/opt/rh/rh-mariadb102/root/usr/bin/mysql"
 MysqlUser = "root"
 Namespace = "databases"
-ServiceName = "mariadb"
+PodSelector = "mariadb"
 ```
 
 Assuming we saved file to /tmp/mariadb-dump.conf
@@ -108,7 +108,7 @@ BackupSrcPaths = "/var/lib/mysql/data/sampledb,/var/lib/mysql/data/test"
 ContainerPlatform = "openshift"
 CopyCmdPath = "/app/oc"
 Namespace = "databases"
-ServiceName = "mariadb"
+PodSelector = "mariadb"
 ```
 
 ### Manual Backup

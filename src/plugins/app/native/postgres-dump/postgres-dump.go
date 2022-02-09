@@ -14,9 +14,10 @@ package main
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/fossul/fossul/src/client/k8s"
 	"github.com/fossul/fossul/src/engine/util"
-	"strings"
 )
 
 type appPlugin string
@@ -62,7 +63,7 @@ func (a appPlugin) Quiesce(config util.Config) util.Result {
 	var args []string
 	var mkdirArgs []string
 
-	podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+	podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["PodSelector"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -126,7 +127,7 @@ func (a appPlugin) Unquiesce(config util.Config) util.Result {
 	args = append(args, "-rf")
 	args = append(args, dumpPath)
 
-	podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+	podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["PodSelector"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -152,7 +153,7 @@ func (a appPlugin) PreRestore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+	podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["PodSelector"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)
@@ -185,7 +186,7 @@ func (a appPlugin) PostRestore(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message
 
-	podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["ServiceName"], config.AccessWithinCluster)
+	podName, err := k8s.GetPodName(config.AppPluginParameters["Namespace"], config.AppPluginParameters["PodSelector"], config.AccessWithinCluster)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
 		messages = append(messages, msg)

@@ -33,6 +33,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		step := stepInit(resultsDir, workflow)
 
 		discoverResult, err := client.Discover(auth, config)
+		workflow := setLastMessage(discoverResult.Result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, discoverResult.Result, config)
 			return 1
@@ -65,6 +67,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.PreAppQuiesceCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.PreQuiesceCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -77,6 +81,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.AppQuiesceCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.QuiesceCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -91,6 +97,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		isQuiesce = true
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Quiesce(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -103,6 +111,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.PostAppQuiesceCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.PostQuiesceCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -118,6 +128,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.BackupCreateCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.BackupCreateCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -130,6 +142,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.StoragePlugin != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Backup(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -147,6 +161,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.PreAppUnquiesceCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.PreUnquiesceCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -159,6 +175,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.AppUnquiesceCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.UnquiesceCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -172,6 +190,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.AppPlugin != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Unquiesce(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -186,6 +206,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.PostAppUnquiesceCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.PostUnquiesceCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -201,6 +223,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.BackupDeleteCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.BackupDeleteCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -213,6 +237,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.StoragePlugin != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.BackupDeleteWorkflow(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -229,6 +255,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 		isMount = true
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Mount(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -244,6 +272,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.ArchiveCreateCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.ArchiveCreateCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -256,6 +286,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.ArchivePlugin != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Archive(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -271,6 +303,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.ArchiveDeleteCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.ArchiveDeleteCmd(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -283,6 +317,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.ArchivePlugin != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.ArchiveDelete(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -298,6 +334,8 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.StoragePlugin != "" && config.ArchivePlugin != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.Unmount(auth, config)
+		workflow := setLastMessage(result, workflow)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -326,6 +364,7 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	if config.SendTrapSuccessCmd != "" {
 		step := stepInit(resultsDir, workflow)
 		result, err := client.SendTrapSuccessCmd(auth, config)
+
 		if err != nil {
 			HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
 			return 1
@@ -339,6 +378,7 @@ func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.
 	setComment(resultsDir, commentMsg, workflow)
 
 	util.SetWorkflowStatusEnd(workflow)
+	workflow.LastMessage = commentMsg
 	util.SerializeWorkflow(resultsDir, workflow)
 
 	//remove workflow lock

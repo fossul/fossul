@@ -40,8 +40,10 @@ func ExecuteCommand(args ...string) (result Result) {
 		message = SetMessage("ERROR", s2)
 		messages = append(messages, message)
 
-		message = SetMessage("ERROR", string(stdoutStderrBytes))
-		messages = append(messages, message)
+		if stdoutStderrBytes != nil {
+			message = SetMessage("ERROR", string(stdoutStderrBytes))
+			messages = append(messages, message)
+		}
 
 		resultCode = 1
 	} else {

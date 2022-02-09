@@ -71,7 +71,7 @@ func backup(configMap map[string]string) {
 
 	fmt.Println("INFO Performing container backup")
 
-	podName, err := k8s.GetPodName(configMap["Namespace"], configMap["ServiceName"], configMap["AccessWithinCluster"])
+	podName, err := k8s.GetPodName(configMap["Namespace"], configMap["PodSelector"], configMap["AccessWithinCluster"])
 	checkError(err)
 
 	fmt.Println("INFO Performing backup for pod " + podName)
@@ -117,7 +117,7 @@ func restore(configMap map[string]string) {
 
 	fmt.Println("INFO Performing container restore")
 
-	podName, err := k8s.GetPodName(configMap["Namespace"], configMap["ServiceName"], configMap["AccessWithinCluster"])
+	podName, err := k8s.GetPodName(configMap["Namespace"], configMap["PodSelector"], configMap["AccessWithinCluster"])
 	checkError(err)
 
 	fmt.Println("INFO Performing restore for pod " + podName)
@@ -286,7 +286,7 @@ func getEnvParams() map[string]string {
 	configMap["ContainerPlatform"] = os.Getenv("ContainerPlatform")
 	configMap["AccessWithinCluster"] = os.Getenv("AccessWithinCluster")
 	configMap["Namespace"] = os.Getenv("Namespace")
-	configMap["ServiceName"] = os.Getenv("ServiceName")
+	configMap["PodSelector"] = os.Getenv("PodSelector")
 	configMap["CopyCmdPath"] = os.Getenv("CopyCmdPath")
 	configMap["BackupSrcPaths"] = os.Getenv("BackupSrcPaths")
 	configMap["BackupDestPath"] = os.Getenv("BackupDestPath")

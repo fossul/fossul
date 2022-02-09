@@ -42,6 +42,7 @@ var storagePort string = os.Getenv("FOSSUL_STORAGE_CLIENT_PORT")
 var debug string = os.Getenv("FOSSUL_SERVER_DEBUG")
 
 var runningWorkflowMap sync.Map
+var c *CronScheduler
 
 //var runningWorkflowMapMutex = sync.RWMutex{}
 //var runningWorkflowMap map[string]string = make(map[string]string)

@@ -13,6 +13,7 @@ limitations under the License.
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -20,8 +21,6 @@ import (
 	"github.com/fossul/fossul/src/engine/util"
 	"github.com/robfig/cron/v3"
 )
-
-var c *CronScheduler
 
 type CronScheduler struct {
 	cronScheduler *cron.Cron
@@ -37,6 +36,12 @@ func AddCronSchedule(profileName, configName, policy, cronSchedule string) (cron
 	var err error
 
 	auth := SetAuth()
+
+	path := dataDir + "/" + profileName + "/" + configName + "/jobSchedule_" + policy
+	schedule, err := ReadJobSchedule(path)
+	if err == nil {
+		c.cronScheduler.Remove(schedule.CronId)
+	}
 
 	id, err = c.cronScheduler.AddFunc(cronSchedule, func() {
 		client.StartBackupWorkflow(auth, profileName, configName, policy)
@@ -60,6 +65,8 @@ func DeleteCronSchedule(profileName, configName, policy string) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("here 12333")
+	fmt.Println(schedule.CronId)
 	c.cronScheduler.Remove(schedule.CronId)
 
 	err = os.Remove(path)
