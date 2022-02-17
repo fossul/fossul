@@ -19,9 +19,14 @@ import (
 	"github.com/robfig/cron/v3"
 )
 
-type JobScheduleResult struct {
+type JobSchedulesResult struct {
 	JobSchedules []JobSchedule `json:"jobSchedules,omitempty"`
 	Result       Result        `json:"result,omitempty"`
+}
+
+type JobScheduleResult struct {
+	JobSchedule JobSchedule `json:"jobSchedule,omitempty"`
+	Result      Result      `json:"result,omitempty"`
 }
 
 type JobSchedule struct {

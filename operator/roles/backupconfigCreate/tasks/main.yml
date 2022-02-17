@@ -1,5 +1,10 @@
 ---
 # tasks file for BackupConfig
+- name: Set Container Platform 
+  set_fact:
+    container_platform: "openshift"
+  when: container_platform is not defined
+
 - name: Set Default Username
   set_fact:
     username: "admin"
@@ -146,66 +151,172 @@
   when: storage_plugin is not defined  
 
 - name: Get Fossul Secret
-  k8s_info:
-    api_version: v1
-    kind: Secret
-    name: fossul-secret
-    namespace: "{{ fossul_namespace }}"
-  register: secret        
+  block:
+  - name: Get Fossul Secret
+    k8s_info:
+      api_version: v1
+      kind: Secret
+      name: fossul-secret
+      namespace: "{{ fossul_namespace }}"
+    register: secret        
+  - name: Get Fossul Password
+    set_fact:
+      fossul_password: "{{ item.value | b64decode }}" 
+    with_dict: "{{ secret.resources[0].data }}"
+    when: item.key == "fossul-password"
+
+  - name: Fossul Secret Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          fossulSecretStatus: "Fossul secret read successfully"
+
+  rescue:
+  - name: Fossul Secret Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          fossulSecretStatus: "Problem with fossul secret, make sure fossul is installed in fossul namespace or fossul_namespace is set."
 
 - name: Get Mariadb Secret
-  k8s_info:
-    api_version: v1
-    kind: Secret
-    name: "{{ mariadb_secret }}"
-    namespace: "{{ ansible_operator_meta.namespace }}"
-  register: mysql_secret
-  when: (app_plugin is defined) and (app_plugin == "mariadb.so")  
+  block:
+  - name: Get Mariadb Secret
+    k8s_info:
+      api_version: v1
+      kind: Secret
+      name: "{{ mariadb_secret }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+    register: mysql_secret
+    when: (app_plugin is defined) and (app_plugin == "mariadb.so")  
 
-- name: Get Mariadb Database 
-  set_fact:
-    mysql_db: "{{ item.value | b64decode }}" 
-  with_dict: "{{ mysql_secret.resources[0].data }}"
-  when: (app_plugin == "mariadb.so") and (mysql_db is not defined) and (item.key == "database-name")
+  - name: Get Mariadb Database 
+    set_fact:
+      mysql_db: "{{ item.value | b64decode }}" 
+    with_dict: "{{ mysql_secret.resources[0].data }}"
+    when: (app_plugin == "mariadb.so") and (mysql_db is not defined) and (item.key == "database-name")
 
-- name: Get Mariadb Root Password 
-  set_fact:
-    mysql_root_password: "{{ item.value | b64decode }}" 
-  with_dict: "{{ mysql_secret.resources[0].data }}"
-  when: (app_plugin == "mariadb.so") and (mysql_root_password is not defined) and (item.key == "database-root-password")          
+  - name: Get Mariadb Root Password 
+    set_fact:
+      mysql_root_password: "{{ item.value | b64decode }}" 
+    with_dict: "{{ mysql_secret.resources[0].data }}"
+    when: (app_plugin == "mariadb.so") and (mysql_root_password is not defined) and (item.key == "database-root-password")          
 
-- name: Get Postgresql Secret
-  k8s_info:
-    api_version: v1
-    kind: Secret
-    name: "{{ postgresql_secret }}"
-    namespace: "{{ ansible_operator_meta.namespace }}"
-  register: pq_secret
-  when: (app_plugin is defined) and (app_plugin == "postgres.so")        
+  - name: Mariadb Secret Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          mariadbSecretStatus: "Mariadb secret read successfully"    
+    when: (app_plugin == "mariadb.so")
 
-- name: Get Postgresql Database 
-  set_fact:
-    pq_db: "{{ item.value | b64decode }}" 
-  with_dict: "{{ pq_secret.resources[0].data }}"
-  when: (app_plugin == "postgres.so") and (pq_db is not defined) and (item.key == "database-name")
+  rescue:
+  - name: Mariadb Secret Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          mariadbSecretStatus: "Problem with mariadb secret, make sure CRs are created in the right namespaces or provide postgresql_secret parameter. Ensure database-name and root-password are set in secret."
 
-- name: Get Postgresql User 
-  set_fact:
-    pq_user: "{{ item.value | b64decode }}" 
-  with_dict: "{{ pq_secret.resources[0].data }}"
-  when: (app_plugin == "postgres.so") and (pq_user is not defined) and (item.key == "database-user")
+- name: Get PostgreSQL Secret
+  block:
+  - name: Get Postgresql Secret
+    k8s_info:
+      api_version: v1
+      kind: Secret
+      name: "{{ postgresql_secret }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+    register: pq_secret
+    when: (app_plugin is defined) and (app_plugin == "postgres.so")        
 
-- name: Get Postgresql Password 
-  set_fact:
-    pq_password: "{{ item.value | b64decode }}" 
-  with_dict: "{{ pq_secret.resources[0].data }}"
-  when: (app_plugin == "postgres.so") and (pq_password is not defined) and (item.key == "database-password")     
+  - name: Get Postgresql Database 
+    set_fact:
+      pq_db: "{{ item.value | b64decode }}" 
+    with_dict: "{{ pq_secret.resources[0].data }}"
+    when: (app_plugin == "postgres.so") and (pq_db is not defined) and (item.key == "database-name")
 
-- name: Get Fossul Password
-  set_fact:
-    fossul_password: "{{ item.value | b64decode }}" 
-  with_dict: "{{ secret.resources[0].data }}"
-  when: item.key == "fossul-password"
+  - name: Get Postgresql User 
+    set_fact:
+      pq_user: "{{ item.value | b64decode }}" 
+    with_dict: "{{ pq_secret.resources[0].data }}"
+    when: (app_plugin == "postgres.so") and (pq_user is not defined) and (item.key == "database-user")
+
+  - name: Get Postgresql Password 
+    set_fact:
+      pq_password: "{{ item.value | b64decode }}" 
+    with_dict: "{{ pq_secret.resources[0].data }}"
+    when: (app_plugin == "postgres.so") and (pq_password is not defined) and (item.key == "database-password")   
+
+  - name: PostgreSQL Secret Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          postgresqlSecretStatus: "Postgresql secret read successfully"   
+    when: (app_plugin == "postgres.so")  
+
+  rescue:
+  - name: PostgreSQL Secret Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          postgresqlSecretStatus: "Problem with postgressql secret, make sure CRs are created in the right namespaces or provide postgresql_secret parameter. Ensure database-name, database-user and database-password are set in secret."   
+
+- name: Test Fossul API
+  block:
+  - name: Get Fossul Status
+    uri:
+      url: "{{fossul_server_url}}/status"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      method: GET
+      body_format: json    
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: fossul_status
+
+  - name: Update fossul status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          fossulStatus: "[{{ fossul_status.json.msg }}] [{{ fossul_status.json.version }}]"    
+
+  rescue:
+  - name: Update fossul status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          fossulStatus: "Error couldn't reach fossul API, check if fossul is deployed in fossul namespace or set fossul_namespace parameter in spec"    
 
 - name: Create Backup Profile Block
   block:
@@ -264,7 +375,7 @@
                \"appPlugin\": \"{{ app_plugin }}\",
                \"storagePlugin\": \"{{ storage_plugin }}\",
                \"archivePlugin\": \"{{ archive_plugin }}\",
-               \"containerPlatform\": \"openshift\",
+               \"containerPlatform\": \"{{ container_platform }}\",
                \"jobRetention\": {{ job_retention }},
                \"autoDiscovery\": {{ auto_discovery | lower }},
                \"backupRetentions\": {{ policies }},

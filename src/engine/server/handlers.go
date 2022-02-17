@@ -15,6 +15,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/fossul/fossul/src/client"
@@ -192,6 +193,8 @@ func DeleteBackup(w http.ResponseWriter, r *http.Request) {
 	var policyName string = params["policy"]
 	var selectedWorkflowId string = params["workflowId"]
 
+	backupFile := dataDir + "/" + profileName + "/" + configName + "/" + selectedWorkflowId + "/backup"
+
 	var result util.Result
 	var messages []util.Message
 
@@ -225,6 +228,18 @@ func DeleteBackup(w http.ResponseWriter, r *http.Request) {
 
 		return
 	} else {
+
+		err = os.Remove(backupFile)
+		if err != nil {
+			message := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, message)
+
+			result = util.SetResult(1, messages)
+
+			_ = json.NewDecoder(r.Body).Decode(&result)
+			json.NewEncoder(w).Encode(result)
+		}
+
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}

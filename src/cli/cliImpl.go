@@ -61,7 +61,28 @@ func GetDefaultConfig(auth client.Auth) {
 
 func ListSchedules(auth client.Auth) {
 	fmt.Println("### Job Schedules ###")
-	jobScheduleResult, err := client.ListSchedules(auth)
+	jobSchedulesResult, err := client.ListSchedules(auth)
+	if err != nil {
+		fmt.Println("[ERROR] " + err.Error())
+		os.Exit(1)
+	}
+	checkResult(jobSchedulesResult.Result)
+
+	// print friendly columns
+	tw := new(tabwriter.Writer)
+	tw.Init(os.Stdout, 10, 20, 5, ' ', 0)
+	fmt.Fprintln(tw, "CronSchedule\t ProfileName\t ConfigName\t Policy\t")
+	for _, schedule := range jobSchedulesResult.JobSchedules {
+		fmt.Fprintln(tw, schedule.CronSchedule+"\t", schedule.ProfileName+"\t", schedule.ConfigName+"\t", schedule.BackupPolicy+"\t")
+	}
+	tw.Flush()
+
+	os.Exit(0)
+}
+
+func GetSchedule(auth client.Auth, profileName, configName, policyName string) {
+	fmt.Println("### Job Schedule ###")
+	jobScheduleResult, err := client.GetSchedule(auth, profileName, configName, policyName)
 	if err != nil {
 		fmt.Println("[ERROR] " + err.Error())
 		os.Exit(1)
@@ -72,9 +93,8 @@ func ListSchedules(auth client.Auth) {
 	tw := new(tabwriter.Writer)
 	tw.Init(os.Stdout, 10, 20, 5, ' ', 0)
 	fmt.Fprintln(tw, "CronSchedule\t ProfileName\t ConfigName\t Policy\t")
-	for _, schedule := range jobScheduleResult.JobSchedules {
-		fmt.Fprintln(tw, schedule.CronSchedule+"\t", schedule.ProfileName+"\t", schedule.ConfigName+"\t", schedule.BackupPolicy+"\t")
-	}
+	fmt.Fprintln(tw, jobScheduleResult.JobSchedule.CronSchedule+"\t", jobScheduleResult.JobSchedule.ProfileName+"\t", jobScheduleResult.JobSchedule.ConfigName+"\t", jobScheduleResult.JobSchedule.BackupPolicy+"\t")
+
 	tw.Flush()
 
 	os.Exit(0)

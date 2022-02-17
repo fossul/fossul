@@ -34,6 +34,7 @@ metadata:
             "name": "mariadb-sample"
           },
           "spec": {
+            "container_platform": "openshift",
             "auto_discovery": false,
             "deployment_name": "mariadb",
             "deployment_type": "DeploymentConfig",
@@ -77,21 +78,22 @@ metadata:
           },
           "spec": {
             "enable_routes": false,
-            "enable_virtualmachines": false         
+            "enable_virtualmachines": false,
+            "container_platform": "openshift"
           }
         }
       ]
     capabilities: Full Lifecycle
     categories: Storage
     certified: "false"
-    containerImage: quay.io/fossul/fossul-operator:v0.3.0
+    containerImage: quay.io/fossul/fossul-operator:v0.4.0
     support: Community
     repository: https://github.com/fossul/fossul
     description: "Fossul is a application centric container native backup and restore framework for databases or applications"
     createdAt: 2022-01-25T20:09:00Z 
     operators.operatorframework.io/builder: operator-sdk-v1.10.1-ocp
     operators.operatorframework.io/project_layout: ansible.sdk.operatorframework.io/v1
-  name: fossul-operator.v0.3.0
+  name: fossul-operator.v0.4.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -357,7 +359,7 @@ spec:
                 serviceAccountName: fossul-operator
                 containers:
                   - name: fossul-operator
-                    image: quay.io/fossul/fossul-operator:v0.3.0
+                    image: quay.io/fossul/fossul-operator:v0.4.0
                     imagePullPolicy: Always
                     env:
                       - name: WATCH_NAMESPACE
@@ -508,11 +510,11 @@ spec:
   - name: Fossul Framework Community
     url: https://github.com/fossul/fossul
   maturity: alpha
-  replaces: fossul-operator.v0.2.0
+  replaces: fossul-operator.v0.3.0
   maintainers:
   - email: ktenzer@redhat.com
     name: Keith Tenzer
   provider:
     name: Fossul Framework
     url: https://github.com/fossul/fossul
-  version: 0.3.0
+  version: 0.4.0

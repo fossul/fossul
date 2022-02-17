@@ -221,6 +221,12 @@ var routes = Routes{
 		ListSchedules,
 	},
 	Route{
+		"GetSchedule",
+		"GET",
+		"/getSchedule/{profileName}/{configName}/{policy}",
+		GetSchedule,
+	},
+	Route{
 		"DeleteBackup",
 		"GET",
 		"/deleteBackup/{profileName}/{configName}/{policy}/{workflowId}",

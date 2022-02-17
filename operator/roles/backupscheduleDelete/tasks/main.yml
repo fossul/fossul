@@ -49,7 +49,7 @@
       status_code: [200]
       return_content: yes
     register: schedule_delete
-    failed_when: schedule_delete.json.messages[0].level == "ERROR"
+    failed_when: schedule_delete.json.messages[0].level == "ERROR" and not schedule_delete.json.messages[0].message.endswith("no such file or directory")
 
   - name: Update Schedule Status
     operator_sdk.util.k8s_status:

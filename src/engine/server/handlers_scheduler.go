@@ -14,10 +14,11 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/fossul/fossul/src/engine/util"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+
+	"github.com/fossul/fossul/src/engine/util"
+	"github.com/gorilla/mux"
 )
 
 // AddSchedule godoc
@@ -142,7 +143,7 @@ func DeleteSchedule(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string
 // @Router /listSchedules [get]
 func ListSchedules(w http.ResponseWriter, r *http.Request) {
-	var jobScheduleResult util.JobScheduleResult
+	var jobScheduleResult util.JobSchedulesResult
 	var jobSchedules []util.JobSchedule
 	var result util.Result
 	var messages []util.Message
@@ -186,6 +187,54 @@ func ListSchedules(w http.ResponseWriter, r *http.Request) {
 	result.Code = 0
 	jobScheduleResult.Result = result
 	jobScheduleResult.JobSchedules = jobSchedules
+
+	_ = json.NewDecoder(r.Body).Decode(&jobScheduleResult)
+	json.NewEncoder(w).Encode(jobScheduleResult)
+}
+
+// GetSchedules godoc
+// @Description get job schedule
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param policy path string true "policy name"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.JobSchedule
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /getSchedules [get]
+func GetSchedule(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+	var policy string = params["policy"]
+
+	var jobScheduleResult util.JobScheduleResult
+	var result util.Result
+	var messages []util.Message
+
+	jobScheduleFile := dataDir + "/" + profileName + "/" + configName + "/jobSchedule_" + policy
+	jobSchedule, err := ReadJobSchedule(jobScheduleFile)
+	if err != nil {
+		msg := util.SetMessage("ERROR", "Couldn't read schedule! "+err.Error())
+		messages = append(messages, msg)
+
+		result.Code = 1
+		result.Messages = messages
+
+		jobScheduleResult.Result = result
+
+		_ = json.NewDecoder(r.Body).Decode(&jobScheduleResult)
+		json.NewEncoder(w).Encode(jobScheduleResult)
+
+		return
+	}
+
+	result.Code = 0
+	jobScheduleResult.Result = result
+	jobScheduleResult.JobSchedule = jobSchedule
 
 	_ = json.NewDecoder(r.Body).Decode(&jobScheduleResult)
 	json.NewEncoder(w).Encode(jobScheduleResult)

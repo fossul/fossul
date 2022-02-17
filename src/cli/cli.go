@@ -27,7 +27,7 @@ func main() {
 	optPolicy := getopt.StringLong("policy", 'i', "", "Backup policy as defined in config")
 	optAction := getopt.StringLong("action", 'a', "", "backup|restore|backupList|backupDelete|archiveList|listProfiles|listConfigs|listPluginConfigs|"+
 		"addProfile|addConfig|addPluginConfig|deleteProfile|deleteConfig|deleteConfigDir|"+
-		"deletePluginConfig|jobList|"+"addSchedule|deleteSchedule|jobStatus")
+		"deletePluginConfig|jobList|"+"addSchedule|deleteSchedule|getSchedule|jobStatus")
 	optPluginName := getopt.StringLong("plugin", 'l', "", "Name of plugin")
 	optPluginType := getopt.StringLong("plugin-type", 't', "", "Plugin type app|storage|archive")
 	optWorkflowId := getopt.StringLong("workflow-id", 'w', "", "Workflow Id")
@@ -368,6 +368,13 @@ func main() {
 		}
 
 		DeleteSchedule(auth, *optProfile, *optConfig, *optPolicy)
+	} else if *optAction == "getSchedule" {
+		if getopt.IsSet("policy") != true {
+			fmt.Println("[ERROR] missing parameter --policy")
+			os.Exit(1)
+		}
+
+		GetSchedule(auth, *optProfile, *optConfig, *optPolicy)
 	} else {
 		fmt.Println("[ERROR] incorrect parameter", *optAction)
 		os.Exit(1)

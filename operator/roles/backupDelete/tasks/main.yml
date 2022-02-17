@@ -54,7 +54,7 @@
       status_code: [200]
       return_content: yes
     register: backup_delete
-    failed_when: backup_delete.json.messages[0].level == "ERROR"
+    failed_when: backup_delete.json.messages[0].level == "ERROR" and not backup_delete.json.messages[0].message.endswith("no such file or directory")    
 
   - name: Update backup status
     operator_sdk.util.k8s_status:

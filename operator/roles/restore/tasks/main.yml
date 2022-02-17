@@ -26,18 +26,76 @@
   when: cleanup_cr is not defined
 
 - name: Get Fossul Secret
-  k8s_info:
-    api_version: v1
-    kind: Secret
-    name: fossul-secret
-    namespace: "{{ fossul_namespace }}"
-  register: secret     
+  block:
+  - name: Get Fossul Secret
+    k8s_info:
+      api_version: v1
+      kind: Secret
+      name: fossul-secret
+      namespace: "{{ fossul_namespace }}"
+    register: secret       
+  - name: Get Fossul Password
+    set_fact:
+      fossul_password: "{{ item.value | b64decode }}" 
+    with_dict: "{{ secret.resources[0].data }}"
+    when: item.key == "fossul-password"
 
-- name: Get Fossul Password
-  set_fact:
-    fossul_password: "{{ item.value | b64decode }}" 
-  with_dict: "{{ secret.resources[0].data }}"
-  when: item.key == "fossul-password"
+  - name: Fossul Secret Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Restore
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          secretStatus: "Fossul secret read successfully"
+
+  rescue:
+  - name: Fossul Secret Status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Restore
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          secretStatus: "Problem with fossul secret, make sure fossul is installed in fossul namespace or fossul_namespace is set."
+
+- name: Test Fossul API
+  block:
+  - name: Get Fossul Status
+    uri:
+      url: "{{fossul_server_url}}/status"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      method: GET
+      body_format: json    
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: fossul_status
+
+  - name: Update fossul status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Restore
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          fossulStatus: "[{{ fossul_status.json.msg }}] [{{ fossul_status.json.version }}]"    
+
+  rescue:
+  - name: Update fossul status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: Restore
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          fossulStatus: "Error couldn't reach fossul API, check if fossul is deployed in fossul namespace or set fossul_namespace parameter in spec"    
 
 - name: Start Restore Workflow Block
   block:  

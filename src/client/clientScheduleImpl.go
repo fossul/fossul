@@ -89,10 +89,41 @@ func DeleteSchedule(auth Auth, profileName, configName, policy string) (util.Res
 	return result, nil
 }
 
-func ListSchedules(auth Auth) (util.JobScheduleResult, error) {
-	var jobScheduleResult util.JobScheduleResult
+func ListSchedules(auth Auth) (util.JobSchedulesResult, error) {
+	var jobSchedulesResult util.JobSchedulesResult
 
 	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/listSchedules", nil)
+	if err != nil {
+		return jobSchedulesResult, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return jobSchedulesResult, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&jobSchedulesResult); err != nil {
+			return jobSchedulesResult, err
+		}
+	} else {
+		return jobSchedulesResult, errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return jobSchedulesResult, nil
+}
+
+func GetSchedule(auth Auth, profileName, configName, policy string) (util.JobScheduleResult, error) {
+	var jobScheduleResult util.JobScheduleResult
+
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/getSchedule/"+profileName+"/"+configName+"/"+policy, nil)
 	if err != nil {
 		return jobScheduleResult, err
 	}
