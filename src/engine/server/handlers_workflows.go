@@ -153,6 +153,71 @@ func StartBackupWorkflow(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// StartBackupWorkflow godoc
+// @Description Start backup workflow using local config
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param policy path string true "name of backup policy"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.WorkflowResult
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /startBackupWorkflow/{profileName}/{configName}/{policy} [post]
+func StartOperatorBackupWorkflow(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+	var policyName string = params["policy"]
+
+	var workflowResult util.WorkflowResult
+	workflow := &util.Workflow{}
+	workflow.Id = util.GetWorkflowId()
+	workflow.Type = "backup"
+	workflow.Policy = policyName
+	workflow.Status = "RUNNING"
+
+	var timestamp string = time.Now().Format(time.RFC3339)
+	workflow.Timestamp = timestamp
+
+	workflowResult.Id = workflow.Id
+
+	config, err := util.GetConsolidatedConfig(configDir, profileName, configName, policyName)
+	printConfigDebug(config)
+
+	if err != nil {
+		result := util.SetResultMessage(1, "ERROR", "Workflow id ["+util.IntToString(workflow.Id)+"] failed to start. Couldn't read config using profile ["+profileName+"] config ["+configName+"] "+err.Error())
+		workflowResult.Result = result
+		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
+		json.NewEncoder(w).Encode(workflowResult)
+	}
+
+	config.WorkflowId = util.IntToString(workflow.Id)
+	config.WorkflowType = workflow.Type
+	config.WorkflowTimestamp = util.GetTimestamp()
+
+	_, ok := runningWorkflowMap.Load(config.ProfileName + "-" + config.ConfigName)
+	if ok {
+		result := util.SetResultMessage(1, "ERROR", "Workflow id ["+util.IntToString(workflow.Id)+"] failed to start. Another workflow is running under profile ["+config.ProfileName+"] config ["+config.ConfigName+"]")
+		workflowResult.Result = result
+		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
+		json.NewEncoder(w).Encode(workflowResult)
+	} else {
+		runningWorkflowMap.Store(config.ProfileName+"-"+config.ConfigName, config.SelectedBackupPolicy)
+
+		go func() {
+			startOperatorBackupWorkflowImpl(dataDir, config, workflow)
+		}()
+
+		result := util.SetResultMessage(0, "INFO", "Workflow id ["+util.IntToString(workflow.Id)+"] started successfully")
+		workflowResult.Result = result
+		_ = json.NewDecoder(r.Body).Decode(&workflowResult)
+		json.NewEncoder(w).Encode(workflowResult)
+	}
+}
+
 // StartRestoreWorkflowLocalConfig godoc
 // @Description Start restore workflow using local config
 // @Param workflowId body workflowId true int

@@ -156,7 +156,7 @@ func startRestoreWorkflowImpl(dataDir string, config util.Config, workflow *util
 		}
 	}
 
-	commentMsg = "Restore Completed Successfully"
+	commentMsg = "Restore Workflow Completed Successfully"
 	setComment(resultsDir, commentMsg, workflow)
 
 	util.SetWorkflowStatusEnd(workflow)

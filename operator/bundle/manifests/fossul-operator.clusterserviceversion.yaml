@@ -35,6 +35,7 @@ metadata:
           },
           "spec": {
             "container_platform": "openshift",
+            "operator_controlled": true,
             "auto_discovery": false,
             "deployment_name": "mariadb",
             "deployment_type": "DeploymentConfig",
@@ -86,14 +87,14 @@ metadata:
     capabilities: Full Lifecycle
     categories: Storage
     certified: "false"
-    containerImage: quay.io/fossul/fossul-operator:v0.4.0
+    containerImage: quay.io/fossul/fossul-operator:v0.5.0
     support: Community
     repository: https://github.com/fossul/fossul
     description: "Fossul is a application centric container native backup and restore framework for databases or applications"
     createdAt: 2022-01-25T20:09:00Z 
     operators.operatorframework.io/builder: operator-sdk-v1.10.1-ocp
     operators.operatorframework.io/project_layout: ansible.sdk.operatorframework.io/v1
-  name: fossul-operator.v0.4.0
+  name: fossul-operator.v0.5.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -116,12 +117,12 @@ spec:
       version: v1
   description: |
     ## Fossul Framework
-    Application backup and restore framework for container native applications on Kubernetes and OpenShift. Fossul provides application centric backup and recovery enabling integration with the application creating an application consistent backup. Since there are many applications and providers for storage or archive Fossul enables plugins that allow proper integration. Fossul provides plugins for postgresql, mariadb, mysql and mongo as well as plugin to integrate with CSI snapshots. Plugins can be written in any language. The Fossul operator deploys Fossul via the Fossul custom resource and additionally provides BackupConfig, Backup, BackupSchedule and Restore custom resources. Each user can configure and manage their own backups with simple custom resources that can be part of CI/CD or source control. Users can also opt to manage backups through Fossul CLI/API instead of the custom resources.
+    Application backup and restore framework for container native applications on Kubernetes and OpenShift. Fossul provides application centric backup and recovery enabling integration with the application creating an application consistent backup. Since there are many applications and providers for storage or archive Fossul enables plugins that allow proper integration. Fossul provides plugins for postgresql, mariadb, mysql and mongo as well as plugin to integrate with CSI snapshots. Plugins can be written in any language. The Fossul operator deploys Fossul via the Fossul custom resource and additionally provides BackupConfig, Backup, BackupSchedule and Restore custom resources. Each user can configure and manage their own backups with simple custom resources that can be part of CI/CD or source control. Users can also opt to manage backups through Fossul CLI/API instead of the custom resources provided by the operator.
 
     ## Installation
     It is recommended to install the operator into the openshift-operators namespace which is the default location for operators. Once the operator is installed create a new project called ```fossul``` and create the Fossul custom resource under the fossul namespace. This will deploy the Fossul Framework. You can choose another namespace for the Fossul Framework but then also need to provide the optional 'fossul_namespace' parameter with the spec for all the additional custom resources. This is required so the Fossul operator can communicate with Fossul.
 
-    Once Fossul is deployed you can manage backups either through custom resources provided by the operator or the Fossul CLI/API. If using the customer resources, first create a BackupConfig custom resource for every application you want to backup. Once that is done, you can optionally create a backup by simply creating a Backup custom resource. You can also create a BackupSchedule custom resource using cron syntax which will schedule your backup to occur on a regular interval or do so via a Kubernetes job. Finally if a backup has been created you can perform a restore through a custom resource as well, providing the workflow id from the completed backup. If you are creating backups through the custom resource the workflow id will be appended to the spec once the backup completes. If you are using the Fossul CLI/API or the BackupSchedule custom resource to create backups you will need to get the workflow id through the Fossul CLI/API directly as the Fossul scheduler won't create Fossul Backup custom resources.
+    Once Fossul is deployed you can manage backups either through custom resources provided by the operator or the Fossul CLI/API. If using the customer resources, first create a BackupConfig custom resource for every application you want to backup. Once that is done, you can optionally create a backup by simply creating a Backup custom resource. You can also create a BackupSchedule custom resource using cron syntax which will schedule your backup to occur on a regular interval or do so via a Kubernetes job. Finally if a backup has been created you can perform a restore through a custom resource as well, providing the workflow id from the completed backup. If you are creating backups through the custom resource the workflow id will be appended to the spec once the backup completes. If you are using the Fossul CLI/API to create backups you will need to get the workflow id through the Fossul CLI/API directly using the backupList action.
 
     For users of the cli, a cli pod is deployed with credentials and if desired you can create or manage backups from within that pod. To use the API you need the credentials stored in the fossul secret. The cli has already been pre-configured with these credentials. The API can also be optionally exposed via routes and API documentation is under ```/api/v1/index.html```.
 
@@ -155,6 +156,7 @@ spec:
       name: mariadb-sample
       namespace: databases
     spec:
+      operator_controlled: true
       auto_discovery: false
       deployment_name: mariadb
       deployment_type: DeploymentConfig
@@ -359,7 +361,7 @@ spec:
                 serviceAccountName: fossul-operator
                 containers:
                   - name: fossul-operator
-                    image: quay.io/fossul/fossul-operator:v0.4.0
+                    image: quay.io/fossul/fossul-operator:v0.5.0
                     imagePullPolicy: Always
                     env:
                       - name: WATCH_NAMESPACE
@@ -510,11 +512,11 @@ spec:
   - name: Fossul Framework Community
     url: https://github.com/fossul/fossul
   maturity: alpha
-  replaces: fossul-operator.v0.3.0
+  replaces: fossul-operator.v0.4.0
   maintainers:
   - email: ktenzer@redhat.com
     name: Keith Tenzer
   provider:
     name: Fossul Framework
     url: https://github.com/fossul/fossul
-  version: 0.4.0
+  version: 0.5.0

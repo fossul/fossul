@@ -31,6 +31,7 @@ type Config struct {
 	WorkflowType             string             `json:"workflowType,omitempty"`
 	WorkflowTimestamp        int64              `json:"workflowTimestamp,omitempty"`
 	Backup                   Backup             `json:"backup,omitempty"`
+	OperatorControlled       bool               `json:"operatorControlled"`
 	ContainerPlatform        string             `json:"containerPlatform,omitempty"`
 	AccessWithinCluster      string             `json:"accessWithinCluster,omitempty"`
 	AppPlugin                string             `json:"appPlugin"`

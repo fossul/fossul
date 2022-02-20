@@ -56,27 +56,8 @@
     register: backup_delete
     failed_when: backup_delete.json.messages[0].level == "ERROR" and not backup_delete.json.messages[0].message.endswith("no such file or directory")    
 
-  - name: Update backup status
-    operator_sdk.util.k8s_status:
-      api_version: fossul.io/v1
-      kind: Backup
-      name: "{{ ansible_operator_meta.name }}"
-      namespace: "{{ ansible_operator_meta.namespace }}"
-      status:
-        fossulResult: 
-          backupStatus: "[{{ backup_delete.json.messages[0].level }}]  {{ backup_delete.json.messages[0].message }}"    
-
   rescue:
-  - name: print backup delete
+  - name: Delete Backup Failed
     debug:
-      msg: "{{ backup_delete }}"
-
-  - name: Update backup status
-    operator_sdk.util.k8s_status:
-      api_version: fossul.io/v1
-      kind: Backup
-      name: "{{ ansible_operator_meta.name }}"
-      namespace: "{{ ansible_operator_meta.namespace }}"
-      status:
-        fossulResult: 
-          backupStatus: "[{{ backup_delete.json.messages[0].level }}] {{ backup_delete.json.messages[0].message }}"        
+      msg: "Deletion of backup [{{ deployment_name }}] policy [{{ policy }}] failed {{ backup_delete }}"
+  ignore_errors: true   

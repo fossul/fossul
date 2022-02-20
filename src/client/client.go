@@ -290,6 +290,38 @@ func StartBackupWorkflow(auth Auth, profileName, configName, policyName string) 
 
 }
 
+func StartOperatorBackupWorkflow(auth Auth, profileName, configName, policyName string) (util.WorkflowResult, error) {
+	var result util.WorkflowResult
+
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/startOperatorBackupWorkflow/"+profileName+"/"+configName+"/"+policyName, nil)
+	if err != nil {
+		return result, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result, err
+		}
+	} else {
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result, nil
+
+}
+
 func StartRestoreWorkflowLocalConfig(auth Auth, profileName, configName, policyName, selectedWorkflowId string, config util.Config) (util.WorkflowResult, error) {
 	var result util.WorkflowResult
 	config = SetAdditionalConfigParams(profileName, configName, policyName, config)
@@ -435,6 +467,70 @@ func GetJobList(auth Auth, profileName, configName string) (util.Jobs, error) {
 	return jobs, nil
 }
 
+func CreateCustomBackupResource(auth Auth, profileName, configName, policyName, workflowId, timestamp string) (util.Result, error) {
+	var result util.Result
+
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/createBackupCustomResource/"+profileName+"/"+configName+"/"+policyName+"/"+workflowId+"/"+timestamp, nil)
+	if err != nil {
+		return result, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result, err
+		}
+	} else {
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result, nil
+
+}
+
+func DeleteCustomBackupResource(auth Auth, profileName, configName, policyName, crName string) (util.Result, error) {
+	var result util.Result
+
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/deleteCustomBackupResource/"+profileName+"/"+configName+"/"+policyName+"/"+crName, nil)
+	if err != nil {
+		return result, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result, err
+		}
+	} else {
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result, nil
+
+}
+
 func UpdateCustomBackupResource(auth Auth, profileName, configName, policyName, crName, workflowId string) (util.Result, error) {
 	var result util.Result
 
@@ -464,5 +560,35 @@ func UpdateCustomBackupResource(auth Auth, profileName, configName, policyName, 
 	}
 
 	return result, nil
+}
 
+func BackupCustomResourceRetention(auth Auth, profileName, configName, policyName string) (util.Result, error) {
+	var result util.Result
+
+	req, err := http.NewRequest("GET", "http://"+auth.ServerHostname+":"+auth.ServerPort+"/backupCustomResourceRetention/"+profileName+"/"+configName+"/"+policyName, nil)
+	if err != nil {
+		return result, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+	req.SetBasicAuth(auth.Username, auth.Password)
+
+	client := &http.Client{}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return result, err
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode == 200 {
+		if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+			return result, err
+		}
+	} else {
+		return result, errors.New("Http Status Error [" + resp.Status + "]")
+	}
+
+	return result, nil
 }

@@ -46,27 +46,8 @@
     register: config
     failed_when: config.json.messages[0].level == "ERROR" and not config.json.messages[0].message.endswith("no such file or directory") 
 
-  - name: Update backup config status
-    operator_sdk.util.k8s_status:
-      api_version: fossul.io/v1
-      kind: BackupConfig
-      name: "{{ ansible_operator_meta.name }}"
-      namespace: "{{ ansible_operator_meta.namespace }}"
-      status:
-        fossulResult: 
-          backupConfigStatus: "[{{ config.json.messages[0].level }}] {{ config.json.messages[0].message }}"
-
   rescue:
-  - name: print delete config
+  - name: Delete BackupConfig Failed
     debug:
-      msg: "{{ config }}"
-
-  - name: Update backup config status
-    operator_sdk.util.k8s_status:
-      api_version: fossul.io/v1
-      kind: BackupConfig
-      name: "{{ ansible_operator_meta.name }}"
-      namespace: "{{ ansible_operator_meta.namespace }}"
-      status:
-        fossulResult: 
-          backupConfigStatus: "[{{ config.json.messages[0].level }}] {{ config.json.messages[0].message }}"
+      msg: "Deletion of backup config [{{ deployment_name }}] policy [{{ policy }}] failed {{ backup_delete }}"
+  ignore_errors: true   

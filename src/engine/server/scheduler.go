@@ -13,7 +13,6 @@ limitations under the License.
 package main
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -37,15 +36,24 @@ func AddCronSchedule(profileName, configName, policy, cronSchedule string) (cron
 
 	auth := SetAuth()
 
+	config, err := util.GetConsolidatedConfig(configDir, profileName, configName, policy)
+	printConfigDebug(config)
+
 	path := dataDir + "/" + profileName + "/" + configName + "/jobSchedule_" + policy
 	schedule, err := ReadJobSchedule(path)
 	if err == nil {
 		c.cronScheduler.Remove(schedule.CronId)
 	}
 
-	id, err = c.cronScheduler.AddFunc(cronSchedule, func() {
-		client.StartBackupWorkflow(auth, profileName, configName, policy)
-	})
+	if config.OperatorControlled {
+		id, err = c.cronScheduler.AddFunc(cronSchedule, func() {
+			client.StartOperatorBackupWorkflow(auth, profileName, configName, policy)
+		})
+	} else {
+		id, err = c.cronScheduler.AddFunc(cronSchedule, func() {
+			client.StartBackupWorkflow(auth, profileName, configName, policy)
+		})
+	}
 
 	if err != nil {
 		return id, err
@@ -65,8 +73,7 @@ func DeleteCronSchedule(profileName, configName, policy string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("here 12333")
-	fmt.Println(schedule.CronId)
+
 	c.cronScheduler.Remove(schedule.CronId)
 
 	err = os.Remove(path)

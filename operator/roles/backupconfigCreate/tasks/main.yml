@@ -5,6 +5,11 @@
     container_platform: "openshift"
   when: container_platform is not defined
 
+- name: Set Operator Controlled
+  set_fact:
+    operator_controlled: "false"
+  when: operator_controlled is not defined
+
 - name: Set Default Username
   set_fact:
     username: "admin"
@@ -372,6 +377,7 @@
       password: "{{fossul_password}}"
       method: POST
       body: "{ \"accessWithinCluster\": \"true\",
+               \"operatorControlled\": {{ operator_controlled | lower }},      
                \"appPlugin\": \"{{ app_plugin }}\",
                \"storagePlugin\": \"{{ storage_plugin }}\",
                \"archivePlugin\": \"{{ archive_plugin }}\",
@@ -379,13 +385,13 @@
                \"jobRetention\": {{ job_retention }},
                \"autoDiscovery\": {{ auto_discovery | lower }},
                \"backupRetentions\": {{ policies }},
-               \"PreAppQuiesceCmd\": \"{{ pre_app_quiesce_cmd }}\",
-               \"AppQuiesceCmd\": \"{{ app_quiesce_cmd }}\",
-               \"PostAppQuiesceCmd\": \"{{ post_app_quiesce_cmd }}\",
-               \"BackupCreateCmd\": \"{{ backup_create_cmd }}\",
-               \"PreAppUnQuiesceCmd\": \"{{ pre_app_unquiesce_cmd }}\",
-               \"AppUnQuiesceCmd\": \"{{ app_unquiesce_cmd }}\",
-               \"PostAppUnQuiesceCmd\": \"{{ post_app_unquiesce_cmd }}\",
+               \"preAppQuiesceCmd\": \"{{ pre_app_quiesce_cmd }}\",
+               \"appQuiesceCmd\": \"{{ app_quiesce_cmd }}\",
+               \"postAppQuiesceCmd\": \"{{ post_app_quiesce_cmd }}\",
+               \"backupCreateCmd\": \"{{ backup_create_cmd }}\",
+               \"preAppUnQuiesceCmd\": \"{{ pre_app_unquiesce_cmd }}\",
+               \"appUnQuiesceCmd\": \"{{ app_unquiesce_cmd }}\",
+               \"postAppUnQuiesceCmd\": \"{{ post_app_unquiesce_cmd }}\",
        }"
       body_format: json    
       force_basic_auth: yes

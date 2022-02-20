@@ -355,7 +355,9 @@
                     name: fossul-secret
               - name: FOSSUL_USER
                 value: "{{username}}"
-              image: quay.io/fossul/fossul-server:v0.4.0
+              - name: FOSSUL_NAMESPACE
+                value: "{{ ansible_operator_meta.namespace }}"                
+              image: quay.io/fossul/fossul-server:v0.5.0
               imagePullPolicy: Always
               name: fossul-server  
               readinessProbe:
@@ -468,7 +470,9 @@
                     name: fossul-secret
               - name: FOSSUL_USER
                 value: "{{username}}"
-              image: quay.io/fossul/fossul-app:v0.4.0
+              - name: FOSSUL_NAMESPACE
+                value: "{{ ansible_operator_meta.namespace }}"                   
+              image: quay.io/fossul/fossul-app:v0.5.0
               imagePullPolicy: Always
               name: fossul-app
               readinessProbe:
@@ -587,7 +591,9 @@
                     name: fossul-secret
               - name: FOSSUL_USER
                 value: "{{username}}}"
-              image: quay.io/fossul/fossul-storage:v0.4.0
+              - name: FOSSUL_NAMESPACE
+                value: "{{ ansible_operator_meta.namespace }}"                   
+              image: quay.io/fossul/fossul-storage:v0.5.0
               imagePullPolicy: Always
               name: fossul-storage
               readinessProbe:
@@ -699,7 +705,9 @@
                     name: fossul-secret
               - name: FOSSUL_USER
                 value: "{{username}}"
-              image: quay.io/fossul/fossul-cli:v0.4.0
+              - name: FOSSUL_NAMESPACE
+                value: "{{ ansible_operator_meta.namespace }}"                   
+              image: quay.io/fossul/fossul-cli:v0.5.0
               imagePullPolicy: Always
               name: fossul-cli  
             securityContext:

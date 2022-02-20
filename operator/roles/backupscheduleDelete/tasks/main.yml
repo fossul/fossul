@@ -51,27 +51,10 @@
     register: schedule_delete
     failed_when: schedule_delete.json.messages[0].level == "ERROR" and not schedule_delete.json.messages[0].message.endswith("no such file or directory")
 
-  - name: Update Schedule Status
-    operator_sdk.util.k8s_status:
-      api_version: fossul.io/v1
-      kind: BackupSchedule
-      name: "{{ ansible_operator_meta.name }}"
-      namespace: "{{ ansible_operator_meta.namespace }}"
-      status:
-        fossulResult: 
-          scheduleStatus: "[{{ schedule_delete.json.messages[0].level }}] {{ schedule_delete.json.messages[0].message }}" 
+
 
   rescue:
-  - name: print schedule delete
+  - name: Delete BackupSchedule Failed
     debug:
-      msg: "{{ schedule_delete }}"
-
-  - name: Update Schedule Status
-    operator_sdk.util.k8s_status:
-      api_version: fossul.io/v1
-      kind: BackupSchedule
-      name: "{{ ansible_operator_meta.name }}"
-      namespace: "{{ ansible_operator_meta.namespace }}"
-      status:
-        fossulResult: 
-          scheduleStatus: "[{{ schedule_delete.json.messages[0].level }}] {{ schedule_delete.json.messages[0].message }}"          
+      msg: "Deletion of backup schedule [{{ deployment_name }}] policy [{{ policy }}] failed {{ backup_delete }}"
+  ignore_errors: true      

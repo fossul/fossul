@@ -71,6 +71,12 @@ var routes = Routes{
 		StartBackupWorkflow,
 	},
 	Route{
+		"StartOperatorBackupWorkflow",
+		"GET",
+		"/startOperatorBackupWorkflow/{profileName}/{configName}/{policy}",
+		StartOperatorBackupWorkflow,
+	},
+	Route{
 		"StartRestoreWorkflowLocalConfig",
 		"GET",
 		"/startRestoreWorkflowLocalConfig/{workflowId}",
@@ -233,10 +239,28 @@ var routes = Routes{
 		DeleteBackup,
 	},
 	Route{
+		"CreateBackupCustomResource",
+		"GET",
+		"/createBackupCustomResource/{profileName}/{configName}/{policy}/{workflowId}/{timestamp}",
+		CreateBackupCustomResource,
+	},
+	Route{
+		"DeleteBackupCustomResource",
+		"GET",
+		"/deleteBackupCustomResource/{profileName}/{configName}/{policy}/{crName}",
+		DeleteBackupCustomResource,
+	},
+	Route{
 		"UpdateBackupCustomResource",
 		"GET",
 		"/updateBackupCustomResource/{profileName}/{configName}/{policy}/{crName}/{op}/{specKey}/{specValue}",
 		UpdateBackupCustomResource,
+	},
+	Route{
+		"BackupCustomResourceRetention",
+		"GET",
+		"/backupCustomResourceRetention/{profileName}/{configName}/{policy}",
+		BackupCustomResourceRetention,
 	},
 	Route{
 		"GetBackup",

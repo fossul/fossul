@@ -18,9 +18,12 @@ import (
 	"os"
 	"strings"
 
+	"fmt"
+
 	"github.com/fossul/fossul/src/client"
 	"github.com/fossul/fossul/src/client/k8s"
 	"github.com/fossul/fossul/src/engine/util"
+	"github.com/fossul/fossul/src/plugins/pluginUtil"
 	"github.com/gorilla/mux"
 )
 
@@ -369,4 +372,204 @@ func UpdateBackupCustomResource(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewDecoder(r.Body).Decode(&result)
 		json.NewEncoder(w).Encode(result)
 	}
+}
+
+// CreateBackupCustomResource godoc
+// @Description Update custom backup resource
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param policy path string true "name of backup policy"
+// @Param workflowId path string true "workflow id"
+// @Param timestamp path string true "timestamp of custom resource creation"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /createBackupCustomResource/{profileName}/{configName}/{policy}/{workflowId}/{timestamp} [get]
+func CreateBackupCustomResource(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+	var policyName string = params["policy"]
+	var workflowId string = params["workflowId"]
+	var timestamp string = params["timestamp"]
+
+	var result util.Result
+	var messages []util.Message
+
+	config, err := util.GetConsolidatedConfig(configDir, profileName, configName, policyName)
+	printConfigDebug(config)
+
+	backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, workflowId, timestamp)
+
+	msg := util.SetMessage("INFO", "Creating backup custom resource ["+backupName+"]")
+	messages = append(messages, msg)
+
+	err = k8s.CreateBackupCustomResource(config.AccessWithinCluster, profileName, backupName, profileName, configName, policyName)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+
+		return
+	} else {
+		msg := util.SetMessage("INFO", "Creating backup custom resource ["+backupName+"] completed successfully")
+		messages = append(messages, msg)
+
+		result = util.SetResult(0, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
+}
+
+// DeleteBackupCustomResource godoc
+// @Description Update custom backup resource
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param policy path string true "name of backup policy"
+// @Param crName path string true "name of custom resource"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /deleteBackupCustomResource/{profileName}/{configName}/{policy}/{crName} [get]
+func DeleteBackupCustomResource(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+	var policyName string = params["policy"]
+	var crName string = params["crName"]
+
+	var result util.Result
+	var messages []util.Message
+
+	config, err := util.GetConsolidatedConfig(configDir, profileName, configName, policyName)
+	printConfigDebug(config)
+
+	msg := util.SetMessage("INFO", "Deleting backup custom resource ["+crName+"]")
+	messages = append(messages, msg)
+
+	err = k8s.DeleteBackupCustomResource(config.AccessWithinCluster, profileName, crName)
+
+	if err != nil {
+		message := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, message)
+
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+
+		return
+	} else {
+		msg := util.SetMessage("INFO", "Deleting backup custom resource ["+crName+"] completed successfully")
+		messages = append(messages, msg)
+
+		result = util.SetResult(0, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+	}
+}
+
+// BackupCustomResourceRetention godoc
+// @Description Update custom backup resource
+// @Param profileName path string true "name of profile"
+// @Param configName path string true "name of config"
+// @Param policy path string true "name of backup policy"
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} util.Result
+// @Header 200 {string} string
+// @Failure 400 {string} string
+// @Failure 404 {string} string
+// @Failure 500 {string} string
+// @Router /deleteBackupCustomResource/{profileName}/{configName}/{policy} [get]
+func BackupCustomResourceRetention(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	var profileName string = params["profileName"]
+	var configName string = params["configName"]
+	var policyName string = params["policy"]
+
+	var result util.Result
+	var messages []util.Message
+
+	config, err := util.GetConsolidatedConfig(configDir, profileName, configName, policyName)
+	printConfigDebug(config)
+
+	var backupList []string
+	backupCustomResourceList, err := k8s.ListBackupCustomResources(config.AccessWithinCluster, profileName)
+	for _, backupCustomResource := range backupCustomResourceList.Items {
+		backupCustomResourceName := backupCustomResource.GetName()
+
+		backupList = append(backupList, backupCustomResourceName)
+	}
+
+	backups, err := pluginUtil.ListCustomResourceBackups(backupList, config.StoragePluginParameters["BackupName"])
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+		result = util.SetResult(1, messages)
+
+		_ = json.NewDecoder(r.Body).Decode(&result)
+		json.NewEncoder(w).Encode(result)
+
+		return
+	}
+
+	backupsByPolicy := util.GetBackupsByPolicy(config.SelectedBackupPolicy, backups)
+	backupCount := len(backupsByPolicy)
+
+	if backupCount > config.SelectedBackupRetention {
+		count := 1
+		for backup := range pluginUtil.ReverseBackupList(backupsByPolicy) {
+			if count > config.SelectedBackupRetention {
+				msg := util.SetMessage("INFO", fmt.Sprintf("Number of backups [%d] greater than backup retention [%d]", backupCount, config.SelectedBackupRetention))
+				messages = append(messages, msg)
+				backupCount = backupCount - 1
+
+				for _, content := range backup.Contents {
+					backupName := content.Data
+					msg = util.SetMessage("INFO", "Deleting backup "+backupName)
+					messages = append(messages, msg)
+
+					err := k8s.DeleteBackupCustomResource(config.AccessWithinCluster, config.ProfileName, backupName)
+					if err != nil {
+						msg := util.SetMessage("ERROR", err.Error())
+						messages = append(messages, msg)
+						result = util.SetResult(1, messages)
+
+						_ = json.NewDecoder(r.Body).Decode(&result)
+						json.NewEncoder(w).Encode(result)
+
+						return
+					}
+
+					msg = util.SetMessage("INFO", "Backup "+backupName+" deleted successfully")
+					messages = append(messages, msg)
+				}
+			}
+			count = count + 1
+		}
+	} else {
+		msg := util.SetMessage("INFO", fmt.Sprintf("Backup deletion skipped, there are [%d] backups but backup retention is [%d]", backupCount, config.SelectedBackupRetention))
+		messages = append(messages, msg)
+	}
+
+	result = util.SetResult(0, messages)
+
+	_ = json.NewDecoder(r.Body).Decode(&result)
+	json.NewEncoder(w).Encode(result)
 }

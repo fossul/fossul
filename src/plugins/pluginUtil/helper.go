@@ -145,6 +145,65 @@ func ListSnapshots(snapshots []string, backupName string) ([]util.Backup, error)
 	return backups, nil
 }
 
+func ListCustomResourceBackups(customResourceBackups []string, backupName string) ([]util.Backup, error) {
+
+	var backups []util.Backup
+	var contents []util.Content
+	var content util.Content
+	type timeSlice []util.Backup
+
+	re := regexp.MustCompile(`(\S+)-(\S+)-(\d+)-(\d+)`)
+	backupsCountMap := make(map[int]util.Backup)
+	for _, customResource := range customResourceBackups {
+		var backup util.Backup
+		match := re.FindStringSubmatch(customResource)
+
+		if len(match) != 0 {
+			backup.Name = match[1]
+			if backup.Name != backupName {
+				continue
+			}
+
+			backup.Policy = match[2]
+			backup.WorkflowId = match[3]
+
+			epoch := util.StringToInt(match[4])
+			backup.Epoch = epoch
+
+			timestamp := util.ConvertEpoch(match[4])
+			backup.Timestamp = timestamp
+
+			content.Source = "customResource"
+			content.Data = customResource
+			content.Type = "customResource"
+
+			contents = append(contents, content)
+			backup.Contents = contents
+
+			backupsCountMap[epoch] = backup
+		}
+
+	}
+
+	for k, _ := range backupsCountMap {
+		var sortedContents []util.Content
+		backup := backupsCountMap[k]
+		backupName := backup.Name + "-" + backup.Policy + "-" + backup.WorkflowId + "-" + util.IntToString(backup.Epoch)
+		for _, content = range backup.Contents {
+			if strings.Contains(content.Data, backupName) {
+				fmt.Println("match " + backup.Name)
+				sortedContents = append(sortedContents, content)
+			}
+		}
+		backup.Contents = sortedContents
+		backups = append(backups, backup)
+	}
+
+	sort.Sort(util.ByEpochBackup(backups))
+
+	return backups, nil
+}
+
 func ListArchives(dirs []string) ([]util.Archive, error) {
 
 	var archives []util.Archive

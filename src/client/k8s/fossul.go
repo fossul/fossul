@@ -17,6 +17,7 @@ import (
 	"context"
 
 	"encoding/json"
+	"os"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -24,11 +25,14 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 )
 
-func CreateBackupCustomResource(accessWithinCluster, namespace, fossulNamespace, crName, profileName, configName, policyName string) error {
+func CreateBackupCustomResource(accessWithinCluster, namespace, crName, profileName, configName, policyName string) error {
 	client, err := getDynamicClient(accessWithinCluster)
 	if err != nil {
 		return err
 	}
+
+	// need to figure out how to get current namespace dynamically
+	fossulNamespace := os.Getenv("FOSSUL_NAMESPACE")
 
 	var backupCustomResourceGroup = schema.GroupVersionResource{Group: "fossul.io", Version: "v1", Resource: "backups"}
 
@@ -41,13 +45,29 @@ func CreateBackupCustomResource(accessWithinCluster, namespace, fossulNamespace,
 			"namespace": namespace,
 		},
 		"spec": map[string]interface{}{
-			"deployment_name":  profileName,
+			"deployment_name":  configName,
 			"policy":           policyName,
 			"fossul_namespace": fossulNamespace,
 		},
 	})
 
 	_, err = client.Resource(backupCustomResourceGroup).Namespace(namespace).Create(context.Background(), backupCustomResource, metav1.CreateOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func DeleteBackupCustomResource(accessWithinCluster, namespace, crName string) error {
+	client, err := getDynamicClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	var backupCustomResourceGroup = schema.GroupVersionResource{Group: "fossul.io", Version: "v1", Resource: "backups"}
+
+	err = client.Resource(backupCustomResourceGroup).Namespace(namespace).Delete(context.Background(), crName, metav1.DeleteOptions{})
 	if err != nil {
 		return err
 	}
