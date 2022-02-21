@@ -13,62 +13,11 @@ limitations under the License.
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/fossul/fossul/src/client"
 	"github.com/fossul/fossul/src/engine/util"
 )
-
-func startOperatorBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.Workflow) int {
-	auth := SetAuth()
-	resultsDir := dataDir + "/" + config.ProfileName + "/" + config.ConfigName + "/" + util.IntToString(workflow.Id)
-	policy := config.SelectedBackupPolicy
-	var isQuiesce bool = false
-	var isMount bool = false
-
-	commentMsg := "Performing Backup"
-	setComment(resultsDir, commentMsg, workflow)
-	step := stepInit(resultsDir, workflow)
-	timestampToString := fmt.Sprintf("%d", config.WorkflowTimestamp)
-	result, err := client.CreateCustomBackupResource(auth, config.ProfileName, config.ConfigName, policy, config.WorkflowId, timestampToString)
-	workflow = setLastMessage(result, workflow)
-	if err != nil {
-		fmt.Println("here1", err.Error())
-		HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
-		return 1
-	}
-	fmt.Println("here2")
-	if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
-		return resultCode
-	}
-	fmt.Println("here3")
-
-	commentMsg = "Performing Backup Retention"
-	setComment(resultsDir, commentMsg, workflow)
-	step = stepInit(resultsDir, workflow)
-	result, err = client.BackupCustomResourceRetention(auth, config.ProfileName, config.ConfigName, policy)
-	workflow = setLastMessage(result, workflow)
-
-	if err != nil {
-		HttpErrorHandlerBackup(err, isQuiesce, isMount, resultsDir, policy, step, workflow, result, config)
-		return 1
-	}
-	if resultCode := StepErrorHandlerBackup(isQuiesce, isMount, resultsDir, policy, step, workflow, result, config); resultCode != 0 {
-		return resultCode
-	}
-
-	commentMsg = "Backup Workflow Completed Successfully"
-	setComment(resultsDir, commentMsg, workflow)
-
-	util.SetWorkflowStatusEnd(workflow)
-	util.SerializeWorkflow(resultsDir, workflow)
-
-	//remove workflow lock
-	runningWorkflowMap.Delete(config.ProfileName + "-" + config.ConfigName)
-
-	return 0
-}
 
 func startBackupWorkflowImpl(dataDir string, config util.Config, workflow *util.Workflow) int {
 	auth := SetAuth()

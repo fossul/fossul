@@ -31,7 +31,6 @@ func CreateBackupCustomResource(accessWithinCluster, namespace, crName, profileN
 		return err
 	}
 
-	// need to figure out how to get current namespace dynamically
 	fossulNamespace := os.Getenv("FOSSUL_NAMESPACE")
 
 	var backupCustomResourceGroup = schema.GroupVersionResource{Group: "fossul.io", Version: "v1", Resource: "backups"}

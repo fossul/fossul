@@ -102,18 +102,23 @@ spec:
     owned:
     - kind: BackupConfig
       name: backupconfigs.fossul.io
+      description: Manages application backup configurations
       version: v1
     - kind: Backup
       name: backups.fossul.io
+      description: Manages application backups      
       version: v1
     - kind: Restore
       name: restores.fossul.io
+      description: Manages application restores      
       version: v1      
     - kind: BackupSchedule
       name: backupschedules.fossul.io
+      description: Manages application backup scheduling      
       version: v1
     - kind: Fossul
       name: fossuls.fossul.io
+      description: Manages deployment of the Fossul Framework   
       version: v1
   description: |
     ## Fossul Framework
@@ -127,7 +132,7 @@ spec:
     For users of the cli, a cli pod is deployed with credentials and if desired you can create or manage backups from within that pod. To use the API you need the credentials stored in the fossul secret. The cli has already been pre-configured with these credentials. The API can also be optionally exposed via routes and API documentation is under ```/api/v1/index.html```.
 
     ## Quick Setup
-    When creating Fossul custom resources generally you will only need to update the deployment_name, deployment_type (DeploymentConfig, Deployment or VirtualMachine) and namespace. All custom resources must be created in the namespace where the database or application exists. 
+    When creating Fossul custom resources generally you will only need to update the ```deployment_name``` and ```deployment_type``` (DeploymentConfig, Deployment or VirtualMachine). All custom resources must be created in the namespace where the database or application exists. 
 
     ### Deploy Fossul in fossul namespace
     ```$ oc new-project fossul```
