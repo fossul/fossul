@@ -47,7 +47,6 @@ func GetPodContainer(podName, namespace, accessWithinCluster string) (string, er
 	}
 
 	pod, err = client.CoreV1().Pods(namespace).Get(context.Background(), podName, metav1.GetOptions{})
-	fmt.Println("here " + pod.Name)
 	if pod.Spec.Containers != nil {
 		if len(pod.Spec.Containers) > 1 {
 			return "", errors.New("Pod [" + pod.Name + "] has more than one containers please specify ContainerName parameter in storage plugin config")

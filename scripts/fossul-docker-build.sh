@@ -1,12 +1,15 @@
 #!/bin/bash
 # Needs to be run from fossul root directory
 
-RELEASE="v0.5.0"
+RELEASE="v0.6.0"
 SERVER_IMAGE="fossul-server"
 APP_IMAGE="fossul-app"
 STORAGE_IMAGE="fossul-storage"
 CLI_IMAGE="fossul-cli"
 REPO="fossul"
+KUBECTL="/usr/local/bin/kubectl"
+
+cp $KUBECTL .
 
 if [[ -z "${BUILD_ARGS}" ]]; then
 	export BUILD_ARGS="all"
@@ -134,3 +137,5 @@ case $BUILD_ARGS in
     exit 1
     ;;
 esac
+
+rm kubectl

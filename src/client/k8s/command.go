@@ -18,6 +18,9 @@ import (
 	"regexp"
 	"strings"
 
+	"io"
+	"os"
+
 	"github.com/fossul/fossul/src/engine/util"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
@@ -232,4 +235,34 @@ func IsRemoteCommand(arg string) bool {
 	} else {
 		return false
 	}
+}
+
+func ExecuteTarCommand(outStream *io.PipeWriter, exec remotecommand.Executor) {
+	//tarResult := make(chan util.Result)
+
+	go func() {
+		defer outStream.Close()
+		//var result util.Result
+		//var messages []util.Message
+
+		err := exec.Stream(remotecommand.StreamOptions{
+			Stdin:  os.Stdin,
+			Stdout: outStream,
+			Stderr: os.Stderr,
+			Tty:    false,
+		})
+
+		if err != nil {
+			fmt.Println("ERROR", "Could not execute command: "+err.Error())
+			//message := util.SetMessage("ERROR", "The tar command failed: "+err.Error())
+			//messages = append(messages, message)
+
+			//result = util.SetResult(1, messages)
+		}
+
+		//tarResult <- result
+		//close(tarResult)
+	}()
+
+	//return tarResult
 }

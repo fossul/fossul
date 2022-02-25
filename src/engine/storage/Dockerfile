@@ -26,6 +26,7 @@ WORKDIR /opt/app-root
 COPY --from=0 /opt/app-root/src/storage ./
 COPY --from=0 /opt/app-root/src/fossul-storage-startup.sh ./
 COPY --from=0 /opt/app-root/src/plugins ./plugins
+COPY kubectl ./
 RUN chown -R 1001:0 /opt/app-root
 
 USER 1001

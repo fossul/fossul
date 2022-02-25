@@ -68,6 +68,8 @@ go build -buildmode=plugin -o $PLUGIN_DIR/storage/csi-ceph.so github.com/fossul/
 if [ $? != 0 ]; then exit 1; fi
 go build -buildmode=plugin -o $PLUGIN_DIR/storage/csi.so github.com/fossul/fossul/src/plugins/storage/native/csi
 if [ $? != 0 ]; then exit 1; fi
+go build -buildmode=plugin -o $PLUGIN_DIR/storage/tar.so github.com/fossul/fossul/src/plugins/storage/native/tar
+if [ $? != 0 ]; then exit 1; fi
 
 echo "Building Services"
 go install github.com/fossul/fossul/src/engine/server
