@@ -170,7 +170,7 @@ func GetTarCleanupCommand(namespace, podName, kubeCmd, tarFile string) []string 
 func GetKubeCmd(kubeCmd string) string {
 
 	if kubeCmd == "" {
-		kubeCmd = "kubectl"
+		kubeCmd = "./kubectl"
 	}
 
 	return kubeCmd

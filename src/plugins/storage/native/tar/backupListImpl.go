@@ -19,7 +19,7 @@ func (s storagePlugin) BackupList(config util.Config) util.Backups {
 	var result util.Result
 	var messages []util.Message
 
-	backupPath := "metadata/backups/" + config.ProfileName + "/" + config.ConfigName
+	backupPath := "data/backups/" + config.ProfileName + "/" + config.ConfigName
 	backupList, err := ListBackups(backupPath)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())

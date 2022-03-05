@@ -80,6 +80,11 @@
     restore_to_new_pvc: "false"
   when: restore_to_new_pvc is not defined      
 
+- name: Set Fossul backup source paths
+  set_fact:
+    backup_source_paths: ""
+  when: backup_source_paths is not defined   
+
 - name: Set Fossul App Quiesce Command
   set_fact:
     app_quiesce_cmd: ""
@@ -595,9 +600,9 @@
           appConfigStatus: "[{{ postgresql_config.json.messages[0].level }}] {{ postgresql_config.json.messages[0].message }}"
     when: (app_plugin is defined) and (app_plugin == "postgres.so")    
 
-- name: Create Storage Plugin Config Block
+- name: Create CSI Storage Plugin Config Block
   block:    
-  - name: Create Storage Plugin Config
+  - name: Create CSI Storage Plugin Config
     uri:
       url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ storage_plugin }}"
       headers:
@@ -621,9 +626,9 @@
       force_basic_auth: yes
       status_code: [200]
       return_content: yes
-    register: csi_config
+    register: csi_storage_config
     when: (storage_plugin is defined) and (storage_plugin == "csi.so")
-    failed_when: csi_config.json.messages[0].level == "ERROR"
+    failed_when: csi_storage_config.json.messages[0].level == "ERROR"
 
   - name: Update storage config status
     operator_sdk.util.k8s_status:
@@ -633,14 +638,14 @@
       namespace: "{{ ansible_operator_meta.namespace }}"
       status:
         fossulResult: 
-          storageConfigStatus: "[{{ csi_config.json.messages[0].level }}] {{ csi_config.json.messages[0].message }}"
-    when: (storage_plugin is defined) and (storage_plugin == "csi.so")  
+          storageConfigStatus: "[{{ csi_storage_config.json.messages[0].level }}] {{ csi_storage_config.json.messages[0].message }}"
+    when: (storage_plugin is defined) and (storage_plugin == "csi.so")
 
   rescue:
   - name: print storage config
     debug:
-      msg: "{{ csi_config }}" 
-    when: (storage_plugin is defined) and (storage_plugin == "csi.so")  
+      msg: "{{ csi_storage_config }}" 
+    when: (storage_plugin is defined) and (storage_plugin == "csi.so")
 
   - name: Update storage config status
     operator_sdk.util.k8s_status:
@@ -650,6 +655,59 @@
       namespace: "{{ ansible_operator_meta.namespace }}"
       status:
         fossulResult: 
-          storageConfigStatus: "[{{ csi_config.json.messages[0].level }}] {{ csi_config.json.messages[0].message }}"
-    when: (storage_plugin is defined) and (storage_plugin == "csi.so")  
+          storageConfigStatus: "[{{ csi_storage_config.json.messages[0].level }}] {{ csi_storage_config.json.messages[0].message }}"
+    when: (storage_plugin is defined) and (storage_plugin == "csi.so")
+
+- name: Create Tar Storage Plugin Config Block
+  block:    
+  - name: Create Tar Storage Plugin Config
+    uri:
+      url: "{{fossul_server_url}}/addPluginConfig/{{ ansible_operator_meta.namespace }}/{{ deployment_name }}/{{ storage_plugin }}"
+      headers:
+        Content-Type: application/json
+        Accept: application/json    
+      user: "{{username}}"
+      password: "{{fossul_password}}"
+      method: POST
+      body: "{ \"Namespace\": \"{{ ansible_operator_meta.namespace }}\",
+               \"BackupName\": \"{{ deployment_name }}\",
+               \"PodSelector\": \"{{ pod_selector }}\",
+               \"BackupSrcPaths\": \"{{ backup_source_paths }}\",             
+       }"
+
+      body_format: json    
+      force_basic_auth: yes
+      status_code: [200]
+      return_content: yes
+    register: tar_storage_config
+    when: (storage_plugin is defined) and (storage_plugin == "tar.so")
+    failed_when: tar_storage_config.json.messages[0].level == "ERROR"
+
+  - name: Update storage config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          storageConfigStatus: "[{{ tar_storage_config.json.messages[0].level }}] {{ tar_storage_config.json.messages[0].message }}"
+    when: (storage_plugin is defined) and (storage_plugin == "tar.so")
+
+  rescue:
+  - name: print storage config
+    debug:
+      msg: "{{ tar_storage_config }}" 
+    when: (storage_plugin is defined) and (storage_plugin == "tar.so")
+
+  - name: Update storage config status
+    operator_sdk.util.k8s_status:
+      api_version: fossul.io/v1
+      kind: BackupConfig
+      name: "{{ ansible_operator_meta.name }}"
+      namespace: "{{ ansible_operator_meta.namespace }}"
+      status:
+        fossulResult: 
+          storageConfigStatus: "[{{ tar_storage_config.json.messages[0].level }}] {{ tar_storage_config.json.messages[0].message }}"
+    when: (storage_plugin is defined) and (storage_plugin == "tar.so")  
  

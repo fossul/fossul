@@ -87,14 +87,14 @@ metadata:
     capabilities: Full Lifecycle
     categories: Storage
     certified: "false"
-    containerImage: quay.io/fossul/fossul-operator:v0.5.0
+    containerImage: quay.io/fossul/fossul-operator:v0.6.0
     support: Community
     repository: https://github.com/fossul/fossul
     description: "Fossul is a application centric container native backup and restore framework for databases or applications"
     createdAt: 2022-01-25T20:09:00Z 
     operators.operatorframework.io/builder: operator-sdk-v1.10.1-ocp
     operators.operatorframework.io/project_layout: ansible.sdk.operatorframework.io/v1
-  name: fossul-operator.v0.5.0
+  name: fossul-operator.v0.6.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -161,6 +161,7 @@ spec:
       name: mariadb-sample
       namespace: databases
     spec:
+      container_platform: openshift
       operator_controlled: true
       auto_discovery: false
       deployment_name: mariadb
@@ -191,6 +192,8 @@ spec:
       name: postgresql-sample
       namespace: databases
     spec:
+      container_platform: openshift
+      operator_controlled: true    
       auto_discovery: false
       deployment_name: postgresql 
       deployment_type: DeploymentConfig
@@ -220,6 +223,8 @@ spec:
       name: rhel8-vm-sample
       namespace: virtualmachines
     spec:
+      container_platform: openshift
+      operator_controlled: true    
       auto_discovery: false
       deployment_name: rhel8-vm
       deployment_type: VirtualMachine
@@ -235,6 +240,32 @@ spec:
       snapshot_timeout: 180
       storage_plugin: csi.so
       app_plugin: kubevirt.so 
+    </pre>
+    ```$ oc create -f backupconfig.yaml```
+
+    ### Create Tar Fossul BackupConfig
+    Creates a backup config using tar to backup folders and files where csi snapshots are not desired
+
+    ```$ vi backupconfig.yaml```
+    <pre>
+    kind: BackupConfig
+    apiVersion: fossul.io/v1
+    metadata:
+      name: tar-sample
+      namespace: databases
+    spec:
+      container_platform: openshift
+      operator_controlled: true    
+      auto_discovery: false
+      deployment_name: anyname
+      job_retention: 50
+      policies:
+        - policy: hourly
+          retentionNumber: 3
+        - policy: daily
+          retentionNumber: 10
+      backup_source_paths: /opt/app-root/src/test
+      storage_plugin: tar.so
     </pre>
     ```$ oc create -f backupconfig.yaml```
 
@@ -366,7 +397,7 @@ spec:
                 serviceAccountName: fossul-operator
                 containers:
                   - name: fossul-operator
-                    image: quay.io/fossul/fossul-operator:v0.5.0
+                    image: quay.io/fossul/fossul-operator:v0.6.0
                     imagePullPolicy: Always
                     env:
                       - name: WATCH_NAMESPACE
@@ -517,11 +548,11 @@ spec:
   - name: Fossul Framework Community
     url: https://github.com/fossul/fossul
   maturity: alpha
-  replaces: fossul-operator.v0.4.0
+  replaces: fossul-operator.v0.5.0
   maintainers:
   - email: ktenzer@redhat.com
     name: Keith Tenzer
   provider:
     name: Fossul Framework
     url: https://github.com/fossul/fossul
-  version: 0.5.0
+  version: 0.6.0

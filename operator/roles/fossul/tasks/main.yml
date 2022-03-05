@@ -86,6 +86,7 @@
         - ""
         resources:
         - pods
+        - pods/exec
         - persistentvolumeclaims
         - persistentvolumes
         verbs:
@@ -146,6 +147,7 @@
         - ""
         resources:
         - pods
+        - pods/exec
         - persistentvolumeclaims
         - persistentvolumes
         verbs:
@@ -216,6 +218,7 @@
         - ""
         resources:
         - pods
+        - pods/exec
         - persistentvolumeclaims
         - persistentvolumes
         verbs:

@@ -32,7 +32,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		restorePath = config.StoragePluginParameters["RestorePath"]
 	}
 
-	backupPath := "metadata/backups/" + config.ProfileName + "/" + config.ConfigName
+	backupPath := "data/backups/" + config.ProfileName + "/" + config.ConfigName
 	backupName, err := GetBackupNameFromWorkflowId(util.IntToString(config.SelectedWorkflowId), backupPath)
 
 	if err != nil {

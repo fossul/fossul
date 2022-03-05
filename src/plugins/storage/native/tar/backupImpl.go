@@ -37,7 +37,7 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 	backup.Timestamp = timestampToString
 
 	backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
-	backupPath := "metadata/backups/" + config.ProfileName + "/" + config.ConfigName
+	backupPath := "data/backups/" + config.ProfileName + "/" + config.ConfigName
 	destPath := backupPath + "/" + backupName + ".tar.gz"
 	backupSrcFilePaths := getBackupSrcPaths(config)
 

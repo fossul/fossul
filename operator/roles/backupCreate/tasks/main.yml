@@ -295,6 +295,8 @@
       status_code: [200]
       return_content: yes
     register: update_backup_name
+    retries: 3
+    delay: 3
     failed_when: update_backup_name.json.messages[0].level == "ERROR"
     when: workflow_id is not defined
 

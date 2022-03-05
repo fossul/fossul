@@ -25,7 +25,7 @@ func (s storagePlugin) BackupDeleteWorkflow(config util.Config) util.Result {
 	var messages []util.Message
 	var resultCode int = 0
 
-	backupPath := "metadata/backups/" + config.ProfileName + "/" + config.ConfigName
+	backupPath := "data/backups/" + config.ProfileName + "/" + config.ConfigName
 	backups, err := ListBackups(backupPath)
 	if err != nil {
 		msg := util.SetMessage("ERROR", err.Error())
