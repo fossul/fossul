@@ -1,0 +1,16 @@
+---
+- name: Deploy Fossul without Operator
+  hosts: localhost
+  gather_facts: no
+  become: no
+  vars:
+    enable_routes: false
+    enable_virtualmachines: false
+    container_platform: openshift
+    ansible_operator_meta:
+      namespace: fossul
+
+  tasks:
+  - import_role:
+      name: fossul
+
