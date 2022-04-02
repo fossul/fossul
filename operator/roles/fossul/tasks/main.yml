@@ -95,6 +95,7 @@
         - "apps"
         resources:
         - deployments
+        - statefulsets
         verbs:
         - '*'
       - apiGroups:
@@ -156,6 +157,7 @@
         - "apps"
         resources:
         - deployments
+        - statefulsets
         verbs:
         - '*'
       - apiGroups:
@@ -170,7 +172,7 @@
         - subjectaccessreviews
         verbs:
         - create
-  when: (container_platform is defined) and (container_platform == "k8s") 
+  when: (container_platform is defined) and (container_platform == "kubernetes") 
 
 - name: Create Fossul Cluster Role Binding
   k8s:

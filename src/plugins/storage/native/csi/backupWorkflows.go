@@ -219,6 +219,109 @@ func DeploymentBackupWorkflow(config util.Config) util.Result {
 	return result
 }
 
+func StatefulSetBackupWorkflow(config util.Config) util.Result {
+	var result util.Result
+	var messages []util.Message
+	var resultCode int = 0
+
+	timestampToString := fmt.Sprintf("%d", config.WorkflowTimestamp)
+	timeout := util.StringToInt(config.StoragePluginParameters["SnapshotTimeoutSeconds"])
+
+	var backup util.Backup
+	backup.Timestamp = timestampToString
+	backup.Epoch = int(config.WorkflowTimestamp)
+	backup.Policy = config.SelectedBackupPolicy
+	backup.WorkflowId = config.WorkflowId
+
+	var contents []util.Content
+	var content util.Content
+
+	statefulset, err := k8s.GetStatefulSet(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
+	if err != nil {
+		msg := util.SetMessage("ERROR", err.Error())
+		messages = append(messages, msg)
+
+		result = util.SetResult(1, messages)
+		return result
+	}
+
+	volumes := statefulset.Spec.VolumeClaimTemplates
+	volumeCount := 0
+	for _, volume := range volumes {
+
+		// unfortunately the pvs name is not in the statefulset you need to put a few pieces of info together, maybe there is better way
+		instance := volume.ObjectMeta.Labels["app.kubernetes.io/instance"]
+		dbName := volume.ObjectMeta.Labels["app.kubernetes.io/name"]
+		volumeName := volume.ObjectMeta.Name
+		pvcName := volumeName + "-" + instance + "-" + dbName + "-" + util.IntToString(volumeCount)
+		volumeCount++
+		backupName := util.GetBackupName(config.StoragePluginParameters["BackupName"], config.SelectedBackupPolicy, config.WorkflowId, timestampToString)
+		backup.Name = backupName
+		snapshotName := backupName + "-" + pvcName
+
+		pvc, err := k8s.GetPersistentVolumeClaim(config.StoragePluginParameters["Namespace"], pvcName, config.AccessWithinCluster)
+		if err != nil {
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+		pvcSize := pvc.Status.Capacity.Storage().String()
+		storageClassName := pvc.Spec.StorageClassName
+
+		content.Size = pvcSize
+		content.StorageClass = *storageClassName
+
+		provisionerName, err := k8s.GetStorageClassProvisionerName(content.StorageClass, config.AccessWithinCluster)
+		if err != nil {
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+
+		snapshotClassName, err := k8s.GetVolumeSnapshotClassName(provisionerName, config.AccessWithinCluster)
+		if err != nil {
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+
+		content.VolumeSnapshotClass = snapshotClassName
+
+		msg := util.SetMessage("INFO", "Creating CSI snapshot ["+snapshotName+"] of pvc ["+pvcName+"] namespace ["+config.StoragePluginParameters["Namespace"]+"] snapshot class ["+snapshotClassName+" ] timeout ["+config.StoragePluginParameters["SnapshotTimeoutSeconds"]+"]")
+		messages = append(messages, msg)
+
+		err = k8s.CreateSnapshot(snapshotName, config.StoragePluginParameters["Namespace"], snapshotClassName, pvcName, config.AccessWithinCluster, timeout)
+		if err != nil {
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+
+		content.Type = "volume"
+		content.Source = pvcName
+		content.Data = snapshotName
+		contents = append(contents, content)
+
+		msg = util.SetMessage("INFO", "CSI snapshot created successfully")
+		messages = append(messages, msg)
+	}
+
+	result = util.SetResult(resultCode, messages)
+
+	backup.Contents = contents
+	result.Backup = backup
+
+	return result
+}
+
 func VirtualMachineBackupWorkflow(config util.Config) util.Result {
 	var result util.Result
 	var messages []util.Message

@@ -20,7 +20,8 @@ import (
 	deploymentConfigClient "github.com/openshift/client-go/apps/clientset/versioned/typed/apps/v1"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
-	deploymentClient "k8s.io/client-go/kubernetes/typed/apps/v1"
+	appsClient "k8s.io/client-go/kubernetes/typed/apps/v1"
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -55,14 +56,14 @@ func getDeploymentConfigClient(accessWithinCluster string) (*deploymentConfigCli
 	return client, nil
 }
 
-func getDeploymentClient(accessWithinCluster string) (*deploymentClient.AppsV1Client, error) {
-	var client *deploymentClient.AppsV1Client
+func getAppsClient(accessWithinCluster string) (*appsClient.AppsV1Client, error) {
+	var client *appsClient.AppsV1Client
 	err, kubeConfig := getKubeConfig(accessWithinCluster)
 	if err != nil {
 		return client, err
 	}
 
-	client, err = deploymentClient.NewForConfig(kubeConfig)
+	client, err = appsClient.NewForConfig(kubeConfig)
 	if err != nil {
 		return client, err
 	}

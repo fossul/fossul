@@ -32,11 +32,11 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 	msg = util.SetMessage("INFO", "Scaling down deployment ["+config.StoragePluginParameters["DeploymentName"]+"]")
 	messages = append(messages, msg)
 
-	var deploymentReplicasInt int32
+	var replicasInt int32
 	var scaleDownInt int32 = 0
 	var err error
 	if config.StoragePluginParameters["DeploymentType"] == "DeploymentConfig" {
-		deploymentReplicasInt, err = k8s.GetDeploymentConfigScaleInteger(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
+		replicasInt, err = k8s.GetDeploymentConfigScaleInteger(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
 		if err != nil {
 			msg := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, msg)
@@ -55,7 +55,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		}
 	} else if config.StoragePluginParameters["DeploymentType"] == "Deployment" {
 		deploymentReplicasIntRef, err := k8s.GetDeploymentScaleInteger(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
-		deploymentReplicasInt = *deploymentReplicasIntRef
+		replicasInt = *deploymentReplicasIntRef
 		if err != nil {
 			msg := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, msg)
@@ -65,6 +65,25 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		}
 
 		err = k8s.ScaleDownDeployment(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster, scaleDownInt, 120)
+		if err != nil {
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+	} else if config.StoragePluginParameters["DeploymentType"] == "StatefulSet" {
+		statefulsetReplicasIntRef, err := k8s.GetStatefulSetScaleInteger(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
+		replicasInt = *statefulsetReplicasIntRef
+		if err != nil {
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+
+		err = k8s.ScaleDownStatefulSet(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster, scaleDownInt, 120)
 		if err != nil {
 			msg := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, msg)
@@ -189,6 +208,17 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 				}
 
 				time.Sleep(5 * time.Second)
+			} else if config.StoragePluginParameters["DeploymentType"] == "StatefulSet" {
+				err := k8s.UpdateStatefulSetVolume(backedUpPvc.Source, pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
+				if err != nil {
+					msg := util.SetMessage("ERROR", err.Error())
+					messages = append(messages, msg)
+
+					result = util.SetResult(1, messages)
+					return result
+				}
+
+				time.Sleep(5 * time.Second)
 			} else if config.StoragePluginParameters["DeploymentType"] == "VirtualMachine" {
 				time.Sleep(5 * time.Second)
 			}
@@ -232,7 +262,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 				}
 			}
 
-			if config.StoragePluginParameters["DeploymentType"] == "Deployment" || config.StoragePluginParameters["DeploymentType"] == "DeploymentConfig" {
+			if config.StoragePluginParameters["DeploymentType"] == "Deployment" || config.StoragePluginParameters["DeploymentType"] == "DeploymentConfig" || config.StoragePluginParameters["DeploymentType"] == "StatefulSet" {
 				msg = util.SetMessage("INFO", "Restoring snapshot ["+backedUpPvc.Data+"] to new pvc ["+pvcRestoreName+"] in namespace ["+config.StoragePluginParameters["Namespace"]+"] using storage class ["+backedUpPvc.StorageClass+"]")
 				messages = append(messages, msg)
 
@@ -271,6 +301,17 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 				}
 
 				time.Sleep(5 * time.Second)
+			} else if config.StoragePluginParameters["DeploymentType"] == "StatefulSet" {
+				err := k8s.UpdateStatefulSetVolume(backedUpPvc.Source, pvcRestoreName, config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster)
+				if err != nil {
+					msg := util.SetMessage("ERROR", err.Error())
+					messages = append(messages, msg)
+
+					result = util.SetResult(1, messages)
+					return result
+				}
+
+				time.Sleep(5 * time.Second)
 			} else if config.StoragePluginParameters["DeploymentType"] == "VirtualMachine" {
 				time.Sleep(5 * time.Second)
 			}
@@ -281,7 +322,7 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		msg = util.SetMessage("INFO", "Scaling up deployment config ["+config.StoragePluginParameters["DeploymentName"]+"]")
 		messages = append(messages, msg)
 
-		err = k8s.ScaleUpDeploymentConfig(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster, deploymentReplicasInt, 120)
+		err = k8s.ScaleUpDeploymentConfig(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster, replicasInt, 120)
 		if err != nil {
 			msg := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, msg)
@@ -294,7 +335,19 @@ func (s storagePlugin) Restore(config util.Config) util.Result {
 		msg = util.SetMessage("INFO", "Scaling up deployment ["+config.StoragePluginParameters["DeploymentName"]+"]")
 		messages = append(messages, msg)
 
-		err = k8s.ScaleUpDeployment(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster, deploymentReplicasInt, 120)
+		err = k8s.ScaleUpDeployment(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster, replicasInt, 120)
+		if err != nil {
+			msg := util.SetMessage("ERROR", err.Error())
+			messages = append(messages, msg)
+
+			result = util.SetResult(1, messages)
+			return result
+		}
+	} else if config.StoragePluginParameters["DeploymentType"] == "StatefulSet" {
+		msg = util.SetMessage("INFO", "Scaling up deployment ["+config.StoragePluginParameters["DeploymentName"]+"]")
+		messages = append(messages, msg)
+
+		err = k8s.ScaleUpStatefulSet(config.StoragePluginParameters["Namespace"], config.StoragePluginParameters["DeploymentName"], config.AccessWithinCluster, replicasInt, 120)
 		if err != nil {
 			msg := util.SetMessage("ERROR", err.Error())
 			messages = append(messages, msg)

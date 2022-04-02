@@ -21,7 +21,7 @@ require (
 	go.mongodb.org/mongo-driver v1.7.4
 	k8s.io/api v0.22.4
 	k8s.io/apimachinery v0.22.4
-	k8s.io/client-go v0.22.4
+	k8s.io/client-go v1.5.2
 	kubevirt.io/api v0.0.0-20211129173424-e2813e40f15a
 )
 

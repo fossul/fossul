@@ -120,6 +120,27 @@ func GetPersistentVolumeName(namespace, pvcName, accessWithinCluster string) (st
 	return pvc.Spec.VolumeName, nil
 }
 
+func RemoveFinalizerFromPersistentVolumeClaim(namespace, pvcName, accessWithinCluster string) error {
+	client, err := getClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	pvc, err := GetPersistentVolumeClaim(namespace, pvcName, accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	pvc.ObjectMeta.Finalizers = nil
+
+	_, err = client.CoreV1().PersistentVolumeClaims(namespace).Update(context.Background(), pvc, metav1.UpdateOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func GetGlusterVolumePath(pvName, accessWithinCluster string) (string, error) {
 	client, err := getClient(accessWithinCluster)
 	if err != nil {
@@ -160,6 +181,11 @@ func ListPersistentVolumeClaims(namespace, accessWithinCluster string) (*v1.Pers
 
 func DeletePersistentVolumeClaim(pvcName, namespace, accessWithinCluster string, timeoutSeconds int) error {
 	client, err := getClient(accessWithinCluster)
+	if err != nil {
+		return err
+	}
+
+	err = RemoveFinalizerFromPersistentVolumeClaim(namespace, pvcName, accessWithinCluster)
 	if err != nil {
 		return err
 	}

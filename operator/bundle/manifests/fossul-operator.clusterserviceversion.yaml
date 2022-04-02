@@ -351,6 +351,9 @@ spec:
           - "apps"
           resources:
           - deployments
+          - statefulsets
+          - daemonsets
+          - replicasets
           verbs:
           - '*'
         - apiGroups:

@@ -24,10 +24,12 @@ func (s storagePlugin) Backup(config util.Config) util.Result {
 		result = DeploymentConfigBackupWorkflow(config)
 	} else if config.StoragePluginParameters["DeploymentType"] == "Deployment" {
 		result = DeploymentBackupWorkflow(config)
+	} else if config.StoragePluginParameters["DeploymentType"] == "StatefulSet" {
+		result = StatefulSetBackupWorkflow(config)
 	} else if config.StoragePluginParameters["DeploymentType"] == "VirtualMachine" {
 		result = VirtualMachineBackupWorkflow(config)
 	} else {
-		msg := util.SetMessage("ERROR", "CSI storage plugin parameters [DeploymentType] must be DeploymentConfig, Deployment or VirtualMachine")
+		msg := util.SetMessage("ERROR", "CSI storage plugin parameters [DeploymentType] must be DeploymentConfig, Deployment, StatefulSet or VirtualMachine")
 		messages = append(messages, msg)
 
 		result = util.SetResult(1, messages)

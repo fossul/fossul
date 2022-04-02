@@ -24,44 +24,44 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 )
 
-func GetDeployment(namespace, deploymentName, accessWithinCluster string) (*apps.Deployment, error) {
-	var deployment *apps.Deployment
+func GetStatefulSet(namespace, name, accessWithinCluster string) (*apps.StatefulSet, error) {
+	var statefulset *apps.StatefulSet
 	client, err := getAppsClient(accessWithinCluster)
 	if err != nil {
-		return deployment, err
+		return statefulset, err
 	}
 
-	deployment, err = client.Deployments(namespace).Get(context.Background(), deploymentName, metav1.GetOptions{})
+	statefulset, err = client.StatefulSets(namespace).Get(context.Background(), name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
 
-	return deployment, nil
+	return statefulset, nil
 }
 
-func GetDeploymentScaleInteger(namespace, deploymentName, accessWithinCluster string) (*int32, error) {
-	deployment, err := GetDeployment(namespace, deploymentName, accessWithinCluster)
+func GetStatefulSetScaleInteger(namespace, name, accessWithinCluster string) (*int32, error) {
+	statefulset, err := GetStatefulSet(namespace, name, accessWithinCluster)
 	if err != nil {
 		return nil, err
 	}
 
-	return deployment.Spec.Replicas, nil
+	return statefulset.Spec.Replicas, nil
 }
 
-func ScaleDownDeployment(namespace, deploymentConfigName, accessWithinCluster string, size int32, t int) error {
+func ScaleDownStatefulSet(namespace, name, accessWithinCluster string, size int32, t int) error {
 	client, err := getAppsClient(accessWithinCluster)
 	if err != nil {
 		return err
 	}
 
-	deployment, err := GetDeployment(namespace, deploymentConfigName, accessWithinCluster)
+	statefulset, err := GetStatefulSet(namespace, name, accessWithinCluster)
 	if err != nil {
 		return err
 	}
 
-	deployment.Spec.Replicas = &size
+	statefulset.Spec.Replicas = &size
 
-	_, err = client.Deployments(namespace).Update(context.Background(), deployment, metav1.UpdateOptions{})
+	_, err = client.StatefulSets(namespace).Update(context.Background(), statefulset, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
@@ -73,13 +73,13 @@ func ScaleDownDeployment(namespace, deploymentConfigName, accessWithinCluster st
 	fmt.Printf("[DEBUG] Waiting up to %v for deployment to be scaled to %d\n", timeout, size)
 
 	return wait.PollImmediate(poll, timeout, func() (bool, error) {
-		deploymentConfig, err := GetDeployment(namespace, deploymentConfigName, accessWithinCluster)
+		statefulsetConfig, err := GetStatefulSet(namespace, name, accessWithinCluster)
 		if err != nil {
 			return false, nil
 		}
 
-		readyReplicas := deploymentConfig.Status.ReadyReplicas
-		numberReplicas := deploymentConfig.Status.Replicas
+		readyReplicas := statefulsetConfig.Status.ReadyReplicas
+		numberReplicas := statefulsetConfig.Status.Replicas
 
 		fmt.Printf("[DEBUG] Waiting for replicas to be scaled down [%d of %d] (%d seconds elapsed)\n", readyReplicas, numberReplicas, int(time.Since(start).Seconds()))
 
@@ -90,20 +90,20 @@ func ScaleDownDeployment(namespace, deploymentConfigName, accessWithinCluster st
 	})
 }
 
-func ScaleUpDeployment(namespace, deploymentConfigName, accessWithinCluster string, size int32, t int) error {
+func ScaleUpStatefulSet(namespace, name, accessWithinCluster string, size int32, t int) error {
 	client, err := getAppsClient(accessWithinCluster)
 	if err != nil {
 		return err
 	}
 
-	deployment, err := GetDeployment(namespace, deploymentConfigName, accessWithinCluster)
+	statefulset, err := GetStatefulSet(namespace, name, accessWithinCluster)
 	if err != nil {
 		return err
 	}
 
-	deployment.Spec.Replicas = &size
+	statefulset.Spec.Replicas = &size
 
-	_, err = client.Deployments(namespace).Update(context.Background(), deployment, metav1.UpdateOptions{})
+	_, err = client.StatefulSets(namespace).Update(context.Background(), statefulset, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
@@ -115,12 +115,12 @@ func ScaleUpDeployment(namespace, deploymentConfigName, accessWithinCluster stri
 	fmt.Printf("[DEBUG] Waiting up to %v for deployment to be scaled to %d\n", timeout, size)
 
 	return wait.PollImmediate(poll, timeout, func() (bool, error) {
-		deploymentConfig, err := GetDeployment(namespace, deploymentConfigName, accessWithinCluster)
+		statefulsetConfig, err := GetStatefulSet(namespace, name, accessWithinCluster)
 		if err != nil {
 			return false, nil
 		}
 
-		readyReplicas := deploymentConfig.Status.ReadyReplicas
+		readyReplicas := statefulsetConfig.Status.ReadyReplicas
 		fmt.Printf("[DEBUG] Waiting for replicas to be scaled up [%d of %d] (%d seconds elapsed)\n", readyReplicas, size, int(time.Since(start).Seconds()))
 
 		if readyReplicas == size {
@@ -130,25 +130,25 @@ func ScaleUpDeployment(namespace, deploymentConfigName, accessWithinCluster stri
 	})
 }
 
-func UpdateDeploymentVolume(pvcName, restorePvcName, namespace, deploymentName, accessWithinCluster string) error {
+func UpdateStatefulSetVolume(pvcName, restorePvcName, namespace, deploymentName, accessWithinCluster string) error {
 
 	client, err := getAppsClient(accessWithinCluster)
 	if err != nil {
 		return err
 	}
 
-	deployment, err := GetDeployment(namespace, deploymentName, accessWithinCluster)
+	statefulset, err := GetStatefulSet(namespace, deploymentName, accessWithinCluster)
 	if err != nil {
 		return err
 	}
 
-	for _, volume := range deployment.Spec.Template.Spec.Volumes {
+	for _, volume := range statefulset.Spec.Template.Spec.Volumes {
 		if volume.Name == pvcName {
 			volume.PersistentVolumeClaim.ClaimName = restorePvcName
 		}
 	}
 
-	_, err = client.Deployments(namespace).Update(context.Background(), deployment, metav1.UpdateOptions{})
+	_, err = client.StatefulSets(namespace).Update(context.Background(), statefulset, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}

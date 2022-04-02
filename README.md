@@ -42,7 +42,10 @@ Once Fossul is operational start using it by setting up demo environment or foll
 * [Getting Started](docs/GETTING_STARTED.md)
 
 ## Fossul Operator
-Fossul provides an operator that is available in the OpenShift Operator Hub.
+Fossul provides an operator that is available in the OpenShift Operator Hub and [OperatorHub.io](https://operatorhub.io).
+
+Follow OperatorHub guide to install OperatorHub pre-requisite for non-OpenShift Kubernetes clusters
+* [Deploy OperatorHub](/docs/OPERATOR_HUB.md)
 
 Follow the operator guide to get fossul up and running
 * [Deploy Fossul and Get It Running using the Operator](docs/OPERATOR.md)
