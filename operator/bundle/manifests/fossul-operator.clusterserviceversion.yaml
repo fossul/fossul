@@ -87,14 +87,14 @@ metadata:
     capabilities: Full Lifecycle
     categories: Storage
     certified: "false"
-    containerImage: quay.io/fossul/fossul-operator:v0.6.0
+    containerImage: quay.io/fossul/fossul-operator:v0.7.0
     support: Community
     repository: https://github.com/fossul/fossul
     description: "Fossul is a application centric container native backup and restore framework for databases or applications"
     createdAt: 2022-01-25T20:09:00Z 
     operators.operatorframework.io/builder: operator-sdk-v1.10.1-ocp
     operators.operatorframework.io/project_layout: ansible.sdk.operatorframework.io/v1
-  name: fossul-operator.v0.6.0
+  name: fossul-operator.v0.7.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -103,22 +103,27 @@ spec:
     - kind: BackupConfig
       name: backupconfigs.fossul.io
       description: Manages application backup configurations
+      displayName: BackupConfig
       version: v1
     - kind: Backup
       name: backups.fossul.io
       description: Manages application backups      
+      displayName: Backup
       version: v1
     - kind: Restore
       name: restores.fossul.io
       description: Manages application restores      
+      displayName: Restore
       version: v1      
     - kind: BackupSchedule
       name: backupschedules.fossul.io
       description: Manages application backup scheduling      
+      displayName: BackupSchedule
       version: v1
     - kind: Fossul
       name: fossuls.fossul.io
       description: Manages deployment of the Fossul Framework   
+      displayName: Deploy Fossul
       version: v1
   description: |
     ## Fossul Framework
@@ -400,7 +405,7 @@ spec:
                 serviceAccountName: fossul-operator
                 containers:
                   - name: fossul-operator
-                    image: quay.io/fossul/fossul-operator:v0.6.0
+                    image: quay.io/fossul/fossul-operator:v0.7.0
                     imagePullPolicy: Always
                     env:
                       - name: WATCH_NAMESPACE
@@ -551,11 +556,11 @@ spec:
   - name: Fossul Framework Community
     url: https://github.com/fossul/fossul
   maturity: alpha
-  replaces: fossul-operator.v0.5.0
+  replaces: fossul-operator.v0.6.0
   maintainers:
   - email: ktenzer@redhat.com
     name: Keith Tenzer
   provider:
     name: Fossul Framework
     url: https://github.com/fossul/fossul
-  version: 0.6.0
+  version: 0.7.0

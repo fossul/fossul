@@ -1,7 +1,7 @@
 #!/bin/bash
 # Needs to be run from operator directory
 
-RELEASE="v0.6.0"
+RELEASE="v0.7.0"
 OPERATOR_IMAGE="fossul-operator"
 BUNDLE_IMAGE="fossul-operator-bundle"
 REPO="fossul"
