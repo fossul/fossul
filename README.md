@@ -1,10 +1,6 @@
 ![](images/fossul_logo.png)
 # Welcome to the Fossul Framework
-[Video Overview and Demo](https://youtu.be/-sNdIpArabI)
-
-[Video Demo using Gluster/OCS 3 snapshots with Fossul](https://youtu.be/75E8WWnLUnc)
-
-[Video Demo using Ceph/OCS 4 CSI snapshots with fossul](https://www.youtube.com/watch?v=lljRfLe6SAY)
+[Product Demo](https://www.youtube.com/watch?v=NdfKW9ZzDVQ)
 
 Fossul is a container-native backup and recovery framework. It aims to provide an application consistent backup, restore as well as recorvery for container-native applications and databases. It's goal is to provide enterprise backup and recovery capabilities enjoyed in traditional world, container-native, in order to increase container adoption and make the migration from traditial to container world that much easier. The challenge of backup, especially in the container-driven world is signifigant. Each application or database has it's own tools, methods and procedures. Applications are much more fluid, dynamic and provide greater abstractions inside containers. In other words backup and restore is even more of a challenge than in traditional world. In addition there is an enormous variation of application and storage vendor capabilities integrated into container platforms (for example snapshots that impact backup as well as restore process).
 
